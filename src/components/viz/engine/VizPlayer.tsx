@@ -142,7 +142,7 @@ function PlayerBody({ def, title, code }: { def: Tracer } & VizPlayerProps) {
               <Panels panels={frame.panels} />
             </div>
           </LayoutGroup>
-          <Legend tones={tones} />
+          <Legend tones={tones} labels={frame.legend} />
           {frame.vars && <VarsPanel vars={frame.vars} />}
           <div
             aria-live="polite"

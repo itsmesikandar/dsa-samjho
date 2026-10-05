@@ -4,8 +4,12 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapter 0 Foundations done (6/6) + Array.
-- Next action: chapter 1 Arrays & Strings → topic `dynamic-array` (array already done)
+- Step: 3 (Content). Chapter 0 done (6/6). Chapter 1: 5/6 done; `kadane` in progress.
+- Next action: kadane — code/*.kt+java written (run `npm run check:code -- arrays-strings/kadane`),
+  still need `viz.ts` (tracers: subarraysMap visual, kadaneTrace how [markers init/choose/best/done],
+  stockTrace [init/sell/min/done], rangeTrace [init/restart/extend/best/done], circularTrace [max/min/done])
+  and `topic.yaml`. Then `npm run build`, commit chapter 1, start chapter 2 Hashing.
+- Engine change this session: frame `legend` overrides tone labels (see CLAUDE.md).
 - Last session note (2026-10-05): chapter 0 committed. Content caches are production-only (dev picks up new
   topics; first request after adding a topic may 404 once). Kotlin 2.4.20 in `tools/kotlinc`, JDK 21 at
   `~/.jdks/jbr-21.0.11` (check:code auto-detects). Visual checks via headless Chrome CDP script (scratchpad).
@@ -42,11 +46,11 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 
 ### 1. Arrays & Strings
 - [x] array (built in Step 2)
-- [ ] dynamic-array
-- [ ] strings
-- [ ] matrix
-- [ ] prefix-sum
-- [ ] kadane
+- [x] dynamic-array
+- [x] strings
+- [x] matrix
+- [x] prefix-sum
+- [~] kadane (code done; viz.ts + topic.yaml left)
 
 ### 2. Hashing
 - [ ] hashing-internals

@@ -226,4 +226,6 @@ export interface Frame {
   line?: string;
   vars?: Record<string, Prim>;
   panels: Panel[];
+  /** override legend text for tones in this frame, e.g. { error: 'ghatao' } */
+  legend?: Partial<Record<Tone, string>>;
 }

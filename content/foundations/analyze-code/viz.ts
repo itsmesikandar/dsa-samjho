@@ -172,7 +172,8 @@ export const fibCalls = tracer<{ n: number }>({
     const seen = new Set<string>();
     let seq = 0;
     let count = 0;
-    const show = (line: string, caption: string) => t.frame({ line, caption, vars: { calls: count }, panels: [{ kind: 'recursion', calls }] });
+    const show = (line: string, caption: string) =>
+      t.frame({ line, caption, vars: { calls: count }, legend: { error: 'repeat call (bekaar kaam)' }, panels: [{ kind: 'recursion', calls }] });
     const fib = (k: number, parent?: string): number => {
       const id = `c${seq++}`;
       count++;

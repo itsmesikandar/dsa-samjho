@@ -1,0 +1,454 @@
+meta:
+  id: dynamic-array
+  chapter: arrays-strings
+  title: Dynamic Array (ArrayList)
+  subtitle: Array jo zaroorat padne par khud bada ho jaaye — size vs capacity
+  level: beginner
+  minutes: 30
+  prereqs: [array, analyze-code]
+  tags: [arraylist, mutablelist, amortized, capacity]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Dynamic array** ek array hai jiski size **apne aap badh** sakti hai. Kotlin mein `MutableList` / `ArrayList`, Java mein `ArrayList`, Flutter/Dart mein normal `List`.
+
+    Andar ka raaz simple hai:
+    - Andar ek **normal fixed array** hota hai.
+    - Do numbers yaad rakhe jaate hain: **size** (kitne items sach mein hain) aur **capacity** (andar wala array kitna bada hai).
+    - Jab `size == capacity` ho jaaye aur naya item aaye → **naya bada array** (aam taur par 1.5× ya 2×) banao, purane items copy karo, purana phenk do.
+
+    ```kotlin
+    val list = mutableListOf<Int>()   // andar chhota array
+    list.add(10)                       // size 1
+    list.add(20)                       // size 2 ... bharne par khud bada
+    ```
+
+    > [!yaad]
+    > **size** = kitne items. **capacity** = kitni jagah. Hum sirf size dekhte hain; capacity andar chhupi rehti hai.
+  analogy: |
+    **Shaadi ka hall book karna** socho. 50 log aane the, 60 ki jagah ka hall liya (capacity 60, size 50). Mehmaan badhte-badhte 60 ho gaye aur 61vaan aa gaya — ab is hall mein jagah nahi!
+
+    Naya bada hall (120 ka) book karo, aur **saare mehmaanon ko wahan shift karo**. Shifting mehengi hai, par baar-baar nahi hoti — agle 60 mehmaan bina shifting ke aa jaayenge. Yahi ArrayList ka tareeka hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Normal array ki size fixed hai. Par real life mein aksar **pata hi nahi hota ki kitne items aayenge**:
+    - Chat screen mein kitne messages aayenge?
+    - API se kitne results milenge?
+    - User kitne items cart mein daalega?
+
+    Har baar khud naya array bana ke copy karna thakaane wala aur bug-prone hai. Dynamic array ye sab chhupa deta hai — tum bas `add()` karo.
+
+    Aur best part: `add()` **average O(1)** hai, kyunki capacity **double (multiply)** hoti hai, +1 nahi.
+
+    > [!socho]
+    > Agar har `add()` par capacity sirf +1 badhaate to kya hota?
+    >
+    > Har add par poora copy! 1 + 2 + 3 + … + n ≈ **n²/2 copies** → har add O(n). Doubling se total copies **2n se kam** → har add **amortized O(1)**.
+
+# 3. Visual intro
+visual:
+  body: |
+    Neeche animation mein items ek-ek karke add hote hain. Dekho:
+    - Jab tak jagah hai — seedha rakh diya (sasta).
+    - Bharte hi — **double size** ka naya array, purane items copy (mehenga, par kabhi-kabhi).
+
+    `copies` counter dekhte raho — wo kabhi n se zyada nahi hota.
+  viz: { tracer: capacityGrowth }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Apna chhota `MyIntList` banate hain — bilkul ArrayList jaisa:
+
+    1. `add(x)`: agar `size == capacity` → pehle `grow()`.
+    2. `grow()`: double size ka naya array, `0..size-1` tak copy, purana array chhodo.
+    3. `data[size] = x`, `size++`.
+    4. `get(i)`: `i` 0..size-1 mein ho to `data[i]`, warna exception (capacity tak nahi — size tak!).
+
+    > [!galti]
+    > `get(i)` mein check `i < capacity` nahi, `i < size` hona chahiye. Capacity ke baaki dabbe khaali (garbage) hain.
+  viz: { tracer: growTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "`get(i)` / `set(i, x)`"
+    time: O(1)
+    space: O(1)
+    why: "Andar array hai — index se seedha."
+  - op: "`add(x)` end par"
+    time: "O(1) amortized"
+    space: O(1)
+    why: "Zyada-tar seedha rakhna; kabhi-kabhi O(n) copy, par average O(1)."
+  - op: "`add(x)` jab array bhara ho (worst case)"
+    time: O(n)
+    space: O(n)
+    why: "Naya array + saare items copy."
+  - op: "`add(0, x)` / `add(i, x)`"
+    time: O(n)
+    space: O(1)
+    why: "i ke baad ke saare items right khiskte hain."
+  - op: "`removeAt(i)`"
+    time: O(n)
+    space: O(1)
+    why: "Gap bharne ke liye baad ke items left khiskte hain."
+  - op: "`removeAt(size - 1)` (last)"
+    time: O(1)
+    space: O(1)
+    why: "Kuch khiskana nahi."
+  - op: "`contains(x)` / `indexOf(x)` / `remove(value)`"
+    time: O(n)
+    space: O(1)
+    why: "Value dhoondhne ke liye scan karna padta hai."
+
+# 6. Code
+code:
+  - title: ArrayList ke kaam ke functions (aur Java ka remove trap)
+    file: api
+    note: |
+      **Java trap:** `list.remove(1)` int deta hai to **index 1** hatata hai; value 1 hatani ho to `list.remove(Integer.valueOf(1))`. Kotlin mein naam alag hain — `remove(value)` aur `removeAt(index)` — isliye ye confusion nahi hota.
+
+      Agar pehle se pata ho ki ~n items aayenge, `ArrayList(n)` se capacity de do — beech ke saare resizes bach jaayenge.
+
+# 7. Examples
+examples:
+  - id: ops
+    level: easy
+    title: Har operation ki cost — kahan sasta, kahan mehenga
+    problem: |
+      List `[3, 7, 9]` par ye operations chalao aur har ek ki complexity batao:
+      1. `add(5)` (end par)
+      2. `add(0, 1)` (shuru mein)
+      3. `removeAt(2)`
+      4. `list[1] = 8`
+
+      Final list kya hogi?
+    intuition: |
+      Dynamic array ke andar normal array hai, to array ke hi rules lagte hain:
+      - **End** par kaam → kisi ko khiskana nahi → O(1).
+      - **Shuru/beech** mein daalna ya hatana → baaki items khiskte hain → O(n).
+      - **Index** se padhna/likhna → O(1).
+
+      Animation mein boxes ko khiskte dekho — wahi O(n) ka kharcha hai.
+    dryRun: |
+      | Operation | List ke baad | Khiske | Cost |
+      |---|---|---|---|
+      | shuru | [3, 7, 9] | – | – |
+      | add(5) | [3, 7, 9, 5] | 0 | O(1) |
+      | add(0, 1) | [1, 3, 7, 9, 5] | 4 | O(n) |
+      | removeAt(2) | [1, 3, 9, 5] | 2 | O(n) |
+      | list[1] = 8 | [1, 8, 9, 5] | 0 | O(1) |
+    viz: { tracer: opsTrace }
+    code: ex1-ops
+    complexity:
+      time: "O(1) end/index, O(n) shuru/beech"
+      space: O(1)
+      why: "Shifting hi asli kharcha hai; extra memory koi nahi (resize ko chhod ke)."
+
+  - id: remove-all
+    level: medium
+    title: List se saare x hatao — O(n²) se O(n)
+    problem: |
+      Ek list aur number x diya hai. List se **saare x hata do**, usi list mein.
+
+      Example: `[3, 2, 2, 3, 4, 2]`, x = 2 → `[3, 3, 4]`
+    intuition: |
+      **Seedha tareeka:** har x par `removeAt(i)` → har remove O(n), aur aise k removes → **O(n·k)**, worst case O(n²).
+
+      **Better — "write pointer":** list ko ek baar padho (`r`). Jo item **rakhna** hai, use aage `w` position par **likh do**. End mein bacha hua hissa kaat do (end se hatana sasta hai).
+
+      Har item ek baar padha, zyada se zyada ek baar likha → **O(n)**, extra space O(1).
+
+      > [!tip]
+      > Library: Kotlin `removeAll { it == x }`, Java `removeIf(v -> v == x)` — dono andar se yahi O(n) tareeka use karte hain. Interview mein manual bhi aana chahiye (LeetCode 27).
+    dryRun: |
+      `[3, 2, 2, 3, 4, 2]`, x = 2
+
+      | r | list[r] | Rakhna? | w ke baad | List (aage ka hissa) |
+      |---|---|---|---|---|
+      | 0 | 3 | haan | 1 | [3, …] |
+      | 1 | 2 | nahi | 1 | |
+      | 2 | 2 | nahi | 1 | |
+      | 3 | 3 | haan | 2 | [3, 3, …] |
+      | 4 | 4 | haan | 3 | [3, 3, 4, …] |
+      | 5 | 2 | nahi | 3 | |
+
+      w = 3 → baaki kaato → **[3, 3, 4]**
+    viz: { tracer: removeAllX }
+    code: ex2-remove-all
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass, har item ek baar padha aur zyada se zyada ek baar likha; end se trimming O(1) per item."
+
+  - id: remove-trap
+    level: tricky
+    title: Loop chalate hue remove — chupa hua bug
+    problem: |
+      List se saare **even** numbers hatane hain. Ek dost ne ye code likha:
+
+      ```kotlin
+      var i = 0
+      while (i < list.size) {
+          if (list[i] % 2 == 0) list.removeAt(i)
+          i++
+      }
+      ```
+
+      `[1, 2, 4, 5, 6, 8]` par chalao. Kya result sahi hai? Kyun nahi?
+    intuition: |
+      `removeAt(i)` ke baad **agla item khisak ke index i par aa jaata hai**. Phir `i++` ho gaya — yaani wo khiska hua item **kabhi check hi nahi hua**!
+
+      Do even numbers lagatar hon (2, 4) to doosra bach jaata hai.
+
+      **Fix 1:** peeche se chalo (`i` = last se 0 tak) — hatane se sirf peeche wale khiskte hain, jo hum pehle hi dekh chuke.
+      **Fix 2:** remove kiya to `i++` mat karo.
+      **Fix 3 (best):** `removeAll { it % 2 == 0 }` — O(n) aur bug-free.
+
+      > [!galti]
+      > `for (x in list) { if (...) list.remove(x) }` → **ConcurrentModificationException**. Iterate karte hue collection badalna mana hai (iterator ka `remove()` chhod ke).
+    dryRun: |
+      Galat code, `[1, 2, 4, 5, 6, 8]`
+
+      | i | list[i] | Kya hua | List ke baad |
+      |---|---|---|---|
+      | 0 | 1 | odd, rakho | [1, 2, 4, 5, 6, 8] |
+      | 1 | 2 | hatao | [1, 4, 5, 6, 8] (4 ab index 1 par!) |
+      | 2 | 5 | odd — **4 skip ho gaya** | |
+      | 3 | 6 | hatao | [1, 4, 5, 8] (8 index 3 par) |
+      | 4 | – | loop khatam — **8 skip** | **[1, 4, 5, 8]** ✗ |
+
+      Sahi answer: **[1, 5]**
+    viz: { tracer: removeTrap }
+    code: ex3-remove-trap
+    complexity:
+      time: "O(n²) removeAt wala, O(n) removeAll wala"
+      space: O(1)
+      why: "Har removeAt O(n) shifting karta hai; removeAll ek pass mein likh deta hai."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Items ki ginti pehle se pata nahi, aur zyada-tar **end par add** karna hai."
+    - "Index se baar-baar padhna hai (`get(i)` O(1))."
+    - "Order maintain karna hai aur list ko iterate karna hai — RecyclerView, API results, cart."
+  avoid:
+    - "**Shuru se** baar-baar add/remove (queue jaisa) — `ArrayDeque` lo."
+    - "Baar-baar **value se dhoondhna** (`contains`) — `HashSet` lo."
+    - "Size fixed hai aur sirf numbers hain — `IntArray` (boxing nahi, kam memory)."
+  signals:
+    - keyword: "size pata nahi, items aate rahenge"
+      think: "`MutableList` / `ArrayList` — add amortized O(1)."
+    - keyword: "remove elements in-place, return new length"
+      think: "Write pointer (w) — O(n), removeAt loop nahi."
+    - keyword: "insert at front / remove from front baar-baar"
+      think: "ArrayList O(n) karega — ArrayDeque (O(1))."
+    - keyword: "list ko iterate karte hue modify"
+      think: "Peeche se chalo, ya `removeAll`/`removeIf`, ya nayi list banao."
+
+# 9. Real-world
+realWorld:
+  - where: "RecyclerView / LazyColumn ka data"
+    how: "Adapter ki list `ArrayList` hai — scroll karte hue `get(position)` O(1). Naye items end mein append (pagination) — sasta."
+  - where: "Chat app messages"
+    how: "Naye messages end mein add — amortized O(1). Agar har message list ke **shuru** mein daalte to har baar O(n) shifting — isliye aksar list ulti dikhate hain (reverseLayout)."
+  - where: "`StringBuilder`"
+    how: "Andar ek char array jo bharne par badhta hai — bilkul dynamic array. Isliye append amortized O(1)."
+  - where: "Flutter / Dart `List`"
+    how: "Dart ki growable List bhi andar se aise hi kaam karti hai — `add` sasta, `insert(0, x)` mehenga."
+  - where: "Network buffers / ByteArrayOutputStream"
+    how: "Response ke bytes aate rehte hain — buffer double hota rehta hai jab tak poora data na aa jaaye."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Loop mein `removeAt(i)` aur phir bhi `i++`"
+    type: logic
+    wrong: |
+      ```kotlin
+      while (i < list.size) { if (bad(list[i])) list.removeAt(i); i++ }
+      ```
+      Hatane ke baad agla item skip ho jaata hai.
+    right: |
+      Peeche se chalo, ya `list.removeAll { bad(it) }` (Java: `removeIf`).
+  - title: "Java mein `remove(int)` vs `remove(Object)`"
+    type: logic
+    wrong: |
+      ```java
+      List<Integer> list = new ArrayList<>(List.of(5, 9, 7));
+      list.remove(1);   // socha value 1 hategi — par INDEX 1 (yaani 9) hat gaya!
+      ```
+    right: |
+      Value hatani ho to `list.remove(Integer.valueOf(1))`. Kotlin mein `remove(value)` aur `removeAt(index)` alag naam hain.
+  - title: "Iterate karte hue add/remove (for-each)"
+    type: other
+    wrong: |
+      ```kotlin
+      for (x in list) if (x < 0) list.remove(x)   // ConcurrentModificationException
+      ```
+    right: |
+      `list.removeAll { it < 0 }`, ya iterator ka `remove()`, ya nayi list banao.
+  - title: "Khaali list par `list[0]` ya `first()`"
+    type: empty
+    wrong: |
+      `val top = list[0]` — khaali list par `IndexOutOfBoundsException`; `first()` par `NoSuchElementException`.
+    right: |
+      `list.firstOrNull()` (null aayega), ya pehle `if (list.isEmpty())` check.
+  - title: "Bahut bade n par `List<Int>` ki memory"
+    type: overflow
+    right: |
+      10⁷ numbers `List<Int>` mein = 10⁷ Integer objects (~200 MB+). `IntArray` mein sirf ~40 MB. Fixed size numbers ke liye IntArray.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "ArrayList andar se kaise kaam karta hai?"
+      a: |
+        Ek normal array + `size`. Bharne par naya bada array (Java mein ~1.5×), purane items copy (`Arrays.copyOf`), purana array chhod diya. `get` O(1), end `add` amortized O(1).
+    - q: "`add()` amortized O(1) kyun hai jab resize O(n) hai?"
+      a: |
+        Capacity **multiply** hoti hai, to resize kabhi-kabhi hota hai. n adds mein total copies 1 + 2 + 4 + … < 2n. Total kaam O(n) → har add ka average O(1).
+    - q: "Growth factor 2× kyun (ya 1.5×), +10 kyun nahi?"
+      followUp: true
+      a: |
+        +10 se har 10 adds par poora copy → total ~n²/20 → har add O(n). Multiply se geometric growth → amortized O(1). 1.5× memory waste kam karta hai, 2× resizes kam — trade-off.
+    - q: "ArrayList vs LinkedList — kab kya?"
+      a: |
+        ArrayList: index access O(1), cache-friendly, end add sasta. LinkedList: beech mein insert/delete O(1) **agar node ka reference pehle se ho**, par dhoondhna O(n), har node alag object. Practically zyada-tar ArrayList hi tez hai; queue ke liye ArrayDeque.
+    - q: "`size` aur `capacity` mein kya fark hai?"
+      a: |
+        size = kitne items sach mein hain. capacity = andar ke array ki length. `size ≤ capacity`. User ko sirf size dikhta hai.
+    - q: "ArrayList se item hatane par memory kam hoti hai?"
+      a: |
+        Nahi — capacity wahi rehti hai. Java mein `trimToSize()` se capacity size jitni kar sakte ho.
+    - q: "Iterate karte hue remove karne par kya hota hai?"
+      followUp: true
+      a: |
+        for-each ke andar `remove` → `ConcurrentModificationException` (modCount check). Index loop mein aage se remove → items skip. Fix: peeche se loop, iterator.remove(), ya removeIf/removeAll.
+    - q: "ArrayList thread-safe hai?"
+      a: |
+        Nahi. Multiple threads se modify karna ho to `Collections.synchronizedList`, `CopyOnWriteArrayList`, ya locking. (Purana `Vector` synchronized tha.)
+    - q: "Kotlin `List` aur `MutableList` mein kya fark hai?"
+      a: |
+        `List` read-only interface hai (add/remove nahi), `MutableList` mein modify kar sakte ho. Dono andar se aksar `ArrayList` hi hote hain — read-only sirf compile-time ka pehra hai.
+  mayAsk:
+    - "Apna dynamic array implement karo (add, get, remove)."
+    - "Shrink kab karoge? (jaise size < capacity / 4)"
+    - "ArrayList mein shuru mein insert baar-baar ho to kya use karoge?"
+    - "`toIntArray()` / `stream().mapToInt` ki cost?"
+
+# 12. Practice
+practice:
+  - name: Remove Element
+    platform: LeetCode
+    num: 27
+    url: "https://leetcode.com/problems/remove-element/"
+    level: easy
+    pattern: Write pointer (in-place remove)
+    hint: "Example 2 jaisa: jo val nahi hai use nums[k] par likho, k++. k return karo."
+  - name: Concatenation of Array
+    platform: LeetCode
+    num: 1929
+    url: "https://leetcode.com/problems/concatenation-of-array/"
+    level: easy
+    pattern: Pre-sized array
+    hint: "Size pehle se pata hai (2n) — dynamic list ki zaroorat nahi, seedha IntArray(2n)."
+  - name: Shuffle the Array
+    platform: LeetCode
+    num: 1470
+    url: "https://leetcode.com/problems/shuffle-the-array/"
+    level: easy
+    pattern: Index math / list building
+    hint: "Result mein x1, y1, x2, y2… — i aur i + n ko baari-baari se add karo."
+  - name: Design Dynamic Array (apna MyArrayList)
+    platform: Custom
+    level: medium
+    pattern: Resize + amortized analysis
+    hint: "add, get, set, removeAt, size likho. removeAt ke baad size < capacity/4 ho to aadha karo (shrink). Copies gino."
+  - name: Remove Duplicates from Sorted Array II
+    platform: LeetCode
+    num: 80
+    url: "https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/"
+    level: medium
+    pattern: Write pointer with condition
+    hint: "nums[w - 2] se compare karo — agar same hai to teesri copy hai, mat likho."
+  - name: Insert Delete GetRandom O(1)
+    platform: LeetCode
+    num: 380
+    url: "https://leetcode.com/problems/insert-delete-getrandom-o1/"
+    level: medium
+    pattern: ArrayList + HashMap, swap-with-last delete
+    hint: "Values ArrayList mein, value → index HashMap mein. Delete: us index par last item rakho, last hatao (O(1)), map update."
+  - name: Insert Delete GetRandom O(1) - Duplicates allowed
+    platform: LeetCode
+    num: 381
+    url: "https://leetcode.com/problems/insert-delete-getrandom-o1-duplicates-allowed/"
+    level: hard
+    pattern: ArrayList + HashMap<Int, Set<index>>
+    hint: "Same swap-with-last trick, par map mein har value ke saare indices ka set rakho."
+  - name: Design Circular Deque (resizing version)
+    platform: Custom
+    level: hard
+    pattern: Ring buffer + doubling
+    hint: "Array + head index + size. addFirst/addLast O(1); bharne par double karo aur items ko head se order mein copy karo (wrap-around dhyaan se)."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Dynamic array = andar fixed array + size; bharne par bada array aur copy."
+    - "size = items, capacity = jagah; get/set index se O(1)."
+    - "End par add amortized O(1) (capacity multiply hoti hai)."
+    - "Shuru/beech mein add/remove O(n) — shifting; contains O(n)."
+    - "Loop mein remove: peeche se chalo ya removeAll/removeIf."
+  cheatsheet: |
+    | Kaam | Kotlin | Java |
+    |---|---|---|
+    | Banana | `mutableListOf()`, `ArrayList(n)` | `new ArrayList<>(n)` |
+    | End par add | `list.add(x)` | `list.add(x)` |
+    | Index par add | `list.add(i, x)` | `list.add(i, x)` |
+    | Index se hatao | `list.removeAt(i)` | `list.remove(i)` (int) |
+    | Value hatao | `list.remove(x)` | `list.remove(Integer.valueOf(x))` |
+    | Condition se hatao | `list.removeAll { it < 0 }` | `list.removeIf(v -> v < 0)` |
+    | → IntArray | `list.toIntArray()` | `list.stream().mapToInt(i -> i).toArray()` |
+
+    **Cost:** get/set O(1) · add end O(1)* · add/remove shuru-beech O(n) · contains O(n)
+  quiz:
+    - q: "ArrayList ka `add(x)` (end par) amortized complexity?"
+      options: ["O(n)", "O(log n)", "O(1)", "O(n²)"]
+      answer: 2
+      explain: "Capacity double/1.5× hoti hai — resize kabhi-kabhi."
+    - q: "`list.add(0, x)` ki complexity?"
+      options: ["O(1)", "O(n)", "O(log n)", "O(n²)"]
+      answer: 1
+      explain: "Saare items right khiskte hain."
+    - q: "Capacity 4, size 4 hai aur add hua. Doubling se nayi capacity?"
+      options: ["5", "6", "8", "16"]
+      answer: 2
+      explain: "Double = 8. (Java ArrayList 1.5× se 6 karta.)"
+    - q: "Java: `list = [5, 9, 7]`, `list.remove(1)` ke baad?"
+      options: ["[9, 7]", "[5, 7]", "[5, 9, 7]", "Error"]
+      answer: 1
+      explain: "int diya → index 1 (9) hata."
+    - q: "Aage se loop chala ke removeAt(i) + i++ karne mein kya bug hai?"
+      options: ["Koi bug nahi", "Hatane ke baad agla item skip ho jaata hai", "List ulti ho jaati hai", "Sab items hat jaate hain"]
+      answer: 1
+      explain: "Agla item khisak ke i par aata hai, aur i++ use chhod deta hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: array
+      why: "Dynamic array ke andar wahi fixed array hai."
+    - id: kotlin-java-toolkit
+      why: "MutableList, ArrayDeque aur boxing — sahi collection chunna."
+  usedLater:
+    - id: two-pointers-same
+      how: "Write pointer (r, w) wala pattern — move zeroes, remove duplicates."
+    - id: stack
+      how: "Stack ko array/list ke end par push/pop karke banate hain — O(1)."
+    - id: heap-basics
+      how: "Heap ek dynamic array mein rehta hai — add end par, phir upar khiskao."
+    - id: hashing-internals
+      how: "HashMap bhi bharne par double hota hai (rehash) — wahi amortized idea."

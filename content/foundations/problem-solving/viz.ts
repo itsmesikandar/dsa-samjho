@@ -46,12 +46,14 @@ export const constraintsTable = tracer<{ n: number }>({
       t.frame({
         caption: `${label} → ${fmtSteps(v)} steps. ${tone === 'done' ? 'Limit ke andar — chalega.' : tone === 'compare' ? 'Limit ke paas — risky, constant chhota ho to shayad.' : 'Bahut zyada — Time Limit Exceeded.'}`,
         vars: { n },
+        legend: { done: 'chalega', compare: 'risky', error: 'TLE' },
         panels: [panel()],
       });
     }
     t.frame({
       caption: `Nateeja: n ≤ ${n} ke liye ${slowestOk} ya usse tez approach socho. Question padhte hi ye hisaab lagao — galat direction mein time barbaad nahi hoga.`,
       vars: { n, 'allowed (max)': slowestOk },
+      legend: { done: 'chalega', compare: 'risky', error: 'TLE' },
       panels: [panel()],
     });
     return slowestOk;

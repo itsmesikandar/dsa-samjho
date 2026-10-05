@@ -61,7 +61,7 @@ export function Panels({ panels }: { panels: Panel[] }) {
   );
 }
 
-export function Legend({ tones }: { tones: Tone[] }) {
+export function Legend({ tones, labels }: { tones: Tone[]; labels?: Partial<Record<Tone, string>> }) {
   if (tones.length === 0) return null;
   return (
     <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted" aria-label="Rangon ka matlab">
@@ -70,7 +70,7 @@ export function Legend({ tones }: { tones: Tone[] }) {
           <span className={`tone ${tone(t)} inline-flex h-3 w-3 items-center justify-center rounded-sm border text-[8px] font-bold`}>
             {TONE_MARK[t] ?? ''}
           </span>
-          {TONE_LABEL[t]}
+          {labels?.[t] ?? TONE_LABEL[t]}
         </li>
       ))}
     </ul>

@@ -16,6 +16,7 @@
 - File ends with a `// Output:` block (exact stdout). Arrays print as `[1, 2]` (`contentToString()` / `Arrays.toString`).
 - Code-sync: trailing `//@name` marker; frame `line: 'name'`. Tracer `run()` returns the first output line (`listStr()` for arrays).
 - Tracer helpers: `src/components/viz/engine/tracer.ts` (`tracer`, `array`, `ids`, `swap`, `listStr`). Panel types: `types.ts`.
+- Tone meaning differs from default label? Set frame `legend` (e.g. `{ error: 'ghatao' }`).
 ## Checks
 - Per topic: `npm run validate` + `npm run check:code`, then tick PROGRESS.md. Per chapter: `npm run build`, git commit.
 - UI changes: check at 390px and desktop, light and dark, no horizontal overflow.

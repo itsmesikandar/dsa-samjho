@@ -1,0 +1,430 @@
+meta:
+  id: prefix-sum
+  chapter: arrays-strings
+  title: Prefix Sum
+  subtitle: Ek baar running total bana lo — phir kisi bhi range ka sum O(1) mein
+  level: beginner
+  minutes: 30
+  prereqs: [array, space-complexity]
+  tags: [prefix-sum, range-query, precompute, difference-array]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Prefix sum** = ek naya array jisme har position par **ab tak ka total** hota hai.
+
+    `pre[k]` = arr ke **pehle k items** ka sum, aur `pre[0] = 0`.
+
+    | i | 0 | 1 | 2 | 3 | 4 |
+    |---|---|---|---|---|---|
+    | arr | 3 | 1 | 4 | 1 | 5 |
+    | pre (k = i+1) | 3 | 4 | 8 | 9 | 14 |
+
+    Iska jaadu: **kisi bhi range `[l..r]` ka sum = `pre[r + 1] − pre[l]`** — sirf ek subtraction!
+
+    > [!yaad]
+    > `pre` ki size **n + 1** rakho aur `pre[0] = 0`. Isse `l = 0` wali query ke liye alag `if` nahi likhna padta.
+  analogy: |
+    **Bank passbook / Paytm statement** socho. Har entry ke saath **balance** likha hota hai (running total).
+
+    "15 tareekh se 20 tareekh tak kitna kharcha hua?" — har entry jodne ki zaroorat nahi. Bas **14 tareekh ka balance − 20 tareekh ka balance** dekh lo. Wahi prefix sum hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Socho array par **bahut saari range-sum queries** aati hain — "index 2 se 7 tak ka sum?", "0 se 500 tak?"…
+
+    - **Bina prefix:** har query par loop → O(n) per query. n = 10⁵ aur q = 10⁵ queries → **10¹⁰** steps. TLE.
+    - **Prefix ke saath:** ek baar O(n) build, phir har query **O(1)** → total **O(n + q)**.
+
+    Ye **time-space trade-off** ka sabse famous example hai — O(n) extra memory, badle mein queries super-fast.
+
+    Aur ye sirf sum tak seemit nahi — prefix **product**, prefix **XOR**, prefix **count**, aur 2D grids mein bhi yahi idea.
+
+    > [!socho]
+    > Prefix sum se "kitne subarrays ka sum k hai?" jaisa sawaal kaise hal hoga?
+    >
+    > Subarray sum = `pre[j] − pre[i]`. To har j par poochho: "pehle kitne `pre[i] = pre[j] − k` aaye?" — HashMap se O(n). Ye HashMap chapter mein karenge.
+
+# 3. Visual intro
+visual:
+  body: |
+    Neeche `pre` ko **seedhi (staircase)** ki tarah dekho — har bar ab tak ka total hai.
+
+    Kisi range ka sum = **do seedhiyon ki unchai ka fark**. Range jitni bhi lambi ho, kaam sirf ek minus.
+  viz: { tracer: staircase }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Do hisse:
+    1. **Build (ek baar):** `pre[i + 1] = pre[i] + arr[i]` — O(n).
+    2. **Query (baar-baar):** `sum(l, r) = pre[r + 1] − pre[l]` — O(1).
+
+    Kyun sahi hai? `pre[r + 1]` = index 0..r ka sum. `pre[l]` = index 0..l−1 ka sum. Ghatane par bacha **l..r** ✓.
+
+    > [!galti]
+    > `pre[r] − pre[l]` likhna sabse common galti hai — isme arr[r] chhoot jaata hai. Ya `pre[r + 1] − pre[l − 1]` — galat indexing. Formula yaad rakho: **r + 1 aur l**.
+  viz: { tracer: rangeSumTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Prefix array build"
+    time: O(n)
+    space: O(n)
+    why: "Ek pass, har item ek baar jodna; n + 1 dabbe."
+  - op: "Range sum query `pre[r+1] − pre[l]`"
+    time: O(1)
+    space: O(1)
+    why: "Do lookups aur ek subtraction."
+  - op: "Range sum bina prefix ke"
+    time: O(n)
+    space: O(1)
+    why: "Har baar loop chala ke jodna."
+  - op: "Ek value update (point update) ke baad prefix theek karna"
+    time: O(n)
+    space: O(1)
+    why: "Aage ke saare prefix badal jaate hain — bahut updates hon to Fenwick/Segment tree."
+  - op: "2D prefix build / rectangle query"
+    time: "O(R × C) / O(1)"
+    space: "O(R × C)"
+    why: "Har cell ek baar; query mein 4 corners."
+  - op: "Difference array: range update `[l..r] += v`"
+    time: "O(1) per update, O(n) final"
+    space: O(n)
+    why: "Sirf do jagah likho; aakhir mein ek prefix pass."
+
+# 6. Code
+code:
+  - title: Difference array — prefix sum ka ulta (range updates O(1))
+    file: difference
+    note: |
+      Jab bahut saare **"l se r tak sab mein v jodo"** wale updates hon: har update par sirf `diff[l] += v` aur `diff[r + 1] -= v`. Aakhir mein `diff` ka prefix sum = asli array. (Jaise: kaunse din kitne log hotel mein the — check-in par +1, check-out par −1.)
+
+# 7. Examples
+examples:
+  - id: pivot
+    level: easy
+    title: Pivot index — left sum == right sum
+    source: { name: Find Pivot Index, platform: LeetCode, url: "https://leetcode.com/problems/find-pivot-index/" }
+    problem: |
+      Array mein wo **pehla index** dhoondho jiske **left wale saare items ka sum** uske **right wale saare items ke sum** ke barabar ho. Na mile to −1.
+
+      Example: `[1, 7, 3, 6, 5, 6]` → **3** (left: 1 + 7 + 3 = 11, right: 5 + 6 = 11)
+    intuition: |
+      Har i par left aur right alag-alag loop se jodna → O(n²).
+
+      Prefix wala soch: **left** chalte-chalte jodte jao (running sum). **right** ke liye total pehle se nikaal lo:
+
+      **right = total − left − arr[i]**
+
+      Ek pass mein ho gaya — O(n), aur poora `pre` array bhi nahi chahiye, sirf ek variable.
+
+      > [!galti]
+      > Index 0 ke liye left = 0 hota hai (khaali). Aur negative numbers bhi ho sakte hain — `[2, 1, -1]` ka answer 0 hai.
+    dryRun: |
+      `[1, 7, 3, 6, 5, 6]`, total = 28
+
+      | i | left | arr[i] | right = 28 − left − arr[i] | Barabar? |
+      |---|---|---|---|---|
+      | 0 | 0 | 1 | 27 | nahi |
+      | 1 | 1 | 7 | 20 | nahi |
+      | 2 | 8 | 3 | 17 | nahi |
+      | 3 | 11 | 6 | 11 | **haan → 3** |
+    viz: { tracer: pivotTrace }
+    code: ex1-pivot
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Total ke liye ek pass, phir ek aur pass; sirf left aur total variables."
+
+  - id: product
+    level: medium
+    title: Product of array except self (bina division)
+    source: { name: Product of Array Except Self, platform: LeetCode, url: "https://leetcode.com/problems/product-of-array-except-self/" }
+    problem: |
+      Har index i ke liye answer[i] = **baaki saare items ka product** (nums[i] ko chhod ke). **Division use nahi karna**, aur O(n) time chahiye.
+
+      Example: `[1, 2, 3, 4]` → `[24, 12, 8, 6]`
+    intuition: |
+      "Sab ka product ÷ nums[i]" — 0 aate hi fail, aur division mana bhi hai.
+
+      Socho: answer[i] = **(i ke left ka product) × (i ke right ka product)**.
+      - Left products = **prefix product** (left se chalo).
+      - Right products = **suffix product** (right se chalo).
+
+      Trick: pehle `res` mein hi left products bharo. Phir peeche se chalte hue ek variable `right` rakho aur `res[i] *= right`. Extra array ki zaroorat nahi.
+    dryRun: |
+      `[1, 2, 3, 4]`
+
+      | i | left product | right product | res |
+      |---|---|---|---|
+      | 0 | 1 | 2×3×4 = 24 | 24 |
+      | 1 | 1 | 3×4 = 12 | 12 |
+      | 2 | 1×2 = 2 | 4 | 8 |
+      | 3 | 1×2×3 = 6 | 1 | 6 |
+    viz: { tracer: productTrace }
+    code: ex2-product
+    complexity:
+      time: O(n)
+      space: "O(1) (output array chhod ke)"
+      why: "Do pass; left products output mein hi, right ek variable mein."
+
+  - id: prefix-2d
+    level: tricky
+    title: 2D prefix sum — kisi bhi rectangle ka sum O(1)
+    source: { name: Range Sum Query 2D - Immutable, platform: LeetCode, url: "https://leetcode.com/problems/range-sum-query-2d-immutable/" }
+    problem: |
+      Ek grid diya hai aur bahut saari queries aayengi: "(r1, c1) se (r2, c2) tak ke rectangle ke saare numbers ka sum?" Har query O(1) mein answer karo.
+    intuition: |
+      1D jaisa hi, bas 2D mein: `pre[r][c]` = upar-left kone se (r−1, c−1) tak ka sum.
+
+      **Build:** apna cell + upar wala total + left wala total − **kona** (wo dono mein gina gaya tha).
+
+      `pre[r+1][c+1] = g[r][c] + pre[r][c+1] + pre[r+1][c] − pre[r][c]`
+
+      **Query (inclusion–exclusion):** bada rectangle − upar wala hissa − left wala hissa + kona (do baar ghata, ek baar wapas jodo).
+
+      `sum = pre[r2+1][c2+1] − pre[r1][c2+1] − pre[r2+1][c1] + pre[r1][c1]`
+
+      > [!tip]
+      > Kaagaz par rectangle banao aur 4 hisse colour karo — formula apne aap samajh aata hai. Interview mein bhi yahi drawing bana ke samjhao.
+    dryRun: |
+      Grid `[[3,0,1,4],[5,6,3,2],[1,2,0,1]]`, query (1,1)–(2,2)
+
+      | Term | Value |
+      |---|---|
+      | pre[3][3] (0..2, 0..2) | 3+0+1+5+6+3+1+2+0 = 21 |
+      | − pre[1][3] (row 0, cols 0..2) | 4 |
+      | − pre[3][1] (rows 0..2, col 0) | 9 |
+      | + pre[1][1] (kona) | 3 |
+      | **Sum** | 21 − 4 − 9 + 3 = **11** ✓ (6+3+2+0) |
+    viz: { tracer: prefix2DTrace }
+    code: ex3-prefix-2d
+    complexity:
+      time: "O(R × C) build, O(1) query"
+      space: "O(R × C)"
+      why: "Har cell ek baar; query mein sirf 4 lookups."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Ek fixed array par **bahut saari range-sum queries**."
+    - "Subarray sum se jude sawaal — `sum(i..j) = pre[j+1] − pre[i]` se pairs mein badal do."
+    - "Left side aur right side ka kuch chahiye (pivot, product except self) — prefix + suffix."
+    - "Bahut saare range updates, query baad mein — difference array."
+  avoid:
+    - "Array baar-baar **badal raha** hai (updates + queries mixed) — har update par prefix O(n). Fenwick tree / Segment tree lo."
+    - "Sirf ek hi query hai — seedha loop kaafi, extra array ki zaroorat nahi."
+    - "Max/min of range chahiye — prefix se nahi hota (sum jaisa 'ghata' nahi sakte). Sparse table / segment tree / deque."
+  signals:
+    - keyword: "sum of subarray / range sum, many queries"
+      think: "Prefix sum — O(1) per query."
+    - keyword: "count subarrays with sum = k"
+      think: "Prefix sum + HashMap (counts of pre values)."
+    - keyword: "add value to range [l, r] many times"
+      think: "Difference array."
+    - keyword: "sum of submatrix / rectangle"
+      think: "2D prefix sum."
+
+# 9. Real-world
+realWorld:
+  - where: "Bank / UPI statement ka balance"
+    how: "Running balance = prefix sum. Kisi period ka kharcha = do balances ka fark."
+  - where: "Analytics dashboards"
+    how: "Daily active users ke cumulative counts store karte hain — kisi bhi date range ka total turant (do numbers ka fark)."
+  - where: "Image processing (integral image)"
+    how: "2D prefix sum ko 'integral image' kehte hain — blur aur face detection (Viola–Jones) mein kisi bhi box ka sum O(1)."
+  - where: "Fitness apps"
+    how: "Steps / calories ka cumulative total — 'is hafte kitne steps' ek subtraction."
+  - where: "Hotel / train seat booking"
+    how: "Difference array: har booking par start +1, end ke baad −1; prefix se har din kitne log — overbooking check."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Galat formula `pre[r] − pre[l]`"
+    type: off-by-one
+    wrong: |
+      `pre` n+1 size ka hai aur `sum(l, r) = pre[r] − pre[l]` likha → arr[r] chhoot gaya.
+    right: |
+      `sum(l, r) = pre[r + 1] − pre[l]`. Ek chhota example (l = r) haath se check karo.
+  - title: "Prefix array n size ka rakhna"
+    type: off-by-one
+    wrong: |
+      `pre[i] = pre[i-1] + arr[i]` aur l = 0 ke liye alag `if`, l−1 = −1 index crash.
+    right: |
+      n + 1 size, `pre[0] = 0` — saari queries ek hi formula se.
+  - title: "Bade sums Int mein"
+    type: overflow
+    wrong: |
+      10⁵ items, har ek 10⁹ → prefix 10¹⁴ tak → `IntArray` mein overflow.
+    right: |
+      `LongArray` for prefix. Query result bhi `Long`.
+  - title: "2D formula mein kona jodna bhoolna"
+    type: logic
+    wrong: |
+      `pre[r2+1][c2+1] − pre[r1][c2+1] − pre[r2+1][c1]` — kona do baar ghata, wapas nahi joda.
+    right: |
+      `+ pre[r1][c1]` zaroori hai (inclusion–exclusion).
+  - title: "Array badalne ke baad purana prefix use karna"
+    type: logic
+    right: |
+      Prefix ek snapshot hai. arr[i] badla to `pre[i+1..n]` sab galat ho gaye — dobara banao (O(n)) ya Fenwick tree lo.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Prefix sum kya hai aur kab use karte ho?"
+      a: |
+        `pre[k]` = pehle k items ka sum. Fixed array par bahut saari range-sum queries ho to — O(n) build, O(1) per query.
+    - q: "Range sum formula likho aur samjhao."
+      a: |
+        `sum(l..r) = pre[r+1] − pre[l]`. pre[r+1] mein 0..r, pre[l] mein 0..l−1; ghatane par l..r bachta hai.
+    - q: "pre[0] = 0 kyun rakhte hain?"
+      a: |
+        Taaki l = 0 wali query bhi same formula se ho: `pre[r+1] − pre[0]`. Alag case nahi likhna padta.
+    - q: "Product of array except self bina division ke kaise?"
+      a: |
+        Prefix product × suffix product. Output array mein pehle left products, phir peeche se ek `right` variable se multiply — O(n), O(1) extra.
+    - q: "Array mein updates bhi aa rahe hain — tab kya?"
+      followUp: true
+      a: |
+        Har update par prefix dobara O(n). Updates aur queries dono bahut hon to **Fenwick tree (BIT)** ya **segment tree** — dono O(log n).
+    - q: "Count subarrays with sum k — approach?"
+      followUp: true
+      a: |
+        Running prefix sum aur HashMap (prefix value → kitni baar aaya). Har position par count += map[pre − k]. Shuru mein map[0] = 1. O(n).
+    - q: "2D prefix sum ka formula?"
+      a: |
+        Build: `pre[r+1][c+1] = g[r][c] + pre[r][c+1] + pre[r+1][c] − pre[r][c]`. Query: `pre[r2+1][c2+1] − pre[r1][c2+1] − pre[r2+1][c1] + pre[r1][c1]`.
+    - q: "Difference array kya hai?"
+      a: |
+        Prefix ka ulta. Range `[l, r]` mein v jodna = `diff[l] += v`, `diff[r+1] −= v` — O(1). Saare updates ke baad diff ka prefix = final array.
+    - q: "Prefix XOR kahan kaam aata hai?"
+      a: |
+        XOR bhi "ulta" ho sakta hai (a ^ a = 0), to `xor(l..r) = px[r+1] ^ px[l]`. Range XOR queries aur "subarray XOR = k" jaise problems.
+  mayAsk:
+    - "Prefix max se range max kyun nahi milta?"
+    - "Equilibrium index / left-right sums wale variants."
+    - "Running sum ko in-place kaise banaoge?"
+    - "Contiguous array: equal 0s aur 1s wala sabse lamba subarray."
+
+# 12. Practice
+practice:
+  - name: Running Sum of 1d Array
+    platform: LeetCode
+    num: 1480
+    url: "https://leetcode.com/problems/running-sum-of-1d-array/"
+    level: easy
+    pattern: Prefix build
+    hint: "`nums[i] += nums[i - 1]` — in-place prefix."
+  - name: Range Sum Query - Immutable
+    platform: LeetCode
+    num: 303
+    url: "https://leetcode.com/problems/range-sum-query-immutable/"
+    level: easy
+    pattern: Prefix + O(1) query
+    hint: "Constructor mein n + 1 size ka prefix; sumRange = pre[r + 1] − pre[l]."
+  - name: Left and Right Sum Differences
+    platform: LeetCode
+    num: 2574
+    url: "https://leetcode.com/problems/left-and-right-sum-differences/"
+    level: easy
+    pattern: Prefix + suffix
+    hint: "Pivot index jaisa: total se right nikaal lo, left chalte-chalte jodo."
+  - name: Subarray Sum Equals K
+    platform: LeetCode
+    num: 560
+    url: "https://leetcode.com/problems/subarray-sum-equals-k/"
+    level: medium
+    pattern: Prefix sum + HashMap
+    hint: "map[0] = 1 se shuru. Har step: count += map[pre − k], phir map[pre]++."
+  - name: Contiguous Array
+    platform: LeetCode
+    num: 525
+    url: "https://leetcode.com/problems/contiguous-array/"
+    level: medium
+    pattern: Prefix (0 → −1) + first-seen index map
+    hint: "0 ko −1 maano. Same prefix value do jagah aaya = beech ka subarray balanced. Pehli baar ka index map mein rakho."
+  - name: Corporate Flight Bookings
+    platform: LeetCode
+    num: 1109
+    url: "https://leetcode.com/problems/corporate-flight-bookings/"
+    level: medium
+    pattern: Difference array
+    hint: "Har booking [first, last, seats]: diff[first−1] += seats, diff[last] −= seats. Phir prefix."
+  - name: Count of Range Sum
+    platform: LeetCode
+    num: 327
+    url: "https://leetcode.com/problems/count-of-range-sum/"
+    level: hard
+    pattern: Long prefix sums + merge sort counting
+    hint: "Har j ke liye kitne i < j jinke liye lower ≤ pre[j] − pre[i] ≤ upper. Merge sort ke merge step mein do pointers se gino."
+  - name: Max Sum of Rectangle No Larger Than K
+    platform: LeetCode
+    num: 363
+    url: "https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/"
+    level: hard
+    pattern: 2D → 1D compression + prefix + TreeSet
+    hint: "Do rows fix karo, columns ka sum ek 1D array bana do. Ab 1D mein 'sum ≤ k' wala max subarray — prefix + TreeSet ceiling."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "pre[k] = pehle k items ka sum; size n + 1, pre[0] = 0."
+    - "sum(l..r) = pre[r+1] − pre[l] — O(1) per query, O(n) build."
+    - "Prefix + suffix se 'left × right' wale sawaal (product except self)."
+    - "2D: build mein kona ghatao, query mein kona wapas jodo."
+    - "Range updates → difference array; updates + queries dono → Fenwick/segment tree."
+  cheatsheet: |
+    ```
+    // 1D
+    pre[i+1] = pre[i] + arr[i]
+    sum(l, r) = pre[r+1] - pre[l]
+
+    // 2D
+    pre[r+1][c+1] = g[r][c] + pre[r][c+1] + pre[r+1][c] - pre[r][c]
+    sum = pre[r2+1][c2+1] - pre[r1][c2+1] - pre[r2+1][c1] + pre[r1][c1]
+
+    // Difference array
+    diff[l] += v; diff[r+1] -= v;  then prefix of diff
+    ```
+  quiz:
+    - q: "arr = [2, 4, 6, 8]. pre (size 5) kya hai?"
+      options: ["[2, 6, 12, 20]", "[0, 2, 6, 12, 20]", "[0, 2, 4, 6, 8]", "[2, 4, 6, 8, 20]"]
+      answer: 1
+      explain: "pre[0] = 0, phir running totals."
+    - q: "pre se arr[1..3] ka sum?"
+      options: ["pre[3] − pre[1]", "pre[4] − pre[1]", "pre[4] − pre[0]", "pre[3] − pre[0]"]
+      answer: 1
+      explain: "pre[r+1] − pre[l] = pre[4] − pre[1]."
+    - q: "q queries, n items. Prefix sum ke saath total time?"
+      options: ["O(n × q)", "O(n + q)", "O(q log n)", "O(n²)"]
+      answer: 1
+      explain: "O(n) build + O(1) har query."
+    - q: "Array mein baar-baar updates ho rahe hain aur queries bhi. Best?"
+      options: ["Prefix sum har baar", "Fenwick / segment tree", "Sorting", "Kuch nahi"]
+      answer: 1
+      explain: "Update aur query dono O(log n)."
+    - q: "Range [l, r] mein v jodna, difference array mein?"
+      options: ["diff[l] += v, diff[r] −= v", "diff[l] += v, diff[r+1] −= v", "diff[l..r] += v", "diff[r] += v"]
+      answer: 1
+      explain: "r ke baad effect khatam karne ke liye r + 1 par −v."
+
+# 14. Connections
+connections:
+  related:
+    - id: space-complexity
+      why: "Prefix sum time-space trade-off ka sabse famous example."
+    - id: kadane
+      why: "Max subarray sum = max(pre[j] − min pre[i]) — prefix ka hi ek roop."
+  usedLater:
+    - id: hashmap
+      how: "Subarray sum equals k = prefix sum + HashMap."
+    - id: sliding-window-fixed
+      how: "Window sum bhi ek tarah ka prefix difference hai."
+    - id: dp-intro
+      how: "Prefix arrays DP mein transitions ko O(1) bana dete hain."
+    - id: binary-search
+      how: "Prefix sums sorted (positive values) hon to unpar binary search."

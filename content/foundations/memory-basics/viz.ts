@@ -170,37 +170,38 @@ export const referenceTrap = tracer<{ arr: number[]; v: number }>({
       entries: entries.map(([key, value, tone]) => ({ key, value, tone })),
     });
     const all = (tone: Tone) => Object.fromEntries(a.map((_, i) => [i, tone]));
+    const legend = { error: 'badal gaya', active: 'dono yahi dekhte hain', swap: 'sirf copy badli' };
 
-    t.frame({
+    t.frame({ legend,
       line: 'a',
       caption: `intArrayOf(...) se heap par ek array object bana (address ${A}). Variable a ke paas sirf ye address hai, values nahi.`,
       panels: [vars([['a', `→ ${A}`, 'new']]), heap(all('new'))],
     });
-    t.frame({
+    t.frame({ legend,
       line: 'b',
       caption: `\`val b = a\` ne nayi array NAHI banayi — sirf address ${A} copy hua. Ab a aur b ek hi array ke do naam hain, jaise ek ghar ke do pate.`,
       panels: [vars([['a', `→ ${A}`], ['b', `→ ${A}`, 'new']]), heap(all('active'))],
     });
     a[0] = v;
-    t.frame({
+    t.frame({ legend,
       line: 'write',
       caption: `b[0] = ${v} → b ne address ${A} wale object ka pehla dabba badla. Lekin a bhi isi object ko dekhta hai!`,
       panels: [vars([['a', `→ ${A}`], ['b', `→ ${A}`, 'active']]), heap({ 0: 'error' })],
     });
     const printed = listStr(a);
-    t.frame({
+    t.frame({ legend,
       line: 'print',
       caption: `a print kiya → ${printed}. a ko kisi ne chhua bhi nahi, phir bhi badal gaya. Yahi "reference trap" hai.`,
       panels: [vars([['a', `→ ${A}`, 'error'], ['b', `→ ${A}`]]), heap({ 0: 'error' }), { kind: 'text', label: 'Output', text: printed }],
     });
     c = [...a];
-    t.frame({
+    t.frame({ legend,
       line: 'copy',
       caption: `copyOf() ne heap par NAYA object banaya (address ${B}) aur saare ${n} values ek-ek karke copy kiye. Isliye copy karna O(n) time aur O(n) memory leta hai.`,
       panels: [vars([['a', `→ ${A}`], ['b', `→ ${A}`], ['c', `→ ${B}`, 'new']]), heap({}, Object.fromEntries(c.map((_, i) => [i, 'new' as Tone])))],
     });
     c[n - 1] = 50;
-    t.frame({
+    t.frame({ legend,
       line: 'write2',
       caption: `c[${n - 1}] = 50 → sirf naya object badla. a wala object safe hai, kyunki ab dono alag-alag dabbe hain.`,
       panels: [vars([['a', `→ ${A}`, 'done'], ['b', `→ ${A}`], ['c', `→ ${B}`, 'swap']]), heap({}, { [n - 1]: 'swap' })],
