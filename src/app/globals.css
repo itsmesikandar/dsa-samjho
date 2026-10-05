@@ -308,6 +308,9 @@ pre,
 .code-box {
   font-variant-ligatures: none;
 }
+:not(pre) > code {
+  overflow-wrap: anywhere;
+}
 .code-box {
   font-family: var(--font-mono);
   font-size: 0.82rem;

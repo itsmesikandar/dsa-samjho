@@ -1,0 +1,432 @@
+meta:
+  id: problem-solving
+  chapter: foundations
+  title: Problem kaise approach karein
+  subtitle: Samjho → examples → constraints → brute force → optimize → code → test
+  level: beginner
+  minutes: 35
+  prereqs: [big-o-time, analyze-code]
+  tags: [approach, constraints, brute-force, interview]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Koi bhi DSA problem dekhte hi **seedha code likhna** sabse badi galti hai. Achhe engineers ek **fixed tareeka** follow karte hain:
+
+    1. **Samjho** — sawaal apne shabdon mein dohraao. Input kya hai, output kya chahiye?
+    2. **Examples** — 2-3 chhote examples khud banao. Edge cases bhi: khaali input, ek item, duplicates, negative numbers.
+    3. **Constraints** — n kitna bada hai? Usse pata chalta hai **kaunsi complexity chalegi**.
+    4. **Brute force** — sabse seedha solution socho aur uski complexity bolo. Chahe slow ho.
+    5. **Optimize** — slow hissa (bottleneck) kya hai? Kaunsa pattern lagega — sort, HashMap, two pointers, sliding window, binary search, prefix sum?
+    6. **Code** — saaf variable names, chhote functions.
+    7. **Test** — apne examples par dry run, phir edge cases.
+
+    > [!yaad]
+    > Interview mein ye saare steps **bol-bol ke** karo (think aloud). Interviewer tumhara answer nahi, tumhara **sochne ka tareeka** judge karta hai.
+  analogy: |
+    **Achha doctor** seedha injection nahi lagata. Pehle poochta hai — "kab se bukhar hai? kuch khaaya?" (samjho). Phir thermometer, blood test (examples aur constraints). Pehle simple dawai deta hai (brute force), zarurat ho to better ilaaj (optimize). Aur baad mein follow-up check (test).
+
+    Bina sawaal pooche injection lagane wala doctor bhi galat hai, aur bina samjhe code likhne wala developer bhi.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    - **Galat direction se bachao:** constraints pehle dekh liye to pata hota hai O(n²) nahi chalega — 20 minute bekaar code likhne se bach gaye.
+    - **Interview score:** bahut log sahi answer ke baad bhi reject hote hain — kyunki chup-chaap code likha, edge cases bhool gaye, ya complexity nahi bata paaye.
+    - **Stuck nahi hote:** jab optimal nahi soojhta, brute force + pattern checklist se raasta milta hai.
+    - **Real kaam mein bhi:** bug fix ho ya naya feature — requirements samjho, examples se reproduce karo, simple pehle, phir optimize.
+
+    > [!socho]
+    > Question kehta hai n ≤ 10⁵, aur tumhara pehla idea nested loop hai. Kya karoge?
+    >
+    > Brute force ko **bolo** ("ye O(n²) hai, 10¹⁰ steps — TLE hoga"), phir turant optimize socho — sort (n log n) ya HashMap (n). Brute force bolna kamzori nahi, samajh ka saboot hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    Constraints padhte hi pehla kaam: **kitne steps allowed hain?** Rough rule — **~10⁸ simple steps ≈ 1 second**.
+
+    Neeche animation har complexity ke steps nikaal ke batata hai ki wo chalega (✓) ya TLE (✗). "Apna input try karo" mein n = 20, n = 5000, n = 10⁹ daal ke dekho — har baar allowed complexity badal jaati hai.
+  viz: { tracer: constraintsTable }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Ek chhote problem par poora tareeka chala ke dekhte hain: **array ka second largest (alag) number**.
+
+    1. **Samjho:** "second largest" matlab sabse bade se chhota sabse bada **alag** number. Na ho to? → interviewer se poocha: **-1 return karo**.
+    2. **Examples:** `[12, 35, 1, 10, 34, 1]` → 34. `[7, 7, 7]` → -1. `[5, 9]` → 5.
+    3. **Constraints:** n ≤ 10⁵ → O(n log n) bhi chalega, O(n) best.
+    4. **Brute force:** sort karo, peeche se pehla alag number lo → **O(n log n)**.
+    5. **Optimize:** sort ki zaroorat hi nahi — ek pass mein do "champions" yaad rakho (`first`, `second`) → **O(n)**, O(1) space.
+    6. **Code** neeche hai.
+    7. **Test:** teeno examples + sab same + do item.
+
+    Animation mein `first` aur `second` ko badalte dekho.
+  viz: { tracer: secondLargest }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Brute force (saare pairs / saare options)"
+    time: "O(n²) ya zyada"
+    space: O(1)
+    why: "Sabse pehle yahi — correct answer ki guarantee, baad mein optimize."
+  - op: "Sort karke scan"
+    time: O(n log n)
+    space: "O(1)–O(n)"
+    why: "Sorted data mein duplicates, pairs, gaps padosi ban jaate hain."
+  - op: "HashMap / HashSet lookup"
+    time: O(n)
+    space: O(n)
+    why: "\"Pehle dekha hai?\" O(1) mein — nested loop hata deta hai."
+  - op: "Two pointers (sorted array)"
+    time: O(n)
+    space: O(1)
+    why: "Har step ek pointer hilta hai — n se zyada steps nahi."
+  - op: "Sliding window (contiguous subarray)"
+    time: O(n)
+    space: O(1)
+    why: "Window dobara nahi jodte — ek aaya, ek gaya."
+  - op: "Binary search"
+    time: O(log n)
+    space: O(1)
+    why: "Sorted data ya monotonic answer par har step aadha."
+  - op: "Prefix sum precompute"
+    time: "O(n) + O(1) har query"
+    space: O(n)
+    why: "Ek baar totals bana lo, phir har range sum ek subtraction."
+
+# 6. Code
+code:
+  - title: Edge cases se test karna — ek chhota example
+    file: edge-cases
+    note: |
+      Har solution ke baad ye checklist chalao: **khaali input, ek item, sab same, negative numbers, bahut bade numbers (overflow)**. Yahan `Long` ne overflow bachaya aur `null` ne khaali array.
+
+# 7. Examples
+examples:
+  - id: duplicate
+    level: easy
+    title: Kya array mein koi number do baar hai?
+    problem: |
+      Ek integer array diya hai. Agar koi bhi number kam se kam do baar aata hai to `true`, warna `false` return karo. n ≤ 10⁵.
+    intuition: |
+      Poore tareeke se chalo:
+      - **Brute force:** har pair compare → O(n²). n = 10⁵ par 5 × 10⁹ — TLE.
+      - **Better:** sort karo — duplicates padosi ban jaayenge → O(n log n).
+      - **Best:** HashSet mein "yaad" rakho kya dekha. Har number par: pehle se hai? → true. O(n) time, O(n) space.
+
+      > [!tip]
+      > Interview mein teeno bolo, phir chuno: "Memory ki dikkat nahi to HashSet; memory tight ho to sort." Ye **trade-off** bolna bahut impress karta hai.
+    dryRun: |
+      `[3, 1, 4, 1, 5]`
+
+      | x | seen mein hai? | seen ke baad |
+      |---|---|---|
+      | 3 | nahi | {3} |
+      | 1 | nahi | {3, 1} |
+      | 4 | nahi | {3, 1, 4} |
+      | 1 | **haan** | → return **true** |
+    viz: { tracer: dupSet }
+    code: ex1-duplicate
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har number ek baar, HashSet check average O(1); worst case n numbers set mein."
+
+  - id: pair-sum
+    level: medium
+    title: Sorted array mein pair jiska sum target ho
+    problem: |
+      Ek **sorted** (chhote se bade) array aur `target` diya hai. Do alag positions ke numbers dhoondho jinka sum `target` ho. Unke index return karo; na mile to `[-1, -1]`.
+
+      Example: `[1, 3, 4, 6, 8, 11]`, target 10 → `[2, 3]` (4 + 6).
+    intuition: |
+      **Brute force:** saare pairs → O(n²).
+
+      Ab constraint ka hint dekho — **"sorted"**. Jab bhi sorted likha ho, socho: binary search ya two pointers.
+
+      - `l` sabse chhote par, `r` sabse bade par.
+      - Sum chhota hai? → badi value chahiye → `l++`.
+      - Sum bada hai? → chhoti value chahiye → `r--`.
+      - Har step ek pointer andar aata hai → max n steps → **O(n)**, O(1) space.
+
+      > [!yaad]
+      > Question ka har shabd ek hint hai. "Sorted", "contiguous", "distinct", "k" — inko underline karo.
+    dryRun: |
+      `[1, 3, 4, 6, 8, 11]`, target 10
+
+      | l | r | sum | Kya kiya |
+      |---|---|---|---|
+      | 0 | 5 | 1 + 11 = 12 | bada → r-- |
+      | 0 | 4 | 1 + 8 = 9 | chhota → l++ |
+      | 1 | 4 | 3 + 8 = 11 | bada → r-- |
+      | 1 | 3 | 3 + 6 = 9 | chhota → l++ |
+      | 2 | 3 | 4 + 6 = 10 | **mil gaya [2, 3]** |
+    viz: { tracer: pairSum }
+    code: ex2-pair-sum
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Har iteration mein l ya r ek kadam andar; total n se kam steps, sirf do pointers."
+
+  - id: max-window
+    level: tricky
+    title: Lagatar k numbers ka sabse bada sum
+    problem: |
+      Ek array aur number k diya hai. Lagatar (contiguous) k numbers ke har group ka sum dekho — sabse bada sum kya hai?
+
+      Example: `[2, 1, 5, 1, 3, 2]`, k = 3 → groups ke sum 8, 7, 9, 6 → answer **9**.
+    intuition: |
+      **Brute force:** har starting point se k numbers jodo → (n − k + 1) × k → **O(n·k)**. k bada ho to lagbhag O(n²).
+
+      **Bottleneck pakdo:** do padosi windows mein k − 1 numbers **same** hain! `[2, 1, 5]` aur `[1, 5, 1]` — sirf 2 gaya, 1 aaya. To dobara poora kyun jodna?
+
+      **Sliding window:** naya sum = purana sum + aane wala − jaane wala. Har step O(1) → total **O(n)**.
+
+      > [!galti]
+      > `best = 0` se shuru mat karo — saare numbers negative hue to answer 0 aa jaayega jo galat hai. Pehli window ka sum hi pehla `best` hai.
+    dryRun: |
+      `[2, 1, 5, 1, 3, 2]`, k = 3
+
+      | Window | Aaya | Gaya | Sum | best |
+      |---|---|---|---|---|
+      | [0..2] | – | – | 8 | 8 |
+      | [1..3] | 1 | 2 | 7 | 8 |
+      | [2..4] | 3 | 1 | 9 | **9** |
+      | [3..5] | 2 | 5 | 6 | 9 |
+    viz: { tracer: maxWindow }
+    code: ex3-max-window
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Har number ek baar window mein aata, ek baar jaata; sirf do variables."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "**Har** problem par — chahe easy lage. Steps chhote ho sakte hain, par chhodo mat."
+    - "Jab stuck ho — wapas brute force par jao, phir pattern checklist se bottleneck hatao."
+    - "Interview mein — har step bolo, interviewer ko saath le ke chalo."
+  avoid:
+    - "Example banaye bina code mat likho — aadha time galat cheez debug karne mein jaayega."
+    - "Pehle hi optimal ke peeche mat bhaago — brute force bolna aur optimize karna hi expected flow hai."
+    - "Constraints ignore mat karo — wahi batate hain kaunsa approach chalega."
+  signals:
+    - keyword: "sorted array"
+      think: "Binary search ya two pointers."
+    - keyword: "subarray / substring (contiguous), size k"
+      think: "Sliding window ya prefix sum."
+    - keyword: "pair / complement / pehle dekha hai?"
+      think: "HashMap / HashSet."
+    - keyword: "top k, kth largest, sabse chhota baar-baar"
+      think: "Heap (PriorityQueue)."
+    - keyword: "saare combinations / subsets / permutations"
+      think: "Backtracking (n chhota hoga, ≤ 20)."
+    - keyword: "shortest path / minimum steps in grid"
+      think: "BFS."
+    - keyword: "max/min ways, choices jo overlap karti hain"
+      think: "Dynamic Programming."
+
+# 9. Real-world
+realWorld:
+  - where: "Production bug fix"
+    how: "Samjho (kya toota) → reproduce karo (examples) → scale dekho (kitne users, constraints) → pehle quick fix (brute force), phir proper fix (optimize) → test."
+  - where: "Naya feature (Android/Flutter)"
+    how: "Requirements clear karo (khaali list, offline, 10,000 items?) — yahi edge cases aur constraints hain. Bina iske feature dobara banana padta hai."
+  - where: "Code review"
+    how: "Reviewer yahi checklist chalata hai: edge cases handle hue? complexity theek hai? naam saaf hain?"
+  - where: "System design interviews"
+    how: "Wahi flow bada version: requirements → scale estimate (constraints) → simple design → bottlenecks → optimize."
+  - where: "Task estimation"
+    how: "Problem ko chhote steps mein todna aur pehle simplest working version banana — team ko jaldi kuch chalta hua dikhta hai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Problem padhte hi code likhna shuru"
+    type: logic
+    wrong: |
+      5 second padha, keyboard pe haath — aur 15 minute baad pata chala sawaal kuch aur tha.
+    right: |
+      Pehle sawaal apne shabdon mein dohraao, ek example ka expected output khud nikaalo, aur interviewer se confirm karo.
+  - title: "Constraints na padhna"
+    type: other
+    wrong: |
+      n ≤ 10⁵ wale sawaal mein O(n²) solution ko perfect karne mein 20 minute.
+    right: |
+      Pehle constraints → allowed complexity. Brute force ki complexity usse zyada hai to seedha optimize socho.
+  - title: "Edge cases bhool jaana"
+    type: empty
+    wrong: |
+      Code sirf "normal" example par test kiya. Khaali array par `arr[0]` crash.
+    right: |
+      Checklist: **khaali, ek item, sab same, sorted/reverse sorted, negative, bahut bade numbers, duplicates**.
+  - title: "Chup-chaap sochna (interview mein)"
+    type: other
+    wrong: |
+      5 minute kuch nahi bole, phir achanak code likh diya. Interviewer ko pata hi nahi tum kya soch rahe the — hint bhi nahi de paaya.
+    right: |
+      Bolte raho: "Main pehle brute force soch raha hoon… ye O(n²) hai… n 10⁵ hai, to optimize karna padega… HashMap try karta hoon."
+  - title: "Bade sum/answer ke liye Int"
+    type: overflow
+    right: |
+      Constraints mein values 10⁹ tak aur n 10⁵ tak → sum 10¹⁴ tak → `Long` chahiye. Ye bhi constraints se hi pata chalta hai.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Problem milte hi pehle 2–3 minute mein kya karoge?"
+      a: |
+        Sawaal dohraaunga, input/output confirm karunga, 1-2 examples (aur edge cases) interviewer ke saath banaunga, aur constraints dekhunga. Phir brute force bolunga.
+    - q: "Brute force batana zaroori hai?"
+      a: |
+        Haan — ye dikhata hai ki tumne problem samjha aur ek correct baseline hai. Uski complexity bolo, phir optimize karo. Kabhi-kabhi brute force hi kaafi hota hai (n chhota ho).
+    - q: "Kaunse clarifying questions poochne chahiye?"
+      a: |
+        Input ki size aur range? Khaali ho sakta hai? Duplicates? Negative numbers? Sorted hai? Answer na mile to kya return karna hai? Input modify kar sakta hoon?
+    - q: "Constraints se complexity kaise guess karte ho?"
+      a: |
+        ~10⁸ steps/second. n ≤ 20 → 2ⁿ, n ≤ 500 → n³, n ≤ 5000 → n², n ≤ 10⁶ → n log n ya n, n ≤ 10⁹ → log n.
+    - q: "Optimize karte waqt kya checklist chalate ho?"
+      a: |
+        Brute force mein kaunsa kaam repeat ho raha hai (bottleneck)? Phir: sort karne se madad? HashMap se lookup O(1)? Two pointers / sliding window? Binary search? Precompute (prefix sum)? Time ke badle space de sakte hain?
+    - q: "Stuck ho gaye to kya karoge?"
+      followUp: true
+      a: |
+        Chhota example haath se solve karta hoon aur dekhta hoon dimaag ne kya kiya. Brute force par wapas jaata hoon. Constraints ka hint dekhta hoon. Interviewer ko bolta hoon kahan atka hoon — aksar wo hint dete hain.
+    - q: "Interviewer hint de to kaise react karoge?"
+      a: |
+        Dhyaan se suno, apne shabdon mein dohraao, aur turant use karo. Hint lena galat nahi — ignore karna galat hai.
+    - q: "Optimal solution nahi aaya, time kam hai. Kya karoge?"
+      followUp: true
+      a: |
+        Brute force ka **working** code likhunga aur bataunga ki optimize kaise karta. Kuch na likhne se working slow code hamesha behtar hai.
+    - q: "Code likhne ke baad test kaise karte ho?"
+      a: |
+        Ek example par line-by-line dry run (variables ki values bolte hue), phir edge cases: khaali, ek item, sab same, extremes. Bugs khud pakdo, interviewer ke pakadne se pehle.
+    - q: "\"Sorted\" shabd dikhte hi kya sochte ho?"
+      a: |
+        Binary search (O(log n)) ya two pointers (O(n)). Sorted data ek bahut bada hint hota hai.
+  mayAsk:
+    - "Input itna bada ho ki memory mein na aaye to?"
+    - "Ye data stream (ek-ek karke aata) ho to kaise karoge?"
+    - "Is solution ko test karne ke liye kaunse test cases likhoge?"
+    - "Tumhara solution aur better ho sakta hai?"
+
+# 12. Practice
+practice:
+  - name: Best Time to Buy and Sell Stock
+    platform: LeetCode
+    num: 121
+    url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"
+    level: easy
+    pattern: Brute force O(n²) → ek pass
+    hint: "Brute force: har din kharido, har aage ke din becho. Optimize: ab tak ka sabse sasta din yaad rakho."
+  - name: Maximum Average Subarray I
+    platform: LeetCode
+    num: 643
+    url: "https://leetcode.com/problems/maximum-average-subarray-i/"
+    level: easy
+    pattern: Fixed sliding window
+    hint: "Example 3 jaisa hi: k ki window, ek aaya ek gaya. Average = best sum / k."
+  - name: How Many Numbers Are Smaller Than the Current Number
+    platform: LeetCode
+    num: 1365
+    url: "https://leetcode.com/problems/how-many-numbers-are-smaller-than-the-current-number/"
+    level: easy
+    pattern: Constraints ka fayda (values chhoti)
+    hint: "Brute force O(n²) chalega (n ≤ 500). Par values ≤ 100 hain — count array + prefix se O(n + 100)."
+  - name: Two Sum II - Input Array Is Sorted
+    platform: LeetCode
+    num: 167
+    url: "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
+    level: medium
+    pattern: Sorted → two pointers
+    hint: "Example 2 wala hi idea. Dhyaan: answer 1-indexed maanga hai."
+  - name: 3Sum
+    platform: LeetCode
+    num: 15
+    url: "https://leetcode.com/problems/3sum/"
+    level: medium
+    pattern: O(n³) → sort + two pointers O(n²)
+    hint: "Sort karo. Har i ke liye baaki do numbers two pointers se dhoondho. Duplicate triplets skip karna mat bhoolo."
+  - name: Merge Intervals
+    platform: LeetCode
+    num: 56
+    url: "https://leetcode.com/problems/merge-intervals/"
+    level: medium
+    pattern: Sort first
+    hint: "Start ke hisaab se sort karo — overlapping intervals padosi ban jaate hain. Phir ek pass mein jodo."
+  - name: Minimum Window Substring
+    platform: LeetCode
+    num: 76
+    url: "https://leetcode.com/problems/minimum-window-substring/"
+    level: hard
+    pattern: Variable sliding window + count map
+    hint: "Right badhao jab tak saare characters na aa jaayein, phir left se chhota karo jab tak valid rahe. Har step best yaad rakho."
+  - name: Candy
+    platform: LeetCode
+    num: 135
+    url: "https://leetcode.com/problems/candy/"
+    level: hard
+    pattern: Brute force simulation → do pass greedy
+    hint: "Ek baar left se right (left padosi se zyada rating → +1), ek baar right se left. Har position par dono ka max."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Samjho → examples → constraints → brute force → optimize → code → test."
+    - "~10⁸ steps ≈ 1 second; constraints se allowed complexity nikaalo."
+    - "Brute force hamesha bolo (complexity ke saath), phir bottleneck hatao."
+    - "Question ke shabd hint hain: sorted, contiguous, k, distinct, pair."
+    - "Edge cases: khaali, ek item, sab same, negative, overflow."
+  cheatsheet: |
+    | Constraint | Allowed | Aksar kya lagta hai |
+    |---|---|---|
+    | n ≤ 10 | O(n!) | permutations |
+    | n ≤ 20 | O(2ⁿ) | subsets, backtracking |
+    | n ≤ 500 | O(n³) | 3 nested loops, DP |
+    | n ≤ 5000 | O(n²) | nested loops, 2D DP |
+    | n ≤ 10⁶ | O(n log n) / O(n) | sort, HashMap, two pointers, window |
+    | n ≤ 10⁹+ | O(log n) / O(1) | binary search, math |
+
+    **Optimize checklist:** sort? · HashMap? · two pointers? · sliding window? · binary search? · prefix sum? · heap?
+  quiz:
+    - q: "Problem padhne ke baad SABSE pehla kadam?"
+      options: ["Code likhna", "Sawaal samajhna aur examples banana", "Optimal solution yaad karna", "Test cases likhna"]
+      answer: 1
+      explain: "Bina samjhe code = galat direction."
+    - q: "n ≤ 10⁵ hai. Brute force O(n²) hai. Kya karoge?"
+      options: ["Wahi submit karo", "Brute force bolo, phir O(n log n) / O(n) approach socho", "Problem chhod do", "Recursion lagao"]
+      answer: 1
+      explain: "10¹⁰ steps TLE denge — optimize zaroori hai."
+    - q: "Question mein \"sorted array\" likha hai. Kaunsa idea sabse pehle?"
+      options: ["Bubble sort", "Two pointers / binary search", "Recursion", "Linked list"]
+      answer: 1
+      explain: "Sorted data binary search aur two pointers ka hint hai."
+    - q: "\"Contiguous subarray of size k\" kis pattern ka hint hai?"
+      options: ["Sliding window", "Heap", "Graph", "Trie"]
+      answer: 0
+      explain: "Window ek aaya, ek gaya — O(n)."
+    - q: "Optimal nahi soojh raha aur time kam hai. Best kya hai?"
+      options: ["Kuch mat likho", "Brute force ka working code likho aur optimization batao", "Random code likho", "Interviewer se solution maango"]
+      answer: 1
+      explain: "Working slow code > kuch nahi."
+
+# 14. Connections
+connections:
+  related:
+    - id: big-o-time
+      why: "Constraints → complexity ka hisaab isi par tika hai."
+    - id: analyze-code
+      why: "Brute force aur optimized dono ki complexity khud nikaalni hoti hai."
+  usedLater:
+    - id: hashmap
+      how: "\"Pehle dekha hai?\" wala optimization — Two Sum."
+    - id: two-pointers-opposite
+      how: "Sorted array wala hint — pair sum, 3Sum."
+    - id: sliding-window-fixed
+      how: "Example 3 ka poora pattern."
+    - id: binary-search-on-answer
+      how: "n ≤ 10⁹ jaise constraints — answer par binary search."

@@ -1,0 +1,457 @@
+meta:
+  id: kotlin-java-toolkit
+  chapter: foundations
+  title: DSA ke liye Kotlin & Java toolkit
+  subtitle: Arrays, collections, StringBuilder, overflow — har problem mein kaam aane wale auzaar
+  level: beginner
+  minutes: 35
+  prereqs: [memory-basics, big-o-time]
+  tags: [kotlin, java, collections, arraydeque, hashmap, overflow]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    DSA problems mein baar-baar **wahi 8-10 cheezein** use hoti hain. Inko Kotlin aur Java dono mein fluently likhna aana chahiye:
+
+    | Kaam | Kotlin | Java |
+    |---|---|---|
+    | Fixed array | `IntArray(n)`, `LongArray(n)` | `int[]`, `long[]` |
+    | Dynamic list | `mutableListOf()`, `ArrayList()` | `ArrayList<>` |
+    | Key → value | `HashMap()`, `mutableMapOf()` | `HashMap<>` |
+    | Unique items | `HashSet()`, `mutableSetOf()` | `HashSet<>` |
+    | Stack / Queue / Deque | `ArrayDeque()` | `ArrayDeque<>` |
+    | Hamesha min/max | `PriorityQueue()` | `PriorityQueue<>` |
+    | Sorted map | `TreeMap()` (`java.util`) | `TreeMap<>` |
+    | String banana | `StringBuilder()` | `StringBuilder` |
+
+    Plus kuch "chhote par zaroori" tricks: `c - 'a'` (char → 0..25), `Long` for bade numbers, `% 1_000_000_007`, comparators.
+
+    > [!yaad]
+    > Kotlin ka `mutableListOf()` andar se Java ka `ArrayList` hi hai, `mutableMapOf()` = `LinkedHashMap`, `hashMapOf()` = `HashMap`. Kotlin JVM par Java ki hi collections use karta hai — complexity same.
+  analogy: |
+    **Mistri ka auzaar ka thaila** socho. Har kaam ke liye sahi auzaar — kil ke liye hathoda, screw ke liye screwdriver. Hathode se screw lagaoge to kaam hoga, par galat aur dheere.
+
+    DSA mein bhi: "pehle dekha hai?" → **HashSet**. "Sabse chhota baar-baar?" → **PriorityQueue**. "Jo last aaya pehle niklega" → **ArrayDeque as stack**. Sahi auzaar chuno, code aadha ho jaata hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    - **Interview mein time bachta hai** — `HashMap` ka `getOrDefault`, `computeIfAbsent`, comparator likhne mein atak gaye to logic ka time chala gaya.
+    - **Galat collection = galat complexity** — `list.contains()` O(n) hai, `set.contains()` O(1). `ArrayList.remove(0)` O(n) hai, `ArrayDeque.removeFirst()` O(1).
+    - **Chupe hue bugs** — Int overflow, `==` se Integer compare, HashMap ka random order.
+    - **Java bhi zaroori** — bahut companies Java mein interview leti hain, aur LeetCode discussions mostly Java/C++ mein hote hain.
+
+    > [!socho]
+    > Queue chahiye. `ArrayList` mein `add()` aur `removeAt(0)` se kaam chalega?
+    >
+    > Chalega, par `removeAt(0)` har baar saare items left khiskata hai → **O(n)**. n operations → O(n²). `ArrayDeque.removeFirst()` **O(1)** hai. Sahi auzaar!
+
+# 3. Visual intro
+visual:
+  body: |
+    `IntArray` aur `List<Int>` dekhne mein ek jaise lagte hain, par memory mein bilkul alag hain.
+
+    `List<Int>` (Java: `ArrayList<Integer>`) mein har number ek **alag object** (Integer) ban jaata hai — isko **boxing** kehte hain. List mein sirf un objects ke **addresses** hote hain. Animation mein arrows dekho.
+
+    Nateeja: List ~4-5 guna zyada memory leti hai aur thodi dheemi hai. Isliye DSA mein jahan size fixed ho, **`IntArray` / `int[]`** lo.
+  viz: { tracer: boxingMemory }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    DSA ka sabse kaam ka collection: **`ArrayDeque`**. Ek hi class se **stack** bhi banta hai aur **queue** bhi — dono ke operations O(1).
+
+    | Kaam | Stack ki tarah | Queue ki tarah |
+    |---|---|---|
+    | Daalna | `addLast(x)` | `addLast(x)` |
+    | Nikaalna | `removeLast()` | `removeFirst()` |
+    | Bina nikaale dekhna | `last()` / `peekLast()` | `first()` / `peekFirst()` |
+    | Khaali hai? | `isEmpty()` | `isEmpty()` |
+
+    > [!galti]
+    > Java mein purani `Stack` class (synchronized, slow) aur queue ke liye `LinkedList` (har node alag object) se bacho. `ArrayDeque` tez hai. Bas dhyaan: Java `ArrayDeque` mein `null` nahi daal sakte.
+
+    Animation mein same values pehle stack mein, phir queue mein jaate hain — dekho kaun pehle nikalta hai.
+  viz: { tracer: dequeTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "`arr[i]`, `list[i]` / `list.get(i)`"
+    time: O(1)
+    space: O(1)
+    why: "Andar array hai — index se seedha address."
+  - op: "`list.add(x)` (end par)"
+    time: "O(1) amortized"
+    space: O(1)
+    why: "Bhar jaane par capacity badhti hai (copy), par average O(1)."
+  - op: "`list.add(0, x)`, `list.removeAt(0)`, `list.contains(x)`"
+    time: O(n)
+    space: O(1)
+    why: "Shifting ya poori list scan."
+  - op: "HashMap `get` / `put` / `containsKey`, HashSet `add` / `contains`"
+    time: "O(1) average"
+    space: "O(n) total"
+    why: "Hash se seedha bucket; worst case (bahut collisions) O(n) ya O(log n)."
+  - op: "ArrayDeque `addFirst/addLast/removeFirst/removeLast`"
+    time: "O(1) amortized"
+    space: O(1)
+    why: "Circular array — dono kinaron par seedha kaam."
+  - op: "PriorityQueue `add` / `poll`; `peek`"
+    time: "O(log n); O(1)"
+    space: O(1)
+    why: "Heap ko upar/neeche theek karna log n; top dekhna turant."
+  - op: "TreeMap `get` / `put` / `floorKey`"
+    time: O(log n)
+    space: O(1)
+    why: "Balanced tree (red-black) — keys sorted rehti hain."
+  - op: "`sort()` / `sortedWith(...)` / `Arrays.sort`"
+    time: O(n log n)
+    space: "O(log n)–O(n)"
+    why: "Objects ke liye TimSort (stable), primitives ke liye dual-pivot quicksort."
+  - op: "String `+` loop mein vs `StringBuilder.append`"
+    time: "O(n²) vs O(n) total"
+    space: O(n)
+    why: "String immutable hai — har `+` nayi copy. StringBuilder ek hi buffer badhata hai."
+
+# 6. Code
+code:
+  - title: Toolkit ek jagah — list, comparator, set, map, char math, Long
+    file: toolkit
+    note: |
+      **Comparator yaad rakho:** Kotlin `compareByDescending<T> { it.marks }.thenBy { it.name }`. Java `Comparator.comparingInt((T s) -> s.marks).reversed().thenComparing(s -> s.name)`. Java mein `reversed()` ke saath lambda ka type likhna padta hai, warna compile error.
+
+# 7. Examples
+examples:
+  - id: frequency
+    level: easy
+    title: Har character kitni baar aaya? (HashMap)
+    problem: |
+      Ek word diya hai. Har character ka count nikaalo aur sorted order mein print karo.
+
+      Example: `"banana"` → `{a=3, b=1, n=2}`
+    intuition: |
+      "Kitni baar" = **counting** = HashMap jisme key = cheez, value = count.
+
+      Har character par: `freq[c] = freq.getOrDefault(c, 0) + 1`. Pehli baar nahi milega to 0 maano.
+
+      > [!tip]
+      > Sirf lowercase letters hon to `IntArray(26)` aur `count[c - 'a']++` aur bhi tez hai — HashMap ka overhead nahi. Ye trick Hashing chapter mein bahut aayegi.
+
+      > [!galti]
+      > `HashMap` print karoge to order random lag sakta hai (aur Kotlin vs Java mein alag). Fixed order chahiye to `TreeMap` / `toSortedMap()`.
+    dryRun: |
+      `"banana"`
+
+      | i | char | count pehle | count baad |
+      |---|---|---|---|
+      | 0 | b | 0 | 1 |
+      | 1 | a | 0 | 1 |
+      | 2 | n | 0 | 1 |
+      | 3 | a | 1 | 2 |
+      | 4 | n | 1 | 2 |
+      | 5 | a | 2 | 3 |
+    viz: { tracer: freqTrace }
+    code: ex1-frequency
+    complexity:
+      time: O(n)
+      space: O(k)
+      why: "Har char par O(1) map update; k = alag characters ki ginti (sorted print O(k log k))."
+
+  - id: group
+    level: medium
+    title: Words ko pehle letter se group karo (Map of Lists)
+    problem: |
+      Words ki list di hai. Unhe **pehle letter** ke hisaab se group karo — har letter ke saamne uske words ki list.
+
+      Example: `[chai, samosa, jalebi, chutney, jam]` → `{c=[chai, chutney], j=[jalebi, jam], s=[samosa]}`
+    intuition: |
+      Ye "grouping" pattern hai: `HashMap<Key, MutableList<Item>>`.
+
+      Mushkil sirf ye hai ki list pehli baar banani padti hai. Iske liye shortcut:
+      - Kotlin: `groups.getOrPut(key) { mutableListOf() }.add(w)`
+      - Java: `groups.computeIfAbsent(key, k -> new ArrayList<>()).add(w)`
+
+      Ek line mein: "list hai to do, nahi hai to nayi banao aur do".
+
+      > [!yaad]
+      > Kotlin mein ye ek line mein bhi hota hai: `words.groupBy { it[0] }`. Interview mein dono aane chahiye — library wala bhi, manual bhi.
+    dryRun: |
+      | Word | Key | List pehle thi? | groups |
+      |---|---|---|---|
+      | chai | c | nahi → nayi | {c=[chai]} |
+      | samosa | s | nahi → nayi | {c=[chai], s=[samosa]} |
+      | jalebi | j | nahi → nayi | … j=[jalebi] |
+      | chutney | c | haan | c=[chai, chutney] |
+      | jam | j | haan | j=[jalebi, jam] |
+    viz: { tracer: groupTrace }
+    code: ex2-group
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har word par ek map lookup + list add (O(1)); saare words map mein store."
+
+  - id: mod
+    level: tricky
+    title: Overflow aur `% (10⁹ + 7)` — n! sahi kaise nikaalein
+    problem: |
+      `n!` (n factorial) nikaalo, par answer bahut bada ho sakta hai — isliye `n! % 1,000,000,007` return karo.
+
+      Saath mein dekho ki `Int` mein seedha multiply karne se kya hota hai.
+    intuition: |
+      13! = 6,227,020,800 — ye `Int` ki limit (~2.1 × 10⁹) se bada hai. `Int` mein multiply karoge to **koi error nahi aayega** — number chupchaap ghoom ke galat (1932053504) ho jaayega. Yahi sabse khatarnak bug hai.
+
+      Fix do cheezon se:
+      1. **`Long`** mein multiply (Long ~9.2 × 10¹⁸ tak jaata hai).
+      2. Har step ke baad **`% MOD`** — taaki result hamesha MOD se chhota rahe, aur agla multiply bhi Long mein fit ho.
+
+      Ye sahi kyun hai? **(a × b) % m = ((a % m) × (b % m)) % m** — beech mein % karne se answer nahi badalta.
+
+      > [!galti]
+      > `(result * i).toLong()` galat hai — multiply `Int` mein ho chuka, overflow pehle hi ho gaya. Pehle `Long` banao, phir multiply.
+    dryRun: |
+      | i | Asli i! | Int (galat?) | Long % MOD |
+      |---|---|---|---|
+      | 12 | 479001600 | 479001600 ✓ | 479001600 |
+      | 13 | 6227020800 | **1932053504 ✗** | 227020758 |
+      | 14 | 87178291200 | 1278945280 ✗ | 178290591 |
+    viz: { tracer: factModTrace }
+    code: ex3-mod
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "n multiplications; sirf ek Long variable."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Size fixed aur numbers hain → `IntArray` / `int[]` (fast, kam memory)."
+    - "Size badalni hai → `MutableList` / `ArrayList`."
+    - "\"Pehle dekha hai?\" / counting / grouping → `HashSet` / `HashMap`."
+    - "Stack ya queue → `ArrayDeque`. Baar-baar min/max → `PriorityQueue`."
+  avoid:
+    - "`List<Int>` jahan `IntArray` chal jaaye — boxing ki memory aur speed cost."
+    - "Queue ke liye `ArrayList.removeAt(0)` — O(n). Java `Stack` class — purani aur slow."
+    - "Loop mein String `+` — StringBuilder use karo."
+    - "HashMap ke order par bharosa — order chahiye to `LinkedHashMap` (insertion) ya `TreeMap` (sorted)."
+  signals:
+    - keyword: "answer modulo 10^9 + 7"
+      think: "`Long` + har step par `% MOD`."
+    - keyword: "only lowercase English letters"
+      think: "`IntArray(26)` + `c - 'a'` — HashMap ki zaroorat nahi."
+    - keyword: "sort by X, then by Y"
+      think: "Comparator chain: `compareBy`/`thenBy` (Kotlin), `comparing().thenComparing()` (Java)."
+    - keyword: "values up to 10^9, n up to 10^5 (sum)"
+      think: "Sum 10¹⁴ tak — `Long`."
+
+# 9. Real-world
+realWorld:
+  - where: "Android: `SparseArray` / `ArrayMap`"
+    how: "Android ne `HashMap<Integer, X>` ki boxing aur memory bachane ke liye `SparseArray` banaya — int keys seedhe array mein. Yahi boxing wala lesson."
+  - where: "Kotlin collections in app code"
+    how: "`groupBy`, `associateBy`, `sortedWith`, `distinct` — ViewModel mein list transform karte waqt roz use hote hain. Andar wahi HashMap/sort chal raha hai."
+  - where: "Navigation back stack"
+    how: "Screen stack = LIFO. Andar `ArrayDeque` jaisa structure — naya screen upar, back = upar wala hatao."
+  - where: "Payments / counters"
+    how: "Paise aur badi counts mein overflow ka bug real nuksaan karta hai — isliye `Long` (ya `BigDecimal`) aur limits ke tests."
+  - where: "Hashing in APIs"
+    how: "Backend mein IDs aur hashes ke saath `% m` (sharding, bucketing) — modulo math roz ka kaam hai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Java mein `Integer` ko `==` se compare"
+    type: logic
+    wrong: |
+      ```java
+      Map<String, Integer> a = ..., b = ...;
+      if (a.get(k) == b.get(k)) { ... }   // 127 tak chalega, 128 par fail!
+      ```
+    right: |
+      ```java
+      if (a.get(k).equals(b.get(k))) { ... }   // ya Objects.equals(x, y)
+      ```
+  - title: "Overflow ke baad Long mein badalna"
+    type: overflow
+    wrong: |
+      ```kotlin
+      val x: Long = (a * b).toLong()   // a * b Int mein ho chuka - pehle hi galat
+      ```
+    right: |
+      ```kotlin
+      val x: Long = a.toLong() * b      // pehle Long, phir multiply
+      ```
+  - title: "Iterate karte hue collection badalna"
+    type: logic
+    wrong: |
+      ```kotlin
+      for (x in list) if (x < 0) list.remove(x)   // ConcurrentModificationException
+      ```
+    right: |
+      `list.removeAll { it < 0 }` (Java: `list.removeIf(x -> x < 0)`), ya iterator ka `remove()`.
+  - title: "Negative number ka modulo"
+    type: logic
+    wrong: |
+      `(-7) % 3` → **-1** (Kotlin/Java dono mein). Index ke liye use kiya to crash.
+    right: |
+      `Math.floorMod(-7, 3)` → 2, ya `((x % m) + m) % m`.
+  - title: "`map[key]!!` jab key na ho"
+    type: "null"
+    wrong: |
+      ```kotlin
+      val c = freq[ch]!! + 1   // key nahi hai to NullPointerException
+      ```
+    right: |
+      `freq.getOrDefault(ch, 0) + 1` ya `(freq[ch] ?: 0) + 1`.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Kotlin mein `IntArray` aur `List<Int>` mein kya fark hai?"
+      a: |
+        `IntArray` = primitive `int[]`, fixed size, numbers seedhe memory mein. `List<Int>` = `Integer` objects ke references, size badal sakti hai (MutableList). IntArray tez aur kam memory.
+    - q: "Stack aur queue ke liye Java mein kya use karte ho?"
+      a: |
+        `ArrayDeque` — stack ke liye `push/pop` (ya `addLast/removeLast`), queue ke liye `offer/poll`. `Stack` class purani aur synchronized hai; `LinkedList` mein har node ka object overhead.
+    - q: "HashMap aur TreeMap mein kab kya?"
+      a: |
+        Order nahi chahiye, sirf fast lookup → HashMap (O(1) avg). Keys sorted chahiye ya "isse just chhota/bada key" (`floorKey`, `ceilingKey`) → TreeMap (O(log n)).
+    - q: "HashMap mein worst case complexity?"
+      followUp: true
+      a: |
+        Bahut collisions par ek bucket lamba ho jaata hai → O(n). Java 8+ mein bade buckets tree ban jaate hain → O(log n). Average O(1).
+    - q: "Answer `% (10⁹ + 7)` kyun maangte hain?"
+      a: |
+        Asli answer bahut bada hota hai (64-bit mein bhi nahi aata). 10⁹ + 7 ek bada **prime** hai; do aise numbers ka product `Long` mein fit hota hai, aur prime hone se division (modular inverse) bhi possible hai.
+    - q: "Comparator likho: marks descending, phir naam ascending."
+      a: |
+        Kotlin: `compareByDescending<Student> { it.marks }.thenBy { it.name }`. Java: `Comparator.comparingInt((Student s) -> s.marks).reversed().thenComparing(s -> s.name)`.
+    - q: "String immutable hone ka DSA par kya asar hai?"
+      a: |
+        Har modification nayi String banata hai — loop mein `+` O(n²). Isliye `StringBuilder` (ya `CharArray`) use karte hain. Fayda: String safely HashMap key ban sakti hai.
+    - q: "`list.contains(x)` loop ke andar — kya problem hai?"
+      followUp: true
+      a: |
+        `contains` O(n) hai → total O(n²). `HashSet` mein convert karo → O(1) average check.
+    - q: "Kotlin `mutableMapOf()` aur `hashMapOf()` mein fark?"
+      a: |
+        `mutableMapOf()` = `LinkedHashMap` (insertion order yaad rakhta hai, thodi extra memory). `hashMapOf()` = `HashMap` (order nahi). DSA mein dono O(1) average.
+  mayAsk:
+    - "PriorityQueue ko max-heap kaise banaoge?"
+    - "`sort()` stable hai ya nahi?"
+    - "Fast input kaise padhte ho (BufferedReader)?"
+    - "`equals()` aur `hashCode()` dono override karna kyun zaroori hai?"
+
+# 12. Practice
+practice:
+  - name: First Unique Character in a String
+    platform: LeetCode
+    num: 387
+    url: "https://leetcode.com/problems/first-unique-character-in-a-string/"
+    level: easy
+    pattern: IntArray(26) counting
+    hint: "Pehle pass mein `count[c - 'a']++`, doosre pass mein pehla char jiska count 1 ho."
+  - name: Valid Parentheses
+    platform: LeetCode
+    num: 20
+    url: "https://leetcode.com/problems/valid-parentheses/"
+    level: easy
+    pattern: ArrayDeque as stack
+    hint: "Opening bracket push karo; closing aaye to top se match karo. Aakhir mein stack khaali hona chahiye."
+  - name: Implement Queue using Stacks
+    platform: LeetCode
+    num: 232
+    url: "https://leetcode.com/problems/implement-queue-using-stacks/"
+    level: easy
+    pattern: Do ArrayDeque stacks
+    hint: "Ek stack mein daalo; nikaalna ho aur doosra khaali ho to saare items ulta karke doosre mein daal do."
+  - name: Group Anagrams
+    platform: LeetCode
+    num: 49
+    url: "https://leetcode.com/problems/group-anagrams/"
+    level: medium
+    pattern: HashMap of lists (getOrPut / computeIfAbsent)
+    hint: "Har word ko sort karke key banao (`String(w.toCharArray().sorted())`), phir Example 2 jaisa group karo."
+  - name: Sort Characters By Frequency
+    platform: LeetCode
+    num: 451
+    url: "https://leetcode.com/problems/sort-characters-by-frequency/"
+    level: medium
+    pattern: HashMap + comparator sort
+    hint: "Count karo, phir entries ko count descending sort karo aur StringBuilder mein har char count baar likho."
+  - name: Kth Largest Element in an Array
+    platform: LeetCode
+    num: 215
+    url: "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+    level: medium
+    pattern: PriorityQueue (min-heap of size k)
+    hint: "Min-heap mein items daalo; size k se badi ho to `poll()`. Aakhir mein `peek()` answer hai."
+  - name: Count of Range Sum
+    platform: LeetCode
+    num: 327
+    url: "https://leetcode.com/problems/count-of-range-sum/"
+    level: hard
+    pattern: Long prefix sums + TreeMap/sorting
+    hint: "Prefix sums Long mein (overflow!). Har prefix ke liye pichle prefixes mein se kitne [p − upper, p − lower] range mein hain — sorted structure se gino."
+  - name: "nCr % (10⁹ + 7) for n ≤ 10⁶"
+    platform: Custom
+    level: hard
+    pattern: Factorials + modular inverse
+    hint: "fact[i] LongArray mein % MOD ke saath banao. Division nahi kar sakte — inverse lo: inv(x) = x^(MOD − 2) % MOD (fast power, Fermat). nCr = fact[n] × inv(fact[r]) × inv(fact[n − r]) % MOD."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Numbers fixed size → IntArray; size badle → MutableList/ArrayList."
+    - "HashMap/HashSet O(1) average; TreeMap O(log n) par sorted."
+    - "ArrayDeque = stack + queue, O(1). Java Stack class aur ArrayList.remove(0) se bacho."
+    - "Bade numbers → Long; `% (10⁹+7)` har step par; pehle Long banao, phir multiply."
+    - "`c - 'a'` se char → 0..25; loop mein String + nahi, StringBuilder."
+  cheatsheet: |
+    | Kaam | Kotlin | Java |
+    |---|---|---|
+    | Count | `m[k] = m.getOrDefault(k, 0) + 1` | `m.merge(k, 1, Integer::sum)` |
+    | Group | `m.getOrPut(k) { mutableListOf() }.add(x)` | `m.computeIfAbsent(k, z -> new ArrayList<>()).add(x)` |
+    | Stack | `addLast` / `removeLast` / `last()` | `push` / `pop` / `peek` |
+    | Queue | `addLast` / `removeFirst` / `first()` | `offer` / `poll` / `peek` |
+    | Max-heap | `PriorityQueue<Int>(compareByDescending { it })` | `new PriorityQueue<>(Collections.reverseOrder())` |
+    | Sort desc | `arr.sortDescending()` | `list.sort(Collections.reverseOrder())` |
+    | Char index | `c - 'a'` | `c - 'a'` |
+    | Safe mod | `Math.floorMod(x, m)` | `Math.floorMod(x, m)` |
+  quiz:
+    - q: "Queue ke liye sabse achha choice?"
+      options: ["ArrayList with remove(0)", "ArrayDeque", "Java Stack class", "HashSet"]
+      answer: 1
+      explain: "ArrayDeque mein removeFirst O(1); ArrayList.remove(0) O(n)."
+    - q: "Sirf lowercase letters count karne ke liye sabse tez?"
+      options: ["HashMap<Char, Int>", "TreeMap", "IntArray(26) with c - 'a'", "List<Int>"]
+      answer: 2
+      explain: "Fixed 26 slots, koi hashing/boxing nahi."
+    - q: "`val x: Long = (a * b).toLong()` (a, b Int) — kya problem hai?"
+      options: ["Koi problem nahi", "Multiply Int mein hua, overflow pehle hi ho chuka", "Compile error", "Long mein convert nahi hota"]
+      answer: 1
+      explain: "Pehle `a.toLong()`, phir multiply."
+    - q: "Keys ko sorted order mein chahiye. Kaunsa map?"
+      options: ["HashMap", "TreeMap", "HashSet", "ArrayDeque"]
+      answer: 1
+      explain: "TreeMap keys sorted rakhta hai (O(log n) operations)."
+    - q: "Java mein `(-7) % 3` ka answer?"
+      options: ["2", "-1", "1", "-2"]
+      answer: 1
+      explain: "Sign pehle number ka rehta hai. Positive chahiye to Math.floorMod(-7, 3) = 2."
+
+# 14. Connections
+connections:
+  related:
+    - id: memory-basics
+      why: "Boxing, references aur Int/Long sizes — sab memory ki kahaani."
+    - id: big-o-time
+      why: "Har collection operation ki complexity — galat auzaar = galat Big-O."
+  usedLater:
+    - id: dynamic-array
+      how: "ArrayList andar se kaise badhti hai — doubling ka asli implementation."
+    - id: hashmap
+      how: "getOrDefault, computeIfAbsent — Hashing chapter ke har problem mein."
+    - id: stack
+      how: "ArrayDeque as stack — parentheses, monotonic stack."
+    - id: priority-queue
+      how: "PriorityQueue ke andar heap — top-k, Dijkstra."

@@ -38,10 +38,10 @@ export function OpsTable({ ops }: { ops: Topic['operations'] }) {
         {ops.map((o) => (
           <li key={o.op} className="rounded-lg border border-line p-3">
             <div className="flex items-start justify-between gap-3">
-              <span className="font-medium">
+              <span className="min-w-0 flex-1 font-medium [overflow-wrap:anywhere]">
                 <Inline src={o.op} />
               </span>
-              <span className="shrink-0 text-right font-mono text-sm">
+              <span className="max-w-[45%] shrink-0 text-right font-mono text-sm [overflow-wrap:anywhere]">
                 <span className="font-semibold text-accent">{o.time}</span>
                 <span className="block text-xs text-muted">space {o.space}</span>
               </span>

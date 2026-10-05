@@ -65,6 +65,10 @@ export function ArrayViz({ p }: { p: ArrayPanel }) {
   const rangeRow = 4;
   const pointerRow = rangeRow + ranges.length;
 
+  if (n === 0 && pointers.length === 0) {
+    return <div className="rounded-md border-2 border-dashed border-line px-3 py-2 text-center font-mono text-xs text-muted">khaali [ ]</div>;
+  }
+
   return (
     <div className="w-full overflow-x-auto pb-1">
       <div

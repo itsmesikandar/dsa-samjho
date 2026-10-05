@@ -1,0 +1,472 @@
+meta:
+  id: memory-basics
+  chapter: foundations
+  title: Memory kaise kaam karti hai
+  subtitle: RAM, address, stack aur heap — har data structure ki neev
+  level: beginner
+  minutes: 30
+  prereqs: []
+  tags: [memory, ram, stack, heap, reference]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Computer ki **memory (RAM)** ko ek bahut lambi line samjho jisme crore-on chhote dabbe hain.
+
+    - Har dabba **1 byte** ka hota hai (1 byte = 8 bits, har bit 0 ya 1).
+    - Har dabbe ka ek number hota hai — **address**. Jaise ghar ka pata.
+    - Jab tum `val age = 25` likhte ho, JVM `age` ke liye kuch dabbe deta hai aur unme 25 likh deta hai. Variable ka naam bas us address ka **nickname** hai.
+
+    Har data type ki size fixed hai:
+
+    | Type | Bytes | Range (lagbhag) |
+    |---|---|---|
+    | `Byte` | 1 | -128 se 127 |
+    | `Char` | 2 | ek character |
+    | `Int` | 4 | ±2.1 arab (2,147,483,647) |
+    | `Long` | 8 | ±9.2 × 10¹⁸ |
+    | `Double` | 8 | decimal numbers |
+
+    JVM (Kotlin/Java) memory ko do bade hisson mein baant-ta hai:
+    - **Stack** — function calls aur unke local variables (primitive values aur references).
+    - **Heap** — saare **objects**: arrays, String, List, tumhari apni classes.
+
+    > [!yaad]
+    > Har data structure (array, linked list, tree…) asal mein memory mein data rakhne ka ek **tareeka** hai. Memory samajh li, to aage sab aasaan hai.
+  analogy: |
+    **Stack = shaadi mein plates ka dher.** Nayi plate hamesha upar rakhi jaati hai, aur uthayi bhi upar se jaati hai. Function call = upar ek plate. Function khatam = wo plate hat gayi.
+
+    **Heap = railway station ka cloak room.** Bada saamaan (object) cloak room mein rakha jaata hai. Tumhare haath mein sirf ek **token** hota hai (reference/address). Token se saamaan milta hai.
+
+    Aur agar tum token ki **photocopy** kisi dost ko de do (`val b = a`) — to dono same saamaan nikal sakte ho. Dost ne bag mein se kuch nikaala, to tumhara bag bhi khaali! Yahi reference ka khel hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    "Main to bas code likhta hoon, memory JVM sambhaal leti hai" — ye soch DSA mein bahut nuksaan karti hai. Memory samjhe bina ye sab samajh nahi aayega:
+
+    1. **Array O(1) kyun, linked list O(n) kyun?** — dono ka memory mein baithne ka tareeka alag hai.
+    2. **Space complexity** — "kitne extra dabbe lage", yahi to space complexity hai.
+    3. **Ajeeb bugs** — function ke andar array badla aur bahar bhi badal gaya; do bade numbers jode aur answer negative aa gaya; recursion chalate hi `StackOverflowError`.
+    4. **Interview ka favourite question** — "Java pass-by-value hai ya pass-by-reference?"
+    5. **Android mein** — memory leaks, `OutOfMemoryError`, bade Bitmaps se app crash.
+
+    > [!socho]
+    > 10⁷ (1 crore) `Long` values ka array kitni memory lega? Memory limit 64 MB ho to chalega?
+    >
+    > 10⁷ × 8 bytes = 8 × 10⁷ bytes ≈ **80 MB**. 64 MB mein fit nahi hoga! Aise hisaab interview aur competitive coding dono mein kaam aate hain.
+
+# 3. Visual intro
+visual:
+  body: |
+    Neeche animation mein dekho: RAM ek line hai, har dabbe ke upar uska **address** likha hai. Variables banenge, padhe jaayenge aur copy honge.
+
+    Dhyaan do — `val copy = age` karne par **value** copy hoti hai, kyunki `Int` ek **primitive** hai. Objects (jaise arrays) ke saath kahaani alag hai — wo "Kaise kaam karta hai" mein dekhenge.
+
+    > [!yaad]
+    > JVM mein asli addresses hum dekh nahi sakte, aur memory pe bahut kuch JVM khud sambhaalta hai. Ye numbers sirf samjhane ke liye hain — par idea 100% sahi hai.
+  viz: { tracer: ramIntro }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Jab program chalta hai, har **function call** ke liye stack par ek **frame** banta hai. Frame mein us function ke parameters aur local variables rehte hain.
+
+    - **Primitive** (Int, Long, Boolean, Char, Double) → value seedha frame mein.
+    - **Object** (array, String, List) → asli data **heap** par, frame mein sirf uska **address (reference)**.
+    - Function **return** hote hi uska frame stack se hat jaata hai — saare local variables khatam.
+    - Heap ka object tab tak zinda rehta hai jab tak koi reference use point kar raha ho. Koi na bache to **Garbage Collector (GC)** use saaf kar deta hai.
+
+    | | Stack | Heap |
+    |---|---|---|
+    | Kya rakhta hai | function frames, primitives, references | objects (array, String, List…) |
+    | Size | chhota (aam taur par ~1 MB per thread) | bada (Android app ko kuch sau MB) |
+    | Kaun saaf karta hai | function return hote hi apne aap | Garbage Collector |
+    | Bhar gaya to | `StackOverflowError` | `OutOfMemoryError` |
+
+    Play dabao aur code ke saath dekho ki `square()` ka frame kaise aata aur jaata hai.
+  viz: { tracer: stackHeap }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Variable padhna / likhna"
+    time: O(1)
+    space: O(1)
+    why: "Address pata hai — seedha us dabbe par jao."
+  - op: "Local variable banana (stack)"
+    time: O(1)
+    space: O(1)
+    why: "Stack pointer bas thoda aage khisakta hai — koi dhoondhna nahi."
+  - op: "Function call / return"
+    time: O(1)
+    space: O(1)
+    why: "Ek frame push ya pop hota hai (frame ka size fixed hai)."
+  - op: "`IntArray(n)` banana (heap)"
+    time: O(n)
+    space: O(n)
+    why: "n dabbe chahiye, aur JVM saare dabbe 0 se bharta hai."
+  - op: "Reference copy: `val b = a`"
+    time: O(1)
+    space: O(1)
+    why: "Sirf address copy hota hai, object nahi."
+  - op: "Object copy: `a.copyOf()`"
+    time: O(n)
+    space: O(n)
+    why: "Naya object banta hai aur har value ek-ek karke copy hoti hai."
+  - op: "Recursion jiski depth d hai"
+    time: "O(d) calls"
+    space: O(d)
+    why: "Har pending call ka frame stack par rehta hai — d frames ek saath."
+
+# 6. Code
+code:
+  - title: Har type ki size aur overflow
+    file: sizes
+    note: |
+      `Int.MAX_VALUE + 1` koi error nahi deta — chupchaap **negative** ho jaata hai. Isko **overflow** kehte hain. Sum, product ya counting mein bade numbers aa sakte hon to `Long` lo.
+  - title: Same object hai ya same values? (`===` vs `==`)
+    file: equality
+    note: |
+      Kotlin: `===` = same object? `==` = same value? (andar se `equals()`).
+      Java: objects par `==` = same object? Values ke liye `.equals()`. Arrays ke liye `contentEquals` / `Arrays.equals`.
+
+# 7. Examples
+examples:
+  - id: bytes
+    level: easy
+    title: n Ints ke liye kitni memory lagegi?
+    problem: |
+      Ek question mein tumhe n numbers (n ≤ 10⁶) ek `IntArray` mein rakhne hain, aur memory limit 256 MB hai.
+
+      Function likho jo bataye ki **n Ints ke liye kitne bytes** chahiye. Phir socho — chalega ya nahi?
+    intuition: |
+      Har `Int` = **4 bytes**. To n Ints = **n × 4 bytes**. Bas itna hi.
+
+      Ek chhoti si baat: n × 4 ko `Int` mein calculate kiya aur n bahut bada hua (jaise 10⁹), to khud calculation hi overflow ho jaayegi. Isliye pehle `Long` mein badlo, phir multiply karo.
+
+      > [!tip]
+      > Yaad rakhne layak: **10⁶ Ints ≈ 4 MB**, **10⁶ Longs ≈ 8 MB**. Interview mein "kitni memory lagegi?" ka jawab turant de sakoge.
+    dryRun: |
+      | n | n × 4 bytes | Lagbhag |
+      |---|---|---|
+      | 3 | 12 | 12 bytes |
+      | 1,00,000 | 4,00,000 | ~390 KB |
+      | 10,00,000 | 40,00,000 | ~3.8 MB → 256 MB mein aaram se |
+    viz: { tracer: intBytes }
+    code: ex1-bytes
+    complexity:
+      time: O(1)
+      space: O(1)
+      why: "Sirf ek multiplication — n kitna bhi bada ho, kaam utna hi."
+
+  - id: reference
+    level: medium
+    title: "`val b = a` — copy ya same array?"
+    problem: |
+      Neeche wala code kya print karega? Pehle khud socho, phir animation chalao.
+
+      ```kotlin
+      val a = intArrayOf(1, 2, 3)
+      val b = a
+      b[0] = 99
+      println(a.contentToString())
+      ```
+
+      Aur asli copy kaise banate hain?
+    intuition: |
+      Array ek **object** hai — heap par rehta hai. Variable `a` mein array nahi, uska **address** hai.
+
+      `val b = a` sirf **address copy** karta hai. Ab `a` aur `b` dono **ek hi array** ke do naam hain. `b` se badla = `a` mein bhi dikhega.
+
+      Asli copy chahiye to `copyOf()` (Java: `clone()`) — ye heap par **naya object** banata hai.
+
+      > [!galti]
+      > Function mein array pass karke andar sort/modify kiya, to caller ka array bhi badal jaata hai. Original bachana ho to pehle copy banao.
+    dryRun: |
+      | Line | a | b | c | Heap mein kya hua |
+      |---|---|---|---|---|
+      | `a = [1,2,3]` | → 1000 | – | – | object @1000 bana |
+      | `b = a` | → 1000 | → 1000 | – | kuch naya nahi |
+      | `b[0] = 99` | → 1000 | → 1000 | – | @1000 = [99, 2, 3] |
+      | `c = a.copyOf()` | → 1000 | → 1000 | → 1020 | naya object @1020 |
+      | `c[2] = 50` | → 1000 | → 1000 | → 1020 | sirf @1020 badla |
+    viz: { tracer: referenceTrap }
+    code: ex2-reference
+    complexity:
+      time: "O(1) reference copy, O(n) copyOf"
+      space: "O(1) reference copy, O(n) copyOf"
+      why: "Address copy karna ek kaam hai; poora object copy karna har value ko chhoota hai."
+
+  - id: pass-by-value
+    level: tricky
+    title: Function ke andar badlaav — bahar dikhega ya nahi?
+    problem: |
+      Function ko ek `Int` aur ek `IntArray` diya. Andar dono ko badla. `main` mein kya print hoga?
+
+      ```kotlin
+      fun tryChange(num: Int, arr: IntArray) {
+          var x = num
+          x = 100
+          arr[0] = 100
+      }
+      // main: num = 5, arr = [5, 6]; tryChange(num, arr)
+      ```
+    intuition: |
+      Golden rule: **Java aur Kotlin hamesha pass-by-VALUE hain.** Function ko argument ki ek **copy** milti hai.
+
+      - `num` ki copy = value 5. Andar kuch bhi karo, bahar ka `num` nahi badlega.
+      - `arr` ki copy = **address** ki copy. Dono address ek hi heap object par point karte hain. To `arr[0] = 100` asli array badal deta hai.
+
+      Yaani: **parameter ko naya value dena** bahar nahi dikhta, par **object ke andar badlaav** bahar dikhta hai.
+
+      > [!tip]
+      > Interview mein bolo: "Java is always pass-by-value. For objects, the value being passed is the reference." Ye line bahut impress karti hai.
+    dryRun: |
+      | Step | main: num | main: arr | tryChange: x | Heap @1000 |
+      |---|---|---|---|---|
+      | call se pehle | 5 | → 1000 | – | [5, 6] |
+      | `x = num` | 5 | → 1000 | 5 | [5, 6] |
+      | `x = 100` | 5 | → 1000 | 100 | [5, 6] |
+      | `arr[0] = 100` | 5 | → 1000 | 100 | [100, 6] |
+      | return ke baad | **5** | → 1000 | (frame gaya) | **[100, 6]** |
+    viz: { tracer: passByValue }
+    code: ex3-pass-by-value
+    complexity:
+      time: O(1)
+      space: O(1)
+      why: "Function call mein sirf ek frame banta hai; array copy nahi hota — sirf address jaata hai."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Memory limit wala question ho — pehle hisaab lagao: **n × bytes per item**."
+    - "Bada array/list function mein bhejna ho — reference jaata hai, copy nahi, isliye ye sasta (O(1)) hai."
+    - "Original data bachana ho — pehle `copyOf()` / `toMutableList()` se copy banao, phir badlo."
+    - "Bade sum/product/count ho — `Long` lo, `Int` overflow ho sakta hai."
+  avoid:
+    - "Bahut gehri recursion (10⁴–10⁵ levels) — stack chhota hai, `StackOverflowError` aa sakta hai. Loop wala (iterative) version socho."
+    - "Loop ke andar har baar naya bada object banana — memory aur GC dono ka kharcha badhta hai."
+    - "Objects ko `==` (Java) se compare karna — wo address compare karta hai, values nahi."
+  signals:
+    - keyword: "memory limit 256 MB, n ≤ 10^6"
+      think: "n × 4 bytes ≈ 4 MB — `IntArray` aaram se fit. 2D array `n × n` ho to dhyaan se!"
+    - keyword: "modify the array in-place"
+      think: "Function ko reference milta hai — andar ka badlaav caller ko bhi dikhega."
+    - keyword: "do not modify the input / return a new list"
+      think: "Pehle copy banao (O(n) extra space)."
+    - keyword: "answer can be large, use 64-bit"
+      think: "`Long` use karo; har multiply/add se pehle `toLong()`."
+
+# 9. Real-world
+realWorld:
+  - where: "Android memory leak"
+    how: "Activity ko kisi static variable ya singleton mein reference se pakad ke rakha → screen band hone par bhi GC usko saaf nahi kar paata. LeakCanary isi ko pakadta hai."
+  - where: "Bitmap / images"
+    how: "12 MP photo = 4000 × 3000 pixels × 4 bytes ≈ 48 MB! Isliye Glide/Coil image ko screen ke size jitna chhota karke load karte hain."
+  - where: "OutOfMemoryError aur heap limit"
+    how: "Har Android app ko limited heap milta hai. Bade lists/caches bina soche rakhe to app crash. Servers par `-Xmx` se heap ki size set karte hain."
+  - where: "Flutter / Dart"
+    how: "Dart mein bhi objects heap par aur GC wahi kaam karta hai. `const` widgets ek hi object dobara use karte hain — memory bachti hai."
+  - where: "Recursion wale features"
+    how: "JSON/XML parser, folder tree scan — bahut deep nesting par recursion stack bhar sakta hai, isliye production code mein aksar explicit stack (loop) use hota hai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Int mein bada sum ya product"
+    type: overflow
+    wrong: |
+      ```kotlin
+      val a = 100_000
+      val b = 100_000
+      val product = a * b       // 10^10 Int mein fit nahi -> galat number!
+      ```
+    right: |
+      ```kotlin
+      val product = a.toLong() * b   // pehle Long, phir multiply
+      ```
+      Dhyaan do: `(a * b).toLong()` bhi galat hai — overflow multiply ke time hi ho chuka hota hai.
+  - title: "Java mein Strings ko `==` se compare karna"
+    type: logic
+    wrong: |
+      ```java
+      if (input == "yes") { ... }   // address compare! kabhi chalega, kabhi nahi
+      ```
+    right: |
+      ```java
+      if (input.equals("yes")) { ... }
+      ```
+      Kotlin mein `==` theek hai (andar `equals()` hi chalta hai). Same object check karna ho to `===`.
+  - title: "2D array ki 'copy' jo asli copy nahi hai (shallow copy)"
+    type: logic
+    wrong: |
+      ```kotlin
+      val copy = grid.copyOf()   // sirf rows ke ADDRESS copy hue
+      copy[0][0] = 9             // grid[0][0] bhi 9 ho gaya!
+      ```
+    right: |
+      ```kotlin
+      val copy = Array(grid.size) { grid[it].copyOf() }   // har row ki alag copy (deep copy)
+      ```
+  - title: "Bahut gehri recursion"
+    type: other
+    wrong: |
+      Linked list ya tree jiski depth 10⁵ ho, uspe seedha recursive function → `StackOverflowError`.
+    right: |
+      Depth bahut badi ho sakti hai to loop + apna stack (`ArrayDeque`) use karo. Ya kam se kam interviewer ko ye risk batao.
+  - title: "Integer cache wala trap (Java)"
+    type: logic
+    wrong: |
+      ```java
+      Integer a = 128, b = 128;
+      System.out.println(a == b);   // false! (127 tak true aata hai)
+      ```
+      Java -128 se 127 tak ke `Integer` objects cache karta hai, uske bahar naye objects bante hain.
+    right: |
+      Objects ko hamesha `.equals()` se compare karo: `a.equals(b)` → `true`.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Stack aur heap memory mein kya fark hai?"
+      a: |
+        - **Stack:** har thread ka apna. Function frames, local primitives aur references. Function khatam → frame apne aap hata. Chhota aur fast. Bhar gaya → `StackOverflowError`.
+        - **Heap:** saare threads share karte hain. Saare objects yahan. Garbage Collector saaf karta hai. Bada. Bhar gaya → `OutOfMemoryError`.
+    - q: "Primitive aur reference type mein kya fark hai?"
+      a: |
+        Primitive (`int`, `long`, `boolean`…) ka variable **khud value** rakhta hai. Reference type (array, String, class) ka variable sirf **object ka address** rakhta hai — object heap par hota hai.
+    - q: "Java pass-by-value hai ya pass-by-reference?"
+      a: |
+        **Hamesha pass-by-value.** Objects ke case mein jo value copy hokar jaati hai wo ek **reference** hai. Isliye function ke andar object ko modify karoge to bahar dikhega, par parameter ko naya object assign karoge to bahar kuch nahi badlega.
+    - q: "`StackOverflowError` aur `OutOfMemoryError` kab aate hain?"
+      a: |
+        `StackOverflowError` — bahut gehri (ya infinite) recursion, stack frames se bhar gaya. `OutOfMemoryError` — heap mein naye object ke liye jagah nahi bachi (bahut bade arrays, leak, bade Bitmaps).
+    - q: "Garbage Collection kya hai? Object kab collect hota hai?"
+      a: |
+        GC heap se un objects ko hatata hai jinhe ab koi bhi **reachable reference** point nahi karta (roots jaise stack variables, static fields se shuru karke dekha jaata hai). Kab chalega ye JVM decide karta hai — hum guarantee nahi kar sakte.
+    - q: "Android mein memory leak ka ek example do."
+      followUp: true
+      a: |
+        Activity ko static field / singleton / long-running background task mein pakad ke rakhna. Screen rotate ya band hone par bhi purani Activity ka reference bacha rehta hai → GC saaf nahi kar paata. Fix: `applicationContext` use karo, ya `WeakReference`, ya lifecycle par listener hatao.
+    - q: "Kotlin mein `==` aur `===` mein kya fark hai?"
+      a: |
+        `==` → values compare (`equals()`). `===` → same object hai ya nahi (address compare). Java mein objects par `==` hi address compare hai, isliye wahan values ke liye `.equals()` likhte hain.
+    - q: "`Integer a = 128, b = 128; a == b` kya dega?"
+      followUp: true
+      a: |
+        `false`. Java -128 se 127 tak ke Integer objects cache karta hai; 128 par do alag objects bante hain aur `==` address compare karta hai. 127 hota to `true`. Sabak: wrapper objects ko `.equals()` se compare karo.
+    - q: "10⁶ `Long` values ka array kitni memory lega?"
+      a: |
+        10⁶ × 8 bytes = 8 × 10⁶ bytes ≈ **8 MB** (plus thoda sa object header). `Int` hota to ~4 MB.
+    - q: "Shallow copy aur deep copy mein kya fark hai?"
+      a: |
+        Shallow copy sirf upar wala object copy karti hai — andar ke objects ke references same rehte hain (jaise `grid.copyOf()` mein rows shared). Deep copy andar ke objects ki bhi nayi copies banati hai, taaki dono puri tarah alag hon.
+  mayAsk:
+    - "String immutable kyun hai? String pool kya hai?"
+    - "WeakReference kab use karte ho?"
+    - "Ek recursive function ki stack space kitni hogi?"
+    - "Autoboxing kya hai aur `List<Integer>` `int[]` se zyada memory kyun leta hai?"
+
+# 12. Practice
+practice:
+  - name: "Har type ki size print karo"
+    platform: Custom
+    level: easy
+    pattern: Data type sizes
+    hint: "Kotlin: `Int.SIZE_BYTES`, `Long.SIZE_BYTES`, `Char.SIZE_BYTES`. Java: `Integer.BYTES`, `Long.BYTES`. Phir 10⁶ items ke liye memory MB mein nikaalo."
+  - name: Concatenation of Array
+    platform: LeetCode
+    num: 1929
+    url: "https://leetcode.com/problems/concatenation-of-array/"
+    level: easy
+    pattern: Naya array banana (heap allocation)
+    hint: "`IntArray(2 * n)` banao, phir `ans[i] = nums[i]` aur `ans[i + n] = nums[i]`. Socho kitni extra memory lagi: 2n × 4 bytes."
+  - name: "Overflow pakdo"
+    platform: Custom
+    level: easy
+    pattern: Overflow check
+    hint: "Do Int jodne se pehle check karo: `Math.addExact(a, b)` overflow par exception deta hai. Ya dono ko `Long` mein jodo aur `Int.MAX_VALUE` se compare karo."
+  - name: "Predict output: swap(a, b) function"
+    platform: Custom
+    level: medium
+    pattern: Pass-by-value
+    hint: "Do Int ko function ke andar swap karo aur bahar print karo — kuch nahi badlega. Phir array ke do index swap karke dekho — badal jaayega. Kyun? Frames ka diagram banao."
+  - name: "2D array ki deep copy"
+    platform: Custom
+    level: medium
+    pattern: Shallow vs deep copy
+    hint: "`grid.copyOf()` sirf rows ke references copy karta hai. Har row ka alag `copyOf()` karo: `Array(grid.size) { grid[it].copyOf() }`. Test: copy badlo, original same rehna chahiye."
+  - name: Copy List with Random Pointer
+    platform: LeetCode
+    num: 138
+    url: "https://leetcode.com/problems/copy-list-with-random-pointer/"
+    level: medium
+    pattern: Deep copy + purane → naye node ka map
+    hint: "`HashMap<Node, Node>` banao: pehle har purane node ka naya node, phir dusre pass mein `next` aur `random` jodo."
+  - name: "Mini memory allocator (LC 2502 jaisa)"
+    platform: Custom
+    level: hard
+    pattern: Contiguous free block dhoondhna
+    hint: "Ek `IntArray(n)` lo jisme 0 = khaali. `allocate(size, id)` = pehla aisa block dhoondho jisme `size` khaali dabbe lagatar hon. `free(id)` = us id ke saare dabbe 0 karo."
+  - name: "StackOverflow experiment: recursion depth naapo"
+    platform: Custom
+    level: hard
+    pattern: Stack frames ki limit
+    hint: "Ek counter ke saath recursive function chalao aur `StackOverflowError` catch karke depth print karo. Phir function mein zyada local variables daalo — depth kam kyun hui? (har frame bada ho gaya)."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "RAM = bytes ki lambi line; har byte ka ek address. Variable = address ka nickname."
+    - "Int 4 bytes, Long 8 bytes. Int ki limit ~2.1 arab — usse aage overflow."
+    - "Stack: function frames, primitives, references. Return hote hi saaf."
+    - "Heap: saare objects. Koi reference na bache to Garbage Collector saaf karta hai."
+    - "`val b = a` (object) sirf address copy karta hai. Java/Kotlin hamesha pass-by-value."
+  cheatsheet: |
+    | Cheez | Yaad rakho |
+    |---|---|
+    | 10⁶ Ints | ≈ 4 MB |
+    | 10⁶ Longs | ≈ 8 MB |
+    | `Int.MAX_VALUE` | 2,147,483,647 (~2.1 × 10⁹) |
+    | Same object? | Kotlin `===`, Java `==` |
+    | Same value? | Kotlin `==`, Java `.equals()` |
+    | Array copy | `copyOf()` / `clone()` — O(n) |
+    | Deep recursion | stack overflow ka risk |
+  quiz:
+    - q: "`IntArray(1000)` lagbhag kitni memory lega (header chhod ke)?"
+      options: ["1000 bytes", "4000 bytes", "8000 bytes", "1 MB"]
+      answer: 1
+      explain: "Har Int 4 bytes → 1000 × 4 = 4000 bytes."
+    - q: "Local variable `val n = 5` (function ke andar) kahan rehta hai?"
+      options: ["Heap", "Stack frame mein", "Hard disk", "CPU cache mein hamesha"]
+      answer: 1
+      explain: "Primitive local variables function ke stack frame mein rehte hain."
+    - q: "`val b = a` (a ek IntArray) ke baad `b[1] = 7` karne se?"
+      options: ["Sirf b badlega", "a bhi badlega", "Error aayega", "a ki copy banegi"]
+      answer: 1
+      explain: "Dono same heap object ko point karte hain."
+    - q: "Function ke andar Int parameter ki copy ko badalne se caller ka variable?"
+      options: ["Badal jaata hai", "Nahi badalta", "Kabhi kabhi badalta hai", "Program crash"]
+      answer: 1
+      explain: "Pass-by-value: function ko sirf value ki copy mili thi."
+    - q: "Bahut gehri recursion se kaunsa error aata hai?"
+      options: ["OutOfMemoryError", "StackOverflowError", "NullPointerException", "ArithmeticException"]
+      answer: 1
+      explain: "Har call ka frame stack par jama hota hai; stack bhar gaya to StackOverflowError."
+
+# 14. Connections
+connections:
+  related:
+    - id: space-complexity
+      why: "Space complexity = kitne extra dabbe (bytes) lage — isi memory ki ginti."
+    - id: kotlin-java-toolkit
+      why: "Int vs Long, IntArray vs List<Int> — memory ka asar har jagah."
+  usedLater:
+    - id: array
+      how: "Array = memory mein lagatar dabbe → O(1) access."
+    - id: singly-linked-list
+      how: "Linked list ke nodes heap par bikhre hote hain, references se jude."
+    - id: recursion-basics
+      how: "Call stack ka poora khel — har call ek frame."
+    - id: hashing-internals
+      how: "`hashCode()` aur `equals()` — same value vs same object yahin se samajh aata hai."

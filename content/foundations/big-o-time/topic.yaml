@@ -1,0 +1,461 @@
+meta:
+  id: big-o-time
+  chapter: foundations
+  title: Time Complexity & Big-O
+  subtitle: Code kitna fast hai — seconds mein nahi, "growth" mein naapo
+  level: beginner
+  minutes: 35
+  prereqs: [memory-basics]
+  tags: [big-o, time-complexity, growth, worst-case]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Time complexity** batati hai ki **input bada hone par code ke steps kitni tezi se badhte hain**.
+
+    Hum seconds mein nahi naapte — kyunki wo phone, laptop, server sab par alag hote hain. Hum **steps ginte** hain, as a function of input size **n**.
+
+    **Big-O** us growth ka "shape" likhne ka short tareeka hai:
+
+    | Big-O | Naam | Example |
+    |---|---|---|
+    | O(1) | constant | `arr[5]` padhna |
+    | O(log n) | logarithmic | binary search |
+    | O(n) | linear | ek loop se sum |
+    | O(n log n) | linearithmic | achhi sorting |
+    | O(n²) | quadratic | nested loop, saare pairs |
+    | O(2ⁿ) | exponential | saare subsets |
+
+    Teen rules yaad rakho:
+    1. **Worst case** dekhte hain (sabse bura input).
+    2. **Constants hata do**: 3n + 5 → O(n).
+    3. **Chhote terms hata do**: n² + n → O(n²).
+
+    > [!yaad]
+    > Big-O ka sawaal hai: **"n 10 guna ho gaya, to kaam kitne guna badhega?"** O(n) mein 10 guna, O(n²) mein 100 guna, O(log n) mein bas thoda sa.
+  analogy: |
+    **Shaadi ka invitation** socho.
+    - **O(1):** WhatsApp group mein ek message — 10 mehmaan hon ya 1000, kaam ek hi.
+    - **O(n):** har mehmaan ko alag se call — jitne mehmaan, utni calls.
+    - **O(n²):** har mehmaan ko baaki **har** mehmaan se milwana — 100 mehmaan = ~5000 introductions!
+    - **O(log n):** telephone directory mein naam dhoondhna — beech se kholo, aadha hata do, phir aadha… 1000 pages mein bhi ~10 baar palatna.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Tumhara code 100 items par 1 second mein chal gaya. Kya 10 lakh items par bhi chalega? **Bina chalaye** ye batana — yahi Big-O ka kaam hai.
+
+    - **Interview:** har solution ke baad poocha jaata hai — "time complexity kya hai? Better kar sakte ho?"
+    - **Online judges (LeetCode/Codeforces):** ek rough rule hai — **~10⁸ simple steps ≈ 1 second**. n = 10⁵ par O(n²) = 10¹⁰ steps → *Time Limit Exceeded*.
+    - **Real apps:** 10,000 contacts ki list par O(n²) search → app atak jaayega.
+
+    > [!socho]
+    > n = 10⁶ hai. O(n log n) wala solution aur O(n²) wala — kitne steps?
+    >
+    > O(n log n) ≈ 10⁶ × 20 = **2 × 10⁷** → aaram se chalega. O(n²) = **10¹²** → ghanton lagega. Same problem, alag approach, zameen-aasman ka fark.
+
+# 3. Visual intro
+visual:
+  body: |
+    Neeche graph mein har line ek complexity hai. X-axis = input size n, Y-axis = steps.
+
+    Marker ko aage badhte dekho. Chhote n par sab lines paas-paas hain — lagta hai sab barabar hain. Par jaise hi n badhta hai, **O(n²)** rocket ki tarah upar jaata hai aur **O(log n)** lagbhag zameen par rehta hai.
+
+    "Apna input try karo" mein n = 30 daal ke dekho.
+  viz: { tracer: growthChart }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Complexity nikaalne ka tareeka: **dekho kaunsa kaam kitni baar chalta hai.**
+
+    1. Jo kaam ek hi baar hota hai (variable banana, return) → **O(1)**.
+    2. Loop jo n baar chalta hai → andar ka kaam × n.
+    3. Sab jod do, phir constants aur chhote terms hata do.
+
+    Array ka sum: `total = 0` (1 baar) + loop (n baar) + `return` (1 baar) = **n + 2 steps → O(n)**.
+
+    Animation mein `steps` counter dekho — har item par ek badhta hai.
+  viz: { tracer: countSteps }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "`arr[i]`, HashMap `get` (average)"
+    time: O(1)
+    space: O(1)
+    why: "n kitna bhi ho, ek hi kaam."
+  - op: "Binary search (sorted array)"
+    time: O(log n)
+    space: O(1)
+    why: "Har step mein aadha hata do — 10⁶ par sirf ~20 steps."
+  - op: "Ek loop (sum, max, linear search)"
+    time: O(n)
+    space: O(1)
+    why: "Har item ek baar — 10⁶ par 10⁶ steps."
+  - op: "Achhi sorting (merge sort, `sort()`)"
+    time: O(n log n)
+    space: "O(n) ya O(log n)"
+    why: "10⁶ par ~2 × 10⁷ steps — aaram se chalta hai."
+  - op: "Nested loop (saare pairs)"
+    time: O(n²)
+    space: O(1)
+    why: "n(n-1)/2 pairs — 10⁵ par ~5 × 10⁹ steps, TLE pakka."
+  - op: "Saare subsets"
+    time: O(2ⁿ)
+    space: O(n)
+    why: "Har item: lo ya na lo — n = 30 par hi ~10⁹."
+  - op: "Saare permutations"
+    time: O(n!)
+    space: O(n)
+    why: "n = 12 par ~4.8 × 10⁸ — sirf bahut chhote n ke liye."
+
+# 6. Code
+code:
+  - title: Growth table — n badhne par log n, n log n, n² kitne hote hain
+    file: growth
+    note: |
+      Table dhyaan se dekho: n 10 se 10⁶ hua (1 lakh guna), log n sirf 3 se 19 hua, par n² 100 se 10¹² ho gaya. `log2` yahan "kitni baar aadha kar sakte hain" wala integer version hai.
+
+# 7. Examples
+examples:
+  - id: linear-search
+    level: easy
+    title: Linear search — best case, worst case
+    problem: |
+      Ek array aur ek number x diya hai. Shuru se ek-ek item dekh ke x dhoondho, aur batao **kitne comparisons** lage.
+
+      Teen case try karo: x beech mein hai, x pehle index par hai, x array mein hai hi nahi.
+    intuition: |
+      Comparisons input par depend karte hain:
+      - **Best case:** x pehle hi index par → 1 comparison.
+      - **Worst case:** x last mein ya hai hi nahi → n comparisons.
+      - **Average:** lagbhag n/2.
+
+      Big-O mein hum **worst case** batate hain, kyunki wo guarantee deta hai — "isse bura nahi hoga". n/2 bhi constant hata ke O(n) hi hai.
+
+      > [!tip]
+      > Interview mein bolo: "Best case O(1), worst case O(n), isliye overall O(n)."
+    dryRun: |
+      Array `[7, 3, 9, 5, 1]`
+
+      | x | Kahan mila | Comparisons | Case |
+      |---|---|---|---|
+      | 5 | index 3 | 4 | average jaisa |
+      | 7 | index 0 | 1 | best |
+      | 8 | nahi mila | 5 | worst |
+    viz: { tracer: linearSearch }
+    code: ex1-linear-search
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Worst case mein har item ek baar dekhna padta hai; sirf ek counter variable."
+
+  - id: pairs
+    level: medium
+    title: Nested loop — kitne pairs ka sum target hai?
+    problem: |
+      Ek array aur `target` diya hai. Kitne pairs (i < j) aise hain jinka sum `target` ke barabar hai? Brute force se karo aur **checks gino**.
+
+      Example: `[1, 5, 3, 3, 2]`, target = 6 → pairs (1, 5) aur (3, 3) → answer **2**.
+    intuition: |
+      Seedha tareeka: har item ko uske **baad wale har item** ke saath jodo.
+      - i = 0 ke liye n-1 checks, i = 1 ke liye n-2… last ke liye 0.
+      - Total = (n-1) + (n-2) + … + 1 = **n(n-1)/2**.
+
+      n(n-1)/2 = n²/2 - n/2 → constants aur chhota term hatao → **O(n²)**.
+
+      > [!socho]
+      > Kya ise O(n) mein kar sakte hain?
+      >
+      > Haan! HashMap mein "abhi tak kaun-kaun se numbers dekhe" rakho — har item par check karo `target - x` pehle dekha hai ya nahi. Ye Hashing chapter mein karenge.
+    dryRun: |
+      `[1, 5, 3, 3, 2]`, target 6, n = 5
+
+      | i | j values | Checks | Pairs mile |
+      |---|---|---|---|
+      | 0 (1) | 5, 3, 3, 2 | 4 | 1+5 ✓ |
+      | 1 (5) | 3, 3, 2 | 3 | – |
+      | 2 (3) | 3, 2 | 2 | 3+3 ✓ |
+      | 3 (3) | 2 | 1 | – |
+      | 4 (2) | – | 0 | – |
+
+      Total checks = 10 = 5×4/2. Answer = **2**.
+    viz: { tracer: countPairs }
+    code: ex2-pairs
+    complexity:
+      time: O(n²)
+      space: O(1)
+      why: "n(n-1)/2 pairs check hote hain; sirf do counters ki extra memory."
+
+  - id: halving
+    level: tricky
+    title: Har baar aadha — O(log n) kaise banta hai
+    problem: |
+      Ek number n diya hai. Use baar-baar 2 se divide karo (integer division) jab tak 1 na bache. **Kitne steps** lage? Aur ye n ke saath kaise badhta hai?
+
+      Example: 64 → 32 → 16 → 8 → 4 → 2 → 1 = **6 steps**.
+    intuition: |
+      Ulta socho: 1 ko kitni baar double karein ki n ban jaaye? 2^k = n → **k = log₂ n**.
+
+      Isliye jo loop har baar problem ko **aadha** karta hai, wo log n baar chalta hai. Ye bahut tez hai:
+      - n = 1000 → ~10 steps
+      - n = 10⁶ → ~20 steps
+      - n = 10⁹ → ~30 steps
+
+      > [!yaad]
+      > Loop variable **multiply ya divide** ho raha hai (×2, /2) → log n. **Add ya subtract** ho raha hai (+1, -1) → n. Binary search, heap, balanced trees — sab mein yahi log n aata hai.
+    dryRun: |
+      n = 64
+
+      | Step | x pehle | x baad |
+      |---|---|---|
+      | 1 | 64 | 32 |
+      | 2 | 32 | 16 |
+      | 3 | 16 | 8 |
+      | 4 | 8 | 4 |
+      | 5 | 4 | 2 |
+      | 6 | 2 | 1 → ruk jao |
+
+      6 = log₂ 64 ✓
+    viz: { tracer: halvings }
+    code: ex3-halving
+    complexity:
+      time: O(log n)
+      space: O(1)
+      why: "Har round mein x aadha hota hai, to log₂ n rounds. Sirf do variables."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Code likhne se **pehle** — approach ki complexity nikaalo, constraints se match karo."
+    - "Do approaches compare karni hon — Big-O jiski chhoti, wo bade n par jeetegi."
+    - "Interview mein har solution ke baad khud bolo: time aur space complexity."
+  avoid:
+    - "Big-O ko exact time mat samjho — O(n) ka code bhi slow ho sakta hai agar har step bhaari ho."
+    - "Bahut chhote n (jaise n ≤ 10) par O(n²) vs O(n) ki fikar mat karo — dono instant hain."
+    - "Best case ko complexity mat batao — interviewer worst case sunna chahta hai (jab tak specifically average na pooche)."
+  signals:
+    - keyword: "n ≤ 10^5 ya 10^6"
+      think: "O(n log n) ya O(n) chahiye — O(n²) TLE dega."
+    - keyword: "n ≤ 1000 – 5000"
+      think: "O(n²) chal jaayega."
+    - keyword: "n ≤ 20"
+      think: "O(2ⁿ) bhi chalega — saare subsets try kar sakte ho."
+    - keyword: "n ≤ 10^9 ya 10^18"
+      think: "Loop bhi nahi chala sakte! O(log n) (binary search) ya O(1) math chahiye."
+
+# 9. Real-world
+realWorld:
+  - where: "Contacts / search screen"
+    how: "10,000 contacts mein har keystroke par poori list scan = O(n). HashMap ya Trie se O(1) / O(length) — typing smooth rehti hai."
+  - where: "Database index"
+    how: "Bina index ke query = poori table scan, O(n). Index (B-tree) ke saath O(log n) — crore rows mein bhi milliseconds."
+  - where: "RecyclerView `DiffUtil`"
+    how: "Do lists ka fark nikaalne ke liye Myers algorithm (~O(N + D²)) — har item ko har item se compare (O(n²)) karta to badi lists par UI atak jaati."
+  - where: "Image filters / camera"
+    how: "Har pixel par ek kaam = O(width × height). 12 MP photo = 1.2 crore pixels — isliye filters GPU par chalte hain."
+  - where: "Backend APIs"
+    how: "Har request mein O(n²) loop chhote data par theek lagta hai, par users badhte hi server CPU 100% — isliye code review mein complexity dekhi jaati hai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Constants ke saath complexity likhna"
+    type: logic
+    wrong: |
+      "Mera code O(2n) hai" ya "O(n/2) hai".
+    right: |
+      Constants hata do: **O(n)**. Big-O shape batata hai, exact count nahi.
+  - title: "Chhupe hue loops bhool jaana"
+    type: logic
+    wrong: |
+      ```kotlin
+      for (x in arr) {
+          if (list.contains(x)) count++   // contains() khud ek loop hai!
+      }
+      ```
+      Ye O(n) nahi, **O(n × m)** hai.
+    right: |
+      Library functions ki complexity bhi gino: `list.contains`, `indexOf`, `remove(0)` → O(n). Fast lookup chahiye to `HashSet` (O(1) average).
+  - title: "Loop mein String jodna"
+    type: logic
+    wrong: |
+      ```kotlin
+      var s = ""
+      for (i in 1..n) s += i   // har baar nayi String copy -> O(n²)
+      ```
+    right: |
+      ```kotlin
+      val sb = StringBuilder()
+      for (i in 1..n) sb.append(i)   // O(n) total
+      ```
+  - title: "Do alag loops ko multiply kar dena"
+    type: logic
+    wrong: |
+      Ek loop n ka, uske baad (andar nahi) doosra loop m ka → "O(n × m)".
+    right: |
+      Ek ke **baad** ek loop = **jodo**: O(n + m). Ek ke **andar** doosra = **multiply**: O(n × m).
+  - title: "Bade n par steps ginte waqt overflow"
+    type: overflow
+    right: |
+      n = 10⁵ par n² = 10¹⁰ — `Int` mein fit nahi. Steps ya pairs gin rahe ho to `Long` lo: `n.toLong() * n`.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Big-O notation kya hai?"
+      a: |
+        Input size n badhne par algorithm ka kaam (time ya memory) **kitni tezi se badhta hai** — uski upper bound. Constants aur chhote terms hata ke sirf growth ka shape likhte hain.
+    - q: "Constants kyun hata dete hain? 2n aur n alag nahi hain kya?"
+      a: |
+        Big-O bade n ki baat karta hai. 2n aur n dono **linear** badhte hain — n 10 guna, kaam 10 guna. Machine, language, compiler badalne se constants waise bhi badal jaate hain. Par n vs n² ka fark koi machine nahi mita sakti.
+    - q: "Best, average aur worst case mein kya fark hai? Big-O kaunsa batata hai?"
+      a: |
+        Same n par alag inputs par alag time lagta hai. Linear search: best O(1), average ~n/2, worst n. Aam taur par complexity = **worst case**, kyunki wo guarantee hai.
+    - q: "n = 10⁵ hai. O(n²) chalega?"
+      a: |
+        10¹⁰ steps — rough rule ~10⁸ steps/second se ~100 second. Nahi chalega. O(n log n) ≈ 1.7 × 10⁶ steps chahiye.
+    - q: "Kya O(n²) hamesha O(n) se slow hota hai?"
+      followUp: true
+      a: |
+        Nahi — chhote n par ya bade constants ke saath O(n²) tez ho sakta hai. Isliye Java/Kotlin ka sort chhote arrays par insertion sort (O(n²)) use karta hai. Big-O bade n par jeet batata hai.
+    - q: "Big-O, Big-Ω (Omega) aur Big-Θ (Theta) mein kya fark hai?"
+      a: |
+        - **O** = upper bound (isse zyada nahi).
+        - **Ω** = lower bound (isse kam nahi).
+        - **Θ** = tight bound (dono — exactly isi rate se).
+
+        Interview mein log "Big-O" bolte hain par matlab aksar tight bound hi hota hai.
+    - q: "log n ka base kya hai? Fark padta hai?"
+      a: |
+        Aam taur par base 2. Big-O mein base se fark nahi padta — log₂ n aur log₁₀ n mein bas constant (≈3.32) ka fark hai, jo hum hata dete hain.
+    - q: "Loop ke andar `list.contains(x)` — total complexity?"
+      followUp: true
+      a: |
+        `contains` khud O(m) hai, to total **O(n × m)**. `HashSet` use karo to average O(1), total O(n).
+    - q: "Amortized O(1) kya hota hai?"
+      a: |
+        Kabhi-kabhi ek operation mehenga hota hai, par **bahut saare operations ka average** O(1) aata hai. Jaise `ArrayList.add()` — bhar jaane par resize O(n), par wo kabhi-kabhi hota hai, average O(1).
+    - q: "O(n log n) kahan aata hai?"
+      a: |
+        Achhi sorting (merge sort, heap sort), aur jahan har item par ek O(log n) kaam ho — jaise n items heap mein daalna.
+  mayAsk:
+    - "Is code ki complexity batao (koi naya snippet)."
+    - "Isse better kar sakte ho? Kya trade-off hoga (time vs space)?"
+    - "Recursion ki complexity kaise nikaaloge?"
+    - "Agar input sorted ho to complexity badlegi?"
+
+# 12. Practice
+practice:
+  - name: Two Sum
+    platform: LeetCode
+    num: 1
+    url: "https://leetcode.com/problems/two-sum/"
+    level: easy
+    pattern: O(n²) → O(n) with HashMap
+    hint: "Pehle brute force (saare pairs) likho aur complexity batao. Phir socho: har x ke liye `target - x` pehle dekha hai? HashMap se O(1) check."
+  - name: Contains Duplicate
+    platform: LeetCode
+    num: 217
+    url: "https://leetcode.com/problems/contains-duplicate/"
+    level: easy
+    pattern: n² → n log n → n
+    hint: "Teen tareeke likho: saare pairs (O(n²)), sort karke padosi check (O(n log n)), HashSet (O(n)). Har ek ki space bhi batao."
+  - name: "Complexity batao: 5 snippets"
+    platform: Custom
+    level: easy
+    pattern: Loops ginna
+    hint: "Single loop, do alag loops, nested loop, i *= 2 wala loop, aur loop ke andar contains() — har ek ki Big-O likho, phir code chala ke steps gin ke verify karo."
+  - name: Container With Most Water
+    platform: LeetCode
+    num: 11
+    url: "https://leetcode.com/problems/container-with-most-water/"
+    level: medium
+    pattern: O(n²) brute force → O(n) two pointers
+    hint: "Saare pairs try karna O(n²) hai. Do pointers dono kinaron se — chhoti wall wala pointer andar khisakao."
+  - name: Product of Array Except Self
+    platform: LeetCode
+    num: 238
+    url: "https://leetcode.com/problems/product-of-array-except-self/"
+    level: medium
+    pattern: O(n²) → O(n) prefix/suffix
+    hint: "Har i ke liye baaki sab multiply karna O(n²). Left products ka ek pass, right products ka ek pass — O(n)."
+  - name: "Constraints se complexity guess karo"
+    platform: Custom
+    level: medium
+    pattern: Constraints → allowed Big-O
+    hint: "5 LeetCode problems kholo, sirf constraints padho (n ≤ ?), aur bina solution dekhe batao kaunsi complexity chahiye. Phir editorial se match karo."
+  - name: Sliding Window Maximum
+    platform: LeetCode
+    num: 239
+    url: "https://leetcode.com/problems/sliding-window-maximum/"
+    level: hard
+    pattern: O(n·k) → O(n) deque
+    hint: "Har window ka max alag se nikaalna O(n·k). Monotonic deque se har item ek baar aata, ek baar jaata — O(n)."
+  - name: Median of Two Sorted Arrays
+    platform: LeetCode
+    num: 4
+    url: "https://leetcode.com/problems/median-of-two-sorted-arrays/"
+    level: hard
+    pattern: O(m + n) merge → O(log(min(m, n)))
+    hint: "Merge karke median O(m + n) — aasaan. Question O(log) maangta hai: chhote array par binary search se partition dhoondho."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Time complexity = input n badhne par steps kitni tezi se badhte hain."
+    - "Worst case dekho; constants aur chhote terms hata do (3n² + 5n → O(n²))."
+    - "Order: O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)."
+    - "Ek ke baad ek loop = jodo; loop ke andar loop = multiply; aadha-aadha = log n."
+    - "~10⁸ simple steps ≈ 1 second — constraints dekh ke allowed complexity guess karo."
+  cheatsheet: |
+    | n ki limit | Kaunsi complexity chalegi |
+    |---|---|
+    | n ≤ 10 | O(n!) |
+    | n ≤ 20 | O(2ⁿ) |
+    | n ≤ 500 | O(n³) |
+    | n ≤ 5000 | O(n²) |
+    | n ≤ 10⁶ | O(n log n) ya O(n) |
+    | n ≤ 10⁹ / 10¹⁸ | O(log n) ya O(1) |
+
+    **Loop pattern → Big-O:** `i++` → n · `i *= 2` / `n /= 2` → log n · nested → n²
+  quiz:
+    - q: "`5n² + 3n + 100` ka Big-O?"
+      options: ["O(5n²)", "O(n²)", "O(n² + n)", "O(100)"]
+      answer: 1
+      explain: "Constants (5, 100) aur chhota term (3n) hata do."
+    - q: "Loop jisme har baar `n = n / 2` hota hai, kitni baar chalega?"
+      options: ["n", "n/2", "log n", "n²"]
+      answer: 2
+      explain: "Har baar aadha → log₂ n baar."
+    - q: "n = 10⁵ hai. Kaunsa approach safe hai?"
+      options: ["O(n²)", "O(n log n)", "O(2ⁿ)", "O(n³)"]
+      answer: 1
+      explain: "~1.7 × 10⁶ steps. O(n²) = 10¹⁰ — bahut slow."
+    - q: "Do alag loops (ek ke baad ek), pehla n ka, doosra m ka. Complexity?"
+      options: ["O(n × m)", "O(n + m)", "O(max(n, m)²)", "O(1)"]
+      answer: 1
+      explain: "Ek ke baad ek = jodo. (Bade n, m par ye O(max(n, m)) bhi likha ja sakta hai.)"
+    - q: "Linear search ka best case?"
+      options: ["O(n)", "O(log n)", "O(1)", "O(n²)"]
+      answer: 2
+      explain: "Item pehle hi index par mil gaya. Par overall complexity worst case wali O(n) batate hain."
+
+# 14. Connections
+connections:
+  related:
+    - id: space-complexity
+      why: "Time ke saath memory bhi ginni hoti hai — wahi rules, dabbe ginne hain."
+    - id: analyze-code
+      why: "Recursion, amortized aur tricky loops ki complexity nikaalne ke tareeke."
+    - id: problem-solving
+      why: "Constraints dekh ke allowed complexity guess karna — interview ka sabse kaam ka shortcut."
+  usedLater:
+    - id: binary-search
+      how: "Har step aadha = O(log n) — sabse famous log n algorithm."
+    - id: merge-sort
+      how: "O(n log n) kahan se aata hai, wahan recursion tree se dekhenge."
+    - id: hashmap
+      how: "O(n²) pairs wale problems ko O(n) mein badalne ka sabse common hathiyaar."
+    - id: dp-intro
+      how: "Exponential O(2ⁿ) recursion ko memoization se polynomial banana."

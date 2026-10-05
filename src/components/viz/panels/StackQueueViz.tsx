@@ -15,7 +15,7 @@ export function StackQueueViz({ p }: { p: LinearPanel }) {
     return (
       <div className="flex justify-center">
         <div className="flex flex-col items-center">
-          <div className="flex min-h-12 w-28 flex-col-reverse gap-1 rounded-b-lg border-x-2 border-b-2 border-line-strong p-1.5">
+          <div className="flex min-h-12 w-max max-w-[calc(100vw-7rem)] min-w-28 flex-col-reverse gap-1 rounded-b-lg border-x-2 border-b-2 border-line-strong p-1.5">
             <AnimatePresence initial={false}>
               {p.items.map((v, i) => {
                 const t = p.tones?.[i];
@@ -26,7 +26,7 @@ export function StackQueueViz({ p }: { p: LinearPanel }) {
                     initial={{ opacity: 0, y: -24 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -24 }}
-                    className={`tone ${tone(t)} relative flex h-9 items-center justify-center rounded border-2 font-mono text-sm font-semibold`}
+                    className={`tone ${tone(t)} relative flex min-h-9 items-center justify-center rounded border-2 px-2.5 py-1 text-center font-mono text-sm font-semibold`}
                   >
                     {fmt(v)}
                     {i === top && (

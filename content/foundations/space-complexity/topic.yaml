@@ -1,0 +1,431 @@
+meta:
+  id: space-complexity
+  chapter: foundations
+  title: Space Complexity
+  subtitle: Algorithm ne kitni EXTRA memory li — aur time ke saath uska sauda
+  level: beginner
+  minutes: 25
+  prereqs: [memory-basics, big-o-time]
+  tags: [space-complexity, in-place, auxiliary-space, trade-off]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Space complexity** batati hai ki input n badhne par algorithm ko **kitni extra memory** chahiye.
+
+    Bilkul time complexity jaisa — bas yahan steps ki jagah **dabbe (memory)** ginte hain:
+
+    | Kya banaya | Extra space |
+    |---|---|
+    | Kuch variables (`i`, `sum`, `max`) | **O(1)** |
+    | Ek array/list size n ki | **O(n)** |
+    | n × n grid | **O(n²)** |
+    | Recursion jiski depth d hai | **O(d)** — call stack! |
+
+    > [!yaad]
+    > Aam taur par **input ko nahi ginte** (wo to pehle se diya hua hai). Jo algorithm ne **apni taraf se** banaya, sirf wo. Isko **auxiliary space** bhi kehte hain.
+  analogy: |
+    **Ghar mein shifting** socho. Saamaan (input) to pehle se hai. Sawaal ye hai ki packing ke liye tumhe **kitne extra dabbe (cartons)** khareedne pade?
+
+    - Saamaan wahin ka wahin jamaya, bas jagah badli → koi naya carton nahi → **O(1)**, isko **in-place** kehte hain.
+    - Har cheez ke liye ek naya carton → jitna saamaan, utne cartons → **O(n)**.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Fast code bhi fail ho sakta hai agar memory zyada khaaye:
+
+    - **Online judges:** memory limit (jaise 256 MB) cross → *Memory Limit Exceeded*.
+    - **Mobile apps:** phone ki RAM limited hai — zyada memory = `OutOfMemoryError`, ya OS app ko background mein maar deta hai.
+    - **Interview:** "Ise O(1) extra space mein karo" — bahut common follow-up hai.
+
+    Aur sabse important: time aur space ka aksar **sauda (trade-off)** hota hai. Thodi memory do, time bacha lo — jaise HashSet se O(n²) ko O(n) banana.
+
+    > [!socho]
+    > Ek recursive function koi array nahi banata. Kya uski space O(1) hai?
+    >
+    > Nahi! Har pending call ka frame **stack par** rehta hai. Depth n hai to space O(n). Ye "chhupa hua" space interview mein bahut pakda jaata hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    Animation mein dekho kaunsi memory **gini** jaati hai aur kaunsi nahi. Input array diya hua hai — usko chhod do. Phir dekho variables, ek naya array aur ek grid kitni memory lete hain.
+
+    "Apna input try karo" mein n badha ke dekho — O(1) wale dabbe wahi rehte hain, O(n) wale line mein badhte hain, aur O(n²) wali grid tezi se phoolti hai.
+  viz: { tracer: spaceMeter }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Space ginne ka tareeka:
+    1. Function ke andar jo **naya** banaya — arrays, lists, maps, strings — unki size kya hai?
+    2. Chhote variables (`i`, `sum`) → har ek O(1).
+    3. Recursion hai? To **max depth** bhi jodo (har level ka ek frame).
+    4. Sab jodo, sabse bada term rakho.
+
+    Neeche wala function har number ka square ek **nayi array** mein daalta hai → result array ki size n → **O(n) extra space**.
+
+    > [!tip]
+    > Interview mein clear bolo: "Extra space O(n) — result array ki wajah se. Agar output ko na ginein to O(1) auxiliary." Ye clarity interviewer ko achhi lagti hai.
+  viz: { tracer: squaresSpace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Kuch variables (`i`, `sum`, `temp`)"
+    time: O(1)
+    space: O(1)
+    why: "Ginti ke dabbe — n se koi fark nahi."
+  - op: "Nayi array / list size n ki"
+    time: O(n)
+    space: O(n)
+    why: "n dabbe chahiye, aur unhe bharne mein n steps."
+  - op: "HashSet / HashMap mein n items"
+    time: "O(n) total"
+    space: O(n)
+    why: "Har item ke liye ek entry (plus thoda overhead)."
+  - op: "n × n grid / 2D DP table"
+    time: O(n²)
+    space: O(n²)
+    why: "n² dabbe — n = 10⁴ par ~400 MB."
+  - op: "Recursion, depth d"
+    time: "depends"
+    space: O(d)
+    why: "Har pending call ka ek stack frame."
+  - op: "In-place swap / reverse"
+    time: O(n)
+    space: O(1)
+    why: "Sirf do pointers aur ek temp — input mein hi kaam."
+  - op: "`substring()` / `copyOf()` / `toList()`"
+    time: "O(k)"
+    space: "O(k)"
+    why: "Ye sab k size ki NAYI copy banate hain — free nahi hain."
+
+# 6. Code
+code:
+  - title: Time vs space ka sauda — duplicate dhoondhna
+    file: tradeoff
+    note: |
+      Dono functions ka answer same hai. Pehla memory bachata hai par slow hai (O(n²) time, O(1) space). Doosra memory deta hai aur fast hai (O(n) time, O(n) space). Kaunsa chuno? Constraints dekho — n bada hai aur memory limit theek hai to doosra.
+
+# 7. Examples
+examples:
+  - id: copy-vs-inplace
+    level: easy
+    title: Ulta karna — nayi array vs in-place
+    problem: |
+      Array ko reverse karne ke do tareeke likho:
+      1. Ek **nayi array** mein ulta copy karke.
+      2. **Usi array** mein swap karke (in-place).
+
+      Dono ki time aur space complexity batao.
+    intuition: |
+      Dono mein har item ek baar chhua jaata hai → time dono ka **O(n)**.
+
+      Fark memory mein hai:
+      - Nayi array = n naye dabbe → **O(n)**.
+      - In-place = sirf `l`, `r`, `temp` → **O(1)**.
+
+      > [!galti]
+      > In-place ka matlab hai input **badal jaayega**. Agar caller ko original array baad mein chahiye, to in-place galat choice hai. Pehle poocho: "Kya main input modify kar sakta hoon?"
+    dryRun: |
+      `[1, 2, 3, 4]`
+
+      | Tareeka | Extra dabbe | Time | Input badla? |
+      |---|---|---|---|
+      | Nayi array | 4 (n) | O(n) | Nahi |
+      | In-place swap | 3 (l, r, temp) | O(n) | Haan |
+    viz: { tracer: copyVsInPlace }
+    code: ex1-copy-vs-inplace
+    complexity:
+      time: O(n)
+      space: "O(n) copy wala, O(1) in-place"
+      why: "Dono n items chhoote hain; copy wala n dabbe aur leta hai."
+
+  - id: prefix
+    level: medium
+    title: Prefix array — memory dekar queries fast karo
+    problem: |
+      Ek array par bahut saari queries aayengi: "index l se r tak ka sum batao". Har query ko jaldi kaise answer karein?
+
+      Example: `[2, 4, 1, 5, 3]`, query (1, 3) → 4 + 1 + 5 = **10**.
+    intuition: |
+      **Seedha tareeka:** har query par l se r tak loop → O(n) per query. 10⁵ queries × 10⁵ items = 10¹⁰ — bahut slow.
+
+      **Smart tareeka:** ek baar `pre` array banao jisme `pre[k]` = pehle k items ka total. Phir:
+
+      **sum(l..r) = pre[r + 1] − pre[l]**
+
+      Jaise metro card ka balance: shuru mein 500, beech mein 380 — to kharcha = 500 − 380. Har station ka hisaab dobara jodna nahi padta.
+
+      Ye **time-space trade-off** hai: O(n) extra memory → har query O(1).
+    dryRun: |
+      arr = `[2, 4, 1, 5, 3]`
+
+      | k | 0 | 1 | 2 | 3 | 4 | 5 |
+      |---|---|---|---|---|---|---|
+      | pre[k] | 0 | 2 | 6 | 7 | 12 | 15 |
+
+      Query (1, 3) = pre[4] − pre[1] = 12 − 2 = **10** ✓
+    viz: { tracer: prefixSpace }
+    code: ex2-prefix
+    complexity:
+      time: "O(n) build, O(1) har query"
+      space: O(n)
+      why: "pre array n + 1 dabbe ka; uske baad har query sirf ek subtraction."
+
+  - id: recursion-stack
+    level: tricky
+    title: Recursion ka chhupa hua space
+    problem: |
+      Array ka sum recursion se karo: `sum(i) = arr[i] + sum(i + 1)`, aur `sum(n) = 0`.
+
+      Function koi nayi array nahi banata. To kya iski space O(1) hai? Loop wale version se compare karo.
+    intuition: |
+      Recursion mein har call ko apne **neeche wale call ka jawab** chahiye. Jab tak jawab nahi aata, wo frame **stack par wait** karta hai.
+
+      `sum(0)` → `sum(1)` → … → `sum(n)` — base case tak pahunchte waqt **n + 1 frames ek saath** stack par hain. Yaani **O(n) space**.
+
+      Loop wala version ek hi `total` variable se kaam karta hai → **O(1)**.
+
+      > [!galti]
+      > "Maine koi array nahi banaya, isliye O(1) space" — recursion mein ye galat hai. Hamesha **max recursion depth** gino.
+    dryRun: |
+      arr = `[3, 1, 4, 2]`
+
+      | Call | Wait kar raha hai | Return |
+      |---|---|---|
+      | sum(0) | sum(1) ka | 3 + 7 = **10** |
+      | sum(1) | sum(2) ka | 1 + 6 = 7 |
+      | sum(2) | sum(3) ka | 4 + 2 = 6 |
+      | sum(3) | sum(4) ka | 2 + 0 = 2 |
+      | sum(4) | – (base) | 0 |
+
+      Max 5 frames ek saath = n + 1.
+    viz: { tracer: recursiveSum }
+    code: ex3-recursion-stack
+    complexity:
+      time: O(n)
+      space: "O(n) recursive, O(1) loop"
+      why: "Dono n items jodte hain; recursion n + 1 frames ek saath stack par rakhta hai."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Memory limit tight ho ya data bahut bada ho — in-place / O(1) space wala tareeka socho."
+    - "Bahut saari queries ho — thodi extra memory (prefix array, HashMap) dekar har query fast karo."
+    - "Interview mein follow-up aaye \"can you do it in O(1) extra space?\" — two pointers, swap, input array ko hi reuse karna socho."
+  avoid:
+    - "Input badalna allowed nahi hai — tab in-place mat karo, copy banao."
+    - "Recursion bahut gehri (10⁵) ho sakti hai — O(n) stack space + StackOverflow risk; loop lo."
+    - "Memory bachane ke chakkar mein code itna complex mat banao ki bugs aayein — pehle simple solution, phir optimize."
+  signals:
+    - keyword: "in-place, O(1) extra space"
+      think: "Nayi array nahi — swap, two pointers, ya input ke andar hi marking (sign flip, index trick)."
+    - keyword: "multiple queries, range sum"
+      think: "Precompute karo (prefix sum) — O(n) space, O(1) per query."
+    - keyword: "output array does not count as extra space"
+      think: "Result array free hai — usi ko scratch space ki tarah use kar sakte ho."
+    - keyword: "recursive solution, n ≤ 10^5"
+      think: "Stack depth n tak — iterative version ya tail-friendly approach socho."
+
+# 9. Real-world
+realWorld:
+  - where: "Image editing apps"
+    how: "Filter lagate waqt poori image ki copy banana (O(n) pixels) mehenga hai, isliye bahut filters in-place ya chhote tiles mein kaam karte hain."
+  - where: "Caching (Glide, Coil, LRU cache)"
+    how: "Memory dekar speed khareedna — images RAM mein rakh lo taaki dobara download na karni pade. Par cache ki size limit rakhni padti hai."
+  - where: "Database indexes"
+    how: "Index extra disk/memory leta hai, par search O(n) se O(log n) ho jaata hai — classic time-space trade-off."
+  - where: "Streaming (video, logs)"
+    how: "Poora data memory mein load nahi karte — thoda-thoda (chunk) padhte hain, taaki memory O(chunk) rahe, O(n) nahi."
+  - where: "Kotlin Sequences / Java Streams"
+    how: "`list.map{}.filter{}` har step par nayi list banata hai; `asSequence()` ek-ek item process karta hai — beech ki lists ka space bachta hai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Recursion ka stack space bhool jaana"
+    type: logic
+    wrong: |
+      "Mera recursive DFS O(1) space hai, maine koi array nahi banaya."
+    right: |
+      Space = O(max recursion depth). Tree DFS = O(height), linked list recursion = O(n).
+  - title: "`substring` / `copyOf` / `toList` ko free samajhna"
+    type: logic
+    wrong: |
+      ```kotlin
+      for (i in s.indices) {
+          val rest = s.substring(i)   // har baar nayi String -> O(n) space + time
+      }
+      ```
+    right: |
+      Index se kaam karo (start, end pointers) — nayi copies mat banao. Ye loop O(n²) memory churn kar raha tha.
+  - title: "In-place kiya par input chahiye tha"
+    type: logic
+    wrong: |
+      Function ke andar `arr.sort()` kar diya — caller ka array bhi sort ho gaya, aur aage ka code galat chala.
+    right: |
+      Pehle poocho / document karo ki input modify hoga. Original chahiye to `arr.copyOf()` par kaam karo.
+  - title: "2D grid ki memory ka andaza na lagana"
+    type: overflow
+    wrong: |
+      n = 10⁵ par `Array(n) { IntArray(n) }` → 10¹⁰ Ints = 40 GB → OutOfMemoryError.
+    right: |
+      Pehle n² × 4 bytes calculate karo. Bada hai to sirf zaroori rows rakho (jaise DP mein sirf pichli row) — O(n) space.
+  - title: "Output space ke baare mein confuse"
+    type: other
+    right: |
+      Interview mein saaf bolo: "Result array chhod ke auxiliary space O(1) hai." LeetCode bhi kuch problems mein likhta hai ki output array extra space mein nahi gini jaayegi.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Space complexity aur auxiliary space mein kya fark hai?"
+      a: |
+        **Total space** = input + extra. **Auxiliary space** = sirf extra jo algorithm ne banaya. Interview mein aam taur par auxiliary hi poocha jaata hai.
+    - q: "In-place algorithm kya hota hai?"
+      a: |
+        Jo input ke andar hi kaam kare aur sirf O(1) (ya bahut kam) extra memory le. Jaise in-place reverse, bubble sort, quick sort (recursion stack chhod ke).
+    - q: "Recursive function ki space complexity kaise nikaalte ho?"
+      a: |
+        Max recursion depth × har frame ka size (aam taur par O(1)). Plus jo arrays har level par banaye. Linear recursion = O(n), balanced tree recursion = O(log n), fib(n) recursion = O(n) depth (time O(2ⁿ) hone ke bawajood).
+    - q: "Time-space trade-off ka ek example do."
+      a: |
+        Duplicate check: O(n²) time + O(1) space vs HashSet se O(n) time + O(n) space. Ya prefix sum: O(n) memory dekar har range query O(1).
+    - q: "Merge sort ki space complexity?"
+      followUp: true
+      a: |
+        O(n) — merge karne ke liye temporary array chahiye. (Recursion stack O(log n) alag se, par O(n) bada hai.) Quick sort average O(log n) stack space leta hai.
+    - q: "Kya HashMap mein n items ki space sach mein O(n) hai?"
+      a: |
+        Haan, O(n) — par constant bada hai: har entry ek object (key, value, hash, next) aur table mein khaali buckets bhi. Practically `IntArray` se kai guna zyada memory.
+    - q: "\"Can you do it in O(1) space?\" — sunte hi kya sochte ho?"
+      followUp: true
+      a: |
+        Two pointers, in-place swap, input array ke andar hi information store karna (sign flip / index marking), ya math (sum/XOR). Aur poochta hoon ki input modify karna allowed hai ya nahi.
+    - q: "fib(n) ka simple recursive version kitni space leta hai?"
+      a: |
+        Time O(2ⁿ) hone ke bawajood space **O(n)** — kyunki ek waqt par sirf ek path (root se leaf) stack par hota hai, aur uski length n hai.
+    - q: "Do arrays alag-alag size n ki banayi. Space?"
+      a: |
+        2n → constant hata do → O(n).
+  mayAsk:
+    - "Is solution ko O(1) space mein convert karo."
+    - "Iterative vs recursive — space ka fark kya hai?"
+    - "DP table ko 2D se 1D kaise karoge?"
+    - "String concatenation loop mein kitni memory leta hai?"
+
+# 12. Practice
+practice:
+  - name: Reverse String
+    platform: LeetCode
+    num: 344
+    url: "https://leetcode.com/problems/reverse-string/"
+    level: easy
+    pattern: In-place two pointers, O(1) space
+    hint: "Question khud kehta hai O(1) extra memory. Dono kinaron se swap karo."
+  - name: Move Zeroes
+    platform: LeetCode
+    num: 283
+    url: "https://leetcode.com/problems/move-zeroes/"
+    level: easy
+    pattern: In-place write pointer
+    hint: "Nayi array mat banao. Ek pointer non-zero items ko aage likhta jaaye, baad mein baaki jagah 0 bhar do."
+  - name: Range Sum Query - Immutable
+    platform: LeetCode
+    num: 303
+    url: "https://leetcode.com/problems/range-sum-query-immutable/"
+    level: easy
+    pattern: O(n) space → O(1) query
+    hint: "Constructor mein prefix array banao. Har query = pre[r + 1] − pre[l]."
+  - name: Product of Array Except Self
+    platform: LeetCode
+    num: 238
+    url: "https://leetcode.com/problems/product-of-array-except-self/"
+    level: medium
+    pattern: Output array ko scratch space banana
+    hint: "Pehle output mein left products bharo. Phir right se ek variable `right` rakh ke multiply karo — extra space O(1) (output chhod ke)."
+  - name: Set Matrix Zeroes
+    platform: LeetCode
+    num: 73
+    url: "https://leetcode.com/problems/set-matrix-zeroes/"
+    level: medium
+    pattern: O(m + n) → O(1) space marking
+    hint: "Pehle do alag arrays (rows, cols) se karo — O(m + n). Phir pehli row aur pehle column ko hi marker bana do — O(1)."
+  - name: Find All Duplicates in an Array
+    platform: LeetCode
+    num: 442
+    url: "https://leetcode.com/problems/find-all-duplicates-in-an-array/"
+    level: medium
+    pattern: Input mein sign flip se marking
+    hint: "Values 1..n hain. Value v dekhi to index v-1 ko negative karo. Pehle se negative = duplicate. HashSet ki zaroorat nahi."
+  - name: First Missing Positive
+    platform: LeetCode
+    num: 41
+    url: "https://leetcode.com/problems/first-missing-positive/"
+    level: hard
+    pattern: O(n) time + O(1) space, cyclic placement
+    hint: "HashSet se aasaan hai par O(n) space. O(1) ke liye har value v (1..n) ko swap karke index v-1 par bhejo."
+  - name: Trapping Rain Water
+    platform: LeetCode
+    num: 42
+    url: "https://leetcode.com/problems/trapping-rain-water/"
+    level: hard
+    pattern: O(n) space → O(1) two pointers
+    hint: "Pehle leftMax aur rightMax arrays se (O(n) space). Phir do pointers aur do variables se wahi kaam O(1) space mein."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Space complexity = input ke alawa kitni extra memory (auxiliary space)."
+    - "Variables O(1), n size ki array O(n), n × n grid O(n²)."
+    - "Recursion = max depth jitne stack frames — chhupa hua O(depth) space."
+    - "In-place = O(1) extra, par input badal jaata hai."
+    - "Time-space trade-off: memory dekar speed (HashSet, prefix sum, cache)."
+  cheatsheet: |
+    | Pattern | Extra space |
+    |---|---|
+    | Do pointers / swap | O(1) |
+    | Prefix array, HashMap, copy | O(n) |
+    | 2D DP table | O(n × m) → aksar O(m) tak ghata sakte ho |
+    | Linear recursion | O(n) stack |
+    | Balanced tree recursion | O(log n) stack |
+    | `substring`, `copyOf`, `toList` | O(k) — nayi copy |
+  quiz:
+    - q: "Function sirf `i` aur `sum` variables use karta hai. Extra space?"
+      options: ["O(n)", "O(1)", "O(log n)", "O(2)"]
+      answer: 1
+      explain: "Fixed number of variables = O(1) (constant 2 hata do)."
+    - q: "Recursive function jo depth n tak jaata hai, koi array nahi banata. Space?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n²)"]
+      answer: 2
+      explain: "n frames ek saath stack par."
+    - q: "Prefix sum array banane ka fayda?"
+      options: ["Memory bachti hai", "Har range-sum query O(1) ho jaati hai", "Array sort ho jaata hai", "Kuch nahi"]
+      answer: 1
+      explain: "O(n) memory ke badle O(1) queries — time-space trade-off."
+    - q: "In-place reverse ki extra space?"
+      options: ["O(1)", "O(n)", "O(n/2)", "O(log n)"]
+      answer: 0
+      explain: "Sirf l, r, temp."
+    - q: "n = 10⁴ ki n × n Int grid lagbhag kitni memory?"
+      options: ["40 KB", "4 MB", "400 MB", "40 GB"]
+      answer: 2
+      explain: "10⁸ Ints × 4 bytes = 4 × 10⁸ bytes ≈ 400 MB."
+
+# 14. Connections
+connections:
+  related:
+    - id: memory-basics
+      why: "Stack frames aur heap objects — space inhi ka hisaab hai."
+    - id: big-o-time
+      why: "Same Big-O rules, bas steps ki jagah dabbe."
+  usedLater:
+    - id: prefix-sum
+      how: "Isi trade-off ka poora chapter — range queries O(1)."
+    - id: two-pointers-same
+      how: "In-place, O(1) space wale tareeke — move zeroes, remove duplicates."
+    - id: recursion-basics
+      how: "Call stack ki depth = recursion ka space."
+    - id: dp-grid
+      how: "2D DP table ko ek row tak chhota karna — O(n·m) se O(m) space."

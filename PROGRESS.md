@@ -4,11 +4,11 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 2 (Engine) done — waiting for user review of Array topic + playground
-- Next action: after review → Step 3, chapter 0 (Foundations), topic `memory-basics`
-- Last session note (2026-10-05): engine + 13 panel types + Array topic built. Verified at 390px/desktop,
-  light/dark via headless Chrome (CDP). Validate fuzzes every tracer (25 random inputs). Kotlin 2.4.20 in
-  `tools/kotlinc`, JDK 21 at `~/.jdks/jbr-21.0.11` (check:code auto-detects).
+- Step: 3 (Content). Chapter 0 Foundations done (6/6) + Array.
+- Next action: chapter 1 Arrays & Strings → topic `dynamic-array` (array already done)
+- Last session note (2026-10-05): chapter 0 committed. Content caches are production-only (dev picks up new
+  topics; first request after adding a topic may 404 once). Kotlin 2.4.20 in `tools/kotlinc`, JDK 21 at
+  `~/.jdks/jbr-21.0.11` (check:code auto-detects). Visual checks via headless Chrome CDP script (scratchpad).
 
 ## Step 1 — Plan
 - [x] PLAN.md
@@ -33,11 +33,11 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 ## Step 3 — Content
 
 ### 0. Foundations
-- [ ] memory-basics
-- [ ] big-o-time
-- [ ] space-complexity
-- [ ] analyze-code
-- [ ] problem-solving
+- [x] memory-basics
+- [x] big-o-time
+- [x] space-complexity
+- [x] analyze-code
+- [x] problem-solving
 - [ ] kotlin-java-toolkit
 
 ### 1. Arrays & Strings

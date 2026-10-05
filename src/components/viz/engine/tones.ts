@@ -6,7 +6,7 @@ export const TONE_LABEL: Record<Tone, string> = {
   swap: 'swap',
   done: 'ho gaya',
   found: 'mil gaya',
-  error: 'galat',
+  error: 'galat / bekaar',
   new: 'naya',
   muted: 'ignore',
 };

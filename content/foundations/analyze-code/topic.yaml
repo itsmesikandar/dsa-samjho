@@ -1,0 +1,436 @@
+meta:
+  id: analyze-code
+  chapter: foundations
+  title: Code analyze kaise karein
+  subtitle: Kisi bhi code ko dekh ke uski complexity nikaalne ke rules
+  level: beginner
+  minutes: 35
+  prereqs: [big-o-time, space-complexity]
+  tags: [analysis, loops, recursion-tree, amortized]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Code analyze karna** = code ko **bina chalaye** batana ki uski time aur space complexity kya hai.
+
+    Iske liye kuch seedhe rules hain:
+
+    | Code ka shape | Rule | Result |
+    |---|---|---|
+    | Ek ke **baad** ek kaam | **Jodo** | O(n) + O(m) = O(n + m) |
+    | Loop ke **andar** loop | **Multiply** | O(n) × O(n) = O(n²) |
+    | Loop variable `+1` / `-1` | n baar | O(n) |
+    | Loop variable `×2` / `÷2` | log n baar | O(log n) |
+    | Recursion | **calls ki ginti × har call ka kaam** | recursion tree se |
+    | Kabhi-kabhi mehenga, aksar sasta | **Average nikaalo** | amortized |
+
+    Aakhir mein: **sabse bada term rakho**, constants hata do.
+
+    > [!yaad]
+    > Analysis ka asli sawaal: **"Kaunsi line sabse zyada baar chalti hai, aur kitni baar?"** Bas usko gin lo.
+  analogy: |
+    **Shaadi ke khaane ka bill** socho:
+    - Tent ka kharcha ek baar (O(1)).
+    - Har mehmaan ki thali (n mehmaan → n thali).
+    - Har mehmaan ko har mehmaan ke saath photo (n × n photos!).
+
+    Total = tent + thali + photos. Mehmaan bahut zyada hon to bill mein **photos ka hissa hi sab kuch** hai — baaki chhote ho jaate hain. Big-O mein bhi yahi: sabse bada term jeet-ta hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Interview mein tumhe sirf solution nahi, uski **complexity bhi khud batani** hoti hai — aur aksar interviewer koi naya code dikha ke poochta hai "iski complexity?"
+
+    Galat analysis ke nuksaan:
+    - Tumne socha O(n), asal mein O(n²) tha (andar chhupa `contains()`) → TLE.
+    - Recursion ka exponential growth pakda nahi → `fib(50)` ghanton chala.
+    - ArrayList ka `add()` O(n) samajh ke bekaar mein dara — wo amortized O(1) hai.
+
+    > [!socho]
+    > `for (i in 0 until n) for (j in 0 until 5) kaam()` — ye O(n²) hai kya?
+    >
+    > Nahi! Andar ka loop sirf **5** baar chalta hai, n baar nahi. 5n → **O(n)**. Loop ke andar loop ka matlab hamesha n² nahi — dekho andar wala kitni baar chalta hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    Alag-alag loop patterns ko same n par chala ke dekhte hain. Har pattern ke saamne likha hai ki wo kitni baar chala aur uska Big-O kya hai.
+
+    "Apna input try karo" mein n = 64 daal ke dekho — `i *= 2` wala sirf 6 chakkar lagata hai, jabki nested wala 4096!
+  viz: { tracer: loopPatterns }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Function ko **hisson** mein todo, har hisse ki complexity nikaalo, phir jodo:
+
+    1. **Hissa 1:** ek loop jo n baar chala → O(n).
+    2. **Hissa 2:** loop ke andar loop, dono n baar → O(n × n) = O(n²).
+    3. **Total:** O(n) + O(n²) → bade n par n² hi matter karta hai → **O(n²)**.
+
+    Animation mein `count` dekho: pehle hisse mein 1-1 badhta hai, doosre mein har bahari chakkar par n ek saath.
+  viz: { tracer: analyzeParts }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Do hisse ek ke baad ek"
+    time: "O(A) + O(B)"
+    space: "max(A, B) ka space"
+    why: "Pehle ek poora, phir doosra — kaam jud-ta hai."
+  - op: "Loop ke andar loop"
+    time: "O(A × B)"
+    space: O(1)
+    why: "Bahar ke har chakkar par andar ka poora loop."
+  - op: "`i += k` (k constant)"
+    time: O(n)
+    space: O(1)
+    why: "n/k chakkar — constant k hata do."
+  - op: "`i *= 2` ya `n /= 2`"
+    time: O(log n)
+    space: O(1)
+    why: "Doubling/halving se log₂ n chakkar."
+  - op: "`k * k <= n`"
+    time: O(√n)
+    space: O(1)
+    why: "k sirf √n tak jaata hai."
+  - op: "Recursion: har call b calls banaye, depth d"
+    time: "O(bᵈ)"
+    space: O(d)
+    why: "Recursion tree ke nodes bᵈ tak; ek waqt par sirf d frames stack par."
+  - op: "Dynamic array `add()` (doubling)"
+    time: "O(1) amortized"
+    space: O(n)
+    why: "Kabhi-kabhi poora copy (O(n)), par n adds mein total copies < 2n."
+
+# 6. Code
+code:
+  - title: Har loop pattern kitni baar chalta hai (n = 16)
+    file: patterns
+    note: |
+      Output ko table jaisa padho: n = 16 par log n = 4, √n = 4, n² = 256. Triangle wala (`y in x + 1 until n`) 120 hai — aadha, par phir bhi O(n²).
+  - title: Amortized O(1) — dynamic array ki doubling
+    file: amortized
+    note: |
+      1000 items daale, copies sirf 1023 hui (1 + 2 + 4 + … + 512). Har add par average ~1 copy → **amortized O(1)**. Agar har baar capacity sirf +1 badhaate, to copies ~n²/2 hoti!
+
+# 7. Examples
+examples:
+  - id: two-loops
+    level: easy
+    title: Do alag loops — O(n × m) nahi, O(n + m)
+    problem: |
+      Do arrays `a` (n items) aur `b` (m items) diye hain. Dono ke saare numbers ka total sum nikaalo, aur complexity batao.
+    intuition: |
+      Code mein do loops hain, par ek **doosre ke andar nahi** — pehle `a` ka loop poora hota hai, **phir** `b` ka.
+
+      Ek ke baad ek = **jodo**: n + m → **O(n + m)**.
+
+      > [!galti]
+      > "Do loops hain, to O(n²)" — galat! n² tab hota jab b ka loop a ke **andar** hota. Aur n aur m ko ek mat maano — wo alag inputs hain, dono likho.
+    dryRun: |
+      a = `[1, 2, 3]`, b = `[4, 5]`
+
+      | Loop | Items | Chakkar | s ke baad |
+      |---|---|---|---|
+      | a | 1, 2, 3 | 3 | 6 |
+      | b | 4, 5 | 2 | 15 |
+
+      Total chakkar = 3 + 2 = **5 = n + m**
+    viz: { tracer: sumBoth }
+    code: ex1-two-loops
+    complexity:
+      time: O(n + m)
+      space: O(1)
+      why: "Do alag loops, ek ke baad ek; sirf ek variable `s`."
+
+  - id: n-log-n
+    level: medium
+    title: Loop ke andar doubling loop — O(n log n)
+    problem: |
+      Neeche wale code ki complexity batao:
+
+      ```kotlin
+      for (i in 0 until n) {
+          var j = 1
+          while (j < n) { ops++; j *= 2 }
+      }
+      ```
+    intuition: |
+      Bahar ka loop: **n** baar (normal).
+
+      Andar ka loop: j = 1, 2, 4, 8… jab tak j < n → **log₂ n** baar (doubling!).
+
+      Loop ke andar loop = **multiply** → n × log n → **O(n log n)**.
+
+      > [!tip]
+      > Har loop ko alag se dekho — "andar wala kitni baar chalta hai?" Nested ka matlab hamesha n² nahi hota.
+    dryRun: |
+      n = 8 → andar j = 1, 2, 4 (3 baar = log₂ 8)
+
+      | i | Andar ke chakkar | ops total |
+      |---|---|---|
+      | 0 | 3 | 3 |
+      | 1 | 3 | 6 |
+      | … | 3 | … |
+      | 7 | 3 | **24** |
+
+      24 = 8 × 3 = n × log n
+    viz: { tracer: nLogN }
+    code: ex2-n-log-n
+    complexity:
+      time: O(n log n)
+      space: O(1)
+      why: "n bahar ke chakkar × log n andar ke chakkar; sirf counters."
+
+  - id: fib-tree
+    level: tricky
+    title: Recursion tree — fib(n) itna slow kyun?
+    problem: |
+      Simple recursive Fibonacci:
+
+      ```kotlin
+      fun fib(n: Int): Int = if (n < 2) n else fib(n - 1) + fib(n - 2)
+      ```
+
+      `fib(5)` ke liye kitne calls hote hain? `fib(20)` ke liye? Time complexity kya hai?
+    intuition: |
+      Recursion analyze karne ka tareeka: **recursion tree banao**.
+      - Har node = ek call. Har call **2 naye calls** banata hai.
+      - Tree ki depth lagbhag n.
+      - Nodes har level par lagbhag double → total ~2ⁿ.
+
+      Isliye time **O(2ⁿ)** (exactly ~1.6ⁿ, par Big-O mein O(2ⁿ) bolte hain). Space sirf **O(n)** — ek waqt par ek hi path stack par.
+
+      Dhyaan do — `fib(3)`, `fib(2)` **baar-baar** compute ho rahe hain. Yahi bekaar kaam DP (memoization) se hatega.
+    dryRun: |
+      | n | fib(n) | Kitne calls |
+      |---|---|---|
+      | 3 | 2 | 5 |
+      | 4 | 3 | 9 |
+      | 5 | 5 | 15 |
+      | 10 | 55 | 177 |
+      | 20 | 6765 | 21,891 |
+
+      n sirf 20 hua, calls 21 hazaar par!
+    viz: { tracer: fibCalls }
+    code: ex3-fib-calls
+    complexity:
+      time: O(2ⁿ)
+      space: O(n)
+      why: "Calls ka tree har level par lagbhag double hota hai; stack par ek waqt sirf ek root-to-leaf path (depth n)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Har solution likhne ke baad — interviewer ke poochne se pehle khud complexity bolo."
+    - "Do approaches mein choose karna ho — dono ko analyze karke constraints se match karo."
+    - "Code slow lag raha ho — sabse zyada chalne wali line dhoondho (wahi bottleneck hai)."
+  avoid:
+    - "\"Do loops = n²\" jaisa shortcut bina dekhe mat lagao — check karo loops nested hain ya nahi, aur andar wala kitni baar chalta hai."
+    - "Library calls ko O(1) maan ke mat chalo — `contains`, `indexOf`, `remove(0)`, `substring` ki apni cost hai."
+    - "Amortized ko worst case mat bolo — ArrayList `add` worst case O(n) hai, amortized O(1)."
+  signals:
+    - keyword: "loop variable × 2 ya ÷ 2"
+      think: "O(log n)."
+    - keyword: "loop ke andar loop, dono n tak"
+      think: "O(n²) — aur andar wala j = i se shuru ho to bhi O(n²)."
+    - keyword: "recursion jo 2 baar khud ko call kare"
+      think: "Recursion tree → aksar O(2ⁿ); repeated subproblems dikhe to DP socho."
+    - keyword: "recursion jo problem aadhi karke 2 baar call kare + O(n) merge"
+      think: "Merge sort jaisa → O(n log n)."
+
+# 9. Real-world
+realWorld:
+  - where: "Code review"
+    how: "Senior engineers PR mein aksar pakadte hain: \"ye loop ke andar DB query / API call hai\" — N+1 problem, jo n badhte hi app ko dheema kar deta hai."
+  - where: "Android performance"
+    how: "`onBindViewHolder` ya Compose recomposition mein heavy loop → har frame par chalta hai → scroll jank. Analysis se pata chalta hai kya cache karna hai."
+  - where: "ArrayList / StringBuilder"
+    how: "Dono doubling se grow karte hain — amortized O(1) append. Isliye StringBuilder loop mein string jodne se kai guna fast hai."
+  - where: "Database queries"
+    how: "Nested loop join O(n × m) vs hash join O(n + m) — query planner yahi analysis karke strategy chunta hai."
+  - where: "Recursion wale parsers / folder scan"
+    how: "Recursion tree aur depth se pata chalta hai ki kitna time aur stack lagega — bahut gehre folders par iterative approach lete hain."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Har nested loop ko n² bol dena"
+    type: logic
+    wrong: |
+      ```kotlin
+      for (i in 0 until n) for (j in 0 until 10) kaam()   // "O(n²)"
+      ```
+    right: |
+      Andar ka loop sirf 10 baar → 10n → **O(n)**. Andar wala loop jitni baar chalta hai wahi multiply karo.
+  - title: "Alag inputs ko ek hi n maan lena"
+    type: logic
+    wrong: |
+      Do arrays n aur m size ke — "O(n²)" ya "O(n)".
+    right: |
+      Nested ho to **O(n × m)**, ek ke baad ek ho to **O(n + m)**. Dono variables likho.
+  - title: "Recursion ko sirf depth se judge karna"
+    type: logic
+    wrong: |
+      "fib(n) ki depth n hai, isliye O(n)."
+    right: |
+      Depth = **space**. Time = **total calls**. fib mein har call 2 calls banata hai → O(2ⁿ) time, O(n) space.
+  - title: "Library functions ki cost bhool jaana"
+    type: other
+    wrong: |
+      `list.remove(0)` loop mein — "O(1) hai".
+    right: |
+      `ArrayList.remove(0)` saare items left khiskata hai → O(n). Loop mein → O(n²). Queue chahiye to `ArrayDeque.removeFirst()` (O(1)).
+  - title: "Steps ginte waqt overflow"
+    type: overflow
+    right: |
+      Experiments mein n² ya 2ⁿ ginti `Int` se bahar ja sakti hai. Counter `Long` rakho.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Loop ke baad loop aur loop ke andar loop — complexity kaise nikaalte ho?"
+      a: |
+        Baad mein = **jodo** (O(n + m)). Andar = **multiply** (O(n × m)). Phir sabse bada term rakho.
+    - q: "`for (i in 1..n) for (j in i..n)` — complexity?"
+      a: |
+        Andar ka loop pehle n, phir n-1, … 1 baar → total n(n+1)/2 → **O(n²)**.
+    - q: "`i *= 2` wala loop O(log n) kyun hai?"
+      a: |
+        k chakkar ke baad i = 2ᵏ. Loop tab rukta hai jab 2ᵏ ≥ n, yaani k = log₂ n.
+    - q: "Recursive function ki time complexity kaise nikaaloge?"
+      a: |
+        Recursion tree banao: har level par kitne calls aur har call kitna kaam karta hai. Total = sab levels ka jod. Ya recurrence likho, jaise T(n) = 2T(n/2) + n → O(n log n).
+    - q: "fib(n) recursive ki time aur space?"
+      followUp: true
+      a: |
+        Time O(2ⁿ) (har call 2 calls). Space O(n) (max depth). Memoization ke saath time O(n), space O(n). Bottom-up do variables se O(1) space.
+    - q: "Amortized analysis kya hai? Example?"
+      a: |
+        Operations ke **poore sequence** ka average cost. ArrayList `add`: bhar jaane par capacity double aur O(n) copy, par n adds mein total copies < 2n → har add **amortized O(1)**.
+    - q: "Agar ArrayList har baar capacity sirf +10 badhaye to?"
+      followUp: true
+      a: |
+        Har 10 adds par poora copy → copies ≈ n²/20 → har add amortized **O(n)**. Isliye growth **multiply** (×1.5 ya ×2) se hoti hai, add se nahi.
+    - q: "T(n) = 2T(n/2) + O(n) ka answer?"
+      a: |
+        O(n log n) — log n levels, har level par total O(n) kaam (merge sort).
+    - q: "T(n) = T(n/2) + O(1)?"
+      a: |
+        O(log n) — har step aadha, kaam constant (binary search).
+    - q: "`while (n > 0) n /= 10` — complexity?"
+      a: |
+        Digits ki ginti = O(log₁₀ n) = O(log n).
+  mayAsk:
+    - "Ek naya snippet dikha ke: iski time aur space batao."
+    - "Is code ka bottleneck kahan hai?"
+    - "Recursive solution ko iterative karo — complexity badlegi?"
+    - "Master theorem pata hai?"
+
+# 12. Practice
+practice:
+  - name: "Complexity batao: 10 snippets"
+    platform: Custom
+    level: easy
+    pattern: Loop patterns pehchanna
+    hint: "+1 loop, ×2 loop, nested, triangle nested, √n loop, do alag loops — har ek ki Big-O likho, phir counter se verify karo."
+  - name: Fibonacci Number
+    platform: LeetCode
+    num: 509
+    url: "https://leetcode.com/problems/fibonacci-number/"
+    level: easy
+    pattern: Recursion tree → memo
+    hint: "Pehle simple recursion likho aur calls gino. Phir ek array mein answers yaad rakho — calls n tak aa jaayenge."
+  - name: Power of Two
+    platform: LeetCode
+    num: 231
+    url: "https://leetcode.com/problems/power-of-two/"
+    level: easy
+    pattern: O(log n) loop vs O(1)
+    hint: "2 se divide karte raho — O(log n). Bonus: `n > 0 && (n and (n - 1)) == 0` — O(1) bit trick (Bits chapter)."
+  - name: Pow(x, n)
+    platform: LeetCode
+    num: 50
+    url: "https://leetcode.com/problems/powx-n/"
+    level: medium
+    pattern: O(n) → O(log n) halving
+    hint: "x ko n baar multiply karna O(n). x^n = (x^(n/2))² — har step n aadha → O(log n). Negative n sambhaalo."
+  - name: Count Primes
+    platform: LeetCode
+    num: 204
+    url: "https://leetcode.com/problems/count-primes/"
+    level: medium
+    pattern: "O(n√n) → sieve O(n log log n)"
+    hint: "Har number ka √n tak check = O(n√n). Sieve: har prime ke multiples cross karo — bahut tez."
+  - name: "Amortized analysis: apna ArrayList"
+    platform: Custom
+    level: medium
+    pattern: Amortized O(1)
+    hint: "Ek class banao jo IntArray mein add kare aur bhar jaane par double kare. Copies gino — n adds par 2n se kam aani chahiye. Phir +10 growth se compare karo."
+  - name: Merge k Sorted Lists
+    platform: LeetCode
+    num: 23
+    url: "https://leetcode.com/problems/merge-k-sorted-lists/"
+    level: hard
+    pattern: "O(N·k) vs O(N log k)"
+    hint: "Ek-ek list jodte jao — kitna kaam? Heap mein har list ka head rakho — har item log k. Dono analyze karo."
+  - name: "Recursion tree draw karo: T(n) = 2T(n/2) + n aur T(n) = 2T(n-1) + 1"
+    platform: Custom
+    level: hard
+    pattern: Recurrence solve karna
+    hint: "Pehle wale mein log n levels, har level n kaam → n log n. Doosre mein har level par calls double, depth n → 2ⁿ. Dono ka tree kaagaz par banao."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Ek ke baad ek = jodo; andar = multiply; phir sabse bada term."
+    - "+1/−1 → n; ×2/÷2 → log n; k² ≤ n → √n."
+    - "Andar wala loop kitni baar chalta hai — wahi multiply hota hai, hamesha n nahi."
+    - "Recursion: time = total calls (tree), space = max depth."
+    - "Amortized = poore sequence ka average (ArrayList add = O(1) amortized)."
+  cheatsheet: |
+    | Recurrence | Answer | Example |
+    |---|---|---|
+    | T(n) = T(n/2) + 1 | O(log n) | binary search |
+    | T(n) = T(n-1) + 1 | O(n) | linear recursion |
+    | T(n) = 2T(n/2) + n | O(n log n) | merge sort |
+    | T(n) = 2T(n-1) + 1 | O(2ⁿ) | fib, Tower of Hanoi |
+    | T(n) = T(n-1) + n | O(n²) | selection sort recursion |
+  quiz:
+    - q: "`for (i in 0 until n) for (j in 0 until 100)` ki complexity?"
+      options: ["O(n²)", "O(100n²)", "O(n)", "O(log n)"]
+      answer: 2
+      explain: "Andar ka loop constant 100 baar → 100n → O(n)."
+    - q: "Bahar loop n baar, andar `j *= 2` wala loop n tak. Total?"
+      options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"]
+      answer: 1
+      explain: "n × log n."
+    - q: "fib(n) simple recursion ki SPACE complexity?"
+      options: ["O(2ⁿ)", "O(n)", "O(1)", "O(n²)"]
+      answer: 1
+      explain: "Stack par ek waqt sirf ek path — depth n."
+    - q: "ArrayList.add() ki amortized complexity?"
+      options: ["O(n)", "O(log n)", "O(1)", "O(n²)"]
+      answer: 2
+      explain: "Doubling ki wajah se total copies < 2n."
+    - q: "T(n) = 2T(n/2) + O(n) ka answer?"
+      options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"]
+      answer: 1
+      explain: "log n levels × har level O(n)."
+
+# 14. Connections
+connections:
+  related:
+    - id: big-o-time
+      why: "Basic Big-O — yahan uske rules ko real code par lagaya."
+    - id: space-complexity
+      why: "Recursion depth = space — dono saath mein analyze karte hain."
+  usedLater:
+    - id: dynamic-array
+      how: "Amortized O(1) add — doubling ka asli implementation."
+    - id: recursion-basics
+      how: "Recursion tree banake time nikaalna."
+    - id: merge-sort
+      how: "T(n) = 2T(n/2) + n → O(n log n) ka live example."
+    - id: dp-intro
+      how: "fib ka O(2ⁿ) → memoization se O(n)."

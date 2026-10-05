@@ -14,7 +14,8 @@ export function MemoryViz({ p }: { p: MemoryPanel }) {
   const arrows = p.arrows ?? [];
   const width = p.cells.length * (CELL + GAP);
   const cx = (i: number) => i * (CELL + GAP) + CELL / 2;
-  const focus = p.cells.findIndex((c) => c.tone === 'found' || c.tone === 'active' || c.tone === 'error');
+  const firstWith = (t: string) => p.cells.findIndex((c) => c.tone === t);
+  const focus = [firstWith('found'), firstWith('error'), firstWith('active')].find((i) => i >= 0) ?? -1;
   const scroller = useRef<HTMLDivElement>(null);
 
   // keep the highlighted cell visible on narrow screens
