@@ -1,0 +1,427 @@
+meta:
+  id: constraint-backtracking
+  chapter: backtracking
+  title: Grid & constraint backtracking
+  subtitle: N-Queens, maze, word search, Sudoku — rakhne se pehle check, wapas jaate waqt mitao
+  level: advanced
+  minutes: 45
+  prereqs: [backtracking-basics, matrix]
+  tags: [backtracking, n-queens, sudoku, grid-dfs, word-search]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Backtracking jab **grid** ya **rules (constraints)** ke saath ho:
+    - **Grid par chalna** (maze, word search): har cell se 4 padosi; jis cell se guzre use **mark** karo (is raaste mein dobara nahi), wapas jaate waqt **unmark**.
+    - **Constraint satisfaction** (N-Queens, Sudoku): har jagah koi value rakhne se **pehle check** karo ki koi rule na toote. Toot-ta hai to wo option hi mat lo (pruning).
+
+    ```kotlin
+    fun dfs(r: Int, c: Int) {
+        if (bahar || deewar || visited) return
+        visited[r][c] = true          // mark
+        for ((dr, dc) in dirs) dfs(r + dr, c + dc)
+        visited[r][c] = false         // unmark (backtrack)
+    }
+    ```
+
+    > [!yaad]
+    > Unmark karo ya nahi? **Saare raaste** chahiye (maze, word search) → unmark. Sirf **kaun-kaun pahunch sakta hai** (flood fill, islands) → unmark mat karo (DFS, har cell ek baar).
+  analogy: |
+    **Exam hall seating:** 8 students, 8x8 hall — koi do ek row, column ya diagonal mein na baithein (cheating!). Ek-ek row mein ek student bithao, har baar check karo; aage jagah na bache to pichhle student ki seat badlo.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Ye puzzles ke liye koi formula nahi — search hi tareeka hai. Par search **smart** honi chahiye:
+    - 8-Queens: bina pruning 64C8 ≈ 4.4 × 10⁹ arrangements. Row-wise + O(1) check ke saath sirf ~2000 nodes.
+    - Sudoku: har cell 9 options, 81 cells → 9⁸¹. Rules se har kadam par options gir jaate hain → milliseconds.
+
+    **O(1) check** ka trick: N-Queens mein `cols[c]`, `d1[r − c]`, `d2[r + c]` boolean arrays — har bar poora board scan nahi.
+
+    > [!socho]
+    > N-Queens mein diagonal `r − c` aur `r + c` se kaise pehchaane?
+    >
+    > Ek diagonal (↘) par chalte hue r aur c dono 1 badhte hain → `r − c` same rehta hai. Doosre (↙) par r badhta, c ghatta → `r + c` same. Har diagonal ka ek number!
+
+# 3. Visual intro
+visual:
+  body: |
+    Chooha (0,0) se (n−1, n−1) jaana chahta hai. █ = deewar. Har cell par D, L, R, U try; aage raasta nahi to **wapas** (backtrack) aur mark hatao.
+
+    Saare raaste milte hain — kyunki wapas jaate waqt cell phir khula ho jaata hai.
+  viz: { tracer: mazeTrace }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **N-Queens:** har **row** mein exactly ek queen (warna row mein do — maarenge). To faisla: row `r` ki queen kis **column** mein?
+    1. `r == n` → board poora → result.
+    2. Har column `c`: `cols[c]`, `d1[r − c + n]`, `d2[r + c]` mein se koi true → skip.
+    3. Warna rakho (teeno true), `place(r + 1)`, phir uthao (teeno false).
+
+    4-Queens ke 2 boards; 8-Queens ke 92.
+
+    > [!tip]
+    > Grey cells = abhi ki queens se attack mein. Dekho kaise ek queen rakhte hi neeche ki rows ke bahut options gayab — yahi pruning.
+  viz: { tracer: queensTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "N-Queens (saare boards)"
+    time: "O(n!) lagbhag"
+    space: O(n)
+    why: "Row r mein ≤ n − r options; boolean arrays se O(1) check."
+  - op: "Sudoku 9x9"
+    time: "Exponential worst, practically ms"
+    space: "O(81) stack"
+    why: "Har cell 9 options, rules se bahut kam."
+  - op: "Word search"
+    time: O(m·n·4^L)
+    space: "O(L) stack"
+    why: "Har start cell, har kadam max 4 (asal mein 3) raaste."
+  - op: "Flood fill / islands"
+    time: O(m·n)
+    space: "O(m·n) stack worst"
+    why: "Har cell ek baar (unmark nahi)."
+  - op: "Maze — saare raaste"
+    time: "O(4^(m·n)) worst"
+    space: O(m·n)
+    why: "Har raaste ke liye cells unmark."
+  - op: "Validity check (naive vs arrays)"
+    time: "O(n) vs O(1)"
+    space: O(n)
+    why: "Rows/cols/boxes ke sets ya boolean arrays."
+
+# 6. Code
+code:
+  - title: Rat in a maze — saare raaste
+    file: maze
+    note: |
+      Visual wala code. Directions ko **D, L, R, U** (alphabetical) order mein try karne se raaste khud sorted milte hain.
+
+      `seen[r][c] = false` wapas jaate waqt — warna doosra raasta is cell se guzar hi nahi paata aur kuch raaste chhoot jaate.
+
+# 7. Examples
+examples:
+  - id: flood-fill
+    level: easy
+    title: Flood fill — paint bucket
+    source: { name: Flood Fill, platform: LeetCode, url: "https://leetcode.com/problems/flood-fill/" }
+    problem: |
+      Image = rangon ki grid. Ek cell `(sr, sc)` se shuru karke, us cell ke rang wale saare **jude hue** cells (upar/neeche/baayein/daayein) naye rang se bharo — jaise Paint ka bucket tool.
+
+      Example: `[[1,1,1],[1,1,0],[1,0,1]]`, (1, 1), rang 2 → `[[2,2,2],[2,2,0],[2,0,1]]`
+    intuition: |
+      Grid DFS:
+      - Bahar ya alag rang → ruko.
+      - Rang do, chaaron padosiyon par recurse.
+
+      Naya rang hi **visited ka nishaan** — dobara wahi cell purane rang wala nahi rahega. Alag `visited` nahi chahiye, aur **unmark nahi** (hum raaste nahi gin rahe, bas pahunch).
+
+      > [!galti]
+      > Naya rang == purana rang → paint ke baad bhi cell "purane rang" wala → infinite recursion → StackOverflowError. Shuru mein check.
+    dryRun: |
+      Start (1,1), purana 1, naya 2
+
+      | Paint | Phir |
+      |---|---|
+      | (1,1) | neeche (2,1)=0 ✗, upar (0,1) |
+      | (0,1) | (0,2), (0,0) |
+      | (0,0) | neeche (1,0) |
+      | (1,0) | neeche (2,0) |
+      | (2,0) | khatam — (2,2) juda nahi, 1 hi raha |
+    viz: { tracer: floodTrace }
+    code: ex1-flood
+    complexity:
+      time: O(m·n)
+      space: "O(m·n) stack (worst)"
+      why: "Har cell ek baar paint."
+
+  - id: word-search
+    level: medium
+    title: Grid mein word dhoondho
+    source: { name: Word Search, platform: LeetCode, url: "https://leetcode.com/problems/word-search/" }
+    problem: |
+      Letters ki grid aur ek word. Word padosi cells (upar/neeche/baayein/daayein) se banta hai? Ek cell ek word mein **ek hi baar**.
+
+      Example: `ABCE / SFCS / ADEE`, word `"ABCCED"` → **true**; `"ABCB"` → false
+    intuition: |
+      Har cell se shuru karke DFS, `k` = word ka kaunsa letter chahiye:
+      - Bahar ya letter alag → false.
+      - Match → cell ko `#` se **mark** (dobara use na ho), 4 padosiyon mein `k + 1`.
+      - Wapas aate waqt **unmark** (asli letter wapas) — doosre start/raaste ke liye.
+
+      > [!tip]
+      > Pruning ideas: board mein word ke letters kaafi hain? (ginti). Word ka pehla letter board mein kam baar aata hai to word ulta karke dhoondho.
+    dryRun: |
+      `"ABCCED"`
+
+      | Kadam | Cell | Letter |
+      |---|---|---|
+      | 0 | (0,0) | A ✓ |
+      | 1 | (0,1) | B ✓ |
+      | 2 | (0,2) | C ✓ |
+      | 3 | (1,2) | C ✓ (neeche) |
+      | 4 | (2,2) | E ✓ |
+      | 5 | (2,1) | D ✓ → **true** |
+    viz: { tracer: wordTrace }
+    code: ex2-word-search
+    complexity:
+      time: O(m·n·3^L)
+      space: "O(L) stack"
+      why: "Har start; pehle kadam ke baad har cell se max 3 naye raaste (aaye hue ko chhod ke)."
+
+  - id: sudoku
+    level: tricky
+    title: Sudoku solver
+    source: { name: Sudoku Solver, platform: LeetCode, url: "https://leetcode.com/problems/sudoku-solver/" }
+    problem: |
+      Sudoku bharo: har row, column aur box mein har digit ek baar. (Animation 4x4 par — digits 1-4, 2x2 boxes; code 9x9 bhi solve karta hai.)
+
+      Example: 4x4 `[1 _ 3 _ / _ 4 _ 2 / 2 _ 4 _ / _ 3 _ 1]` → pehli row `1 2 3 4`
+    intuition: |
+      Pehla khaali cell dhoondho, 1..n har digit try:
+      - Row, column, box mein pehle se hai → skip.
+      - Rakho → **baaki puzzle recursion se solve**. Ho gaya → true (upar tak).
+      - Nahi hua → hatao, agla digit.
+      - Koi digit nahi chala → **false** — matlab pichhla faisla galat tha, wo wapas jaayega.
+
+      > [!tip]
+      > Tez banane ke tareeke: rows/cols/boxes ke boolean arrays (check O(1)); aur sabse **kam options** wala khaali cell pehle bharo (MRV heuristic) — mushkil puzzles bhi turant.
+    dryRun: |
+      4x4
+
+      | Cell | Try | Kya hua |
+      |---|---|---|
+      | (0,1) | 2 | ✓ (row mein 1, 3; col mein 4, 3) |
+      | (0,3) | 4 | ✓ |
+      | (1,0) | 3 | ✓ |
+      | … | | koi backtrack nahi — unique, seedha solve |
+    viz: { tracer: sudokuTrace }
+    code: ex3-sudoku
+    complexity:
+      time: "O(9^(khaali cells)) worst"
+      space: "O(81) stack"
+      why: "Har khaali cell max 9 options; rules se practically bahut kam."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Puzzle / constraint satisfaction — Sudoku, N-Queens, crossword, KenKen."
+    - "Grid mein saare raaste / word / pattern dhoondhna."
+    - "Constraints chhote n ke saath (n ≤ 10 queens, 9x9 board)."
+  avoid:
+    - "Sirf pahunch / connected parts — DFS/BFS bina unmark (O(m·n))."
+    - "Shortest path grid mein — BFS (backtracking saare raaste dekhega, bahut slow)."
+    - "Count of paths without obstacles — DP / combinatorics."
+  signals:
+    - keyword: "place n items so no two attack / conflict"
+      think: "Row-by-row + O(1) conflict arrays."
+    - keyword: "word exists in grid / path in maze"
+      think: "DFS + mark/unmark."
+    - keyword: "fill connected region / count islands"
+      think: "DFS bina unmark (Graphs chapter)."
+    - keyword: "solve sudoku / valid board"
+      think: "Pehla khaali cell, digits try, rows/cols/boxes check."
+
+# 9. Real-world
+realWorld:
+  - where: "Paint / photo editors"
+    how: "Bucket fill tool = flood fill."
+  - where: "Games"
+    how: "Sudoku / crossword apps ke solvers aur hint systems; maze games ka path finding."
+  - where: "Timetable / exam seating"
+    how: "Constraint satisfaction — clash na ho, rules na tootein; backtracking + heuristics."
+  - where: "Chip design (VLSI)"
+    how: "Components ko board par aise rakhna ki rules na tootein — constraint search."
+  - where: "Word games (Boggle, Scrabble helpers)"
+    how: "Grid mein words dhoondhna — word search + Trie."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Unmark bhool gaye (saare raaste wale problem mein)"
+    type: logic
+    wrong: |
+      Word search mein `#` lagaya par wapas letter nahi rakha → doosre start ke liye cell gayab, galat false.
+    right: |
+      Recursion ke baad asli value wapas.
+  - title: "Flood fill mein same rang"
+    type: logic
+    wrong: |
+      newColor == oldColor → infinite recursion.
+    right: |
+      Shuru mein `if (old == color) return image`.
+  - title: "Bounds check order"
+    type: off-by-one
+    wrong: |
+      `board[r][c] != word[k] || r < 0` → pehle hi index bahar crash.
+    right: |
+      Pehle bounds (`r in 0 until m`), phir value.
+  - title: "Diagonal index negative"
+    type: off-by-one
+    wrong: |
+      `d1[r - c]` → r < c par negative index.
+    right: |
+      `d1[r - c + n]` (array size 2n).
+  - title: "Sudoku box ka shuru"
+    type: off-by-one
+    wrong: |
+      Box start `r / 3` (0-2) maana — wo box number hai, cell index nahi.
+    right: |
+      `r / 3 * 3` (0, 3, 6).
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "N-Queens mein conflict O(1) mein kaise check?"
+      a: |
+        cols[c], d1[r − c + n], d2[r + c] boolean arrays. Row-wise rakhte hain to row conflict hota hi nahi.
+    - q: "Word search mein visited array ki jagah kya?"
+      a: |
+        Board cell ko '#' se badal do aur wapas rakh do — extra memory nahi. Par input badalta hai (interview mein bolo).
+    - q: "Flood fill mein unmark kyun nahi?"
+      a: |
+        Hum sirf pahunch rahe hain (har cell ek baar paint), saare raaste nahi gin rahe. Unmark karte to exponential ho jaata.
+    - q: "Sudoku solver tez kaise?"
+      followUp: true
+      a: |
+        Rows/cols/boxes ke bitmask/boolean arrays; sabse kam options wala cell pehle (MRV); naked singles pehle bhar do.
+    - q: "N-Queens II (sirf count)?"
+      followUp: true
+      a: |
+        Same backtracking, board ki jagah counter. Bitmask se aur tez: available = ~(cols | d1 | d2) & mask.
+    - q: "Word Search II (bahut saare words)?"
+      a: |
+        Har word ke liye alag search slow. Words ka Trie banao, ek DFS mein Trie ke saath chalo (Trie chapter).
+    - q: "Grid DFS mein recursion depth problem?"
+      a: |
+        1000x1000 grid par recursion 10⁶ gehri → StackOverflowError. Iterative stack ya BFS lo.
+    - q: "Maze mein shortest path chahiye to?"
+      a: |
+        Backtracking nahi — BFS (har cell ek baar, pehli baar pahunchna = sabse chhota).
+  mayAsk:
+    - "N-Queens II."
+    - "Valid Sudoku."
+    - "Path with Maximum Gold."
+    - "Unique Paths III."
+
+# 12. Practice
+practice:
+  - name: Flood Fill
+    platform: LeetCode
+    num: 733
+    url: "https://leetcode.com/problems/flood-fill/"
+    level: easy
+    pattern: Grid DFS (no unmark)
+    hint: "Example 1."
+  - name: Island Perimeter
+    platform: LeetCode
+    num: 463
+    url: "https://leetcode.com/problems/island-perimeter/"
+    level: easy
+    pattern: Grid neighbours
+    hint: "Har land cell ke 4 kinare; jis taraf paani ya bahar hai wo perimeter mein. DFS ki zaroorat bhi nahi."
+  - name: Find Winner on a Tic Tac Toe Game
+    platform: LeetCode
+    num: 1275
+    url: "https://leetcode.com/problems/find-winner-on-a-tic-tac-toe-game/"
+    level: easy
+    pattern: Rows / cols / diagonals counters
+    hint: "N-Queens wali soch: har player ke liye rows[r], cols[c], diag (r == c), anti (r + c == 2) counters; kisi ka 3 hua to jeet."
+  - name: Word Search
+    platform: LeetCode
+    num: 79
+    url: "https://leetcode.com/problems/word-search/"
+    level: medium
+    pattern: DFS + mark/unmark
+    hint: "Example 2."
+  - name: Path with Maximum Gold
+    platform: LeetCode
+    num: 1219
+    url: "https://leetcode.com/problems/path-with-maximum-gold/"
+    level: medium
+    pattern: Grid backtracking, max over paths
+    hint: "Har sone wale cell se DFS; cell ko 0 karke mark, wapas rakho; har raaste ka sum, max lo."
+  - name: Valid Sudoku
+    platform: LeetCode
+    num: 36
+    url: "https://leetcode.com/problems/valid-sudoku/"
+    level: medium
+    pattern: Constraint check with sets
+    hint: "Har row, col, box (index r / 3 * 3 + c / 3) ke liye seen set/boolean. Koi digit dobara → false."
+  - name: N-Queens
+    platform: LeetCode
+    num: 51
+    url: "https://leetcode.com/problems/n-queens/"
+    level: hard
+    pattern: Row-wise + O(1) conflict arrays
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Sudoku Solver
+    platform: LeetCode
+    num: 37
+    url: "https://leetcode.com/problems/sudoku-solver/"
+    level: hard
+    pattern: Constraint backtracking
+    hint: "Example 3 — phir boolean arrays se check O(1) karo."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Rakhne se pehle check (pruning), wapas jaate waqt undo."
+    - "Saare raaste → unmark; sirf pahunch (flood/islands) → unmark nahi."
+    - "N-Queens: row-wise; cols, r − c + n, r + c arrays → O(1) check."
+    - "Sudoku: pehla khaali cell, digits try; koi nahi chala → false (pichhla galat)."
+    - "Grid DFS: pehle bounds, phir value; gehri recursion ka dhyaan."
+  cheatsheet: |
+    ```kotlin
+    // N-Queens
+    for (c in 0 until n) {
+        if (cols[c] || d1[r - c + n] || d2[r + c]) continue
+        mark(true); place(r + 1); mark(false)
+    }
+    // grid path (saare raaste)
+    fun dfs(r: Int, c: Int, k: Int): Boolean {
+        if (k == L) return true
+        if (out(r, c) || b[r][c] != w[k]) return false
+        val ch = b[r][c]; b[r][c] = '#'
+        val ok = dirs.any { (dr, dc) -> dfs(r + dr, c + dc, k + 1) }
+        b[r][c] = ch; return ok
+    }
+    ```
+  quiz:
+    - q: "4-Queens ke kitne solutions?"
+      options: ["1", "2", "4", "0"]
+      answer: 1
+      explain: "Do boards (ek doosre ka mirror)."
+    - q: "Cell (2, 5) aur (4, 3) — same ↙ diagonal (r + c)?"
+      options: ["Haan", "Nahi"]
+      answer: 0
+      explain: "2 + 5 = 7 = 4 + 3."
+    - q: "Flood fill mein visited ka nishaan?"
+      options: ["Alag boolean grid zaroori", "Naya rang hi kaafi", "Stack", "Kuch nahi chahiye"]
+      answer: 1
+      explain: "Rang badalne ke baad wo cell purane rang wala nahi rehta."
+    - q: "Word search mein wapas aate waqt letter kyun rakhte hain?"
+      options: ["Speed", "Doosre raaston/starts ke liye cell phir use ho sake", "Memory", "Zaroori nahi"]
+      answer: 1
+      explain: "Warna galat false."
+    - q: "Sudoku 9x9 mein cell (4, 7) ka box kahan se shuru?"
+      options: ["(3, 6)", "(4, 7)", "(1, 2)", "(3, 7)"]
+      answer: 0
+      explain: "4 / 3 × 3 = 3, 7 / 3 × 3 = 6."
+
+# 14. Connections
+connections:
+  related:
+    - id: backtracking-basics
+      why: "Choose / explore / un-choose."
+    - id: matrix
+      why: "Grid indexing, padosi."
+  usedLater:
+    - id: dfs
+      how: "Islands, connected components — grid DFS bina unmark."
+    - id: bfs
+      how: "Grid mein shortest path."
+    - id: trie
+      how: "Word Search II — Trie + grid backtracking."

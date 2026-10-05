@@ -4,8 +4,9 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–7 done (39 topics).
-- Next action: chapter 8 → `backtracking-basics` (recursion panel via `callTree`; text panel for current path).
+- Step: 3 (Content). Chapters 0–8 done (42 topics).
+- Next action: chapter 9 → `binary-tree-basics` (tree panel: nodes {id, value, left, right}, root id).
+- Tracers that can explode on random input: cap frames with a budget counter (see constraint-backtracking sudoku/word) — validate fuzz fails on FrameLimitError.
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
 - Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
@@ -93,9 +94,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] monotonic-stack
 
 ### 8. Backtracking
-- [ ] backtracking-basics
-- [ ] permutations-combinations
-- [ ] constraint-backtracking
+- [x] backtracking-basics
+- [x] permutations-combinations
+- [x] constraint-backtracking
 
 ### 9. Trees
 - [ ] binary-tree-basics

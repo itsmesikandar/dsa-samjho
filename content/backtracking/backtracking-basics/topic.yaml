@@ -1,0 +1,434 @@
+meta:
+  id: backtracking-basics
+  chapter: backtracking
+  title: Backtracking basics
+  subtitle: Choose, explore, un-choose — saare raaste try karo, galat lage to wapas aao
+  level: intermediate
+  minutes: 40
+  prereqs: [recursion-patterns]
+  tags: [backtracking, subsets, pruning, decision-tree]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Backtracking** = saare possible jawab banane ka tareeka — ek-ek faisla lo, aage badho, aur jab raasta khatam (ya galat) ho to **wapas aa ke faisla badlo**.
+
+    Teen kadam (har backtracking code mein):
+    1. **Choose** — ek option chuno (path mein daalo).
+    2. **Explore** — baaki faislon ke liye recursion.
+    3. **Un-choose** — option wapas nikaalo, taaki agla option saaf halat se try ho.
+
+    ```kotlin
+    fun bt(state) {
+        if (poora ho gaya) { res.add(path.toList()); return }
+        for (option in options(state)) {
+            if (!valid(option)) continue   // pruning
+            path.add(option)               // choose
+            bt(next state)                 // explore
+            path.removeAt(path.size - 1)   // un-choose
+        }
+    }
+    ```
+
+    > [!yaad]
+    > Ye **multi-branch recursion** hi hai (Recursion patterns) — bas ek shared `path` jise har kadam ke baad **undo** karte hain. Answer list mein hamesha **copy** daalo (`path.toList()`).
+  analogy: |
+    **Bhool-bhulaiya (maze).** Har mod par ek raasta chuno. Aage dead end mila? **Wapas pichhle mod tak** aao aur doosra raasta lo. Tab tak jab tak bahar ka raasta na mile (ya saare raaste dekh lo).
+
+    Wapas aate waqt jo chalk ka nishaan lagaya tha, mita do — yahi "un-choose".
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Kuch problems ka koi formula / greedy nahi — **saare options** dekhne padte hain: saare subsets, saare permutations, Sudoku, N-Queens, word search.
+
+    Brute force "sab bana ke check karo" bhi yahi hai, par backtracking **smart** hai:
+    - Ek-ek faisla lete waqt hi galat raasta pehchaan lo → **poori shaakh kaat do** (pruning). Combination Sum mein bada number aaya → aage ke sab chhod do.
+    - Ek hi `path` reuse — har option ke liye nayi list nahi.
+
+    > [!socho]
+    > `res.add(path)` (bina copy) likha to kya hoga?
+    >
+    > Sab entries **same list object** ko point karengi — aur aakhir mein path khaali ho jaata hai. Result: `[[], [], [], …]`. Hamesha `path.toList()` / `new ArrayList<>(path)`.
+
+# 3. Visual intro
+visual:
+  body: |
+    Har item par do raaste: **+** (lo) ya **−** (chhodo). Ye **decision tree** hai — har patta (leaf) ek subset.
+
+    Dekho DFS kaise ek shaakh ke end tak jaata hai, phir **wapas** aa ke doosri shaakh.
+  viz: { tracer: subsetTree }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Subsets** (loop wala dhaancha):
+    - Har call par path **khud ek subset** hai → result mein copy.
+    - `start` se aage ke har item ke liye: choose → `bt(i + 1)` → un-choose.
+    - `i + 1` (aur `start`) se **peeche ke items dobara nahi** aate — isliye `[1, 2]` aur `[2, 1]` dono nahi bante.
+
+    `[1, 2, 3]` → `[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]`
+
+    > [!tip]
+    > Do dhaanche yaad rakho: **loop wala** (har call par "agla kaun?" — subsets, combinations) aur **lo/chhodo wala** (har item par 2 raaste — code section). Dono same answers, alag order.
+  viz: { tracer: subsetsTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Subsets (n items)"
+    time: O(n · 2ⁿ)
+    space: "O(n) stack + output"
+    why: "2ⁿ subsets, har copy O(n)."
+  - op: "Permutations"
+    time: O(n · n!)
+    space: "O(n) + output"
+    why: "n! orders, har copy O(n) (agla topic)."
+  - op: "Combinations (n choose k)"
+    time: O(k · C(n, k))
+    space: O(k)
+    why: "Har combination ek baar."
+  - op: "Pruning ka fayda"
+    time: "Worst same, practically bahut kam"
+    space: "same"
+    why: "Galat shaakhein jaldi kat jaati hain."
+  - op: "Palindrome partitioning"
+    time: O(n · 2ⁿ)
+    space: O(n)
+    why: "Har gap par kaato ya na kaato; palindrome check O(n)."
+  - op: "Recursion stack"
+    time: "lagu nahi"
+    space: "O(depth)"
+    why: "Gehraai = faislon ki ginti (n)."
+
+# 6. Code
+code:
+  - title: Lo / chhodo wala dhaancha
+    file: take-skip
+    note: |
+      Har item ke liye ek level: pehle **lo** (path mein daalo, aage jao, wapas nikaalo), phir **chhodo** (seedha aage). Leaf par (saare items ka faisla) result.
+
+      Jab har item par binary choice ho (subset sum, target sum, XOR) — ye dhaancha seedha fit hota hai. Aur memo lagane mein aasaan (DP chapter).
+
+# 7. Examples
+examples:
+  - id: subset-xor
+    level: easy
+    title: Saare subsets ke XOR ka jod
+    source: { name: Sum of All Subset XOR Totals, platform: LeetCode, url: "https://leetcode.com/problems/sum-of-all-subset-xor-totals/" }
+    problem: |
+      Har subset ke numbers ka XOR nikaalo (khaali subset = 0), phir sab subsets ke XOR jodo.
+
+      Example: `[5, 1, 6]` → **28**
+    intuition: |
+      Lo / chhodo dhaancha, par path ki jagah **running XOR** parameter mein:
+      - Lo: `go(i + 1, x xor nums[i])`
+      - Chhodo: `go(i + 1, x)`
+      - Leaf: `x` return; dono raaston ka jod upar.
+
+      State **parameter** mein ho (Int, immutable) to un-choose ki zaroorat hi nahi — wapas aate hi purana value.
+
+      > [!socho]
+      > O(n) trick: har bit jo kisi bhi number mein hai, theek aadhe subsets (2^(n−1)) mein "on" hoti hai → answer = (sabka OR) × 2^(n−1). [5,1,6]: OR = 7, × 4 = 28 ✓.
+    dryRun: |
+      `[5, 1, 6]` ke subsets: {} 0, {5} 5, {1} 1, {6} 6, {5,1} 4, {5,6} 3, {1,6} 7, {5,1,6} 2
+
+      Jod: 0 + 5 + 1 + 6 + 4 + 3 + 7 + 2 = **28**
+    viz: { tracer: xorTrace }
+    code: ex1-xor
+    complexity:
+      time: O(2ⁿ)
+      space: "O(n) stack"
+      why: "Har item par 2 raaste."
+
+  - id: combination-sum
+    level: medium
+    title: Combination Sum — dobara le sakte ho
+    source: { name: Combination Sum, platform: LeetCode, url: "https://leetcode.com/problems/combination-sum/" }
+    problem: |
+      Alag-alag positive candidates aur `target`. Har number **kitni bhi baar** le sakte ho. Saare **unique** combinations jinka sum = target.
+
+      Example: `[2, 3, 6, 7]`, target 7 → `[[2, 2, 3], [7]]`
+    intuition: |
+      Loop wala dhaancha, `remain` ke saath:
+      - `remain == 0` → mila.
+      - Option `i` (start se): choose `c[i]`, `bt(i, remain − c[i])` — **i** se (same number dobara chalega), `i + 1` nahi.
+      - `start` ki wajah se peeche nahi jaate → `[2, 3]` aur `[3, 2]` dobara nahi.
+
+      **Pruning:** pehle sort. `c[i] > remain` → aage sab bade → `break`. Poori shaakhein kat jaati hain.
+
+      > [!galti]
+      > `bt(0, …)` se har baar shuru kiya → `[2, 2, 3]`, `[2, 3, 2]`, `[3, 2, 2]` teeno aa gaye. `start` pass karo.
+    dryRun: |
+      sorted `[2, 3, 6, 7]`, target 7
+
+      | Path | remain | Kya hua |
+      |---|---|---|
+      | 2 | 5 | aage |
+      | 2 2 | 3 | aage |
+      | 2 2 2 | 1 | 2 > 1 → break |
+      | 2 2 3 | 0 | **mila** |
+      | 2 3 | 2 | 3 > 2 → break |
+      | 3 | 4 | 3 3 → 1, break |
+      | 6 | 1 | break |
+      | 7 | 0 | **mila** |
+    viz: { tracer: comboTrace }
+    code: ex2-combo-sum
+    complexity:
+      time: "O(n^(T/min)) worst"
+      space: "O(T/min) stack"
+      why: "Gehraai = target / sabse chhota number; pruning se practically bahut kam."
+
+  - id: palindrome-partition
+    level: tricky
+    title: Palindrome tukdon mein kaato
+    source: { name: Palindrome Partitioning, platform: LeetCode, url: "https://leetcode.com/problems/palindrome-partitioning/" }
+    problem: |
+      String ko aise tukdon mein kaato ki **har tukda palindrome** ho. Saare tareeke do.
+
+      Example: `"aab"` → `[["a", "a", "b"], ["aa", "b"]]`
+    intuition: |
+      Faisla: **agla tukda kitna lamba?** `start` se `end` tak har lambai try karo:
+      - `s[start..end]` palindrome nahi → **skip** (pruning — is raaste koi jawab nahi).
+      - Palindrome → tukda path mein, `bt(end + 1)`, phir hatao.
+      - `start == length` → poora kat gaya → result.
+
+      > [!tip]
+      > Palindrome check baar-baar same substrings par hota hai — `isPal[i][j]` DP table pehle bana lo (O(n²)), phir check O(1). Interview follow-up.
+    dryRun: |
+      `"aab"`
+
+      | start | Tukda | Palindrome? | Path |
+      |---|---|---|---|
+      | 0 | a | ✓ | a |
+      | 1 | a | ✓ | a a |
+      | 2 | b | ✓ | a a b → **mila** |
+      | 1 | ab | ✗ | skip |
+      | 0 | aa | ✓ | aa |
+      | 2 | b | ✓ | aa b → **mila** |
+      | 0 | aab | ✗ | skip |
+    viz: { tracer: palPartTrace }
+    code: ex3-pal-partition
+    complexity:
+      time: O(n · 2ⁿ)
+      space: "O(n) stack"
+      why: "Har gap par kaato/na kaato (2ⁿ⁻¹), har check O(n)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "\"Saare\" subsets / combinations / permutations / arrangements chahiye."
+    - "Constraint wali search — Sudoku, N-Queens, word search."
+    - "n chhota (≤ 15–20) aur exponential theek hai."
+    - "Partition / split ke saare tareeke."
+  avoid:
+    - "Sirf GINTI chahiye ya best value — aksar DP (overlapping subproblems)."
+    - "n bada (10⁵) — exponential kabhi nahi chalega; greedy/DP socho."
+    - "Ek hi jawab chahiye aur greedy se mil jaata hai."
+  signals:
+    - keyword: "all subsets / power set"
+      think: "Loop dhaancha, start index, har node result."
+    - keyword: "all combinations that sum to target"
+      think: "Sort + remain + break pruning."
+    - keyword: "partition string so that each part …"
+      think: "Har lambai ka tukda try, valid ho to recurse."
+    - keyword: "n ≤ 15 / 20 in constraints"
+      think: "2ⁿ ya n! chal jaayega — backtracking."
+
+# 9. Real-world
+realWorld:
+  - where: "Sudoku / puzzle solvers"
+    how: "Khaali cell mein 1-9 try, rule toote to wapas — backtracking."
+  - where: "Compilers / regex engines"
+    how: "Regex matching (backtracking engines) — ek raasta fail to doosra try."
+  - where: "Scheduling"
+    how: "Exams / meetings ka timetable jismein constraints hon — options try karo, clash par wapas."
+  - where: "Games AI"
+    how: "Chess / tic-tac-toe mein chaalein try karna (game tree search)."
+  - where: "Config / test generation"
+    how: "Saare feature combinations generate karna testing ke liye."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Path ki copy nahi daali"
+    type: logic
+    wrong: |
+      `res.add(path)` → saari entries ek hi list → aakhir mein sab khaali.
+    right: |
+      `res.add(path.toList())` / `new ArrayList<>(path)`.
+  - title: "Un-choose bhool gaye"
+    type: logic
+    wrong: |
+      `path.add(x); bt(...)` aur hatana bhool gaye → agla option purane kachre ke saath.
+    right: |
+      Har `add` ke baad recursion, phir `removeAt(size − 1)`.
+  - title: "start index nahi rakha"
+    type: logic
+    wrong: |
+      Har call `0` se loop → same combination alag orders mein dobara.
+    right: |
+      Combinations/subsets mein `start` pass karo; permutations mein `used` array.
+  - title: "Pruning mein continue vs break"
+    type: logic
+    wrong: |
+      Sorted candidates par `c[i] > remain` hone par `continue` — kaam karta hai par bekaar iterations.
+    right: |
+      Sorted ho to `break` (aage sab bade). Unsorted ho to sirf `continue`.
+  - title: "Khaali input"
+    type: empty
+    wrong: |
+      Khaali array ke subsets mein `[[]]` bhool gaye (sirf `[]` return).
+    right: |
+      Khaali set bhi subset hai — loop dhaancha har call par path add karta hai, to `[[]]` apne aap.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Backtracking aur brute force mein fark?"
+      a: |
+        Brute force saare candidates poore bana ke check karta hai. Backtracking ek-ek faisla lete waqt galat raasta pehchaan ke poori shaakh kaat deta hai (pruning) — wahi exponential, par practically bahut tez.
+    - q: "Backtracking ka template batao."
+      a: |
+        bt(state): base par result mein copy; har option: valid? choose → bt(next) → un-choose.
+    - q: "Subsets ki complexity?"
+      a: |
+        2ⁿ subsets, har copy O(n) → O(n · 2ⁿ). Space O(n) stack (output alag).
+    - q: "Combination Sum mein duplicates combinations kaise roke?"
+      followUp: true
+      a: |
+        start index: sirf i se aage options. [2,3] bana, [3,2] kabhi nahi (3 ke baad 2 nahi aata).
+    - q: "Combination Sum II (har number ek baar, input mein duplicates)?"
+      followUp: true
+      a: |
+        Sort; bt(i + 1); same level par same value skip: if (i > start && c[i] == c[i − 1]) continue.
+    - q: "Backtracking kab DP ban jaata hai?"
+      a: |
+        Jab sirf count/best chahiye aur same state (index, remain) baar-baar aaye — memo lagao. Saare jawab LIST karne hon to backtracking hi.
+    - q: "Palindrome check fast kaise?"
+      a: |
+        isPal[i][j] = s[i] == s[j] && isPal[i+1][j−1] — O(n²) precompute, phir O(1).
+    - q: "Iterative subsets?"
+      a: |
+        Result = [[]]; har item ke liye existing har subset mein item jod ke naye add. Ya bitmask 0..2ⁿ − 1.
+  mayAsk:
+    - "Subsets II (duplicates)."
+    - "Combination Sum II / III."
+    - "Letter Case Permutation."
+    - "Generate Parentheses."
+
+# 12. Practice
+practice:
+  - name: Sum of All Subset XOR Totals
+    platform: LeetCode
+    num: 1863
+    url: "https://leetcode.com/problems/sum-of-all-subset-xor-totals/"
+    level: easy
+    pattern: Take / skip with parameter state
+    hint: "Example 1 — phir OR × 2^(n−1) trick."
+  - name: Binary Watch
+    platform: LeetCode
+    num: 401
+    url: "https://leetcode.com/problems/binary-watch/"
+    level: easy
+    pattern: Choose k LEDs out of 10
+    hint: "10 LEDs mein se turnedOn chuno (combinations), ya seedha har h (0..11), m (0..59) ke bits gino."
+  - name: Binary Tree Paths
+    platform: LeetCode
+    num: 257
+    url: "https://leetcode.com/problems/binary-tree-paths/"
+    level: easy
+    pattern: Path backtracking on tree
+    hint: "Trees chapter ke baad: node path mein daalo, leaf par path string banao, wapas aate waqt hatao."
+  - name: Subsets
+    platform: LeetCode
+    num: 78
+    url: "https://leetcode.com/problems/subsets/"
+    level: medium
+    pattern: Loop template with start
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Combination Sum
+    platform: LeetCode
+    num: 39
+    url: "https://leetcode.com/problems/combination-sum/"
+    level: medium
+    pattern: Remain + reuse + break pruning
+    hint: "Example 2."
+  - name: Palindrome Partitioning
+    platform: LeetCode
+    num: 131
+    url: "https://leetcode.com/problems/palindrome-partitioning/"
+    level: medium
+    pattern: Cut positions + validity check
+    hint: "Example 3."
+  - name: Word Break II
+    platform: LeetCode
+    num: 140
+    url: "https://leetcode.com/problems/word-break-ii/"
+    level: hard
+    pattern: Partition backtracking + memo
+    hint: "Palindrome Partitioning jaisa, par tukda dictionary mein hona chahiye. Same start baar-baar aata hai — start → sentences ka memo."
+  - name: Expression Add Operators
+    platform: LeetCode
+    num: 282
+    url: "https://leetcode.com/problems/expression-add-operators/"
+    level: hard
+    pattern: Backtracking with running value and last operand
+    hint: "Har position par number ka tukda lo (leading zero dhyaan), +, −, * try karo. * ke liye 'last operand' rakho: value − last + last × cur."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Backtracking = choose → explore → un-choose (DFS on decision tree)."
+    - "Result mein path ki COPY daalo."
+    - "Subsets/combinations: start index; reuse allowed → bt(i), warna bt(i + 1)."
+    - "Pruning: invalid option → continue; sorted aur aage sab invalid → break."
+    - "Parameter state (Int) ho to undo apne aap; shared list ho to removeAt."
+  cheatsheet: |
+    ```kotlin
+    val res = mutableListOf<List<Int>>(); val path = mutableListOf<Int>()
+    fun bt(start: Int, remain: Int) {
+        if (remain == 0) { res.add(path.toList()); return }
+        for (i in start until c.size) {
+            if (c[i] > remain) break          // prune (sorted)
+            path.add(c[i])                    // choose
+            bt(i, remain - c[i])              // explore (i = reuse, i+1 = no reuse)
+            path.removeAt(path.size - 1)      // un-choose
+        }
+    }
+    ```
+  quiz:
+    - q: "[1, 2, 3] ke kitne subsets?"
+      options: ["6", "7", "8", "9"]
+      answer: 2
+      explain: "2³ = 8 (khaali samet)."
+    - q: "res.add(path) (bina copy) ka result?"
+      options: ["Sahi", "Saari entries same list — aakhir mein khaali", "Compile error", "Duplicates"]
+      answer: 1
+      explain: "Ek hi object ka reference."
+    - q: "Combination Sum mein same number dobara lene ke liye agli call?"
+      options: ["bt(i + 1, …)", "bt(i, …)", "bt(0, …)", "bt(start, …)"]
+      answer: 1
+      explain: "i se hi — same number phir option."
+    - q: "\"aab\" ke palindrome partitions kitne?"
+      options: ["1", "2", "3", "4"]
+      answer: 1
+      explain: "[a, a, b] aur [aa, b]."
+    - q: "Backtracking ki space (output chhod ke)?"
+      options: ["O(1)", "O(depth)", "O(2ⁿ)", "O(n!)"]
+      answer: 1
+      explain: "Recursion stack + path = gehraai."
+
+# 14. Connections
+connections:
+  related:
+    - id: recursion-patterns
+      why: "Multi-branch recursion ka dhaancha."
+    - id: dfs
+      why: "Backtracking = decision tree par DFS."
+  usedLater:
+    - id: permutations-combinations
+      how: "used array, duplicates skip, k-combinations."
+    - id: constraint-backtracking
+      how: "N-Queens, Sudoku, word search — grid par."
+    - id: dp-intro
+      how: "Count/best chahiye to memo — DP."
