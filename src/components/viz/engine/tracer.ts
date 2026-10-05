@@ -1,4 +1,4 @@
-import type { ArrayPanel, ArrPointer, Cell, Frame } from './types';
+import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, RecursionPanel, Tone } from './types';
 
 export const MAX_FRAMES = 400;
 
@@ -132,6 +132,36 @@ export function swap<T>(a: T[], i: number, j: number): void {
   const x = a[i];
   a[i] = a[j];
   a[j] = x;
+}
+
+/** recursion panel builder: push() marks parent waiting, done() marks parent active again */
+export function callTree(label = 'Calls') {
+  const calls: CallNode[] = [];
+  let seq = 0;
+  const parentOf = (me: CallNode) => (me.parent ? calls.find((c) => c.id === me.parent) : undefined);
+  return {
+    calls,
+    push(text: string, parent?: string, tone?: Tone): CallNode {
+      const me: CallNode = { id: `c${seq++}`, parent, label: text, state: 'active', tone };
+      const p = parentOf(me);
+      if (p) p.state = 'waiting';
+      calls.push(me);
+      return me;
+    },
+    done(me: CallNode, ret: string, tone?: Tone) {
+      me.state = 'done';
+      me.ret = ret;
+      if (tone) me.tone = tone;
+      const p = parentOf(me);
+      if (p) p.state = 'active';
+    },
+    depth(me: CallNode) {
+      let d = 1;
+      for (let p = parentOf(me); p; p = parentOf(p)) d++;
+      return d;
+    },
+    panel: (): RecursionPanel => ({ kind: 'recursion', label, calls }),
+  };
 }
 
 // ---------- input parsing (user typed text → values) ----------

@@ -1,0 +1,461 @@
+meta:
+  id: recursion-basics
+  chapter: recursion
+  title: Recursion basics
+  subtitle: Function jo khud ko call kare — base case, call stack aur "bharosa" wala soch
+  level: beginner
+  minutes: 35
+  prereqs: [memory-basics, big-o-time]
+  tags: [recursion, call-stack, base-case, tailrec, divide-by-two]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Recursion** = function jo **khud ko** call kare — har baar **chhote** input ke saath.
+
+    Har recursive function ke do hisse:
+    1. **Base case** — sabse chhota input jiska jawab seedha pata hai. Yahan **ruk jao**.
+    2. **Recursive case** — sawaal ko thoda chhota karo, khud ko call karo, aur jo jawab aaye usme apna hissa jodo.
+
+    ```kotlin
+    fun factorial(n: Int): Long {
+        if (n <= 1) return 1          // base case
+        return n * factorial(n - 1)   // recursive case
+    }
+    ```
+
+    > [!yaad]
+    > Har call **call stack** par ek naya frame banata hai (apne `n`, apne local variables). Call khatam → frame hatta hai → control wahin wapas jahan se call hua tha.
+  analogy: |
+    **Andhere cinema hall mein apni row number jaanni hai.** Tum aage wale se poochte ho: "Bhai, tum kaunsi row mein ho?" Wo bhi nahi jaanta — wo apne aage wale se poochta hai… aise hi pehli row tak.
+
+    Pehli row wala bolta hai "1" (**base case**). Ab jawab **wapas** aata hai: doosra bolta "2", teesra "3"… tum tak.
+
+    Tumne poori line nahi gini — bas aage wale par **bharosa** kiya aur usme 1 joda. Yahi recursion hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Kuch problems ka structure **khud jaisa** hota hai — bada sawaal = chhota wahi sawaal + thoda kaam:
+    - Folder ke andar folders (file explorer).
+    - Tree ke andar subtrees (binary tree — Trees chapter).
+    - "Saare combinations" (Backtracking chapter).
+    - Divide & conquer — merge sort, quick sort, binary search.
+
+    Inke liye loop likhna mushkil, recursion likhna **chhota aur saaf**.
+
+    > [!socho]
+    > Kya recursion loop se **fast** hai?
+    >
+    > Nahi. Har call ka kharcha hai (naya stack frame), aur gehraai zyada ho to **StackOverflowError**. Recursion **soch** aasaan karta hai, speed nahi. Simple loop ho sakta ho to loop lo.
+
+# 3. Visual intro
+visual:
+  body: |
+    Function: `print("andar k")` → `show(k − 1)` → `print("bahar k")`.
+
+    Dekho **call stack** kaise badhta aur ghatta hai, aur output ka order: **andar** seedhe order mein (jaate waqt), **bahar** ulte order mein (lautte waqt). Call ke baad likha code = wapas aate waqt chalta hai.
+  viz: { tracer: upDown }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Example: `factorial(5)`.
+
+    1. `factorial(5)` ko `4!` chahiye → `factorial(4)` call, aur **ruk ke intezaar** (waiting).
+    2. Aise hi `factorial(3)`, `factorial(2)`, `factorial(1)`.
+    3. `factorial(1)` — **base case** → seedha 1 return.
+    4. Ab lautna: `2 × 1 = 2`, `3 × 2 = 6`, `4 × 6 = 24`, `5 × 24 = 120`.
+
+    **Recursion kaise likhein (3 sawaal):**
+    - Sabse chhota input kya hai, uska jawab? → base case
+    - Chhota sawaal kaunsa? (`n − 1`, `n / 2`, baaki array…)
+    - Chhote ka jawab mil gaya **maan lo** — usse bade ka jawab kaise banega?
+
+    > [!tip]
+    > Teesra sawaal hi asli trick hai: **leap of faith**. Andar ki har call ko trace mat karo — maan lo `factorial(n − 1)` sahi hai, bas apna kadam sahi likho.
+  viz: { tracer: factTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Linear recursion (n → n − 1)"
+    time: O(n)
+    space: "O(n) stack"
+    why: "n calls, sab ek saath stack par (jab tak base na aaye)."
+  - op: "Halving (n → n / 2), ek call"
+    time: O(log n)
+    space: "O(log n) stack"
+    why: "Har call input aadha."
+  - op: "Do calls har level (n → n − 1, do baar)"
+    time: O(2ⁿ)
+    space: "O(n) stack"
+    why: "Calls ka ped double hota hai; par ek waqt mein stack par sirf ek raasta."
+  - op: "Kotlin tailrec"
+    time: O(n)
+    space: O(1)
+    why: "Compiler ise loop bana deta hai."
+  - op: "Ek function call ka kharcha"
+    time: O(1)
+    space: "1 stack frame"
+    why: "Parameters, locals, return address — loop iteration se mehenga."
+  - op: "JVM stack ki gehraai"
+    time: "lagu nahi"
+    space: "~10⁴ frames (lagbhag)"
+    why: "Default thread stack chhota; isse gehra → StackOverflowError."
+
+# 6. Code
+code:
+  - title: tailrec — gehri recursion bina stack overflow
+    file: tailrec
+    note: |
+      Agar recursive call function ka **aakhri kaam** ho (uske baad kuch jodna/multiply nahi), to Kotlin ka `tailrec` use **loop** bana deta hai — stack nahi bharta. Trick: jawab ek **accumulator** parameter mein saath le chalo.
+
+      Java mein `tailrec` nahi hai — wahan gehri recursion ki jagah seedha loop likho. Normal recursion `n = 10 lakh` par `StackOverflowError` deta hai (output mein dekho).
+
+# 7. Examples
+examples:
+  - id: reverse-string
+    level: easy
+    title: String ko recursion se ulta karo
+    source: { name: Reverse String, platform: LeetCode, url: "https://leetcode.com/problems/reverse-string/" }
+    problem: |
+      Char array ko **in-place** ulta karo — recursion se.
+
+      Example: `['h','e','l','l','o']` → `['o','l','l','e','h']`
+    intuition: |
+      Teen sawaal:
+      - **Chhota input:** 0 ya 1 char (`l >= r`) — kuch nahi karna.
+      - **Mera kaam:** dono kinare (`l`, `r`) badal do.
+      - **Chhota sawaal:** andar ka hissa `l + 1 .. r − 1` — wahi problem! `reverse(l + 1, r − 1)` par bharosa.
+
+      Ye wahi two pointers hai — loop ki jagah recursion.
+
+      > [!galti]
+      > `s.substring(1, n − 1)` banake recursion mat karo — har baar nayi string copy = O(n²). **Indexes pass karo**, array wahi rahe.
+    dryRun: |
+      `"hello"`
+
+      | Call | Swap | Array |
+      |---|---|---|
+      | rev(0, 4) | h ↔ o | o e l l h |
+      | rev(1, 3) | e ↔ l | o l l e h |
+      | rev(2, 2) | base (l = r) | **o l l e h** |
+    viz: { tracer: revTrace }
+    code: ex1-reverse
+    complexity:
+      time: O(n)
+      space: "O(n) stack"
+      why: "n/2 calls, sab stack par. Loop version O(1) space."
+
+  - id: fast-power
+    level: medium
+    title: x ki power n — O(log n) mein
+    source: { name: "Pow(x, n)", platform: LeetCode, url: "https://leetcode.com/problems/powx-n/" }
+    problem: |
+      `x` (decimal) aur `n` (integer, negative bhi) do. `xⁿ` nikaalo.
+
+      Example: `2.0, 10` → `1024.0`; `2.0, −2` → `0.25`
+    intuition: |
+      Seedha: x ko n baar multiply → O(n). n = 2³¹ ho to bahut slow.
+
+      **Trick:** `x¹⁰ = (x⁵)²`, `x⁵ = (x²)² × x`. Har baar power **aadhi**:
+      - n even: `xⁿ = half × half`
+      - n odd: `xⁿ = half × half × x`
+      - jahan `half = x^(n/2)` — **ek hi call**.
+
+      **Negative n:** `x⁻ⁿ = (1/x)ⁿ`.
+
+      > [!galti]
+      > `pow(x, n/2) * pow(x, n/2)` — do baar call kiya to calls ka ped ban gaya → wapas O(n)! Ek baar call karo, variable mein rakho.
+
+      > [!galti]
+      > `n = Int.MIN_VALUE` (−2147483648) ko `-n` karo to Int mein fit nahi hota (overflow, wapas negative). Pehle `Long` mein badlo.
+    dryRun: |
+      `2¹⁰`
+
+      | Call | Even/odd | Return |
+      |---|---|---|
+      | pow(0) | base | 1 |
+      | pow(1) | odd | 1 × 1 × 2 = 2 |
+      | pow(2) | even | 2 × 2 = 4 |
+      | pow(5) | odd | 4 × 4 × 2 = 32 |
+      | pow(10) | even | 32 × 32 = **1024** |
+    viz: { tracer: powTrace }
+    code: ex2-pow
+    complexity:
+      time: O(log n)
+      space: "O(log n) stack"
+      why: "Har call power aadhi; ~log₂ n calls."
+
+  - id: hanoi
+    level: tricky
+    title: Tower of Hanoi
+    source: { name: Tower Of Hanoi, platform: GFG, url: "https://www.geeksforgeeks.org/problems/tower-of-hanoi-1587115621/1" }
+    problem: |
+      Teen khambe A, B, C. A par `n` disks (neeche bada, upar chhota). Saare disks C par le jaao.
+
+      Rules: ek baar mein ek disk (sabse upar wala), aur **bada disk kabhi chhote ke upar nahi**.
+
+      Saare moves print karo (aur kitne moves lage).
+    intuition: |
+      Ye recursion ka "leap of faith" sikhaane wala classic hai. Seedha socho to dimaag ghoom jaata hai. Teen sawaal poocho:
+
+      - **Sabse bada disk (n) C par kaise jaayega?** Uske upar ke `n − 1` disks pehle hatane padenge — B par.
+      - Uske baad disk n seedha A → C.
+      - Phir B wale `n − 1` disks C par (disk n ke upar).
+
+      "n − 1 disks ko B par le jaao" — ye **wahi problem** hai, chhoti! `hanoi(n − 1)` par bharosa karo. Base: 0 disks → kuch nahi.
+
+      > [!socho]
+      > Kitne moves? T(n) = T(n − 1) + 1 + T(n − 1) = 2·T(n − 1) + 1 → **2ⁿ − 1**. 64 disks = 1.8 × 10¹⁹ moves — 1 move per second se bhi 500 arab saal!
+    dryRun: |
+      n = 2, A → C (B madad)
+
+      | Call | Kaam |
+      |---|---|
+      | hanoi(2, A→C) | pehle hanoi(1, A→B) |
+      | hanoi(1, A→B) | disk 1: A → B |
+      | hanoi(2, A→C) | disk 2: A → C |
+      | hanoi(2, A→C) | phir hanoi(1, B→C) |
+      | hanoi(1, B→C) | disk 1: B → C — **3 moves** |
+    viz: { tracer: hanoiTrace }
+    code: ex3-hanoi
+    complexity:
+      time: O(2ⁿ)
+      space: "O(n) stack"
+      why: "2ⁿ − 1 moves; recursion ki gehraai n."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Problem ka structure khud jaisa hai — tree, nested folders, nested brackets."
+    - "Divide & conquer — aadha-aadha karke hal (merge sort, fast power, binary search)."
+    - "Saare options try karne hain (subsets, permutations) — backtracking."
+    - "Recursive definition di hai (factorial, Fibonacci, grammar)."
+  avoid:
+    - "Simple loop se ho jaata hai (array sum, linear search) — recursion sirf stack kharch karega."
+    - "Gehraai bahut zyada (10⁵ size linked list) — StackOverflowError; loop ya explicit stack lo."
+    - "Same sub-calls baar-baar (Fibonacci) — bina memo ke exponential; DP lo."
+  signals:
+    - keyword: "tree, nested, sub-folder, sub-problem same type"
+      think: "Recursion: base case + chhota wahi sawaal."
+    - keyword: "power, x^n, n bahut bada"
+      think: "Halving recursion → O(log n)."
+    - keyword: "generate all / print all ways"
+      think: "Recursion (backtracking) — har choice ek branch."
+    - keyword: "Hanoi, move all from A to C"
+      think: "n − 1 hatao, bada hilao, n − 1 wapas."
+
+# 9. Real-world
+realWorld:
+  - where: "File explorer / Android storage"
+    how: "Folder ka total size = apni files + har sub-folder ka size (recursive). `File.walk()` andar yahi karta hai."
+  - where: "Flutter / Compose UI"
+    how: "Widget tree / composable tree recursively build aur layout hota hai — har widget apne children ko measure karta hai."
+  - where: "JSON parsing"
+    how: "JSON ke andar object, uske andar object… parser recursively padhta hai (recursive descent parser)."
+  - where: "Compilers"
+    how: "Expression `2 * (3 + 4)` ka syntax tree recursion se banta aur evaluate hota hai."
+  - where: "Cryptography (RSA)"
+    how: "Bahut badi powers ka modulus — fast power (Example 2) ka modular roop."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Base case hi nahi (ya kabhi nahi pahunchta)"
+    type: logic
+    wrong: |
+      ```kotlin
+      fun f(n: Int): Int = n + f(n - 2)  // base nahi; aur odd n par n == 0 kabhi nahi aayega
+      ```
+      → StackOverflowError.
+    right: |
+      Base case aisa ho jo **har** input se pahunch sake: `if (n <= 0) return 0`.
+  - title: "Chhota input bhool gaye"
+    type: empty
+    wrong: |
+      `if (n == 1) return 1` — `factorial(0)` par n = 0, −1, −2… kabhi nahi rukta.
+    right: |
+      `if (n <= 1) return 1`.
+  - title: "Ek hi sub-call do baar"
+    type: logic
+    wrong: |
+      `return pow(x, n / 2) * pow(x, n / 2)` → calls ka ped → O(n).
+    right: |
+      `val half = pow(x, n / 2); return half * half`.
+  - title: "Int.MIN_VALUE ko negate karna"
+    type: overflow
+    wrong: |
+      `n = -n` jab n = −2147483648 → wapas −2147483648.
+    right: |
+      Pehle `n.toLong()`, phir negate.
+  - title: "Har call mein substring / array copy"
+    type: other
+    wrong: |
+      `reverse(s.substring(1))` — har call O(n) copy → total O(n²) time aur memory.
+    right: |
+      Indexes (`l`, `r`) pass karo, data wahi rahe.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Recursion ke do zaroori hisse?"
+      a: |
+        Base case (sabse chhota input, seedha jawab) aur recursive case (chhote input par khud ko call + apna kaam). Base na ho ya na pahunche → StackOverflowError.
+    - q: "Recursion ki space complexity kaise nikaalte ho?"
+      a: |
+        Ek waqt mein stack par sabse zyada kitne frames — yaani recursion ki max gehraai × har frame ka size. factorial: O(n). Fast power: O(log n).
+    - q: "StackOverflowError kyun aata hai aur kaise bachoge?"
+      a: |
+        Har call ek stack frame leta hai; stack fixed size ka hai. Bachao: iteration, explicit stack (ArrayDeque), Kotlin tailrec, ya badi stack wala Thread.
+    - q: "Tail recursion kya hai?"
+      followUp: true
+      a: |
+        Recursive call function ka aakhri kaam ho. Kotlin `tailrec` ise loop bana deta hai — O(1) stack. Java/JVM khud nahi karta.
+    - q: "Recursion vs iteration — kab kaunsa?"
+      a: |
+        Tree/nested/backtracking → recursion (saaf code). Simple linear kaam ya bahut gehraai → loop. Har recursion ko stack se iterative bana sakte hain.
+    - q: "Pow(x, n) O(log n) kaise? Negative n?"
+      a: |
+        x^n = (x^(n/2))², odd par × x; ek call. Negative: (1/x)^(−n), Int.MIN_VALUE ke liye Long.
+    - q: "Hanoi mein kitne moves aur kyun?"
+      a: |
+        T(n) = 2T(n − 1) + 1 → 2ⁿ − 1. Ye minimum bhi hai — sabse bade disk ko hilane se pehle baaki n − 1 hatane hi padenge.
+    - q: "Fibonacci recursion slow kyun hai?"
+      followUp: true
+      a: |
+        Har call do calls banata hai aur same fib(k) baar-baar → O(2ⁿ). Memoization se O(n) — DP chapter.
+    - q: "Head vs tail position mein print karna — farak?"
+      a: |
+        Call se pehle print → jaate waqt (seedha order). Call ke baad print → lautte waqt (ulta order). Linked list ulta print karna isi se.
+  mayAsk:
+    - "Recursion se array ka sum / max."
+    - "Recursion se linked list ulta print karo."
+    - "Palindrome check recursive."
+    - "Digits ka sum recursively."
+
+# 12. Practice
+practice:
+  - name: Fibonacci Number
+    platform: LeetCode
+    num: 509
+    url: "https://leetcode.com/problems/fibonacci-number/"
+    level: easy
+    pattern: Two-branch recursion
+    hint: "Base: n < 2 → n. Phir socho itna slow kyun hai (Analyze Code topic ka viz)."
+  - name: Reverse String
+    platform: LeetCode
+    num: 344
+    url: "https://leetcode.com/problems/reverse-string/"
+    level: easy
+    pattern: Recursion with indexes
+    hint: "Example 1."
+  - name: Power of Two
+    platform: LeetCode
+    num: 231
+    url: "https://leetcode.com/problems/power-of-two/"
+    level: easy
+    pattern: Halving recursion
+    hint: "n == 1 → true; n odd ya ≤ 0 → false; warna isPowerOfTwo(n / 2)."
+  - name: "Pow(x, n)"
+    platform: LeetCode
+    num: 50
+    url: "https://leetcode.com/problems/powx-n/"
+    level: medium
+    pattern: Fast power
+    hint: "Example 2 — Int.MIN_VALUE wala case mat bhoolna."
+  - name: K-th Symbol in Grammar
+    platform: LeetCode
+    num: 779
+    url: "https://leetcode.com/problems/k-th-symbol-in-grammar/"
+    level: medium
+    pattern: Recursion on parent position
+    hint: "Row n ka k-th symbol uske parent (row n − 1, position (k + 1) / 2) se aata hai. k odd → parent jaisa, even → ulta."
+  - name: Find the Winner of the Circular Game
+    platform: LeetCode
+    num: 1823
+    url: "https://leetcode.com/problems/find-the-winner-of-the-circular-game/"
+    level: medium
+    pattern: Josephus recursion
+    hint: "winner(n) = (winner(n − 1) + k) % n (0-indexed), base winner(1) = 0. Answer + 1."
+  - name: Basic Calculator
+    platform: LeetCode
+    num: 224
+    url: "https://leetcode.com/problems/basic-calculator/"
+    level: hard
+    pattern: Recursion for brackets
+    hint: "'(' mile to recursion se andar ka result lo (index aage badhta rahe), ')' par return. Sign aur running sum sambhaalo."
+  - name: Parsing A Boolean Expression
+    platform: LeetCode
+    num: 1106
+    url: "https://leetcode.com/problems/parsing-a-boolean-expression/"
+    level: hard
+    pattern: Recursive descent parsing
+    hint: "parse(): 't'/'f' → base. '!', '&', '|' → '(' ke baad commas tak har sub-expression ko recursively parse karo."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Recursion = base case + chhote input par khud ko call."
+    - "Har call = stack frame. Space = max gehraai."
+    - "Leap of faith: chhote ka jawab sahi maan lo, apna kadam likho."
+    - "Ek sub-call ek baar (pow): O(log n). Do sub-calls (fib, hanoi): O(2ⁿ)."
+    - "Gehri recursion → StackOverflowError; Kotlin tailrec ya loop."
+  cheatsheet: |
+    ```kotlin
+    fun solve(n: Int): Result {
+        if (n <= 1) return BASE            // 1. base case
+        val small = solve(n - 1)           // 2. chhota sawaal (bharosa)
+        return combine(n, small)           // 3. apna kadam
+    }
+
+    // fast power
+    fun pow(x: Double, n: Long): Double {
+        if (n == 0L) return 1.0
+        val h = pow(x, n / 2)
+        return if (n % 2 == 0L) h * h else h * h * x
+    }
+
+    tailrec fun sum(n: Long, acc: Long = 0): Long =
+        if (n == 0L) acc else sum(n - 1, acc + n)
+    ```
+  quiz:
+    - q: "factorial(4) ke time stack par sabse zyada kitne frames honge (factorial(1) base)?"
+      options: ["1", "2", "4", "24"]
+      answer: 2
+      explain: "factorial(4), (3), (2), (1) — chaaron ek saath, jab tak base return na kare."
+    - q: "print(n) call ke BAAD likha hai: show(n − 1); print(n). show(3) ka output?"
+      options: ["3 2 1", "1 2 3", "3 1 2", "Kuch nahi"]
+      answer: 1
+      explain: "Print lautte waqt hota hai — sabse gehra (1) pehle lautta hai."
+    - q: "pow(x, n / 2) * pow(x, n / 2) ki complexity?"
+      options: ["O(log n)", "O(n)", "O(n²)", "O(1)"]
+      answer: 1
+      explain: "Har level par calls double, levels log n → 2^(log n) = n."
+    - q: "Hanoi mein 5 disks ke moves?"
+      options: ["10", "25", "31", "32"]
+      answer: 2
+      explain: "2⁵ − 1 = 31."
+    - q: "Base case na ho to JVM par kya hoga?"
+      options: ["Infinite loop, program atak jaayega", "StackOverflowError", "Compile error", "0 return"]
+      answer: 1
+      explain: "Har call frame leta hai; stack bhar jaata hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: memory-basics
+      why: "Stack memory aur frames wahin samjhe the."
+    - id: analyze-code
+      why: "Fibonacci ka call tree aur O(2ⁿ) wahin dekha."
+  usedLater:
+    - id: recursion-patterns
+      how: "Linear, divide & conquer, multi-branch, memo — patterns."
+    - id: merge-sort
+      how: "Divide & conquer — aadha-aadha sort, phir merge."
+    - id: tree-traversals
+      how: "Har tree problem recursion se."
+    - id: backtracking-basics
+      how: "Recursion + choose/un-choose."
+    - id: dp-intro
+      how: "Recursion + memo = DP."

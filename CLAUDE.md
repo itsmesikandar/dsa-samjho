@@ -15,8 +15,9 @@
 - Kotlin: top-level functions + `fun main()`. Java: non-public `class Main` (first class in file) with static methods + `main`. ASCII only, Hinglish comments.
 - File ends with a `// Output:` block (exact stdout). Arrays print as `[1, 2]` (`contentToString()` / `Arrays.toString`).
 - Code-sync: trailing `//@name` marker; frame `line: 'name'`. Tracer `run()` returns the first output line (`listStr()` for arrays).
-- Tracer helpers: `src/components/viz/engine/tracer.ts` (`tracer`, `array`, `ids`, `swap`, `listStr`). Panel types: `types.ts`.
+- Tracer helpers: `src/components/viz/engine/tracer.ts` (`tracer`, `array`, `ids`, `swap`, `listStr`, `callTree` for recursion panels). Panel types: `types.ts`.
 - Tone meaning differs from default label? Set frame `legend` (e.g. `{ error: 'ghatao' }`).
+- Inside `${...}` use ASCII `-`, never `−` (syntax error). Never rewrite files with PowerShell `Get-Content`/`Set-Content` (reads UTF-8 as ANSI → mojibake); use the Edit tool or node.
 ## Checks
 - Per topic: `npm run validate` + `npm run check:code`, then tick PROGRESS.md. Per chapter: `npm run build`, git commit.
 - UI changes: check at 390px and desktop, light and dark, no horizontal overflow.

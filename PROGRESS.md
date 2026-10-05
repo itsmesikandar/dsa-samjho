@@ -4,8 +4,10 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–3 done (20 topics).
-- Next action: chapter 4 → `recursion-basics` (use `recursion` panel; fibCalls in foundations/analyze-code/viz.ts shows parent `active` before return frame).
+- Step: 3 (Content). Chapters 0–4 done (22 topics).
+- Next action: chapter 5 → `simple-sorts` (code how/bubble/selection written; next ex1 height-checker (selection), ex2 count swaps = inversions (bubble, GFG), ex3 nearly-sorted (insertion, GFG); visual = bubble sort on `bars` panel).
+- Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
+- Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
 - Note: low RAM on this machine (~1 GB free) makes `npm run build` slow (24 min once); run it once per chapter.
 - Engine: frame `legend` overrides tone labels (see CLAUDE.md).
 - Last session note (2026-10-05): chapter 0 committed. Content caches are production-only (dev picks up new
@@ -63,8 +65,8 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] sliding-window-variable
 
 ### 4. Recursion
-- [ ] recursion-basics
-- [ ] recursion-patterns
+- [x] recursion-basics
+- [x] recursion-patterns
 
 ### 5. Sorting & Searching
 - [ ] simple-sorts
