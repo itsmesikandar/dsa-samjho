@@ -17,6 +17,8 @@ function hintFor(s: InputSpec): string {
       return `rows ko ; se alag karo (jaise ${s.charset.slice(0, 2).repeat(2)}; ...), max ${s.maxRows}×${s.maxCols}`;
     case 'edges':
       return `jaise 0-1, 1-2${s.weighted ? ' (weight ke saath: 0-1:4)' : ''}; nodes 0–${s.nodes - 1}`;
+    case 'tree':
+      return `level order, # = khaali (jaise 3, 9, 20, #, #, 15, 7); max ${s.maxNodes} nodes${s.bst ? ', BST' : ''}`;
   }
 }
 

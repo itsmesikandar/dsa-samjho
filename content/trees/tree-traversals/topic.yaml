@@ -1,0 +1,432 @@
+meta:
+  id: tree-traversals
+  chapter: trees
+  title: DFS Traversals
+  subtitle: Preorder, inorder, postorder — node ko KAB likhte ho, bas itna farak. Recursion aur stack dono se
+  level: intermediate
+  minutes: 40
+  prereqs: [binary-tree-basics, stack]
+  tags: [tree, dfs, preorder, inorder, postorder, iterative]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Tree ke saare nodes visit karne ke 3 DFS orders (Depth First — pehle gehra jao):
+
+    | Order | Kram | Yaad rakho |
+    |---|---|---|
+    | **Preorder** | Node → Left → Right | Pehle khud, phir bachche (copy / serialize) |
+    | **Inorder** | Left → Node → Right | BST mein **sorted** order |
+    | **Postorder** | Left → Right → Node | Pehle bachche, phir khud (delete / size / height) |
+
+    ```kotlin
+    fun dfs(r: TreeNode?) {
+        if (r == null) return
+        // PRE: yahan likho
+        dfs(r.left)
+        // IN: yahan likho
+        dfs(r.right)
+        // POST: yahan likho
+    }
+    ```
+
+    > [!yaad]
+    > Ek hi DFS har node par **3 baar** aata hai — aate waqt, left ke baad, jaate waqt. Jahan "likhte" ho wahi order.
+  analogy: |
+    **Ghar ki safai, kamra-dar-kamra:**
+    - Preorder: kamre mein ghuste hi light jalao, phir andar ke kamre.
+    - Inorder: baayein kamra saaf, phir ye kamra, phir daayein.
+    - Postorder: pehle andar ke saare kamre saaf, aakhir mein is kamre ka darwaza band (jaate waqt).
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Har order ka apna kaam:
+    - **Preorder** — tree copy / serialize karna (root pehle chahiye taaki wapas bana sako).
+    - **Inorder** — BST ko sorted padhna, k-th smallest, validate BST.
+    - **Postorder** — jab node ko bachchon ke jawab chahiye: height, size, delete tree, expression evaluate.
+
+    **Iterative** version (stack se) interview mein poochte hain — recursion samajh aayi ya nahi, aur gehre tree par stack overflow se bachne ke liye.
+
+    > [!socho]
+    > Sirf preorder se tree wapas ban sakta hai?
+    >
+    > Nahi (values distinct ho tab bhi) — `[1, 2]` preorder: 2 left bachcha tha ya right? Pata nahi. **Preorder + inorder** mile to haan — inorder batata hai kaun left, kaun right (Example 2).
+
+# 3. Visual intro
+visual:
+  body: |
+    Ek DFS chakkar, teen lists. Har node par dekho kab **pre** (pehli baar), kab **in** (left ke baad), kab **post** (dono ke baad) mein likha jaata hai.
+  viz: { tracer: threeOrders }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Iterative inorder** (apna stack):
+    1. `cur` se jitna ho sake **baayein** jao, har node stack par (inko baad mein likhna hai).
+    2. Aage left nahi → stack se pop → **likho**.
+    3. `cur = node.right` → uske liye phir step 1.
+    4. `cur == null` aur stack khaali → khatam.
+
+    BST `[4, 2, 6, 1, 3, 5, 7]` → `[1, 2, 3, 4, 5, 6, 7]` — sorted!
+
+    > [!tip]
+    > Iterative preorder aur bhi aasaan: stack mein root; pop → likho → **right pehle push, phir left** (taaki left pehle nikle). Postorder: preorder ka (N, R, L) ulta.
+  viz: { tracer: inorderTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Pre / in / post order (recursive)"
+    time: O(n)
+    space: "O(h) stack"
+    why: "Har node 3 baar chhua, kaam O(1)."
+  - op: "Iterative (apna stack)"
+    time: O(n)
+    space: O(h)
+    why: "Same, bas call stack ki jagah ArrayDeque."
+  - op: "Morris traversal"
+    time: O(n)
+    space: O(1)
+    why: "Temporary right links (threads) — stack nahi."
+  - op: "Construct from pre + in"
+    time: O(n)
+    space: O(n)
+    why: "HashMap se root ki inorder jagah O(1)."
+  - op: "Flatten to list (preorder)"
+    time: O(n)
+    space: O(1)
+    why: "Har node par left ko right mein sarkao."
+  - op: "Path sum (root to leaf)"
+    time: O(n)
+    space: O(h)
+    why: "Top-down remaining sum."
+
+# 6. Code
+code:
+  - title: Teeno orders — recursion
+    file: recursive
+    note: |
+      Teeno functions mein sirf `out.add(…)` ki jagah alag hai: pehle (pre), beech (in), aakhir (post).
+
+      Tree `[1, 2, 3, 4, 5]`: pre `1 2 4 5 3`, in `4 2 5 1 3`, post `4 5 2 3 1`. Root pre mein **pehla**, post mein **aakhri** — construct problems isi ka fayda uthate hain.
+
+# 7. Examples
+examples:
+  - id: path-sum
+    level: easy
+    title: Root se leaf tak sum = target?
+    source: { name: Path Sum, platform: LeetCode, url: "https://leetcode.com/problems/path-sum/" }
+    problem: |
+      Koi **root-se-leaf** raasta hai jiske nodes ka sum `target` ho?
+
+      Example: `[5, 4, 8, 11, #, 13, 4, 7, 2, #, #, #, 1]`, target 22 → **true** (5 → 4 → 11 → 2)
+    intuition: |
+      Preorder (top-down): har node par apna hissa ghatao — `remain = target − value` — aur bachchon se `remain` maango.
+      - **Leaf** par: `remain == 0`?
+      - Warna left `||` right.
+
+      > [!galti]
+      > `root == null` par `target == 0` return kiya → beech ke node (jiska ek hi bachcha) ke null side se galat true. Check **leaf** par karo, null par false.
+    dryRun: |
+      target 22
+
+      | Node | remain |
+      |---|---|
+      | 5 | 17 |
+      | 4 | 13 |
+      | 11 | 2 |
+      | 7 (leaf) | −5 ✗ |
+      | 2 (leaf) | **0 ✓** |
+    viz: { tracer: pathSumTrace }
+    code: ex1-path-sum
+    complexity:
+      time: O(n)
+      space: O(h)
+      why: "Har node ek baar; mila to baaki chhod diya."
+
+  - id: construct-pre-in
+    level: medium
+    title: Preorder + inorder se tree banao
+    source: { name: Construct Binary Tree from Preorder and Inorder Traversal, platform: LeetCode, url: "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" }
+    problem: |
+      Tree ke preorder aur inorder (values alag-alag) diye hain. Tree wapas banao.
+
+      Example: pre `[3, 9, 20, 15, 7]`, in `[9, 3, 15, 20, 7]` → `[3, 9, 20, #, #, 15, 7]`
+    intuition: |
+      - Preorder ka **pehla** = root.
+      - Inorder mein root ke **baayein sab left subtree**, daayein right subtree.
+      - Recursion: left subtree (inorder `lo..m−1`), phir right (`m+1..hi`). Preorder mein pointer `p` aage badhta jaata hai — left wale pehle aate hain, isliye **pehle left banao**.
+
+      Inorder mein root dhoondhna har baar O(n) → total O(n²). **HashMap** (value → index) se O(1) → O(n).
+
+      > [!galti]
+      > Right pehle banaya → preorder pointer galat node ko root bana deta hai. Order: left, phir right.
+    dryRun: |
+      | p → root | Inorder range | Left part | Right part |
+      |---|---|---|---|
+      | 3 | 9 3 15 20 7 | 9 | 15 20 7 |
+      | 9 | 9 | – | – |
+      | 20 | 15 20 7 | 15 | 7 |
+      | 15, 7 | leaf | | |
+    viz: { tracer: constructTrace }
+    code: ex2-construct
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har node ek baar banta hai; map O(n)."
+
+  - id: flatten
+    level: tricky
+    title: Tree ko linked list banao (preorder, in-place)
+    source: { name: Flatten Binary Tree to Linked List, platform: LeetCode, url: "https://leetcode.com/problems/flatten-binary-tree-to-linked-list/" }
+    problem: |
+      Tree ko **preorder** order mein ek chain banao — har node ka `right` agla node, `left = null`. Usi tree mein (in-place).
+
+      Example: `[1, 2, 5, 3, 4, #, 6]` → `1 → 2 → 3 → 4 → 5 → 6`
+    intuition: |
+      Preorder list bana ke jodna → O(n) memory. **O(1) tareeka** (Morris jaisa):
+
+      Har `cur` par, agar left hai:
+      - Left subtree ka **preorder mein aakhri** node = left subtree ka sabse **daayein** node (`tail`).
+      - `tail.right = cur.right` (purana right left subtree ke baad aayega).
+      - `cur.right = cur.left`, `cur.left = null`.
+
+      Phir `cur = cur.right`. Har node par left ek baar right mein sarakta hai.
+
+      > [!tip]
+      > Kyun sahi: preorder = node, poora left subtree, poora right subtree. Humne exactly yahi order right pointers mein bana diya.
+    dryRun: |
+      | cur | Left? | tail | Kya kiya |
+      |---|---|---|---|
+      | 1 | 2 | 4 | 4.right = 5; 1.right = 2 |
+      | 2 | 3 | 3 | 3.right = 4; 2.right = 3 |
+      | 3, 4 | – | | aage |
+      | 5 | – | | aage (6) |
+
+      Chain: **1 2 3 4 5 6**
+    viz: { tracer: flattenTrace }
+    code: ex3-flatten
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "tail dhoondhne ke raaste har edge max do baar chalte hain."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "BST se sorted / k-th smallest / validate → inorder."
+    - "Copy / serialize / root pehle chahiye → preorder."
+    - "Node ko bachchon ke jawab chahiye (height, delete, sums) → postorder."
+    - "Gehra tree / recursion mana → iterative stack."
+  avoid:
+    - "Level by level kaam (level averages, right view) → BFS (agla topic)."
+    - "Shortest path / kareeb wala pehle → BFS."
+  signals:
+    - keyword: "inorder / BST sorted / kth smallest"
+      think: "Inorder (iterative mein k-th pop par ruko)."
+    - keyword: "construct tree from two traversals"
+      think: "Pre/post se root, inorder se left/right; HashMap."
+    - keyword: "root to leaf path / sum"
+      think: "Preorder top-down remaining."
+    - keyword: "flatten / in-place reorder of tree"
+      think: "Morris jaisa pointer rewiring."
+
+# 9. Real-world
+realWorld:
+  - where: "File copy / backup"
+    how: "Folder pehle banao, phir uske andar ki files (preorder). Delete: pehle andar ka sab, phir folder (postorder)."
+  - where: "Compilers"
+    how: "Expression tree: postorder se evaluate (3 4 + jaisa), inorder se readable (3 + 4) print."
+  - where: "Databases"
+    how: "B-tree index ka inorder walk = sorted rows (ORDER BY index se)."
+  - where: "UI frameworks"
+    how: "Views measure pehle bachche phir parent (postorder), draw pehle parent phir bachche (preorder)."
+  - where: "JSON / XML serialization"
+    how: "Object tree ko preorder mein likhna — padhne wala wahi order se wapas banata hai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Iterative preorder mein push ka order"
+    type: logic
+    wrong: |
+      `push(left); push(right)` → right pehle nikla → order N R L.
+    right: |
+      Pehle right push, phir left (stack LIFO).
+  - title: "Inorder loop condition"
+    type: logic
+    wrong: |
+      `while (st.isNotEmpty())` → shuru mein stack khaali, loop chala hi nahi.
+    right: |
+      `while (cur != null || st.isNotEmpty())`.
+  - title: "Path sum null par check"
+    type: logic
+    wrong: |
+      `if (root == null) return target == 0` → ek bachche wale node ke khaali side se galat true.
+    right: |
+      Leaf par check; null par false.
+  - title: "Construct mein O(n) root search"
+    type: other
+    wrong: |
+      Har call mein inorder scan → O(n²).
+    right: |
+      HashMap(value → index) ek baar.
+  - title: "Duplicate values ke saath construct"
+    type: logic
+    wrong: |
+      Values repeat → inorder mein root ki jagah ambiguous → galat tree.
+    right: |
+      Problem distinct guarantee karta hai — warna unique tree nahi banta.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Teeno DFS orders aur unka use?"
+      a: |
+        Pre (N L R): copy/serialize. In (L N R): BST sorted. Post (L R N): bachchon ke jawab chahiye (height, delete).
+    - q: "Iterative inorder likho."
+      a: |
+        cur = root; jab tak cur ya stack: baayein push karte jao; pop, visit; cur = right.
+    - q: "Iterative postorder?"
+      followUp: true
+      a: |
+        Preorder jaisa par N R L (left pehle push), result ulta karo. Ya ek stack + lastVisited pointer.
+    - q: "Morris traversal kya hai?"
+      followUp: true
+      a: |
+        Inorder O(1) space: har node ke inorder predecessor ka right temporary cur par point karao (thread), wapas aate waqt hatao. Tree badalta hai par aakhir mein wapas.
+    - q: "Kaunsi do traversals se tree unique banta hai?"
+      a: |
+        Inorder + (preorder ya postorder). Pre + post se tabhi jab har node ke 0 ya 2 bachche (full tree).
+    - q: "BST ka k-th smallest?"
+      a: |
+        Iterative inorder, k-th pop par return. O(h + k).
+    - q: "Recursion vs iterative space?"
+      a: |
+        Dono O(h). Iterative heap memory use karta hai (bada tree chal jaata hai), recursion call stack (overflow ho sakta hai).
+    - q: "Flatten O(1) mein kaise?"
+      a: |
+        Har node ke left subtree ka rightmost dhoondho, usse purane right se jodo, left ko right bana do.
+  mayAsk:
+    - "Binary Tree Preorder (iterative)."
+    - "Construct from Inorder and Postorder."
+    - "Kth Smallest in BST."
+    - "Binary Tree Paths."
+
+# 12. Practice
+practice:
+  - name: Binary Tree Inorder Traversal
+    platform: LeetCode
+    num: 94
+    url: "https://leetcode.com/problems/binary-tree-inorder-traversal/"
+    level: easy
+    pattern: Iterative stack
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Binary Tree Preorder Traversal
+    platform: LeetCode
+    num: 144
+    url: "https://leetcode.com/problems/binary-tree-preorder-traversal/"
+    level: easy
+    pattern: Stack, right pehle push
+    hint: "Pop → likho → right push → left push."
+  - name: Binary Tree Postorder Traversal
+    platform: LeetCode
+    num: 145
+    url: "https://leetcode.com/problems/binary-tree-postorder-traversal/"
+    level: easy
+    pattern: Reverse of N R L
+    hint: "Preorder jaisa par left pehle push (N R L banega), aakhir mein list ulti."
+  - name: Construct Binary Tree from Preorder and Inorder Traversal
+    platform: LeetCode
+    num: 105
+    url: "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/"
+    level: medium
+    pattern: Root from pre, split by inorder
+    hint: "Example 2."
+  - name: Construct Binary Tree from Inorder and Postorder Traversal
+    platform: LeetCode
+    num: 106
+    url: "https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/"
+    level: medium
+    pattern: Root from end of post
+    hint: "Postorder ka AAKHRI = root; pointer peeche se chalao, aur PEHLE right subtree banao."
+  - name: Flatten Binary Tree to Linked List
+    platform: LeetCode
+    num: 114
+    url: "https://leetcode.com/problems/flatten-binary-tree-to-linked-list/"
+    level: medium
+    pattern: Rightmost of left subtree
+    hint: "Example 3."
+  - name: Recover a Tree From Preorder Traversal
+    platform: LeetCode
+    num: 1028
+    url: "https://leetcode.com/problems/recover-a-tree-from-preorder-traversal/"
+    level: hard
+    pattern: Preorder with depth markers + stack
+    hint: "Dashes gino = depth. Stack ka size depth se zyada ho to pop. Top ka left khaali → left, warna right; phir push."
+  - name: Vertical Order Traversal of a Binary Tree
+    platform: LeetCode
+    num: 987
+    url: "https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/"
+    level: hard
+    pattern: DFS with (col, row) + sort
+    hint: "Har node ke liye (col, row, value) list banao (left = col − 1, right = col + 1). Sort: col, row, value. Col wise group."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Pre N L R, In L N R, Post L R N — likhne ki jagah ka farak."
+    - "BST inorder = sorted."
+    - "Iterative inorder: baayein push → pop visit → right."
+    - "Pre + In (ya Post + In) se tree; HashMap se O(n)."
+    - "Flatten: left subtree ka rightmost → purana right; left ko right banao."
+  cheatsheet: |
+    ```kotlin
+    // iterative inorder
+    var cur = root; val st = ArrayDeque<TreeNode>()
+    while (cur != null || st.isNotEmpty()) {
+        while (cur != null) { st.addLast(cur); cur = cur.left }
+        val n = st.removeLast(); visit(n); cur = n.right
+    }
+    // iterative preorder
+    st.addLast(root); while (st.isNotEmpty()) { val n = st.removeLast(); visit(n)
+        n.right?.let(st::addLast); n.left?.let(st::addLast) }
+    ```
+  quiz:
+    - q: "Tree [1, 2, 3] ka postorder?"
+      options: ["1 2 3", "2 1 3", "2 3 1", "3 2 1"]
+      answer: 2
+      explain: "Left (2), right (3), phir node (1)."
+    - q: "BST ka kaunsa traversal sorted deta hai?"
+      options: ["Preorder", "Inorder", "Postorder", "Level order"]
+      answer: 1
+      explain: "Left (chhote) → node → right (bade)."
+    - q: "Iterative preorder mein pehle kise push karte hain?"
+      options: ["Left", "Right", "Root ke baad koi farak nahi", "Dono saath"]
+      answer: 1
+      explain: "Stack LIFO — left pehle nikalna chahiye."
+    - q: "Preorder [3, 9, 20], inorder [9, 3, 20] — root ka left?"
+      options: ["20", "9", "null", "3"]
+      answer: 1
+      explain: "Inorder mein 3 ke baayein 9."
+    - q: "Morris traversal ki space?"
+      options: ["O(n)", "O(h)", "O(1)", "O(log n)"]
+      answer: 2
+      explain: "Temporary threads, koi stack nahi."
+
+# 14. Connections
+connections:
+  related:
+    - id: binary-tree-basics
+      why: "Tree recursion basics."
+    - id: stack
+      why: "Iterative DFS = apna stack."
+  usedLater:
+    - id: level-order
+      how: "BFS — level by level (queue)."
+    - id: bst
+      how: "Inorder = sorted; validate, k-th."
+    - id: tree-recursion
+      how: "Postorder style: diameter, balanced."
+    - id: dfs
+      how: "Graph DFS — wahi idea, visited ke saath."

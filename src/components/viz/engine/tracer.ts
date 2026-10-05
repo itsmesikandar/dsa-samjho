@@ -1,4 +1,4 @@
-import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, ListPanel, RecursionPanel, Tone } from './types';
+import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, ListPanel, RecursionPanel, Tone, TreePanel } from './types';
 
 export const MAX_FRAMES = 400;
 
@@ -57,7 +57,17 @@ export interface EdgesSpec extends SpecBase {
   minW?: number;
   maxW?: number;
 }
-export type InputSpec = IntSpec | IntArraySpec | StringSpec | IntGridSpec | CharGridSpec | EdgesSpec;
+export interface TreeSpec extends SpecBase {
+  type: 'tree';
+  /** LeetCode level order; null = khaali jagah */
+  default: (number | null)[];
+  maxNodes: number;
+  min: number;
+  max: number;
+  /** input BST hona chahiye (random bhi BST banenge) */
+  bst?: boolean;
+}
+export type InputSpec = IntSpec | IntArraySpec | StringSpec | IntGridSpec | CharGridSpec | EdgesSpec | TreeSpec;
 export type InputValues = Record<string, unknown>;
 
 export class Recorder {
@@ -219,7 +229,95 @@ export function formatInput(spec: InputSpec, v: unknown): string {
       return (v as string[]).join('; ');
     case 'edges':
       return (v as number[][]).map(([a, b, w]) => (w === undefined ? `${a}-${b}` : `${a}-${b}:${w}`)).join(', ');
+    case 'tree':
+      return (v as (number | null)[]).map((x) => (x === null ? '#' : String(x))).join(', ');
   }
+}
+
+// ---------- binary trees (LeetCode level order) ----------
+
+export interface TNode {
+  id: string;
+  value: number;
+  left: string | null;
+  right: string | null;
+}
+
+/** level order (null = khaali) → nodes (id = 't' + level-order index) + root. Galat format par error string. */
+export function buildTree(levels: (number | null)[]): { nodes: Map<string, TNode>; root: string | null } | string {
+  const nodes = new Map<string, TNode>();
+  if (!levels.length || levels[0] === null) return levels.every((x) => x === null) ? { nodes, root: null } : 'Root khaali hai to baaki values nahi ho sakti.';
+  const mk = (i: number) => {
+    const id = `t${i}`;
+    nodes.set(id, { id, value: levels[i] as number, left: null, right: null });
+    return id;
+  };
+  const root = mk(0);
+  const q = [root];
+  let i = 1;
+  while (q.length && i < levels.length) {
+    const p = nodes.get(q.shift()!)!;
+    for (const side of ['left', 'right'] as const) {
+      if (i >= levels.length) break;
+      if (levels[i] !== null) {
+        p[side] = mk(i);
+        q.push(p[side]!);
+      }
+      i++;
+    }
+  }
+  if (i < levels.length && levels.slice(i).some((x) => x !== null)) return 'Kuch values ka parent hi nahi (beech mein # zyada hain).';
+  return { nodes, root };
+}
+
+/** nodes → level order (trailing nulls hata ke) */
+export function levelOrderOf(nodes: Map<string, TNode>, root: string | null): (number | null)[] {
+  const out: (number | null)[] = [];
+  const q: (string | null)[] = [root];
+  while (q.length) {
+    const id = q.shift()!;
+    if (id === null) {
+      out.push(null);
+      continue;
+    }
+    const n = nodes.get(id)!;
+    out.push(n.value);
+    q.push(n.left, n.right);
+  }
+  while (out.length && out[out.length - 1] === null) out.pop();
+  return out;
+}
+
+const isBst = (nodes: Map<string, TNode>, id: string | null, lo = -Infinity, hi = Infinity): boolean => {
+  if (!id) return true;
+  const n = nodes.get(id)!;
+  return n.value > lo && n.value < hi && isBst(nodes, n.left, lo, n.value) && isBst(nodes, n.right, n.value, hi);
+};
+
+export function treeView(
+  nodes: Map<string, TNode>,
+  root: string | null,
+  opts: { label?: string; tones?: Record<string, Tone>; badges?: Record<string, string>; pointers?: Record<string, string | null | undefined>; edgeTones?: Record<string, Tone> } = {},
+): TreePanel {
+  const list: TreePanel['nodes'] = [];
+  const walk = (id: string | null) => {
+    if (!id) return;
+    const n = nodes.get(id)!;
+    list.push({ id, value: n.value, left: n.left, right: n.right, tone: opts.tones?.[id], badge: opts.badges?.[id] });
+    walk(n.left);
+    walk(n.right);
+  };
+  walk(root);
+  return {
+    kind: 'tree',
+    label: opts.label,
+    root,
+    nodes: list,
+    pointers: Object.entries(opts.pointers ?? {})
+      .filter((e): e is [string, string] => typeof e[1] === 'string')
+      .map(([name, at]) => ({ name, at })),
+    edgeTones: opts.edgeTones,
+  };
 }
 
 type Parsed = { ok: true; value: unknown } | { ok: false; error: string };
@@ -292,6 +390,19 @@ function parseOne(spec: InputSpec, raw: string): Parsed {
         } else edges.push([a, b]);
       }
       return { ok: true, value: edges };
+    }
+    case 'tree': {
+      const parts = splitList(s);
+      if (!parts.length) return fail('Tree ki values daalo, jaise 3, 9, 20, #, #, 15, 7');
+      if (parts.some((p) => p !== '#' && p.toLowerCase() !== 'null' && !INT.test(p))) return fail('Har jagah integer ya # (khaali) daalo.');
+      const levels = parts.map((p) => (INT.test(p) ? Number(p) : null));
+      const built = buildTree(levels);
+      if (typeof built === 'string') return fail(built);
+      if (!built.root) return fail('Kam se kam ek node chahiye.');
+      if (built.nodes.size > spec.maxNodes) return fail(`Zyada se zyada ${spec.maxNodes} nodes.`);
+      if ([...built.nodes.values()].some((n) => n.value < spec.min || n.value > spec.max)) return fail(`Har value ${spec.min} se ${spec.max} ke beech ho.`);
+      if (spec.bst && !isBst(built.nodes, built.root)) return fail('Ye BST nahi hai (left mein chhote, right mein bade, sab alag).');
+      return { ok: true, value: levelOrderOf(built.nodes, built.root) };
     }
   }
 }
@@ -367,6 +478,31 @@ function randomOne(spec: InputSpec, rnd: () => number): unknown {
         if (b >= a) b++;
         return spec.weighted ? [a, b, randInt(rnd, spec.minW ?? 1, spec.maxW ?? 99)] : [a, b];
       });
+    }
+    case 'tree': {
+      const count = randInt(rnd, 1, spec.maxNodes);
+      const nodes = new Map<string, TNode>();
+      const vals: number[] = [];
+      if (spec.bst) {
+        const set = new Set<number>();
+        while (set.size < Math.min(count, spec.max - spec.min + 1)) set.add(randInt(rnd, spec.min, spec.max));
+        vals.push(...set);
+      } else for (let i = 0; i < count; i++) vals.push(randInt(rnd, spec.min, spec.max));
+      vals.forEach((v, i) => {
+        const id = `r${i}`;
+        nodes.set(id, { id, value: v, left: null, right: null });
+        if (i === 0) return;
+        let cur = nodes.get('r0')!;
+        for (;;) {
+          const side: 'left' | 'right' = spec.bst ? (v < cur.value ? 'left' : 'right') : rnd() < 0.5 ? 'left' : 'right';
+          if (!cur[side]) {
+            cur[side] = id;
+            break;
+          }
+          cur = nodes.get(cur[side]!)!;
+        }
+      });
+      return levelOrderOf(nodes, 'r0');
     }
   }
 }

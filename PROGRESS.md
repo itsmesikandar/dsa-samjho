@@ -5,10 +5,12 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 
 ## Current
 - Step: 3 (Content). Chapters 0–8 done (42 topics).
-- Next action: chapter 9 → `binary-tree-basics` (tree panel: nodes {id, value, left, right}, root id).
+- Next action: chapter 9 → `tree-recursion` (binary-tree-basics, tree-traversals, level-order done; then bst, lca, build + commit).
 - Tracers that can explode on random input: cap frames with a budget counter (see constraint-backtracking sudoku/word) — validate fuzz fails on FrameLimitError.
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
+- Tree topics: input spec `type: 'tree'` (level order, `#` = null, maxNodes/min/max/bst); helpers `buildTree`, `levelOrderOf`, `treeView` in tracer.ts. Code files copy the `TreeNode` + `build(vararg Int?)` pattern from `content/trees/level-order/code/how.kt` / `.java` (Java build uses `LinkedList` queue, ArrayDeque rejects null).
+- Chapter 9 so far is NOT committed yet (content/trees/ + tracer.ts/InputForm.tsx tree changes). Screenshot check of level-order still pending.
 - Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
 - Note: low RAM on this machine (~1 GB free) makes `npm run build` slow (24 min once); run it once per chapter.
 - Engine: frame `legend` overrides tone labels (see CLAUDE.md).
@@ -99,9 +101,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] constraint-backtracking
 
 ### 9. Trees
-- [ ] binary-tree-basics
-- [ ] tree-traversals
-- [ ] level-order
+- [x] binary-tree-basics
+- [x] tree-traversals
+- [x] level-order
 - [ ] tree-recursion
 - [ ] bst
 - [ ] lca
