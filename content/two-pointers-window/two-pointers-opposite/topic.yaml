@@ -1,0 +1,428 @@
+meta:
+  id: two-pointers-opposite
+  chapter: two-pointers-window
+  title: Two Pointers (dono kinaron se)
+  subtitle: Ek pointer shuru se, ek end se — har kadam par aadhe options khatam
+  level: intermediate
+  minutes: 35
+  prereqs: [array, problem-solving]
+  tags: [two-pointers, sorted, opposite-ends, 3sum]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Two pointers (opposite ends)** = do index — `l` array ke **shuru** mein, `r` **end** mein. Har kadam par kisi ek ko **andar** ki taraf khiskao, jab tak dono mil na jaayein.
+
+    ```kotlin
+    var l = 0
+    var r = arr.size - 1
+    while (l < r) {
+        // arr[l] aur arr[r] dekh ke faisla:
+        // l++ ya r-- (ya dono)
+    }
+    ```
+
+    Kahan kaam aata hai:
+    - **Sorted array** mein pair dhoondhna (sum = target)
+    - **Reverse / palindrome** (dono kinare milaana)
+    - **Container / area** jaise problems
+    - **3Sum** (ek fix + baaki do par two pointers)
+
+    > [!yaad]
+    > Har kadam par ek pointer hilta hai → zyada se zyada n kadam → **O(n)**, aur extra memory **O(1)**.
+  analogy: |
+    **Shaadi mein do log dulhan ke liye perfect joda dhoondh rahe hain** — ek line chhote se bade height ki. Ek dost line ke shuru se, ek end se.
+
+    Jodi zyada lambi lag rahi hai? Lambe wale ko hatao (r--). Bahut chhoti? Chhote ko hatao (l++). Har baar ek insaan line se hat jaata hai — jaldi hi jawab mil jaata hai, sabko sabse milwaane ki zaroorat nahi.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Pairs wale problems ka brute force **O(n²)** hota hai (har pair check). Two pointers usse **O(n)** bana deta hai — bina extra memory ke (HashMap O(n) memory leta).
+
+    Shart: data mein koi **order** ho (sorted), ya problem ka structure aisa ho ki ek pointer hilane se kuch options **pakka bekaar** ho jaayein.
+
+    > [!socho]
+    > Sorted array mein sum bahut bada aaya (`arr[l] + arr[r] > target`). `r--` hi kyun, `l++` kyun nahi?
+    >
+    > `l++` karne se sum aur **bada** hoga (sorted!). Aur `arr[l]` sabse chhota bacha hai — jab uske saath bhi `arr[r]` zyada hai, to `arr[r]` kisi ke saath kaam nahi aayega. Isliye `arr[r]` ko hatana safe hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    Neeche grid mein **saare pairs** ke sums hain (row = i, column = j). Brute force sab cells dekhta hai.
+
+    Two pointers har kadam par **poori ek row ya column** hata deta hai (grey) — isliye sirf ~n kadam lagte hain. Ye "kyun sahi hai" ka asli saboot hai.
+  viz: { tracer: pairGrid }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Example: **sorted array ke squares, sorted order mein** (negative numbers bhi hain).
+
+    `[-4, -1, 0, 3, 10]` ke squares `[16, 1, 0, 9, 100]` — order toot gaya. Sort karoge to O(n log n).
+
+    **Observation:** sabse bada square hamesha **kisi kinare** par hoga (sabse negative ya sabse positive). To:
+    1. `l` aur `r` dono kinaron par.
+    2. Jiska `|value|` bada, uska square result ke **end** mein likho, us pointer ko andar karo.
+    3. Result ko peeche se bharo.
+
+    > [!tip]
+    > "Sabse bada/chhota kahan milega?" ka jawab **kinare** ho to opposite two pointers socho.
+  viz: { tracer: squaresTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Sorted pair sum (Two Sum II)"
+    time: O(n)
+    space: O(1)
+    why: "Har kadam ek pointer andar; HashMap ki memory nahi."
+  - op: "Reverse / palindrome check"
+    time: O(n)
+    space: O(1)
+    why: "n/2 swaps ya compares."
+  - op: "Container with most water"
+    time: O(n)
+    space: O(1)
+    why: "Chhoti deewar hatao — har kadam ek option khatam."
+  - op: "3Sum"
+    time: O(n²)
+    space: "O(1) (sort aur output chhod ke)"
+    why: "Sort O(n log n) + har i par O(n) two pointers."
+  - op: "Sorted squares"
+    time: O(n)
+    space: O(n)
+    why: "Ek pass; result array n ka."
+  - op: "Brute force (saare pairs)"
+    time: O(n²)
+    space: O(1)
+    why: "n(n−1)/2 pairs."
+
+# 6. Code
+code:
+  - title: Template — Two Sum II (sorted, 1-indexed)
+    file: two-sum-sorted
+    note: |
+      Ye opposite two pointers ka sabse saaf template hai. Problem-solving topic mein bhi dekha tha — yahan LeetCode 167 ka exact format (answer 1-indexed).
+
+# 7. Examples
+examples:
+  - id: reverse-vowels
+    level: easy
+    title: Sirf vowels ulte karo
+    source: { name: Reverse Vowels of a String, platform: LeetCode, url: "https://leetcode.com/problems/reverse-vowels-of-a-string/" }
+    problem: |
+      Ek string mein sirf **vowels** (a, e, i, o, u — capital bhi) ka order ulta karo. Baaki letters apni jagah rahein.
+
+      Example: `"hello"` → `"holle"`
+    intuition: |
+      Normal reverse jaisa — l aur r se swap. Bas pehle dono ko apna-apna **agla vowel** dhoondhne do (consonants skip).
+
+      - `l` aage badhta hai jab tak vowel na mile.
+      - `r` peeche aata hai jab tak vowel na mile.
+      - Dono vowels → swap, dono andar.
+
+      > [!galti]
+      > Skip loops mein `l < r` check zaroori — string mein vowel hi na ho to pointers bahar chale jaayenge.
+    dryRun: |
+      `"hello"` → h e l l o
+
+      | l | r | Kya hua | String |
+      |---|---|---|---|
+      | 0 → 1 | 4 | h skip; e aur o vowels | |
+      | 1 | 4 | swap e ↔ o | h o l l e |
+      | 2 | 3 | l, l skip → mil gaye | **holle** |
+    viz: { tracer: vowelsRevTrace }
+    code: ex1-vowels
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har char ek baar; String immutable hai, isliye char array copy O(n)."
+
+  - id: container
+    level: medium
+    title: Container with most water
+    source: { name: Container With Most Water, platform: LeetCode, url: "https://leetcode.com/problems/container-with-most-water/" }
+    problem: |
+      Deewaron ki unchaiyan di hain (har index par ek deewar). Do deewarein chuno jinke beech **sabse zyada paani** aaye. Paani = chhoti deewar × dono ki doori.
+
+      Example: `[1, 8, 6, 2, 5, 4, 8, 3, 7]` → **49** (index 1 aur 8: min(8, 7) × 7)
+    intuition: |
+      Brute force: saare pairs → O(n²).
+
+      Shuru karo sabse **chaudi** jodi se (l = 0, r = end). Ab kaunsi deewar hatayein?
+
+      **Chhoti deewar hatao.** Kyun? Area chhoti deewar se limit hai. Agar chhoti ko rakh ke doosri ko andar laao, to doori kam hogi aur unchai chhoti wali se upar ja hi nahi sakti — area kabhi nahi badhega. To chhoti deewar ke saath ab koi bhi jodi fayde ki nahi — use hata do.
+
+      > [!tip]
+      > Ye "greedy + two pointers" ka classic hai. Interview mein **kyun chhoti hatate hain** ye proof bolna zaroori hai — sirf code nahi.
+    dryRun: |
+      | l | r | h[l] | h[r] | Area | best | Hatao |
+      |---|---|---|---|---|---|---|
+      | 0 | 8 | 1 | 7 | 1 × 8 = 8 | 8 | l (1 chhota) |
+      | 1 | 8 | 8 | 7 | 7 × 7 = 49 | **49** | r |
+      | 1 | 7 | 8 | 3 | 3 × 6 = 18 | 49 | r |
+      | 1 | 6 | 8 | 8 | 8 × 5 = 40 | 49 | r |
+      | … | | | | | 49 | |
+    viz: { tracer: containerTrace }
+    code: ex2-container
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Har kadam ek deewar hatti; sirf do pointers aur best."
+
+  - id: three-sum
+    level: tricky
+    title: 3Sum — saare unique triplets jinka sum 0
+    source: { name: 3Sum, platform: LeetCode, url: "https://leetcode.com/problems/3sum/" }
+    problem: |
+      Ek array mein se saare **unique** triplets `[a, b, c]` dhoondho jinka sum 0 ho. Same triplet do baar nahi aana chahiye.
+
+      Example: `[-1, 0, 1, 2, -1, -4]` → `[[-1, -1, 2], [-1, 0, 1]]`
+    intuition: |
+      Brute force: teen loops → O(n³).
+
+      **Trick:** array **sort** karo. Phir har `i` ko pehla number fix karo — baaki do ka sum `−a[i]` chahiye. Ye ab ek **sorted Two Sum** hai → two pointers, O(n).
+
+      Total: n × O(n) = **O(n²)**.
+
+      **Duplicates se bachna** (sabse tricky hissa):
+      - `a[i]` pichle `a[i−1]` jaisa ho → skip (same triplets dobara banenge).
+      - Triplet milne ke baad `l` ko aage badhao jab tak same value hai.
+
+      > [!galti]
+      > HashSet mein triplets daal ke duplicates hatana bhi chalta hai, par interviewer sorted-skip wala clean tareeka expect karta hai.
+    dryRun: |
+      Sorted: `[-4, -1, -1, 0, 1, 2]`
+
+      | i (a[i]) | Need | Two pointers result |
+      |---|---|---|
+      | 0 (−4) | 4 | koi pair nahi |
+      | 1 (−1) | 1 | (−1, 2) ✓, (0, 1) ✓ |
+      | 2 (−1) | – | pichle jaisa → skip |
+      | 3 (0) | 0 | koi nahi |
+    viz: { tracer: threeSumTrace }
+    code: ex3-three-sum
+    complexity:
+      time: O(n²)
+      space: "O(1) extra (sort aur output chhod ke)"
+      why: "Sort O(n log n), phir har i par ek two-pointer pass O(n)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Array **sorted** hai (ya sort kar sakte ho) aur pair/triplet ka sum chahiye."
+    - "Dono kinaron ko milaana hai — reverse, palindrome."
+    - "Ek pointer hilane se kuch options pakka bekaar ho jaate hain (container, trapping rain water)."
+  avoid:
+    - "Array unsorted hai aur original indexes chahiye (Two Sum I) — sort se index kho jaate hain; HashMap lo."
+    - "Contiguous subarray ka sum/length chahiye — wo sliding window (same direction) hai."
+    - "Negative numbers ke saath subarray sum — prefix + HashMap."
+  signals:
+    - keyword: "sorted array, pair with sum"
+      think: "l = 0, r = n − 1; sum chhota → l++, bada → r--."
+    - keyword: "palindrome / reverse in place"
+      think: "Dono kinaron se milao/swap."
+    - keyword: "3Sum / 4Sum / k-sum"
+      think: "Sort + (k−2) loops + two pointers; duplicates skip."
+    - keyword: "max area / trapped water between bars"
+      think: "Chhoti side wala pointer andar."
+
+# 9. Real-world
+realWorld:
+  - where: "Photo / video editing"
+    how: "Image ko mirror (flip) karna = har row ko two pointers se reverse."
+  - where: "Merging sorted data"
+    how: "Do sorted lists se 'closest pair' ya target sum dhoondhna — finance mein buy/sell matching."
+  - where: "Text processing"
+    how: "Palindrome / symmetric checks, string reverse — two pointers in-place, extra memory nahi."
+  - where: "Gaming / physics"
+    how: "Sorted positions par 'kaunse do objects ek doori par hain' jaise checks."
+  - where: "Database joins"
+    how: "Sort-merge join: do sorted tables par pointers chala ke matching rows — two pointers ka bada bhai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Unsorted array par opposite two pointers"
+    type: logic
+    wrong: |
+      `[3, 1, 4, 2]`, target 5 par seedha l/r → galat faisle (sum ka order ka koi matlab nahi).
+    right: |
+      Pehle sort (agar original index nahi chahiye), warna HashMap.
+  - title: "`while (l <= r)` jab pair chahiye"
+    type: off-by-one
+    wrong: |
+      `l <= r` → l == r par ek hi element ko do baar use kar liya.
+    right: |
+      Pair ke liye `l < r`.
+  - title: "3Sum mein duplicates"
+    type: logic
+    wrong: |
+      `[-1, -1, 0, 1]` → `[-1, 0, 1]` do baar aaya.
+    right: |
+      `if (i > 0 && a[i] == a[i−1]) continue`, aur found ke baad `l` ko same values se aage badhao.
+  - title: "Sum overflow"
+    type: overflow
+    right: |
+      Values 10⁹ ke paas → `a[l] + a[r]` Int overflow. `.toLong()` karke jodo.
+  - title: "Skip loops mein bounds check bhoolna"
+    type: off-by-one
+    wrong: |
+      `while (!isVowel(c[l])) l++` — vowel hi nahi hai to l string ke bahar.
+    right: |
+      `while (l < r && !isVowel(c[l])) l++`.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Opposite two pointers kab kaam karta hai?"
+      a: |
+        Jab data sorted ho ya structure aisa ho ki har kadam par ek pointer hilane se kuch options pakka bekaar ho jaayein. Tab O(n²) → O(n).
+    - q: "Sorted Two Sum mein ye approach sahi kyun hai (proof)?"
+      a: |
+        Sum bada: arr[l] sabse chhota bacha hai, phir bhi zyada → arr[r] kisi ke saath target nahi bana sakta → hata do. Sum chhota: symmetric argument se arr[l] hata do. Koi valid pair kabhi nahi hata.
+    - q: "Container with most water mein chhoti deewar kyun hatate ho?"
+      followUp: true
+      a: |
+        Area = min(h) × width. Chhoti deewar rakhi to width ghategi aur min upar nahi jaayega — area kabhi nahi badhega. Isliye chhoti deewar ke saare remaining pairs bekaar — hata do.
+    - q: "3Sum ki complexity aur duplicates kaise sambhaale?"
+      a: |
+        Sort + har i par two pointers = O(n²). Same a[i] skip, aur triplet milne par l ko same values se aage.
+    - q: "Two Sum (unsorted, index chahiye) mein two pointers kyun nahi?"
+      a: |
+        Sort karne se original index kho jaate hain (pair of value-index sort kar sakte ho, par O(n log n)). HashMap O(n) seedha.
+    - q: "4Sum kaise karoge?"
+      followUp: true
+      a: |
+        Sort + do loops (i, j) + two pointers → O(n³). Duplicates har level par skip. Sum Long mein (overflow).
+    - q: "Trapping rain water two pointers se?"
+      a: |
+        leftMax, rightMax rakho; jis side ka max chhota, us side ka paani pakka = max − height; wo pointer andar. O(n), O(1).
+    - q: "Opposite pointers aur same-direction pointers mein fark?"
+      a: |
+        Opposite: dono kinaron se andar (pairs, palindrome). Same direction: dono aage badhte (read/write, sliding window, fast/slow).
+  mayAsk:
+    - "3Sum Closest."
+    - "Valid Palindrome II (ek char hata sakte ho)."
+    - "Boats to Save People."
+    - "Sort Colors (Dutch flag — teen pointers)."
+
+# 12. Practice
+practice:
+  - name: Two Sum II - Input Array Is Sorted
+    platform: LeetCode
+    num: 167
+    url: "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
+    level: medium
+    pattern: Opposite pointers on sorted array
+    hint: "Code section ka template. Answer 1-indexed."
+  - name: Valid Palindrome
+    platform: LeetCode
+    num: 125
+    url: "https://leetcode.com/problems/valid-palindrome/"
+    level: easy
+    pattern: Opposite pointers + skip
+    hint: "Strings topic ka example — non-alphanumeric skip, lowercase compare."
+  - name: Squares of a Sorted Array
+    platform: LeetCode
+    num: 977
+    url: "https://leetcode.com/problems/squares-of-a-sorted-array/"
+    level: easy
+    pattern: Bada value kinare par
+    hint: "'Kaise kaam karta hai' wala — result ko peeche se bharo."
+  - name: Reverse Vowels of a String
+    platform: LeetCode
+    num: 345
+    url: "https://leetcode.com/problems/reverse-vowels-of-a-string/"
+    level: easy
+    pattern: Opposite pointers + filter
+    hint: "Example 1."
+  - name: Container With Most Water
+    platform: LeetCode
+    num: 11
+    url: "https://leetcode.com/problems/container-with-most-water/"
+    level: medium
+    pattern: Chhoti side hatao
+    hint: "Example 2 — proof bhi bolo."
+  - name: 3Sum
+    platform: LeetCode
+    num: 15
+    url: "https://leetcode.com/problems/3sum/"
+    level: medium
+    pattern: Sort + fix one + two pointers
+    hint: "Example 3 — dono duplicate skips."
+  - name: Trapping Rain Water
+    platform: LeetCode
+    num: 42
+    url: "https://leetcode.com/problems/trapping-rain-water/"
+    level: hard
+    pattern: Two pointers with leftMax/rightMax
+    hint: "Jis side ka max chhota, us side ka paani pakka tay hai — wahi pointer andar."
+  - name: Maximum Score of a Good Subarray
+    platform: LeetCode
+    num: 1793
+    url: "https://leetcode.com/problems/maximum-score-of-a-good-subarray/"
+    level: hard
+    pattern: Two pointers expanding outward (greedy)
+    hint: "l = r = k se shuru. Har kadam us taraf failao jidhar ka agla number BADA hai (min kam se kam gire). Har step score = min × width."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "l shuru se, r end se; har kadam ek pointer andar; O(n), O(1)."
+    - "Sorted pair sum: chhota → l++, bada → r--."
+    - "Proof: hilaaya gaya element kisi bache hue ke saath kaam nahi aata."
+    - "Container: chhoti deewar hatao. 3Sum: sort + fix i + two pointers, duplicates skip."
+    - "Unsorted + index chahiye → HashMap; contiguous subarray → sliding window."
+  cheatsheet: |
+    ```kotlin
+    var l = 0; var r = a.size - 1
+    while (l < r) {
+        val s = a[l] + a[r]
+        when {
+            s == target -> return ...
+            s < target  -> l++
+            else        -> r--
+        }
+    }
+    // 3Sum: sort; for i { if (i>0 && a[i]==a[i-1]) continue; two pointers on i+1..n-1 }
+    ```
+  quiz:
+    - q: "Sorted [1, 3, 5, 8], target 11. Pehla step (l=0, r=3) ke baad kya?"
+      options: ["l++", "r--", "Answer mil gaya", "Dono hilao"]
+      answer: 0
+      explain: "1 + 8 = 9 < 11 — sum chhota hai, badi value chahiye → l++."
+    - q: "Container with most water mein kaunsi deewar hatate hain?"
+      options: ["Badi", "Chhoti", "Random", "Beech wali"]
+      answer: 1
+      explain: "Chhoti deewar area ko limit karti hai."
+    - q: "3Sum ki best complexity (is approach se)?"
+      options: ["O(n)", "O(n log n)", "O(n²)", "O(n³)"]
+      answer: 2
+      explain: "Sort + har i par O(n)."
+    - q: "Pair ke liye loop condition?"
+      options: ["l <= r", "l < r", "l != 0", "r > 0"]
+      answer: 1
+      explain: "l == r ek hi element hai."
+    - q: "Unsorted array, original indexes chahiye (Two Sum). Best?"
+      options: ["Opposite two pointers", "HashMap", "Sliding window", "Binary search"]
+      answer: 1
+      explain: "Sort karne se index kho jaate hain."
+
+# 14. Connections
+connections:
+  related:
+    - id: two-pointers-same
+      why: "Doosri family — dono pointers ek hi direction mein."
+    - id: problem-solving
+      why: "Sorted pair sum wahin pehli baar dekha tha."
+  usedLater:
+    - id: binary-search
+      how: "Sorted data ka doosra hathiyaar — O(log n)."
+    - id: reverse-linked-list
+      how: "Reverse ka idea linked list mein bhi (pointers badal ke)."
+    - id: intervals
+      how: "Sorted start/end par do pointers — meeting rooms, platforms."
+    - id: greedy-classics
+      how: "Container jaisa greedy + two pointers proof."

@@ -1,0 +1,460 @@
+meta:
+  id: two-pointers-same
+  chapter: two-pointers-window
+  title: Two Pointers (ek hi direction)
+  subtitle: Ek padhta hai, ek likhta hai â€” dono aage hi badhte hain, kabhi peeche nahi
+  level: intermediate
+  minutes: 30
+  prereqs: [array, two-pointers-opposite]
+  tags: [two-pointers, read-write, in-place, fast-slow]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Two pointers (same direction)** = do index, **dono shuru se aage** badhte hain â€” par alag speed se.
+
+    - `r` (**reader**) â€” har item ek-ek karke padhta hai. Har loop mein aage.
+    - `w` (**writer**) â€” sirf tab aage jab koi **kaam ka** item likhna ho.
+
+    ```kotlin
+    var w = 0
+    for (r in arr.indices) {
+        if (kaamKaHai(arr[r])) {
+            arr[w] = arr[r]   // kaam ka item aage khiskao
+            w++
+        }
+    }
+    // ab arr[0 until w] = answer
+    ```
+
+    Hamesha `w <= r` â€” writer kabhi reader se aage nahi jaata. Isliye jo jagah overwrite hoti hai, wo reader pehle hi padh chuka hota hai. **Usi array mein** kaam ho jaata hai.
+
+    > [!yaad]
+    > Dono pointers sirf aage â†’ total kadam â‰¤ 2n â†’ **O(n)**. Nayi array nahi â†’ **O(1)** extra space.
+  analogy: |
+    **Shaadi ke buffet ki line mein plates saaf karna.** Ek bhai (reader) har plate uthata hai aur dekhta hai. Achhi plate? Doosre bhai (writer) ko deta hai, jo use stack mein **aage se** lagata jaata hai. Tooti plate? Reader seedha aage badh jaata hai.
+
+    Reader har plate dekhta hai, writer sirf achhi plates rakhta hai â€” aur dono ek hi table par kaam kar rahe hain, nayi table nahi chahiye.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    "Array se kuch items hatao / filter karo" ka seedha tareeka:
+    - **Nayi list** bana ke kaam ke items daalo â†’ O(n) extra memory.
+    - Ya har bekaar item par `removeAt(i)` â†’ har remove baaki sabko khiskata hai â†’ **O(nÂ²)**.
+
+    Read/write pointers dono problems hal karte hain: **O(n) time, O(1) space**, ek hi pass.
+
+    Interview mein bahut problems mein likha hota hai **"in-place"** ya **"O(1) extra memory"** â€” wahi iska signal hai.
+
+    > [!socho]
+    > `for (i in list.indices) if (list[i] == 0) list.removeAt(i)` â€” isme kya gadbad hai?
+    >
+    > Do gadbad: (1) har `removeAt` O(n) hai, to total O(nÂ²). (2) Remove ke baad items khisak jaate hain aur `i++` ek item **skip** kar deta hai â€” `[0, 0, 1]` mein doosra 0 bach jaata hai. Read/write pointers mein ye dono problem nahi.
+
+# 3. Visual intro
+visual:
+  body: |
+    Sentence mein faltu spaces hain. `r` har character padhta hai; `w` sirf kaam ke characters likhta hai.
+
+    Dekho: **hare** cells = ab tak ka answer. `w` hamesha `r` ke peeche ya barabar rehta hai â€” isliye overwrite safe hai. Apna sentence daal ke try karo.
+  viz: { tracer: readerWriter }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Example: **sorted array se duplicates hatao** (in-place), aur batao kitne unique bache.
+
+    `[0, 0, 1, 1, 1, 2, 2, 3, 3, 4]` â†’ pehle 5 jagah `[0, 1, 2, 3, 4]`, return **5**.
+
+    **Observation:** sorted hai, to same numbers **padosi** hain. Naya unique tabhi aata hai jab number **pichle likhe** number se alag ho.
+
+    1. `a[0]` hamesha unique â†’ `w = 1`.
+    2. `r` ko 1 se end tak chalao.
+    3. `a[r] != a[w âˆ’ 1]` â†’ naya unique â†’ `a[w] = a[r]`, `w++`.
+    4. End mein `w` = unique count.
+
+    > [!tip]
+    > `a[r]` ko `a[r âˆ’ 1]` se bhi compare kar sakte ho (sorted hai). Par `a[w âˆ’ 1]` (pichla **likha** item) wala tareeka zyada general hai â€” Example 3 mein wahi kaam aayega.
+  viz: { tracer: dedupTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Filter in-place (remove element / zeroes)"
+    time: O(n)
+    space: O(1)
+    why: "Ek pass; kaam ka item w par likho."
+  - op: "Sorted array dedupe"
+    time: O(n)
+    space: O(1)
+    why: "Pichle likhe item se compare."
+  - op: "Do sorted arrays merge"
+    time: O(m + n)
+    space: "O(m + n) nayi array / O(1) agar jagah pehle se ho"
+    why: "Har item ek baar likha jaata hai."
+  - op: "Subsequence check"
+    time: O(n)
+    space: O(1)
+    why: "Dono strings par ek-ek pointer, sirf aage."
+  - op: "Har bekaar item par removeAt (galat tareeka)"
+    time: O(nÂ²)
+    space: O(1)
+    why: "Har remove baaki items khiskata hai."
+  - op: "Nayi list mein filter (simple tareeka)"
+    time: O(n)
+    space: O(n)
+    why: "Saaf code, par extra memory."
+
+# 6. Code
+code:
+  - title: Is subsequence? (do strings, dono pointer aage)
+    file: subsequence
+    note: |
+      Same-direction ka doosra roop: pointers **do alag sequences** par. `t` par loop chalta hai, `s` ka pointer sirf match par aage badhta hai. Kabhi peeche nahi â€” isliye O(|t|).
+
+# 7. Examples
+examples:
+  - id: move-zeroes
+    level: easy
+    title: Saare zero end mein bhejo
+    source: { name: Move Zeroes, platform: LeetCode, url: "https://leetcode.com/problems/move-zeroes/" }
+    problem: |
+      Array ke saare **0** end mein bhejo. Baaki numbers ka **order wahi** rahe. Nayi array nahi banani.
+
+      Example: `[0, 1, 0, 3, 12]` â†’ `[1, 3, 12, 0, 0]`
+    intuition: |
+      Ye "filter non-zero" hi hai. `w` = agla non-zero kahan jaayega.
+
+      - `a[r]` non-zero â†’ `a[w]` aur `a[r]` **swap**, `w++`.
+      - `a[r]` zero â†’ kuch mat karo.
+
+      Swap kyun, sirf likhna kyun nahi? Swap se zero apne aap peeche chale jaate hain â€” baad mein alag loop se zero bharne ki zaroorat nahi.
+
+      > [!socho]
+      > Order kaise bacha rehta hai?
+      >
+      > Non-zero items usi order mein `w` par aate hain jis order mein `r` unhe padhta hai. Zeroes ka order matter hi nahi karta â€” sab same hain.
+    dryRun: |
+      `[0, 1, 0, 3, 12]`
+
+      | r | a[r] | Kya hua | w (baad mein) | Array |
+      |---|---|---|---|---|
+      | 0 | 0 | skip | 0 | 0 1 0 3 12 |
+      | 1 | 1 | swap a[0] â†” a[1] | 1 | 1 0 0 3 12 |
+      | 2 | 0 | skip | 1 | 1 0 0 3 12 |
+      | 3 | 3 | swap a[1] â†” a[3] | 2 | 1 3 0 0 12 |
+      | 4 | 12 | swap a[2] â†” a[4] | 3 | **1 3 12 0 0** |
+    viz: { tracer: moveZeroesTrace }
+    code: ex1-move-zeroes
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass, har item par ek compare aur zyada se zyada ek swap."
+
+  - id: merge-sorted
+    level: medium
+    title: Do sorted arrays ko merge karo (pehli array ke andar)
+    source: { name: Merge Sorted Array, platform: LeetCode, url: "https://leetcode.com/problems/merge-sorted-array/" }
+    problem: |
+      `nums1` mein `m` sorted numbers hain, aur end mein `n` khaali jagah (0). `nums2` mein `n` sorted numbers. `nums2` ko `nums1` mein merge karo â€” result sorted, **nayi array nahi**.
+
+      Example: `nums1 = [1, 2, 3, 0, 0, 0], m = 3`, `nums2 = [2, 5, 6]` â†’ `[1, 2, 2, 3, 5, 6]`
+    intuition: |
+      Normal merge aage se karta hai (sabse chhota pehle). Par yahan aage se likhoge to `nums1` ke numbers **overwrite** ho jaayenge â€” abhi padhe bhi nahi.
+
+      **Trick: peeche se bharo.** Khaali jagah end mein hai. Teen pointers:
+      - `i` = nums1 ka aakhri asli number
+      - `j` = nums2 ka aakhri number
+      - `k` = likhne ki jagah (end se)
+
+      Dono mein jo **bada** hai, wo `k` par. Wahi pointer peeche.
+
+      Kyun safe hai? `k` hamesha `i` se aage ya barabar hai â€” jo likh rahe ho wo jagah ya to khaali hai ya pehle hi padh li gayi.
+
+      > [!tip]
+      > `nums2` khatam (`j < 0`) â†’ ruk jao. `nums1` ke bache numbers pehle se sahi jagah par hain. Ulta nahi: `nums1` khatam ho to `nums2` ke bache copy karne padenge â€” isliye loop `while (j >= 0)` hai.
+    dryRun: |
+      nums1 = `[1, 2, 3, _, _, _]`, nums2 = `[2, 5, 6]`
+
+      | i | j | k | Compare | Likha | nums1 |
+      |---|---|---|---|---|---|
+      | 2 | 2 | 5 | 3 vs 6 | 6 | 1 2 3 _ _ 6 |
+      | 2 | 1 | 4 | 3 vs 5 | 5 | 1 2 3 _ 5 6 |
+      | 2 | 0 | 3 | 3 vs 2 | 3 | 1 2 3 3 5 6 |
+      | 1 | 0 | 2 | 2 vs 2 | 2 (nums2) | 1 2 2 3 5 6 |
+      | â€“ | â€“ | â€“ | j < 0, ruko | | **1 2 2 3 5 6** |
+    viz: { tracer: mergeTrace }
+    code: ex2-merge
+    complexity:
+      time: O(m + n)
+      space: O(1)
+      why: "Har jagah ek baar likhi; sirf teen pointers."
+
+  - id: dups-ii
+    level: tricky
+    title: Har number zyada se zyada 2 baar
+    source: { name: Remove Duplicates from Sorted Array II, platform: LeetCode, url: "https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/" }
+    problem: |
+      Sorted array mein har number **zyada se zyada 2 baar** rehna chahiye. In-place karo, naya length return karo.
+
+      Example: `[1, 1, 1, 2, 2, 3]` â†’ `5`, pehle 5 jagah `[1, 1, 2, 2, 3]`
+    intuition: |
+      Ek count variable rakh ke bhi ho jaata hai, par ek **chhoti trick** hai:
+
+      Naya item `x` rakhna hai ya nahi? Dekho `a[w âˆ’ 2]` â€” **2 jagah peeche likha** item.
+      - `x == a[w âˆ’ 2]` â†’ sorted hai, to `a[w âˆ’ 2]` aur `a[w âˆ’ 1]` dono `x` hain. Ye teesri copy hogi â†’ **skip**.
+      - Alag â†’ rakho.
+      - Pehle 2 items (`w < 2`) hamesha rakho.
+
+      > [!galti]
+      > `a[r âˆ’ 2]` se compare mat karo (padhne wale se). Overwrite ke baad array badal chuka hai â€” **likhe hue** hisse (`a[w âˆ’ 2]`) se compare karo. `[1, 1, 1, 2, 2, 3]` par `a[r âˆ’ 2]` wala code galat answer deta hai.
+
+      > [!yaad]
+      > General rule: "har number max **k** baar" â†’ `w < k || x != a[w âˆ’ k]`. k = 1 matlab "How" wala dedupe.
+    dryRun: |
+      `[1, 1, 1, 2, 2, 3]`
+
+      | r | x | a[wâˆ’2] | Rakho? | w (baad mein) |
+      |---|---|---|---|---|
+      | 0 | 1 | â€“ (w < 2) | haan | 1 |
+      | 1 | 1 | â€“ (w < 2) | haan | 2 |
+      | 2 | 1 | 1 | **nahi** (teesri copy) | 2 |
+      | 3 | 2 | 1 | haan | 3 |
+      | 4 | 2 | 1 | haan | 4 |
+      | 5 | 3 | 2 | haan | **5** |
+    viz: { tracer: dupsIITrace }
+    code: ex3-dups-ii
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass; sirf w aur loop variable."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "**In-place** filter / remove / compact karna hai (O(1) extra memory)."
+    - "Sorted array mein duplicates sambhaalne hain."
+    - "Do sorted sequences ko saath-saath chalana hai (merge, subsequence, intersection)."
+    - "Linked list mein fast/slow (cycle, middle) â€” yahi family."
+  avoid:
+    - "Pair ka sum chahiye sorted array mein â€” wo opposite ends wala two pointers hai."
+    - "Contiguous subarray ka sum/length condition â€” wo sliding window hai (same direction ka hi khaas roop)."
+    - "Order bachana zaroori nahi aur code simple chahiye â€” `filter {}` se nayi list bhi theek hai."
+  signals:
+    - keyword: "in-place, O(1) extra memory, remove / move"
+      think: "Reader r + writer w; kaam ka item a[w++] = a[r]."
+    - keyword: "sorted array, remove duplicates"
+      think: "Pichle likhe item a[w âˆ’ 1] (ya a[w âˆ’ k]) se compare."
+    - keyword: "merge two sorted arrays / lists"
+      think: "Har list par ek pointer; jagah kam ho to peeche se bharo."
+    - keyword: "is subsequence / matching order"
+      think: "Bade sequence par loop, chhote ka pointer sirf match par aage."
+
+# 9. Real-world
+realWorld:
+  - where: "Android RecyclerView / Flutter list filtering"
+    how: "Buffer ke andar hi deleted items hatana (compaction) â€” nayi list allocate nahi, GC kam."
+  - where: "Garbage collectors"
+    how: "Mark-compact GC: zinda objects ko heap ke shuru mein khiskata hai â€” read/write pointers ka bada roop."
+  - where: "Text editors"
+    how: "Extra spaces / blank lines hatana (trim, collapse) â€” ek pass mein."
+  - where: "Merge sort aur databases"
+    how: "Do sorted runs ko merge karna â€” merge sort, external sort, LSM-tree compaction (RocksDB, Cassandra)."
+  - where: "Version control / diff"
+    how: "Do sorted file lists par saath-saath chal ke 'added / removed' nikaalna."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Loop ke andar removeAt"
+    type: logic
+    wrong: |
+      ```kotlin
+      for (i in list.indices) if (list[i] == 0) list.removeAt(i)
+      ```
+      Items khisakte hain â†’ kuch skip, aur index bahar (crash). Upar se O(nÂ²).
+    right: |
+      Read/write pointers, ya `list.removeAll { it == 0 }` (andar se yahi karta hai).
+  - title: "Dedupe mein a[r âˆ’ 1] / a[r âˆ’ 2] se compare"
+    type: logic
+    wrong: |
+      Max-2 wale problem mein `a[r] != a[r âˆ’ 2]` â€” overwrite ke baad galat.
+    right: |
+      Hamesha **likhe hue** hisse se: `a[w âˆ’ 1]` ya `a[w âˆ’ k]`.
+  - title: "Empty array"
+    type: empty
+    wrong: |
+      `removeDuplicates` mein seedha `w = 1` â†’ empty array par 1 return.
+    right: |
+      Pehle `if (nums.isEmpty()) return 0`.
+  - title: "Merge aage se karna"
+    type: logic
+    wrong: |
+      `nums1` mein aage se likha â†’ abhi na padhe numbers overwrite.
+    right: |
+      Khaali jagah end mein hai â†’ **peeche se** bharo.
+  - title: "Merge mein nums1 khatam hone par ruk jaana"
+    type: empty
+    wrong: |
+      `while (i >= 0 && j >= 0)` aur baad mein nums2 ke bache copy karna bhool gaye. `m = 0` par kuch nahi hota.
+    right: |
+      `while (j >= 0)` aur andar `i >= 0 &&` check.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "In-place remove ka O(n) tareeka kya hai?"
+      a: |
+        Reader r har item padhta hai, writer w sirf kaam ke items likhta hai: `a[w++] = a[r]`. End mein `0 until w` answer. O(n), O(1).
+    - q: "Overwrite se data kyun nahi khota?"
+      a: |
+        Hamesha w â‰¤ r. Jo jagah w likhta hai, use r pehle hi padh chuka hai. Isliye kuch bina padhe overwrite nahi hota.
+    - q: "Move zeroes mein swap kyun, sirf copy kyun nahi?"
+      a: |
+        Copy karo to end mein alag loop se zero bharne padte. Swap se zero apne aap peeche jaate hain â€” ek pass. Writes kam karne ho to copy + fill bhi chalta hai.
+    - q: "Merge Sorted Array peeche se kyun?"
+      followUp: true
+      a: |
+        Khaali jagah end mein hai. Aage se likho to nums1 ke unread numbers overwrite. Peeche se: k â‰¥ i hamesha, overwrite safe.
+    - q: "Har number max k baar â€” general solution?"
+      a: |
+        `if (w < k || x != a[w âˆ’ k]) a[w++] = x`. Sorted hone se a[w âˆ’ k] == x ka matlab k copies pehle se likhi hain.
+    - q: "Same-direction aur opposite two pointers mein fark?"
+      a: |
+        Opposite: kinaron se andar, pairs/palindrome. Same direction: dono shuru se aage, filter/merge/window/fast-slow.
+    - q: "Is Subsequence ka follow-up: bahut saare s, ek hi t?"
+      followUp: true
+      a: |
+        Har s ke liye O(|t|) mehenga. t ke har char ki index list banao (HashMap), phir har s ke char ke liye binary search se agla index. O(|s| log |t|) per query.
+    - q: "Fast/slow pointers kya hai?"
+      a: |
+        Same direction, alag speed (1 aur 2). Linked list ka middle, cycle detection (Floyd). Linked list chapter mein detail.
+    - q: "Kotlin mein `removeAll` / `filter` use kar sakte ho?"
+      a: |
+        Real code mein haan. Interview mein "in-place, O(1)" bola ho to khud likh ke dikhao â€” aur batao library andar yahi karti hai.
+  mayAsk:
+    - "Remove Element (val wale sab hatao)."
+    - "Sort Colors (teen pointers)."
+    - "Intersection of two sorted arrays."
+    - "Backspace String Compare (peeche se do pointers)."
+    - "Is Subsequence ka follow-up (bahut saari queries)."
+
+# 12. Practice
+practice:
+  - name: Remove Duplicates from Sorted Array
+    platform: LeetCode
+    num: 26
+    url: "https://leetcode.com/problems/remove-duplicates-from-sorted-array/"
+    level: easy
+    pattern: Read/write, compare with last written
+    hint: "'Kaise kaam karta hai' wala â€” a[w âˆ’ 1] se compare."
+  - name: Move Zeroes
+    platform: LeetCode
+    num: 283
+    url: "https://leetcode.com/problems/move-zeroes/"
+    level: easy
+    pattern: Read/write + swap
+    hint: "Example 1."
+  - name: Merge Sorted Array
+    platform: LeetCode
+    num: 88
+    url: "https://leetcode.com/problems/merge-sorted-array/"
+    level: easy
+    pattern: Merge from back
+    hint: "Example 2 â€” peeche se bharo."
+  - name: Remove Duplicates from Sorted Array II
+    platform: LeetCode
+    num: 80
+    url: "https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/"
+    level: medium
+    pattern: Compare with a[w âˆ’ k]
+    hint: "Example 3."
+  - name: Sort Colors
+    platform: LeetCode
+    num: 75
+    url: "https://leetcode.com/problems/sort-colors/"
+    level: medium
+    pattern: Three pointers (Dutch flag)
+    hint: "low, mid, high. 0 mila â†’ low ke saath swap (dono aage); 2 mila â†’ high ke saath swap (sirf high peeche, mid wahi); 1 â†’ mid aage."
+  - name: Shortest Unsorted Continuous Subarray
+    platform: LeetCode
+    num: 581
+    url: "https://leetcode.com/problems/shortest-unsorted-continuous-subarray/"
+    level: medium
+    pattern: Two scans tracking max / min
+    hint: "Left se chalo, ab tak ka max rakho â€” jahan a[i] < max, wo right boundary. Right se min ke saath left boundary."
+  - name: Minimum Number of Operations to Make Array Continuous
+    platform: LeetCode
+    num: 2009
+    url: "https://leetcode.com/problems/minimum-number-of-operations-to-make-array-continuous/"
+    level: hard
+    pattern: Sort + in-place dedupe + same-direction window
+    hint: "Sort karo, duplicates hatao (yahi topic). Har start par r ko aage badhao jab tak a[r] < a[start] + n. Answer = n âˆ’ sabse badi window."
+  - name: First Missing Positive
+    platform: LeetCode
+    num: 41
+    url: "https://leetcode.com/problems/first-missing-positive/"
+    level: hard
+    pattern: In-place placement (index = value âˆ’ 1)
+    hint: "Har x (1..n) ko index x âˆ’ 1 par swap karte raho. Phir pehla i jahan a[i] != i + 1 â€” answer i + 1."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Reader r har item, writer w sirf kaam ke items; dono sirf aage."
+    - "w â‰¤ r hamesha â€” isliye in-place overwrite safe. O(n), O(1)."
+    - "Dedupe: likhe hue a[w âˆ’ 1] se compare; max k copies: a[w âˆ’ k]."
+    - "Merge in-place: khaali jagah end mein â†’ peeche se bharo, while (j >= 0)."
+    - "Loop mein removeAt = O(nÂ²) + skip bug. Read/write lo."
+  cheatsheet: |
+    ```kotlin
+    // filter in-place
+    var w = 0
+    for (r in a.indices) if (keep(a[r])) a[w++] = a[r]
+    // a[0 until w] = answer
+
+    // sorted, max k copies
+    for (x in a) if (w < k || x != a[w - k]) a[w++] = x
+
+    // merge nums2 into nums1 (peeche se)
+    var i = m - 1; var j = n - 1; var k = m + n - 1
+    while (j >= 0) nums1[k--] = if (i >= 0 && nums1[i] > nums2[j]) nums1[i--] else nums2[j--]
+    ```
+  quiz:
+    - q: "Read/write pointers mein kaunsi baat hamesha sach hai?"
+      options: ["w â‰¤ r", "w > r", "w == r", "w aur r ulti direction mein"]
+      answer: 0
+      explain: "Writer kabhi reader se aage nahi jaata â€” isliye overwrite safe."
+    - q: "[0, 0, 1, 1, 2] par removeDuplicates kya return karega?"
+      options: ["2", "3", "5", "1"]
+      answer: 1
+      explain: "Unique: 0, 1, 2 â†’ 3."
+    - q: "Merge Sorted Array mein nums1 mein peeche se kyun likhte hain?"
+      options: ["Fast hota hai", "Aage se likhne par unread numbers overwrite ho jaate", "Sorted descending chahiye", "nums2 bada hai"]
+      answer: 1
+      explain: "Khaali jagah end mein hai; peeche se likhna safe hai."
+    - q: "Max 2 copies wale dedupe mein naye x ko kisse compare karte hain?"
+      options: ["a[r âˆ’ 1]", "a[r âˆ’ 2]", "a[w âˆ’ 2]", "a[w]"]
+      answer: 2
+      explain: "Likhe hue hisse se â€” 2 peeche wala same hai to ye teesri copy hogi."
+    - q: "Loop ke andar list.removeAt(i) ki complexity?"
+      options: ["O(n)", "O(n log n)", "O(nÂ²)", "O(1)"]
+      answer: 2
+      explain: "Har remove O(n) khiskata hai, n baar."
+
+# 14. Connections
+connections:
+  related:
+    - id: two-pointers-opposite
+      why: "Doosri family â€” kinaron se andar."
+    - id: sliding-window-fixed
+      why: "Window ke do kinare bhi same direction mein chalte hain."
+    - id: dynamic-array
+      why: "removeAt kyun O(n) hai â€” wahin dekha."
+  usedLater:
+    - id: sliding-window-variable
+      how: "l aur r dono aage â€” window badhao/ghatao."
+    - id: fast-slow-pointers
+      how: "Linked list mein same direction, alag speed â€” cycle aur middle."
+    - id: merge-sort
+      how: "Do sorted halves ka merge â€” yahi pointer-per-array idea."

@@ -4,9 +4,8 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0, 1, 2 done (16 topics).
-- Next action: chapter 3 → `two-pointers-opposite` (code/*.kt+java written; need check:code, viz.ts, topic.yaml).
-  Plan: how = sorted squares; ex1 reverse vowels; ex2 container with most water; ex3 3Sum; visual = pair-elimination grid.
+- Step: 3 (Content). Chapters 0–3 done (20 topics).
+- Next action: chapter 4 → `recursion-basics` (use `recursion` panel; fibCalls in foundations/analyze-code/viz.ts shows parent `active` before return frame).
 - Note: low RAM on this machine (~1 GB free) makes `npm run build` slow (24 min once); run it once per chapter.
 - Engine: frame `legend` overrides tone labels (see CLAUDE.md).
 - Last session note (2026-10-05): chapter 0 committed. Content caches are production-only (dev picks up new
@@ -41,7 +40,7 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] space-complexity
 - [x] analyze-code
 - [x] problem-solving
-- [ ] kotlin-java-toolkit
+- [x] kotlin-java-toolkit
 
 ### 1. Arrays & Strings
 - [x] array (built in Step 2)
@@ -58,10 +57,10 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] frequency-count
 
 ### 3. Two Pointers & Sliding Window
-- [ ] two-pointers-opposite
-- [ ] two-pointers-same
-- [ ] sliding-window-fixed
-- [ ] sliding-window-variable
+- [x] two-pointers-opposite
+- [x] two-pointers-same
+- [x] sliding-window-fixed
+- [x] sliding-window-variable
 
 ### 4. Recursion
 - [ ] recursion-basics
