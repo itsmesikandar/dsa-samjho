@@ -1,0 +1,432 @@
+meta:
+  id: hashset
+  chapter: hashing
+  title: HashSet
+  subtitle: Sirf unique items ka thaila — "hai ya nahi?" O(1) mein
+  level: beginner
+  minutes: 25
+  prereqs: [hashing-internals]
+  tags: [hashset, unique, set-operations, consecutive]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **HashSet** = unique items ka collection. Har item **ek hi baar** aata hai, aur "ye set mein hai?" ka jawab **average O(1)** mein milta hai.
+
+    ```kotlin
+    val seen = HashSet<Int>()
+    seen.add(5)        // true  (naya)
+    seen.add(5)        // false (pehle se hai — kuch nahi badla)
+    println(5 in seen) // true
+    ```
+
+    HashSet andar se **HashMap hi hai** — set ke items keys hain, value ek dummy. Isliye complexity bhi same.
+
+    Teen tarah ke sets:
+    | Set | Order | Speed |
+    |---|---|---|
+    | `HashSet` | koi fixed order nahi | O(1) avg |
+    | `LinkedHashSet` | jis order mein daale | O(1) avg |
+    | `TreeSet` | sorted | O(log n) |
+
+    > [!yaad]
+    > `add()` boolean return karta hai — **true = naya tha, false = pehle se tha**. Duplicate check ek hi line mein: `if (!set.add(x)) // duplicate!`
+  analogy: |
+    **Shaadi ke gate par guest register** socho. Har guest ka naam ek baar likha jaata hai. Koi dobara aaye to guard turant bol deta hai "aap to andar ho chuke" — poori list padhe bina (kyunki register naam ke pehle akshar se baanta hua hai).
+
+    Set bilkul yahi hai: duplicates allowed nahi, aur "hai ya nahi" ka jawab turant.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Bahut saare problems mein value nahi, sirf ye jaanna hota hai ki **"ye pehle aaya hai ya nahi?"**:
+    - Duplicate hai?
+    - Do lists mein common kya hai?
+    - Cycle hai? (koi state dobara aayi?)
+    - Visited nodes (graph BFS/DFS)
+
+    List mein `contains` O(n) hai — loop mein O(n²). Set mein O(1) — loop mein O(n).
+
+    > [!socho]
+    > Graph traversal mein "visited" yaad rakhne ke liye kya use karoge?
+    >
+    > HashSet (ya nodes 0..n−1 hon to BooleanArray). Har node par "dekha?" O(1). Graphs chapter mein ye har jagah aayega.
+
+# 3. Visual intro
+visual:
+  body: |
+    Duplicates wali list ko set mein daalte hain. Dekho — duplicate aate hi `add()` false deta hai aur set waisa ka waisa rehta hai.
+
+    "Apna input try karo" mein bahut saare duplicates daal ke dekho.
+  viz: { tracer: setDedupe }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Set ke saath common operations:
+    - `add(x)` — naya ho to daalo (true), warna false.
+    - `x in set` / `contains(x)` — O(1).
+    - **Intersection** (dono mein common), **union** (dono ke saare), **difference** (sirf pehle mein).
+
+    Kotlin mein `intersect`, `union`, `-` operators; Java mein `retainAll`, `addAll`, `removeAll` (ye set ko **badalte** hain — isliye pehle copy banao).
+
+    > [!galti]
+    > Java mein `a.retainAll(b)` **a ko hi badal deta hai**. Original chahiye to `new HashSet<>(a)` ki copy par karo.
+  viz: { tracer: setOpsTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "`add(x)` / `remove(x)` / `contains(x)`"
+    time: "O(1) average"
+    space: O(1)
+    why: "HashMap ki tarah bucket se seedha."
+  - op: "List → Set (dedupe)"
+    time: O(n)
+    space: O(n)
+    why: "Har item ek add."
+  - op: "Intersection a ∩ b"
+    time: "O(min(n, m))"
+    space: "O(min(n, m))"
+    why: "Chhote set par loop, bade mein contains."
+  - op: "Union a ∪ b"
+    time: O(n + m)
+    space: O(n + m)
+    why: "Dono ke saare items ek baar."
+  - op: "Difference a − b"
+    time: O(n)
+    space: O(n)
+    why: "a ke har item ka b mein check."
+  - op: "TreeSet `add` / `ceiling` / `floor`"
+    time: O(log n)
+    space: O(1)
+    why: "Balanced tree — sorted order bhi, nearest bhi."
+
+# 6. Code
+code:
+  - title: Order chahiye? LinkedHashSet aur TreeSet
+    file: order
+    note: |
+      **LinkedHashSet** — duplicates hatao par pehli baar wala order rakho (search history, recent items).
+      **TreeSet** — sorted + `ceiling` (≥ x mein sabse chhota) / `floor` (≤ x mein sabse bada) — "nearest value" wale problems mein bahut kaam ka.
+
+# 7. Examples
+examples:
+  - id: happy
+    level: easy
+    title: Happy number — set se chakkar (cycle) pakdo
+    source: { name: Happy Number, platform: LeetCode, url: "https://leetcode.com/problems/happy-number/" }
+    problem: |
+      Ek number lo, uske har digit ka square jodo, aur ye baar-baar karo. Agar kabhi **1** aa jaaye to number "happy" hai. Agar 1 kabhi na aaye (chakkar mein ghoomta rahe) to nahi.
+
+      Example: 19 → 1² + 9² = 82 → 68 → 100 → **1** → happy. 2 → … → 4 → 16 → … → 4 (chakkar) → not happy.
+    intuition: |
+      "Kabhi 1 nahi aayega" kaise pata chale? Agar koi number **dobara** aa gaya, to wahi sequence repeat hogi — infinite loop.
+
+      To har number ko set mein daalo. `add()` false de = pehle dekha = chakkar → false.
+
+      > [!tip]
+      > Cycle detection ka ek aur tareeka: **fast & slow pointer** (Floyd) — O(1) space. Linked list chapter mein yahi trick aayegi.
+    dryRun: |
+      n = 19
+
+      | x | Naya? | Agla |
+      |---|---|---|
+      | 19 | haan | 1 + 81 = 82 |
+      | 82 | haan | 64 + 4 = 68 |
+      | 68 | haan | 36 + 64 = 100 |
+      | 100 | haan | 1 + 0 + 0 = **1** → happy |
+    viz: { tracer: happyTrace }
+    code: ex1-happy
+    complexity:
+      time: "O(log n) per step, kuch steps"
+      space: "O(steps)"
+      why: "Digits gin-na O(log n); numbers jaldi chhote ho jaate hain, isliye steps kam; set mein utne hi numbers."
+
+  - id: intersection
+    level: medium
+    title: Do arrays ka intersection (unique)
+    source: { name: Intersection of Two Arrays, platform: LeetCode, url: "https://leetcode.com/problems/intersection-of-two-arrays/" }
+    problem: |
+      Do arrays diye hain. Wo numbers return karo jo **dono** mein hain — har number sirf ek baar.
+
+      Example: `[4, 9, 5]` aur `[9, 4, 9, 8, 4]` → `[4, 9]`
+    intuition: |
+      **Brute force:** b ke har item ko a mein dhoondho → O(n × m).
+
+      **Set se:** a ko set bana do (O(n)). Phir b ke har item par `in setA` (O(1)). Result bhi set mein daalo — duplicates apne aap ruk jaayenge.
+
+      > [!tip]
+      > Agar dono arrays **sorted** hon to set ki zaroorat nahi — do pointers se O(n + m) aur O(1) space.
+    dryRun: |
+      setA = {4, 9, 5}
+
+      | b ka x | setA mein? | res |
+      |---|---|---|
+      | 9 | haan | {9} |
+      | 4 | haan | {9, 4} |
+      | 9 | haan (par res mein pehle se) | {9, 4} |
+      | 8 | nahi | {9, 4} |
+      | 4 | haan (pehle se) | {9, 4} |
+
+      Sorted → **[4, 9]**
+    viz: { tracer: interTrace }
+    code: ex2-intersection
+    complexity:
+      time: O(n + m)
+      space: O(n)
+      why: "a ka set banane mein n, b par ek pass mein m; set ki memory."
+
+  - id: consecutive
+    level: tricky
+    title: Longest consecutive sequence — O(n) bina sort
+    source: { name: Longest Consecutive Sequence, platform: LeetCode, url: "https://leetcode.com/problems/longest-consecutive-sequence/" }
+    problem: |
+      Ek unsorted array diya hai. Sabse lambi aisi sequence ki length batao jisme numbers **lagatar** hon (jaise 1, 2, 3, 4) — array mein kisi bhi jagah ho sakte hain. **O(n)** time chahiye.
+
+      Example: `[100, 4, 200, 1, 3, 2]` → **4** (1, 2, 3, 4)
+    intuition: |
+      Sort karke gin sakte ho — O(n log n). O(n) ke liye **set**:
+
+      Har number x par seedha aage ginna shuru kiya (x+1, x+2…) to same sequence baar-baar gini jaayegi → O(n²).
+
+      **Trick:** sirf **sequence ki shuruaat** se gino — yaani jab `x − 1` set mein **nahi** hai. Baaki (beech wale) skip.
+
+      Ab har number zyada se zyada ek baar "aage ginti" mein aata hai → total **O(n)**.
+
+      > [!galti]
+      > Duplicates (jaise do baar 0) se length na badhe — isliye set par loop karo, original array par nahi.
+    dryRun: |
+      set = {100, 4, 200, 1, 3, 2}
+
+      | x | x − 1 set mein? | Kya kiya | len |
+      |---|---|---|---|
+      | 100 | 99 nahi | shuruaat → 101 nahi | 1 |
+      | 4 | 3 hai | skip | – |
+      | 200 | 199 nahi | shuruaat | 1 |
+      | 1 | 0 nahi | shuruaat → 2, 3, 4 hain | **4** |
+      | 3 | 2 hai | skip | – |
+      | 2 | 1 hai | skip | – |
+    viz: { tracer: consecTrace }
+    code: ex3-consecutive
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har number ek baar set mein, aur ek hi baar kisi sequence ki ginti mein; set ki memory."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Sirf \"hai ya nahi?\" chahiye — value nahi (warna HashMap)."
+    - "Duplicates hatane hain / unique count."
+    - "Visited / seen tracking — cycles, graphs, states."
+    - "Do collections ka common / union / difference."
+  avoid:
+    - "Count chahiye (kitni baar) — HashMap."
+    - "Order chahiye — LinkedHashSet (insertion) ya TreeSet (sorted)."
+    - "Values chhoti range mein (0..n) — BooleanArray tez aur halka."
+  signals:
+    - keyword: "contains duplicate / unique / distinct"
+      think: "HashSet, `if (!set.add(x))`."
+    - keyword: "detect cycle in a sequence of states"
+      think: "Set of seen states (ya fast-slow pointer)."
+    - keyword: "consecutive sequence, O(n)"
+      think: "Set + sirf shuruaat se ginti."
+    - keyword: "nearest greater / smaller value seen so far"
+      think: "TreeSet ceiling/floor (O(log n))."
+
+# 9. Real-world
+realWorld:
+  - where: "Notification de-duplication"
+    how: "Same message ID dobara aaye to notification mat dikhao — seen IDs ka set."
+  - where: "Recently viewed / search history"
+    how: "LinkedHashSet — duplicate hatao par order rakho; naya search upar."
+  - where: "Contacts sync"
+    how: "Phone numbers ka set — duplicate contacts pehchanne aur common contacts (intersection) nikaalne ke liye."
+  - where: "Web crawler"
+    how: "Visited URLs ka set — ek page dobara crawl nahi hota."
+  - where: "Permissions / feature flags"
+    how: "User ke enabled features ka set — `\"dark_mode\" in features` O(1)."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "List mein `contains` loop ke andar"
+    type: logic
+    wrong: |
+      ```kotlin
+      for (x in b) if (a.contains(x)) ...   // a ek List -> O(n × m)
+      ```
+    right: |
+      `val setA = a.toHashSet()` pehle, phir `x in setA` — O(n + m).
+  - title: "Java `retainAll` / `removeAll` se original kharab"
+    type: logic
+    wrong: |
+      `a.retainAll(b)` ke baad `a` ab intersection hai — original a gaya.
+    right: |
+      `Set<Integer> common = new HashSet<>(a); common.retainAll(b);`
+  - title: "Set ke order par bharosa"
+    type: logic
+    wrong: |
+      HashSet print kiya aur expect kiya ki daale gaye order mein aaye.
+    right: |
+      LinkedHashSet (insertion order) ya `sorted()` / TreeSet.
+  - title: "Mutable objects set mein"
+    type: logic
+    wrong: |
+      List ko set mein daala, phir list badli — ab `contains` false (hash badal gaya).
+    right: |
+      Set mein immutable items rakho (Int, String, data class with `val`).
+  - title: "Khaali input"
+    type: empty
+    right: |
+      Khaali array ka longest consecutive = 0, intersection = []. Loop se pehle edge case socho — code aksar apne aap sahi hota hai, par confirm karo.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "HashSet andar se kaise kaam karta hai?"
+      a: |
+        Andar ek HashMap — elements keys, value ek dummy constant. `add` = `map.put(x, DUMMY) == null`. Isliye operations average O(1).
+    - q: "HashSet, LinkedHashSet aur TreeSet mein fark?"
+      a: |
+        HashSet: koi order nahi, O(1). LinkedHashSet: insertion order, O(1), thodi zyada memory. TreeSet: sorted, O(log n), floor/ceiling/first/last.
+    - q: "Set mein duplicate kaise detect karte hain?"
+      a: |
+        `add()` ka return: false matlab element pehle se tha. Ek hi call mein check + insert.
+    - q: "Longest consecutive sequence O(n) kaise?"
+      followUp: true
+      a: |
+        Saare numbers set mein; sirf un x se ginti shuru karo jinke liye x − 1 set mein nahi. Har number ek hi baar gina jaata hai.
+    - q: "Do sorted arrays ka intersection — set ke bina?"
+      followUp: true
+      a: |
+        Do pointers: chhota wala aage badhao, barabar mile to result mein daalo. O(n + m), O(1) extra.
+    - q: "Bahut bade data (memory mein na aaye) mein \"pehle dekha?\" kaise?"
+      a: |
+        Bloom filter — chhoti memory mein probabilistic set (false positive ho sakta hai, false negative nahi). Ya disk-based / external sort.
+    - q: "Set of custom objects kab kaam nahi karega?"
+      a: |
+        Jab class mein equals/hashCode override na ho — har naya object alag maana jaayega. data class / record use karo.
+    - q: "BooleanArray vs HashSet — kab kya?"
+      a: |
+        Values 0..n (chhoti, dense) → BooleanArray: tez, kam memory, koi hashing nahi. Values bade/sparse range mein (jaise 10⁹ tak) → HashSet.
+  mayAsk:
+    - "Contains Duplicate III (doori aur value dono ki limit) — TreeSet."
+    - "Valid Sudoku (rows, cols, boxes ke sets)."
+    - "Jewels and Stones."
+    - "First missing positive (O(1) space mein)."
+
+# 12. Practice
+practice:
+  - name: Contains Duplicate
+    platform: LeetCode
+    num: 217
+    url: "https://leetcode.com/problems/contains-duplicate/"
+    level: easy
+    pattern: add() false = duplicate
+    hint: "Ek loop, `if (!set.add(x)) return true`."
+  - name: Jewels and Stones
+    platform: LeetCode
+    num: 771
+    url: "https://leetcode.com/problems/jewels-and-stones/"
+    level: easy
+    pattern: Set membership
+    hint: "Jewels ka set banao, stones mein har char ka check."
+  - name: Happy Number
+    platform: LeetCode
+    num: 202
+    url: "https://leetcode.com/problems/happy-number/"
+    level: easy
+    pattern: Seen-states set (cycle)
+    hint: "Example 1. Bonus: fast-slow pointer se O(1) space."
+  - name: Valid Sudoku
+    platform: LeetCode
+    num: 36
+    url: "https://leetcode.com/problems/valid-sudoku/"
+    level: medium
+    pattern: Sets per row / column / box
+    hint: "Har cell par `\"r$r-$d\"`, `\"c$c-$d\"`, `\"b${r/3}${c/3}-$d\"` ek hi set mein — koi add false de to invalid."
+  - name: Longest Consecutive Sequence
+    platform: LeetCode
+    num: 128
+    url: "https://leetcode.com/problems/longest-consecutive-sequence/"
+    level: medium
+    pattern: Set + sequence start
+    hint: "Example 3 — sirf shuruaat (x − 1 nahi) se gino."
+  - name: Find the Duplicate Number
+    platform: LeetCode
+    num: 287
+    url: "https://leetcode.com/problems/find-the-duplicate-number/"
+    level: medium
+    pattern: Set (O(n) space) → follow-up O(1) space
+    hint: "Set se seedha: pehla jiska add() false. Question O(1) extra space maangta hai — values ko 'next pointer' maan ke fast-slow cycle detection (linked list chapter)."
+  - name: Contains Duplicate III
+    platform: LeetCode
+    num: 220
+    url: "https://leetcode.com/problems/contains-duplicate-iii/"
+    level: hard
+    pattern: TreeSet window (ceiling)
+    hint: "Size k ki window ka TreeSet; har x par `ceiling(x − valueDiff)` ≤ x + valueDiff? Window se purana hatao."
+  - name: First Missing Positive
+    platform: LeetCode
+    num: 41
+    url: "https://leetcode.com/problems/first-missing-positive/"
+    level: hard
+    pattern: Set → O(1) space index marking
+    hint: "Set se aasaan (1 se ginti jab tak set mein ho). O(1) space ke liye array ko hi set bana do — value v ko index v−1 par bhejo."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "HashSet = unique items; add/contains/remove average O(1)."
+    - "add() false = pehle se tha — duplicate check ek line mein."
+    - "Andar se HashMap (items = keys)."
+    - "LinkedHashSet = insertion order; TreeSet = sorted + floor/ceiling (O(log n))."
+    - "Patterns: dedupe, seen/visited, cycle, intersection, consecutive-start trick."
+  cheatsheet: |
+    | Kaam | Kotlin | Java |
+    |---|---|---|
+    | Banana | `hashSetOf()`, `list.toHashSet()` | `new HashSet<>(list)` |
+    | Duplicate? | `if (!s.add(x))` | `if (!s.add(x))` |
+    | Common | `a intersect b` | `copy.retainAll(b)` |
+    | Sab | `a union b` | `copy.addAll(b)` |
+    | Sirf a | `a - b` | `copy.removeAll(b)` |
+    | Sorted / nearest | `TreeSet`, `ceiling`, `floor` | same |
+  quiz:
+    - q: "`set.add(7)` jab 7 pehle se ho — return?"
+      options: ["true", "false", "Exception", "7"]
+      answer: 1
+      explain: "Kuch nahi badla — false."
+    - q: "List mein duplicates hatane ka sabse aasaan tareeka (order zaroori nahi)?"
+      options: ["Sort", "list.toSet()", "Nested loop", "Reverse"]
+      answer: 1
+      explain: "Set mein convert — O(n)."
+    - q: "Keys sorted chahiye aur \"x se just bada\" bhi?"
+      options: ["HashSet", "LinkedHashSet", "TreeSet", "ArrayList"]
+      answer: 2
+      explain: "TreeSet ceiling/higher."
+    - q: "Longest consecutive mein ginti kab shuru karte hain?"
+      options: ["Har number se", "Jab x + 1 set mein na ho", "Jab x − 1 set mein na ho", "Sirf sabse chhote se"]
+      answer: 2
+      explain: "x − 1 nahi = x sequence ki shuruaat."
+    - q: "Values 0..10⁵ hain aur sirf visited chahiye. Sabse halka?"
+      options: ["HashSet<Int>", "BooleanArray", "TreeSet", "HashMap<Int, Boolean>"]
+      answer: 1
+      explain: "Dense chhoti range — array index hi set hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: hashmap
+      why: "Set = map ki sirf keys; count chahiye to map."
+    - id: hashing-internals
+      why: "Andar wahi buckets aur hashCode/equals."
+  usedLater:
+    - id: bfs
+      how: "Visited set — har node ek baar."
+    - id: fast-slow-pointers
+      how: "Cycle detection O(1) space mein — set ka alternative."
+    - id: sliding-window-variable
+      how: "Window ke andar unique characters ka set."
+    - id: backtracking-basics
+      how: "Used items ka set taaki duplicate choice na ho."

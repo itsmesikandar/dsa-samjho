@@ -1,0 +1,430 @@
+meta:
+  id: frequency-count
+  chapter: hashing
+  title: Frequency Counting
+  subtitle: 'Kaun kitni baar aaya? — anagrams, top-k, majority sab isi se'
+  level: beginner
+  minutes: 30
+  prereqs: [hashmap, strings]
+  tags: [frequency, counting, anagram, bucket-sort, top-k]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Frequency counting** = har cheez ki **ginti** rakhna: kaunsa number / letter / word kitni baar aaya.
+
+    Do tareeke:
+    | Kab | Kya use karo | Kyun |
+    |---|---|---|
+    | Sirf `'a'..'z'` (ya chhoti fixed range) | `IntArray(26)`, index = `c − 'a'` | Sabse tez, koi hashing nahi |
+    | Kuch bhi (numbers, words, objects) | `HashMap<T, Int>` | Koi bhi key |
+
+    ```kotlin
+    val count = IntArray(26)
+    for (c in "banana") count[c - 'a']++   // a=3, b=1, n=2
+    ```
+
+    Ek baar ginti ho gayi, phir bahut saare sawaal turant: sabse zyada kaun? sirf ek baar kaun? do strings mein letters same?
+
+    > [!yaad]
+    > Counting **ek pass** (O(n)) hai. Uske baad jo bhi sawaal ho, aksar counts se O(1) ya O(26) mein jawab.
+  analogy: |
+    **Election ki vote counting** socho. Har ballot padho aur candidate ke naam ke aage ek tally mark lagao. Saare ballot ek baar padhne ke baad — kaun jeeta, kisko kitne mile, sab ek nazar mein.
+
+    Ya **kirane ki dukaan ka stock register** — har item kitna bacha, ek line mein.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Bahut saare string aur array problems asal mein **ginti** ke sawaal hain:
+    - Anagram? → dono ki letter counts same?
+    - First unique character? → count == 1 wala pehla.
+    - Majority element? → count > n/2.
+    - Top K frequent? → counts ko frequency se order karo.
+    - Ransom note bana sakte ho? → magazine mein har letter kaafi hai?
+
+    Bina counting ke ye aksar O(n²) ho jaate hain (har item ke liye poora array ginna). Counting se **O(n)**.
+
+    > [!socho]
+    > Do strings anagram hain ya nahi — sort karke compare karna O(n log n). Counting se?
+    >
+    > `IntArray(26)`: pehli string +1, doosri −1. Sab 0 → anagram. **O(n)** aur O(1) extra space.
+
+# 3. Visual intro
+visual:
+  body: |
+    Election ki ginti ka animation — har vote par us candidate ka count badhta hai. Aakhir mein jeetne wala ek nazar mein.
+
+    "Apna input try karo" mein apne votes daalo (A–E).
+  viz: { tracer: electionTally }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Lowercase letters ke liye **`IntArray(26)`** sabse best:
+    - `'a'` ka code 97, `'b'` ka 98… to `c − 'a'` = 0..25 — seedha array index.
+    - Har character par `count[c − 'a']++`.
+
+    Ek hi pass, koi hashing nahi, koi boxing nahi.
+
+    > [!galti]
+    > Input mein uppercase, digits ya space bhi ho sakte hain? Tab `c − 'a'` negative ya 25 se bada → crash. Pehle constraints padho; zaroorat ho to `IntArray(128)` (saare ASCII) ya HashMap.
+  viz: { tracer: letterCountTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "IntArray(26) se ginti"
+    time: O(n)
+    space: O(1)
+    why: "Har char ek baar; 26 dabbe fixed."
+  - op: "HashMap se ginti"
+    time: "O(n) average"
+    space: O(k)
+    why: "k = alag items; har update O(1) average."
+  - op: "Do strings ke counts compare (26 letters)"
+    time: O(26) = O(1)
+    space: O(1)
+    why: "Sirf 26 numbers milane hain."
+  - op: "Max frequency item"
+    time: O(k)
+    space: O(1)
+    why: "Counts par ek pass."
+  - op: "Top K by frequency (bucket sort)"
+    time: O(n)
+    space: O(n)
+    why: "Frequency 1..n tak hi — usi ko index bana do."
+  - op: "Top K by frequency (heap)"
+    time: O(n log k)
+    space: O(n)
+    why: "Har item heap mein O(log k)."
+
+# 6. Code
+code:
+  - title: Ginti ke teen tareeke — IntArray, HashMap, one-liner
+    file: styles
+    note: |
+      Kotlin ka `groupingBy { it }.eachCount()` aur Java ka `Collectors.groupingBy(..., counting())` andar se HashMap hi hai — interview mein manual loop bhi likh paao, ye zaroori hai.
+
+# 7. Examples
+examples:
+  - id: anagram
+    level: easy
+    title: Valid anagram
+    source: { name: Valid Anagram, platform: LeetCode, url: "https://leetcode.com/problems/valid-anagram/" }
+    problem: |
+      Do strings s aur t (lowercase) diye hain. Kya t, s ka **anagram** hai — yaani same letters, same ginti, bas order alag?
+
+      Examples: `"listen"`, `"silent"` → true. `"rat"`, `"car"` → false.
+    intuition: |
+      Anagram ka matlab hi hai: **har letter ki ginti dono mein barabar**.
+
+      Ek hi `IntArray(26)`: s ke har letter par +1, t ke har letter par −1. Agar sab barabar hai to aakhir mein **saare 0**.
+
+      Length alag ho to seedha false — shortcut.
+
+      > [!tip]
+      > Unicode/emoji strings ho to `IntArray(26)` nahi chalega — HashMap<Char, Int> lo. Interview mein ye follow-up aksar aata hai.
+    dryRun: |
+      `"rat"` vs `"car"`
+
+      | Step | +1 (s) | −1 (t) | Non-zero counts |
+      |---|---|---|---|
+      | i = 0 | r | c | r: 1, c: −1 |
+      | i = 1 | a | a | r: 1, c: −1 |
+      | i = 2 | t | r | t: 1, c: −1 |
+      | End | | | t = 1 ≠ 0 → **false** |
+    viz: { tracer: anagramTrace }
+    code: ex1-anagram
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass + 26 counts check; array fixed size."
+
+  - id: group-anagrams
+    level: medium
+    title: Group anagrams
+    source: { name: Group Anagrams, platform: LeetCode, url: "https://leetcode.com/problems/group-anagrams/" }
+    problem: |
+      Words ki list hai. Jo words ek doosre ke anagram hain unhe ek group mein rakho.
+
+      Example: `[eat, tea, tan, ate, nat, bat]` → `[[ate, eat, tea], [bat], [nat, tan]]`
+    intuition: |
+      Grouping = HashMap<key, list>. Sawaal hai **key kya ho** jo saare anagrams ke liye same aaye?
+
+      **Option 1:** letters sort karo — `"eat"`, `"tea"`, `"ate"` → sab `"aet"`.
+      **Option 2:** 26 counts ko string bana do (`"1#0#0#…"`) — sort se bhi tez (O(k) per word).
+
+      Phir `getOrPut(key) { mutableListOf() }.add(word)`.
+
+      > [!galti]
+      > `CharArray` / `IntArray` ko seedha key mat banao — arrays ka hashCode content se nahi banta! String ya List mein badlo.
+    dryRun: |
+      | Word | Key (sorted) | Group |
+      |---|---|---|
+      | eat | aet | [eat] |
+      | tea | aet | [eat, tea] |
+      | tan | ant | [tan] |
+      | ate | aet | [eat, tea, ate] |
+      | nat | ant | [tan, nat] |
+      | bat | abt | [bat] |
+    viz: { tracer: groupAnaTrace }
+    code: ex2-group-anagrams
+    complexity:
+      time: "O(n · k log k)"
+      space: "O(n · k)"
+      why: "n words, har word sort O(k log k); saare words map mein."
+
+  - id: top-k
+    level: tricky
+    title: Top K frequent elements — bucket sort se O(n)
+    source: { name: Top K Frequent Elements, platform: LeetCode, url: "https://leetcode.com/problems/top-k-frequent-elements/" }
+    problem: |
+      Ek array aur k diya hai. Sabse zyada baar aane wale **k** numbers return karo. O(n log n) se behtar chahiye.
+
+      Example: `[1, 1, 1, 2, 2, 3]`, k = 2 → `[1, 2]`
+    intuition: |
+      Pehle counts nikaalo (HashMap). Ab counts ke hisaab se "top k" chahiye.
+
+      - Sort by count → O(n log n).
+      - Min-heap of size k → O(n log k).
+      - **Bucket sort → O(n):** koi bhi frequency **1 se n** ke beech hi ho sakti hai. To array banao `bucket[f]` = wo numbers jo exactly f baar aaye. Phir f = n se neeche aate hue k numbers utha lo.
+
+      > [!yaad]
+      > Jab values ki **range chhoti aur pata** ho (yahan 1..n), to sort ki jagah unhe hi index bana do — yahi counting/bucket sort ka idea hai.
+    dryRun: |
+      `[1, 1, 1, 2, 2, 3]`, k = 2
+
+      | Step | Result |
+      |---|---|
+      | Counts | {1: 3, 2: 2, 3: 1} |
+      | Buckets | bucket[3] = [1], bucket[2] = [2], bucket[1] = [3] |
+      | f = 6, 5, 4 | khaali |
+      | f = 3 | [1] |
+      | f = 2 | [1, 2] → k poora |
+    viz: { tracer: topKTrace }
+    code: ex3-top-k
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Ginti O(n), buckets O(n), ek pass upar se neeche."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Sawaal mein \"kitni baar\", \"same characters\", \"most / least frequent\" ho."
+    - "Do collections ka content compare karna ho (order chhod ke)."
+    - "Har item ke liye check ki kaafi supply hai (ransom note)."
+  avoid:
+    - "Order bhi matter karta ho (\"same sequence\") — counting order bhool jaati hai."
+    - "Range bahut badi aur sparse ho (values 10⁹ tak) — IntArray nahi, HashMap."
+    - "Sirf yes/no chahiye ki hai ya nahi — set kaafi hai."
+  signals:
+    - keyword: "anagram / permutation of string"
+      think: "IntArray(26) counts compare."
+    - keyword: "only lowercase letters"
+      think: "IntArray(26), c − 'a'."
+    - keyword: "k most frequent"
+      think: "Count map + bucket sort (O(n)) ya min-heap (O(n log k))."
+    - keyword: "majority element (> n/2)"
+      think: "Count map, ya Boyer–Moore voting (O(1) space)."
+
+# 9. Real-world
+realWorld:
+  - where: "Trending hashtags / search terms"
+    how: "Har term ki ginti, phir top-k — Twitter/Instagram trends isi idea par (bade scale par approximate counting)."
+  - where: "Analytics dashboards"
+    how: "Screen views, button clicks — event naam → count; sabse zyada use hone wale features."
+  - where: "Keyboard suggestions"
+    how: "Kaunse words zyada type hote hain uski ginti — suggestions ka order."
+  - where: "Compression (Huffman coding)"
+    how: "Har character ki frequency se chhote codes — zyada aane wale char ko chhota code."
+  - where: "Spam / fraud detection"
+    how: "Kisi IP ya user se aane wali requests ki ginti — limit cross to block (rate limiting)."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "`c − 'a'` uppercase/space par"
+    type: logic
+    wrong: |
+      Input mein 'A' ya ' ' aaya → index −32 ya −65 → ArrayIndexOutOfBoundsException.
+    right: |
+      Constraints check karo; zaroorat ho to `lowercase()` pehle, ya `IntArray(128)`, ya HashMap.
+  - title: "Array ko HashMap key banana"
+    type: logic
+    wrong: |
+      ```kotlin
+      val key = w.toCharArray().apply { sort() }
+      groups[key] = ...   // CharArray ka hashCode content se nahi -> har baar alag key
+      ```
+    right: |
+      `String(chars)` ya `chars.joinToString("")` ko key banao.
+  - title: "Length check bhoolna (anagram)"
+    type: logic
+    wrong: |
+      "ab" aur "abb": +1/−1 loop sirf chhoti length tak chala → galat true.
+    right: |
+      Pehle `if (s.length != t.length) return false`.
+  - title: "Kotlin nullable count"
+    type: "null"
+    wrong: |
+      `map[x] = map[x]!! + 1` — pehli baar crash.
+    right: |
+      `map[x] = map.getOrDefault(x, 0) + 1` (Java: `merge(x, 1, Integer::sum)`).
+  - title: "Top-k mein ties ka order"
+    type: other
+    right: |
+      Do numbers ki frequency barabar ho to kaunsa pehle? Question/interviewer se poocho. Test deterministic chahiye to bucket ke andar sort karo.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Anagram check ka best tareeka?"
+      a: |
+        Length same check, phir IntArray(26) — s se +1, t se −1, sab 0? O(n) time, O(1) space. Unicode ho to HashMap.
+    - q: "IntArray(26) aur HashMap — kab kya?"
+      a: |
+        Keys chhoti fixed range (letters, digits) → array: tez, kam memory. Keys arbitrary (words, bade numbers) → HashMap.
+    - q: "Top K frequent ki complexity options?"
+      a: |
+        Sort O(n log n); min-heap size k O(n log k); bucket sort O(n) (frequency 1..n). Quickselect bhi average O(n).
+    - q: "Group anagrams mein key kya rakhoge?"
+      followUp: true
+      a: |
+        Sorted string (O(k log k)) ya 26-count signature string (O(k)). Array ko seedha key nahi — uska hash content se nahi banta.
+    - q: "Majority element (> n/2) O(1) space mein?"
+      followUp: true
+      a: |
+        Boyer–Moore voting: candidate aur count. Same mile to +1, alag to −1; count 0 ho to naya candidate. Majority hamesha bachta hai.
+    - q: "First unique character kaise dhoondhoge?"
+      a: |
+        Pehle pass mein counts, doosre pass mein string ke order mein pehla jiska count 1. O(n).
+    - q: "Ransom note — magazine se bana sakte ho?"
+      a: |
+        Magazine ke letters gino; note ke har letter par count−−; kabhi negative → false.
+    - q: "Bahut bade stream mein top-k (memory kam)?"
+      a: |
+        Exact ke liye heap of size k + counts map (map bada ho sakta hai). Approximate: Count-Min Sketch / Misra–Gries — kam memory mein heavy hitters.
+    - q: "Sort characters by frequency kaise?"
+      a: |
+        Counts → bucket by frequency (ya sort entries) → har char ko count baar StringBuilder mein. O(n) bucket se.
+  mayAsk:
+    - "Find all anagrams of p in s (sliding window + counts)."
+    - "Minimum steps to make two strings anagram."
+    - "Can you form a palindrome from these letters? (at most one odd count)"
+    - "Majority element II (> n/3)."
+
+# 12. Practice
+practice:
+  - name: First Unique Character in a String
+    platform: LeetCode
+    num: 387
+    url: "https://leetcode.com/problems/first-unique-character-in-a-string/"
+    level: easy
+    pattern: Count array, do pass
+    hint: "Pehle counts, phir string ke order mein pehla count == 1."
+  - name: Ransom Note
+    platform: LeetCode
+    num: 383
+    url: "https://leetcode.com/problems/ransom-note/"
+    level: easy
+    pattern: Supply vs demand counts
+    hint: "Magazine ke counts, note ke har char par −1; negative hua to false."
+  - name: Majority Element
+    platform: LeetCode
+    num: 169
+    url: "https://leetcode.com/problems/majority-element/"
+    level: easy
+    pattern: Count map → Boyer–Moore
+    hint: "Pehle HashMap se. Phir O(1) space: candidate + count voting."
+  - name: Sort Characters By Frequency
+    platform: LeetCode
+    num: 451
+    url: "https://leetcode.com/problems/sort-characters-by-frequency/"
+    level: medium
+    pattern: Counts + bucket by frequency
+    hint: "bucket[f] = chars jinki frequency f; upar se neeche har char ko f baar likho."
+  - name: Group Anagrams
+    platform: LeetCode
+    num: 49
+    url: "https://leetcode.com/problems/group-anagrams/"
+    level: medium
+    pattern: Map with sorted/count key
+    hint: "Example 2. Bonus: 26-count signature key se O(n · k)."
+  - name: Top K Frequent Elements
+    platform: LeetCode
+    num: 347
+    url: "https://leetcode.com/problems/top-k-frequent-elements/"
+    level: medium
+    pattern: Bucket sort by frequency
+    hint: "Example 3. Heap wala tareeka bhi likh ke compare karo."
+  - name: Minimum Window Substring
+    platform: LeetCode
+    num: 76
+    url: "https://leetcode.com/problems/minimum-window-substring/"
+    level: hard
+    pattern: Counts + variable window
+    hint: "t ke counts chahiye; window badhao jab tak saare na mil jaayein ('missing' counter), phir left se chhota karo."
+  - name: Substring with Concatenation of All Words
+    platform: LeetCode
+    num: 30
+    url: "https://leetcode.com/problems/substring-with-concatenation-of-all-words/"
+    level: hard
+    pattern: Word counts + window (word length steps)
+    hint: "Words ki count map. Har offset (0..wordLen−1) se window chalao, ek-ek word ke step mein; counts match = answer."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Frequency counting = har item ki ginti, ek pass O(n)."
+    - "Lowercase letters → IntArray(26), index c − 'a'; baaki → HashMap."
+    - "Anagram: +1 / −1, aakhir mein sab 0."
+    - "Grouping key: sorted string ya count signature (array seedha key nahi)."
+    - "Top K: bucket[frequency] → O(n)."
+  cheatsheet: |
+    ```kotlin
+    val cnt = IntArray(26); for (c in s) cnt[c - 'a']++
+    val m = HashMap<Int, Int>(); for (x in a) m[x] = m.getOrDefault(x, 0) + 1
+    // anagram
+    for (i in s.indices) { cnt[s[i]-'a']++; cnt[t[i]-'a']-- }; cnt.all { it == 0 }
+    // top k
+    val bucket = Array(n + 1) { mutableListOf<Int>() }; for ((x, f) in m) bucket[f].add(x)
+    ```
+  quiz:
+    - q: "\"aabbc\" ke liye IntArray(26) mein count['b' − 'a']?"
+      options: ["1", "2", "3", "0"]
+      answer: 1
+      explain: "b do baar aaya."
+    - q: "Do strings anagram hain — counting approach ki space complexity (lowercase)?"
+      options: ["O(n)", "O(1)", "O(n log n)", "O(26n)"]
+      answer: 1
+      explain: "26 fixed dabbe."
+    - q: "Group anagrams mein key ke liye kya galat hai?"
+      options: ["Sorted string", "Count signature string", "Seedha CharArray", "List<Char>"]
+      answer: 2
+      explain: "Array ka hashCode content se nahi banta."
+    - q: "Top K frequent bucket sort mein bucket array ki size?"
+      options: ["k", "26", "n + 1", "max value"]
+      answer: 2
+      explain: "Frequency 0..n."
+    - q: "Input mein uppercase bhi hai. `c − 'a'` index safe hai?"
+      options: ["Haan", "Nahi — negative ho sakta hai", "Sirf Java mein", "Sirf Kotlin mein"]
+      answer: 1
+      explain: "'A' − 'a' = −32."
+
+# 14. Connections
+connections:
+  related:
+    - id: hashmap
+      why: "Counting map ka sabse common use hai."
+    - id: strings
+      why: "Char math (c − 'a') yahin se."
+  usedLater:
+    - id: sliding-window-fixed
+      how: "Find all anagrams — window ke counts."
+    - id: sorting-in-practice
+      how: "Counting sort = frequency counting ka sorting version."
+    - id: top-k
+      how: "Heap se top-k — doosra tareeka."
+    - id: greedy-classics
+      how: "Partition labels jaise problems mein last-occurrence counting."

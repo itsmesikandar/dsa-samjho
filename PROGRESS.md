@@ -4,8 +4,9 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0 and 1 done (12 topics).
-- Next action: chapter 2 Hashing → `hashing-internals`.
+- Step: 3 (Content). Chapters 0, 1, 2 done (16 topics).
+- Next action: chapter 3 → `two-pointers-opposite` (code/*.kt+java written; need check:code, viz.ts, topic.yaml).
+  Plan: how = sorted squares; ex1 reverse vowels; ex2 container with most water; ex3 3Sum; visual = pair-elimination grid.
 - Note: low RAM on this machine (~1 GB free) makes `npm run build` slow (24 min once); run it once per chapter.
 - Engine: frame `legend` overrides tone labels (see CLAUDE.md).
 - Last session note (2026-10-05): chapter 0 committed. Content caches are production-only (dev picks up new
@@ -51,10 +52,10 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] kadane
 
 ### 2. Hashing
-- [ ] hashing-internals
-- [ ] hashmap
-- [ ] hashset
-- [ ] frequency-count
+- [x] hashing-internals
+- [x] hashmap
+- [x] hashset
+- [x] frequency-count
 
 ### 3. Two Pointers & Sliding Window
 - [ ] two-pointers-opposite

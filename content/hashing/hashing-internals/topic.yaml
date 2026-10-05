@@ -1,0 +1,433 @@
+meta:
+  id: hashing-internals
+  chapter: hashing
+  title: Hashing andar se kaise kaam karta hai
+  subtitle: Hash function, buckets, collisions, load factor aur rehash — HashMap ka asli raaz
+  level: intermediate
+  minutes: 35
+  prereqs: [array, dynamic-array, memory-basics]
+  tags: [hashing, hash-function, collision, chaining, load-factor]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Hashing** = kisi key (number, word, object) ko ek **formula** se seedha array ke **index** mein badalna, taaki use dhoondhna na pade.
+
+    HashMap / HashSet andar se aise bane hain:
+    1. Ek **array of buckets** (dabbe), size m.
+    2. **Hash function**: key → ek bada number (`hashCode()`).
+    3. **Index** = hash ko m ke andar laao (simple version: `hash % m`).
+    4. Key us bucket mein rakh do. Dhoondhna ho to wahi formula → wahi bucket → seedha mil gaya.
+
+    Do alag keys ka same bucket aa jaana = **collision**. Iske do ilaaj:
+    - **Chaining** — har bucket mein ek chhoti list (Java HashMap yahi karta hai).
+    - **Open addressing** — agla khaali dabba dhoondho (linear probing).
+
+    > [!yaad]
+    > HashMap ka O(1) "jaadu" = **array ka O(1) index access** + ek **hash calculation**. Bas itna hi.
+  analogy: |
+    **College library mein roll number wale lockers** socho. Roll number 1234 → locker 1234 % 100 = **34**. Kisi ko bhi dhoondhna ho, saare lockers nahi dekhte — seedha 34 number.
+
+    Do students ka same locker aa gaya (1234 aur 5634 dono → 34)? Ek hi locker mein dono ka saamaan, alag thaili mein (chaining). Ya doosra student agla khaali locker le leta hai (probing).
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Array mein value se dhoondhna O(n) hai. Sorted array mein O(log n). Hashing se **average O(1)** — chahe 10 items hon ya 1 crore.
+
+    Isliye HashMap/HashSet DSA ka sabse zyada use hone wala tool hai:
+    - "Pehle dekha hai?" → HashSet
+    - "Kitni baar aaya?" → HashMap counts
+    - "Iska jodi kahan hai?" → HashMap lookup
+
+    Par andar ki samajh zaroori hai, warna ye bugs aate hain:
+    - Custom class ko key banaya aur `get` mein `null` aaya (`equals`/`hashCode` nahi likhe).
+    - Galat assumption ki HashMap ka order fixed hai.
+    - Interview question: "HashMap andar se kaise kaam karta hai?" — ye **sabse common** Java interview question hai.
+
+    > [!socho]
+    > Agar saari keys ek hi bucket mein chali jaayein to kya hoga?
+    >
+    > Wo bucket ek lambi list ban jaayegi → har get O(n)! Isliye achha hash function aur load factor control zaroori hai. (Java 8+ bahut lambi chain ko balanced tree bana deta hai → O(log n).)
+
+# 3. Visual intro
+visual:
+  body: |
+    Ek word key kaise bucket number banti hai — step by step dekho. Java ka `String.hashCode()` har character par `h = h × 31 + char` karta hai. Phir `% m` se bucket.
+
+    "Apna input try karo" mein apna naam daalo aur buckets ki ginti badal ke dekho.
+
+    > [!yaad]
+    > Asli Java HashMap `% m` ki jagah thoda alag (`(h ^ (h >>> 16)) & (m − 1)`, jahan m power of 2 hai) karta hai — bas tez aur behtar failaav ke liye. Idea same hai.
+  viz: { tracer: hashFunction }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Apna chhota HashMap banate hain — **chaining** ke saath:
+    - `put(key, value)`: bucket nikaalo → us bucket ki list mein key hai? To value update. Nahi? To list mein jodo.
+    - `get(key)`: bucket nikaalo → **sirf usi bucket** ki list dekho.
+
+    Default input mein 12, 7 aur 17 teeno `% 5 = 2` dete hain — teen keys ek bucket mein (collision). Chain mein sab safe hain, bas us bucket mein thoda scan karna padta hai.
+
+    > [!tip]
+    > Interview answer ka template: "Buckets ka array → hashCode se index → collision par linked list (Java 8+: 8 se zyada par red-black tree) → load factor 0.75 par capacity double aur rehash."
+  viz: { tracer: myMapTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Hash nikaalna (Int key)"
+    time: O(1)
+    space: O(1)
+    why: "Ek-do arithmetic operations."
+  - op: "Hash nikaalna (String length k)"
+    time: O(k)
+    space: O(1)
+    why: "Har character par ek step (Java String apna hash cache kar leti hai)."
+  - op: "put / get / remove — average"
+    time: O(1)
+    space: O(1)
+    why: "Bucket seedha milta hai, chain chhoti (load factor ki wajah se)."
+  - op: "put / get — worst case"
+    time: "O(n) (Java 8+: O(log n))"
+    space: O(1)
+    why: "Saari keys ek bucket mein — lambi chain (ya tree)."
+  - op: "Rehash (capacity double)"
+    time: O(n)
+    space: O(n)
+    why: "Har key dobara hash hoke nayi jagah — kabhi-kabhi, isliye put amortized O(1)."
+  - op: "Poore map par iterate"
+    time: "O(n + capacity)"
+    space: O(1)
+    why: "Khaali buckets bhi dekhne padte hain."
+
+# 6. Code
+code:
+  - title: equals() aur hashCode() — custom key ka sabse bada trap
+    file: equals-hashcode
+    note: |
+      **Rule:** agar do objects `equals()` mein barabar hain, to unka `hashCode()` bhi **same** hona chahiye. Warna wo alag buckets mein jaayenge aur map unhe kabhi nahi milayega.
+
+      Kotlin `data class` aur Java `record` dono apne aap sahi `equals` + `hashCode` banate hain. Normal class key banao to dono override karo.
+
+# 7. Examples
+examples:
+  - id: buckets
+    level: easy
+    title: Keys kaunse bucket mein giri? Collisions gino
+    problem: |
+      Kuch integer keys aur buckets ki ginti m di hai. Har key `key % m` wale bucket mein jaati hai. Har bucket mein kitni keys aayi, aur kitne collisions hue?
+
+      Example: keys `[12, 7, 19, 25, 30]`, m = 7 → counts `[1, 0, 1, 0, 1, 2, 0]`, collisions = 1.
+    intuition: |
+      Har key ka bucket = `key % m`. Ek count array lo aur us index ko ++ karo.
+
+      Collision = bucket mein pehli key ke **baad** aane wali har key → har bucket ka `max(0, count − 1)` jodo.
+
+      > [!tip]
+      > m prime number (7, 11, 31) rakhne se keys aksar achhe se failti hain. m = 10 lo aur saari keys 10 ke multiple hon to sab bucket 0 mein!
+    dryRun: |
+      m = 7
+
+      | key | key % 7 | bucket count |
+      |---|---|---|
+      | 12 | 5 | b5 = 1 |
+      | 7 | 0 | b0 = 1 |
+      | 19 | 5 | b5 = 2 ← collision |
+      | 25 | 4 | b4 = 1 |
+      | 30 | 2 | b2 = 1 |
+    viz: { tracer: bucketsTrace }
+    code: ex1-buckets
+    complexity:
+      time: O(n + m)
+      space: O(m)
+      why: "Har key ek baar; count array m ka."
+
+  - id: probing
+    level: medium
+    title: Open addressing — linear probing se keys rakhna
+    problem: |
+      Table size m hai, har dabbe mein ek hi key aa sakti hai. Key `k` ko `k % m` par rakho; wo bhara ho to **agle** dabbe (`i + 1`, end ke baad wapas 0) mein, jab tak khaali na mile.
+
+      Keys `[18, 41, 22, 44, 59, 32, 31, 73]`, m = 11 → final table?
+    intuition: |
+      Chaining mein har bucket ki list hoti hai. **Open addressing** mein list nahi — table ke andar hi agla khaali dabba dhoondhte hain.
+
+      - Pehli pasand: `k % m`.
+      - Bhara hai → `(i + 1) % m` → phir se check.
+
+      Aakhri key 73 dekho: `73 % 11 = 7`, par 7, 8, 9, 10, 0, 1 sab bhare hain — 7 probes ke baad dabba 2! Isko **clustering** kehte hain. Table jitna bhara, utna bura.
+
+      > [!galti]
+      > Table poora bhar gaya to `while` loop kabhi khatam nahi hoga — insert se pehle check karo ki jagah hai (ya rehash karo).
+    dryRun: |
+      m = 11
+
+      | key | k % 11 | Probes | Final dabba |
+      |---|---|---|---|
+      | 18 | 7 | – | 7 |
+      | 41 | 8 | – | 8 |
+      | 22 | 0 | – | 0 |
+      | 44 | 0 | 0 bhara → 1 | 1 |
+      | 59 | 4 | – | 4 |
+      | 32 | 10 | – | 10 |
+      | 31 | 9 | – | 9 |
+      | 73 | 7 | 7,8,9,10,0,1 bhare → 2 | **2** |
+    viz: { tracer: probingTrace }
+    code: ex2-probing
+    complexity:
+      time: "O(1) average, O(m) worst per insert"
+      space: O(m)
+      why: "Khaali table mein seedha jagah; bharne par lambe probes."
+
+  - id: rehash
+    level: tricky
+    title: Load factor aur rehash — HashMap kab aur kaise bada hota hai
+    problem: |
+      Chaining wala table capacity 4 se shuru. Har insert ke baad agar **size / capacity > 0.75** ho jaaye, to capacity **double** karo aur saari keys **dobara** daalo.
+
+      Keys `[5, 9, 13, 2, 6]` daalne ke baad capacity kya hogi aur buckets kaise dikhenge?
+    intuition: |
+      **Load factor** = size / capacity = har bucket mein average kitni keys. Ye badhega to chains lambi → lookup slow.
+
+      Isliye ek limit (Java: **0.75**) cross hote hi:
+      1. Capacity double.
+      2. **Har key ko dobara hash** karo — kyunki `key % capacity` mein capacity badal gayi, to bucket bhi badal sakta hai (5 → bucket 1 tha, ab 5).
+
+      Rehash O(n) hai par kabhi-kabhi hota hai (doubling) → put **amortized O(1)** — bilkul dynamic array jaisa.
+
+      > [!tip]
+      > Pehle se pata ho ki ~n keys aayengi to `HashMap(expectedSize / 0.75 + 1)` se banao — beech ke saare rehash bach jaayenge.
+    dryRun: |
+      | Step | Key | Bucket | size / cap | Kya hua |
+      |---|---|---|---|---|
+      | 1 | 5 | 5 % 4 = 1 | 1/4 | – |
+      | 2 | 9 | 1 | 2/4 | collision (chain) |
+      | 3 | 13 | 1 | 3/4 = 0.75 | abhi > 0.75 nahi |
+      | 4 | 2 | 2 | 4/4 = 1.0 | **> 0.75 → rehash, cap = 8** |
+      | – | 5, 9, 13, 2 | 5, 1, 5, 2 | 4/8 | nayi jagahen |
+      | 5 | 6 | 6 | 5/8 | – |
+    viz: { tracer: rehashTrace }
+    code: ex3-rehash
+    complexity:
+      time: "O(1) amortized per insert"
+      space: O(n)
+      why: "Rehash O(n) par capacity double hone se kabhi-kabhi; total kaam O(n)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Fast lookup by key chahiye — \"ye hai ya nahi?\", \"iski value kya hai?\" — average O(1)."
+    - "Counting, grouping, de-duplication — HashMap/HashSet."
+    - "Apni class ko key banana hai — data class / record use karo (equals + hashCode sahi)."
+  avoid:
+    - "Keys ka **order** chahiye (sorted ya range queries) — TreeMap (O(log n)) lo."
+    - "Keys chhoti range ke integers hain (jaise 0..100 ya 'a'..'z') — seedha array index (IntArray) tez aur halka."
+    - "Mutable object ko key banana jiske fields baad mein badlenge — hash badal jaayega, key \"kho\" jaayegi."
+  signals:
+    - keyword: "O(1) lookup / pehle dekha hai?"
+      think: "HashSet / HashMap."
+    - keyword: "custom object as key"
+      think: "equals() + hashCode() dono — data class / record."
+    - keyword: "design HashMap / HashSet (bina library)"
+      think: "Buckets array + chaining (list per bucket) + modulo."
+    - keyword: "keys 0..10^6 tak, dense"
+      think: "Array as hash table (index = key) — hashing ki zaroorat nahi."
+
+# 9. Real-world
+realWorld:
+  - where: "Caches (Glide, Coil, OkHttp)"
+    how: "URL/key → cached image/response. Andar LinkedHashMap — O(1) lookup + LRU order."
+  - where: "Android `SparseArray` / `ArrayMap`"
+    how: "Chhote maps ke liye HashMap ka memory overhead (har entry ek object) bachane ke liye sorted arrays + binary search — trade-off: speed thodi kam, memory kam."
+  - where: "Databases"
+    how: "Hash index se exact-match query (WHERE id = 42) O(1); range query ke liye B-tree index."
+  - where: "Load balancers / sharding"
+    how: "userId hash % servers → kaunsa server. Consistent hashing se server add/remove par kam keys hilti hain."
+  - where: "Passwords aur file integrity"
+    how: "Cryptographic hash (SHA-256) alag cheez hai par idea same — data ka chhota fingerprint. Downloads check karne ke liye hash compare."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Custom key class mein equals/hashCode nahi"
+    type: logic
+    wrong: |
+      ```kotlin
+      class Point(val x: Int, val y: Int)
+      map[Point(1, 2)] = "ghar"
+      map[Point(1, 2)]   // null!
+      ```
+    right: |
+      `data class Point(val x: Int, val y: Int)` — ya dono functions override karo.
+  - title: "Sirf equals override, hashCode nahi"
+    type: logic
+    wrong: |
+      equals() kehta hai barabar, par hashCode alag → do "barabar" keys alag buckets mein → duplicates aur `get` fail.
+    right: |
+      Hamesha **dono saath** override karo, same fields use karke.
+  - title: "Key ko map mein daalne ke baad badalna"
+    type: logic
+    wrong: |
+      `val key = mutableListOf(1, 2); map[key] = "x"; key.add(3)` → hashCode badal gaya, `map[key]` ab null.
+    right: |
+      Keys immutable rakho (String, Int, data class with `val`).
+  - title: "Negative hash par `%`"
+    type: logic
+    wrong: |
+      `hash % m` → hash negative ho to index negative → crash.
+    right: |
+      `Math.floorMod(hash, m)` ya `(hash and 0x7fffffff) % m`.
+  - title: "Open addressing mein table poora bharna"
+    type: overflow
+    right: |
+      Load factor kam rakho (~0.5–0.7) aur bharne se pehle resize karo, warna probing loop kabhi khatam nahi hoga.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "HashMap andar se kaise kaam karta hai?"
+      a: |
+        Buckets ka array (default 16). `put`: key ka `hashCode()` → spread → `& (n − 1)` se index → bucket mein node daalo (key pehle se ho to value replace). Collision par linked list; ek bucket mein 8 se zyada (aur table ≥ 64) par red-black tree. Size > capacity × 0.75 par capacity double + rehash.
+    - q: "equals() aur hashCode() ka contract kya hai?"
+      a: |
+        equals true → hashCode same hona **zaroori**. hashCode same → equals true hona zaroori **nahi** (collision). Dono saath override karo.
+    - q: "Collision kya hai aur kaise handle hota hai?"
+      a: |
+        Do alag keys ka same bucket. Chaining (bucket mein list/tree) ya open addressing (linear/quadratic probing, double hashing). Java HashMap chaining use karta hai.
+    - q: "Load factor kya hai? 0.75 kyun?"
+      a: |
+        size / capacity. 0.75 time aur memory ka balance hai — kam rakho to memory waste, zyada rakho to collisions aur slow lookup.
+    - q: "HashMap worst case O(n) kab hota hai?"
+      followUp: true
+      a: |
+        Jab bahut saari keys ek hi bucket mein jaayein (kharab hashCode, ya jaan-boojh kar attack). Java 8+ mein tree banne se O(log n).
+    - q: "Capacity hamesha 2 ki power kyun hoti hai (Java)?"
+      followUp: true
+      a: |
+        Taaki `hash % n` ki jagah tez `hash & (n − 1)` use ho sake. Saath mein hash ke upar ke bits ko neeche mila dete hain (`h ^ h >>> 16`) taaki saare bits index par asar daalein.
+    - q: "HashMap thread-safe hai? Kya use karoge?"
+      a: |
+        Nahi. Multi-thread mein `ConcurrentHashMap` (fine-grained locking / CAS). `Collections.synchronizedMap` poore map par lock — slow.
+    - q: "HashMap mein null key allowed hai?"
+      a: |
+        Java HashMap mein ek null key allowed (bucket 0 mein). Hashtable aur ConcurrentHashMap mein null key/value allowed nahi.
+    - q: "HashSet andar se kaise bana hai?"
+      a: |
+        Andar ek HashMap — set ke elements keys hain, value ek dummy object. Isliye same complexity.
+    - q: "Chaining aur open addressing — kab kya?"
+      a: |
+        Chaining simple, deletion aasaan, high load par bhi chalta hai. Open addressing cache-friendly (sab ek array mein), kam memory, par deletion tricky (tombstones) aur load factor kam rakhna padta hai.
+  mayAsk:
+    - "Apna HashMap implement karo (put, get, remove, resize)."
+    - "String.hashCode() kaise calculate hota hai?"
+    - "Consistent hashing kya hai?"
+    - "LinkedHashMap kaise insertion order yaad rakhta hai?"
+
+# 12. Practice
+practice:
+  - name: Design HashSet
+    platform: LeetCode
+    num: 705
+    url: "https://leetcode.com/problems/design-hashset/"
+    level: easy
+    pattern: Buckets + chaining
+    hint: "1000 buckets ka array, har bucket ek list. add/remove/contains sirf key % 1000 wale bucket mein."
+  - name: Design HashMap
+    platform: LeetCode
+    num: 706
+    url: "https://leetcode.com/problems/design-hashmap/"
+    level: easy
+    pattern: Buckets + chaining with (key, value)
+    hint: "'Kaise kaam karta hai' wala MyHashMap + remove. Remove mein bucket ki list se entry hatao."
+  - name: "Bucket distribution experiment"
+    platform: Custom
+    level: easy
+    pattern: Achha vs kharab hash
+    hint: "1000 keys (sab 10 ke multiple) ko m = 10 aur m = 11 buckets mein daalo. Har case mein max chain length nikaalo — prime m ka fayda dikhega."
+  - name: "Apna HashMap with resize"
+    platform: Custom
+    level: medium
+    pattern: Chaining + load factor + rehash
+    hint: "MyHashMap mein size rakho; size > 0.75 × capacity par capacity double karo aur saari entries naye buckets mein daalo. 10⁵ keys daal ke time dekho."
+  - name: "Linear probing with delete (tombstones)"
+    platform: Custom
+    level: medium
+    pattern: Open addressing
+    hint: "Delete par dabba khaali (null) mat karo — 'DELETED' mark lagao, warna aage wali keys ka search toot jaayega. Insert DELETED dabbe ko reuse kar sakta hai."
+  - name: Encode and Decode TinyURL
+    platform: LeetCode
+    num: 535
+    url: "https://leetcode.com/problems/encode-and-decode-tinyurl/"
+    level: medium
+    pattern: HashMap (short code ↔ long URL)
+    hint: "Counter ya random 6-char code → map mein code → URL. Collision aaye to naya code."
+  - name: LRU Cache
+    platform: LeetCode
+    num: 146
+    url: "https://leetcode.com/problems/lru-cache/"
+    level: hard
+    pattern: HashMap + doubly linked list
+    hint: "Map: key → node. List: recent use order. get/put par node ko front mein laao; capacity cross par tail hatao. Sab O(1). (Linked list chapter ke baad aur aasaan lagega.)"
+  - name: "Consistent hashing simulator"
+    platform: Custom
+    level: hard
+    pattern: Hash ring + TreeMap
+    hint: "Servers ko hash karke ek ring (TreeMap) par rakho; key ka server = ring par uske baad wala pehla server (ceilingKey, na mile to firstKey). Server add/remove par kitni keys hilti hain — gino."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Hash function: key → number; index = number % m (Java: & (m − 1))."
+    - "Collision = same bucket; chaining (list/tree) ya open addressing (probing)."
+    - "Load factor = size / capacity; 0.75 cross → capacity double + rehash."
+    - "Average O(1), worst O(n) (Java 8+: O(log n) via tree)."
+    - "Custom key: equals + hashCode dono (data class / record); keys immutable."
+  cheatsheet: |
+    | Cheez | Java HashMap |
+    |---|---|
+    | Default capacity | 16 |
+    | Load factor | 0.75 |
+    | Index | `(h ^ (h >>> 16)) & (n − 1)` |
+    | Collision | linked list → tree (> 8 nodes, table ≥ 64) |
+    | Resize | capacity × 2, rehash |
+    | null key | 1 allowed |
+    | Thread-safe | nahi → ConcurrentHashMap |
+  quiz:
+    - q: "Keys 15, 22, 29 aur m = 7 — kitni keys bucket 1 mein?"
+      options: ["0", "1", "2", "3"]
+      answer: 3
+      explain: "15 % 7 = 1, 22 % 7 = 1, 29 % 7 = 1 — teeno collision."
+    - q: "Java HashMap ka default load factor?"
+      options: ["0.5", "0.75", "1.0", "0.9"]
+      answer: 1
+      explain: "0.75 time-memory balance."
+    - q: "equals() override kiya par hashCode() nahi. Kya hoga?"
+      options: ["Kuch nahi", "Barabar objects alag buckets mein ja sakte hain — map mein duplicate/miss", "Compile error", "HashMap tez ho jaayega"]
+      answer: 1
+      explain: "Contract toota — equal objects ka hash same hona chahiye."
+    - q: "Rehash ke time har key ko dobara hash kyun karte hain?"
+      options: ["Order badalne ke liye", "Capacity badli to key % capacity (bucket) badal sakta hai", "Memory saaf karne ke liye", "Zaroori nahi hai"]
+      answer: 1
+      explain: "Index capacity par depend karta hai."
+    - q: "HashMap get ki worst-case complexity (Java 8+)?"
+      options: ["O(1)", "O(log n)", "O(n²)", "O(n log n)"]
+      answer: 1
+      explain: "Lambi chain red-black tree ban jaati hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: dynamic-array
+      why: "Rehash = dynamic array ki doubling jaisa — amortized O(1)."
+    - id: kotlin-java-toolkit
+      why: "HashMap/HashSet ke functions aur boxing ka kharcha."
+  usedLater:
+    - id: hashmap
+      how: "Two Sum, isomorphic strings, subarray sum = k — sab inhi internals par chalte hain."
+    - id: hashset
+      how: "HashSet = HashMap ki keys."
+    - id: doubly-linked-list
+      how: "LRU cache = HashMap + doubly linked list."
+    - id: trie
+      how: "Strings ke prefix ke liye hashing ka alternative."
