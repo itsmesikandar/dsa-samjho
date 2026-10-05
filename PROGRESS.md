@@ -4,8 +4,9 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–5 done (29 topics).
-- Next action: chapter 6 → `singly-linked-list` (use `list` panel: nodes with id/next, pointers by node id).
+- Step: 3 (Content). Chapters 0–6 done (34 topics).
+- Next action: chapter 7 → `stack` (stack panel: items bottom→top; LinearPanel kind 'stack' | 'queue' | 'deque').
+- List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
 - Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
 - Note: low RAM on this machine (~1 GB free) makes `npm run build` slow (24 min once); run it once per chapter.
@@ -78,11 +79,11 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] binary-search-on-answer
 
 ### 6. Linked List
-- [ ] singly-linked-list
-- [ ] doubly-linked-list
-- [ ] fast-slow-pointers
-- [ ] reverse-linked-list
-- [ ] linked-list-techniques
+- [x] singly-linked-list
+- [x] doubly-linked-list
+- [x] fast-slow-pointers
+- [x] reverse-linked-list
+- [x] linked-list-techniques
 
 ### 7. Stack & Queue
 - [ ] stack
@@ -148,4 +149,5 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [ ] Lighthouse check (mobile)
 - [ ] Bundle trim: topic page first-load JS is 210 KB gzip (React/Next ~165, motion ~37). Lazy-load VizPlayer (+ motion) via `next/dynamic` so motion loads only when a player is near
 - [ ] Shiki highlighting for fenced code blocks inside markdown (now plain monospace)
+- [ ] LinkedListViz on 390px: only ~3 nodes visible (panel scrolls). Consider smaller node width / wrap on mobile
 - [ ] Deploy config + Vercel deploy

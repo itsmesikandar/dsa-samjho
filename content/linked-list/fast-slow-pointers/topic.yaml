@@ -1,0 +1,443 @@
+meta:
+  id: fast-slow-pointers
+  chapter: linked-list
+  title: Fast & Slow Pointers
+  subtitle: Ek 1 kadam, ek 2 kadam — beech dhoondho, circle pakdo, circle ki shuruaat nikaalo (Floyd)
+  level: intermediate
+  minutes: 35
+  prereqs: [singly-linked-list, two-pointers-same]
+  tags: [linked-list, fast-slow, floyd, cycle-detection, middle]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Do pointers, **dono head se**, alag speed:
+    - `slow` — har baar 1 kadam
+    - `fast` — har baar 2 kadam
+
+    ```kotlin
+    var slow = head; var fast = head
+    while (fast != null && fast.next != null) {
+        slow = slow.next
+        fast = fast.next.next
+    }
+    ```
+
+    Is chhote se trick se teen bade kaam:
+    1. **Beech ka node** — fast end par, slow aadhe raaste par.
+    2. **Circle (cycle) hai?** — circle mein fast peeche se aa ke slow ko pakad leta hai.
+    3. **Circle kahan se shuru** — milne ke baad ek pointer head par, dono 1-1 kadam (Floyd).
+
+    > [!yaad]
+    > Sab **O(n) time, O(1) memory**. HashSet wala tareeka bhi kaam karta hai par O(n) memory.
+  analogy: |
+    **Gol race track par do dhaavak** — ek tez (2x), ek dheema. Seedhi sadak hoti to tez wala aage nikal ke finish line par pahunch jaata. Par gol track par wo **ghoom ke peeche se** dheeme ko pakad leta hai.
+
+    To agar dono kabhi mil gaye → track gol hai (circle). Tez wala finish (null) tak pahuncha → seedha track.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Linked list mein na index hai, na length pehle se pata. "Beech wala node" ke liye pehle length gino (ek pass), phir aadhe tak chalo (doosra pass). Fast/slow **ek pass** mein.
+
+    Circle ke liye: HashSet mein har node daalo, dobara mile to circle → O(n) memory. Fast/slow → **O(1)**. Interview mein yahi poochte hain.
+
+    Aur ye sirf list nahi — koi bhi "agla state" wala function: **Happy Number** (digits square ka sum), **Find the Duplicate Number** (i → nums[i]) — sab "circle hai?" ke sawaal ban jaate hain.
+
+    > [!socho]
+    > Fast 2 kadam aur slow 1 — circle mein fast slow ko **kood ke** aage nikal sakta hai kya, bina milaye?
+    >
+    > Nahi. Circle ke andar dono ka faasla har kadam **ek** ghatta hai (fast +2, slow +1). Faasla 3, 2, 1, 0 — beech mein koi number skip nahi hota. Isliye milna pakka. (3 kadam wala fast skip kar sakta hai!)
+
+# 3. Visual intro
+visual:
+  body: |
+    Track ko gol banao (pos = jahan aakhri node wapas jude). Neela = slow, narangi = fast.
+
+    pos = −1 karke dekho — seedhe track par fast null tak pahunch jaata hai.
+  viz: { tracer: raceTrack }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Middle of the list:**
+
+    `1 → 2 → 3 → 4 → 5`
+
+    | Kadam | slow | fast |
+    |---|---|---|
+    | 0 | 1 | 1 |
+    | 1 | 2 | 3 |
+    | 2 | 3 | 5 |
+    | – | fast.next = null → ruko | **3** |
+
+    Even length (`1..6`) par fast null par rukta hai aur slow **doosra** beech wala (4) deta hai. Pehla beech wala chahiye (jaise list ko do hisson mein todne ke liye)? `while (fast.next != null && fast.next.next != null)`.
+
+    > [!tip]
+    > Condition `fast != null && fast.next != null` — dono check zaroori, warna `fast.next.next` par NullPointerException.
+  viz: { tracer: middleTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Middle node"
+    time: O(n)
+    space: O(1)
+    why: "Ek pass; fast dugni speed."
+  - op: "Cycle hai? (Floyd)"
+    time: O(n)
+    space: O(1)
+    why: "Circle mein faasla har kadam 1 ghatta hai."
+  - op: "Cycle start"
+    time: O(n)
+    space: O(1)
+    why: "Milne ke baad head se dobara, 1-1 kadam."
+  - op: "Cycle ki length"
+    time: O(n)
+    space: O(1)
+    why: "Milne ke baad ek pointer ghumao jab tak wapas na aaye."
+  - op: "Aakhir se n-th (gap pointers)"
+    time: O(n)
+    space: O(1)
+    why: "Same speed, par n ka faasla."
+  - op: "HashSet se cycle"
+    time: O(n)
+    space: O(n)
+    why: "Har node set mein — simple par memory."
+
+# 6. Code
+code:
+  - title: Aakhir se n-th node hatao (gap wale pointers)
+    file: nth-end
+    note: |
+      Isi family ka doosra roop: speed **same**, par shuru mein **faasla**. `fast` ko n + 1 kadam aage bhejo, phir dono saath. Jab fast null, slow hatane wale ke **pichhle** par.
+
+      `dummy` node (head se pehle nakli) — taaki head hatana pade (n = length) to bhi same code chale.
+
+# 7. Examples
+examples:
+  - id: has-cycle
+    level: easy
+    title: List mein circle hai?
+    source: { name: Linked List Cycle, platform: LeetCode, url: "https://leetcode.com/problems/linked-list-cycle/" }
+    problem: |
+      Linked list mein kahin **circle** hai (koi node peeche ke kisi node ko point kare)? O(1) memory mein batao.
+
+      Example: `3 → 2 → 0 → −4 → (wapas 2)` → **true**
+    intuition: |
+      Race track wali soch: slow 1, fast 2.
+      - Circle nahi → fast null tak pahunch jaayega → false.
+      - Circle hai → dono circle mein ghoomenge, fast har kadam 1 node kareeb → **milenge** → true.
+
+      Kitne kadam? Circle mein pahunchne ke baad circle ki lambai se kam → total O(n).
+
+      > [!galti]
+      > `slow == fast` check loop ke **shuru** mein mat karo — shuru mein dono head par hain, turant true aa jaayega. Pehle chalo, phir check.
+    dryRun: |
+      `3 → 2 → 0 → −4 → 2…`
+
+      | Kadam | slow | fast |
+      |---|---|---|
+      | 1 | 2 | 0 |
+      | 2 | 0 | 2 |
+      | 3 | −4 | −4 → **mile** |
+    viz: { tracer: cycleTrace }
+    code: ex1-cycle
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Fast max ~2n kadam."
+
+  - id: cycle-start
+    level: medium
+    title: Circle kis node se shuru hota hai?
+    source: { name: Linked List Cycle II, platform: LeetCode, url: "https://leetcode.com/problems/linked-list-cycle-ii/" }
+    problem: |
+      Circle hai to wo node do jahan se circle **shuru** hota hai (jahan peeche se arrow aata hai). Na ho to null. List badalni nahi, O(1) memory.
+
+      Example: `3 → 2 → 0 → −4 → (wapas 2)` → **2 wala node**
+    intuition: |
+      **Phase 1:** slow/fast se milne ki jagah dhoondho.
+
+      **Phase 2:** ek pointer `p` head par wapas. `p` aur `slow` dono **1-1 kadam**. Jahan milein = circle start.
+
+      **Kyun?** Maan lo head se circle-start tak `a`, circle-start se milne ki jagah `b`, circle ki lambai `c`.
+      - slow chala `a + b`, fast chala `2(a + b)`.
+      - Fast ne slow se kuch poore chakkar zyada lagaye: `2(a + b) − (a + b) = k·c` → `a + b = k·c` → **`a = k·c − b`**.
+      - Matlab milne ki jagah se `a` kadam aage chalo to (circle mein) circle-start par pahunchoge. Aur head se bhi `a` kadam = circle-start. Isliye dono wahan milte hain!
+
+      > [!tip]
+      > Interview mein ye proof 30 second mein bolna practice karo — "a = kc − b" yaad rakho.
+    dryRun: |
+      a = 1 (3 → 2), circle = 2 → 0 → −4 (c = 3)
+
+      | Phase | p | slow | |
+      |---|---|---|---|
+      | 1 | – | −4 (mile) | b = 2 |
+      | 2 | 3 | −4 | |
+      | 2 | 2 | 2 | **mile → 2** |
+    viz: { tracer: cycleStartTrace }
+    code: ex2-cycle-start
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Do phase, dono O(n)."
+
+  - id: find-duplicate
+    level: tricky
+    title: Duplicate number — array ko linked list maano
+    source: { name: Find the Duplicate Number, platform: LeetCode, url: "https://leetcode.com/problems/find-the-duplicate-number/" }
+    problem: |
+      `n + 1` numbers, sab `1..n` ke beech — to kam se kam ek number repeat hai. Wo number do. **Array badalna nahi**, extra memory O(1).
+
+      Example: `[1, 3, 4, 2, 2]` → **2**
+    intuition: |
+      Sort (array badla) ya HashSet (O(n) memory) — dono mana hain.
+
+      **Trick:** har index `i` se arrow `nums[i]` ki taraf banao. Ye ek "linked list" hai jahan `next(i) = nums[i]`.
+      - Index 0 par koi arrow nahi aata (values 1..n) → 0 = **head**.
+      - Duplicate value `d` par **do** index arrow bhejte hain → wahan se **circle shuru** hota hai.
+
+      Ab ye Linked List Cycle II hai! Floyd chalao, circle start = duplicate.
+
+      > [!socho]
+      > Binary search on answer se bhi ho sakta hai: "≤ mid wale numbers kitne?" — mid se zyada ho to duplicate ≤ mid (pigeonhole). O(n log n). Floyd O(n).
+    dryRun: |
+      `[1, 3, 4, 2, 2]`: arrows 0→1, 1→3, 2→4, 3→2, 4→2
+
+      Path: 0 → 1 → 3 → 2 → 4 → 2 → 4 … (circle 2 ⇄ 4, start **2**)
+
+      | Phase | slow | fast |
+      |---|---|---|
+      | 1 | 3 | 2 |
+      | 1 | 2 | 2 → mile |
+      | 2 (slow = nums[0] = 1) | 1 → 3 → 2 | 2 → 4 → 2 → **2** |
+    viz: { tracer: dupTrace }
+    code: ex3-duplicate
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Floyd ke do phase; array sirf padha."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Linked list ka beech (palindrome check, list todna, merge sort on list)."
+    - "Circle hai? / circle kahan se? — O(1) memory chahiye."
+    - "Koi bhi 'agla state = f(abhi ka)' process jo ghoom sakta hai (happy number, duplicate)."
+    - "Aakhir se k-th — gap wale pointers."
+  avoid:
+    - "Array hai aur index se beech mil jaata hai — n / 2."
+    - "Memory ki fikar nahi aur code simple chahiye — HashSet bhi theek."
+    - "Cycle ke saare nodes / sab circles chahiye (graph) — DFS / union-find."
+  signals:
+    - keyword: "middle of linked list"
+      think: "slow 1, fast 2."
+    - keyword: "cycle / loop in list, O(1) memory"
+      think: "Floyd: milo to circle."
+    - keyword: "where does the cycle begin"
+      think: "Mile ke baad head se 1-1 kadam."
+    - keyword: "n + 1 numbers in 1..n, no modify, O(1) space"
+      think: "i → nums[i] graph + Floyd."
+
+# 9. Real-world
+realWorld:
+  - where: "Memory leak / corrupt data"
+    how: "Bugs se linked structure mein galti se circle ban jaaye to traversal kabhi khatam nahi hota — Floyd se detect, bina extra memory."
+  - where: "Random number generators"
+    how: "Pseudo-random sequence kab repeat hone lagta hai (period) — Floyd / Brent cycle detection."
+  - where: "Cryptography"
+    how: "Pollard's rho algorithm (factorization) andar Floyd cycle detection use karta hai."
+  - where: "Media player"
+    how: "Playlist ka beech (shuffle ke liye do hisse) ek pass mein."
+  - where: "Distributed systems"
+    how: "Request forwarding mein loop (A → B → C → A) pakadna — state sequence ka cycle."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Sirf fast != null check"
+    type: "null"
+    wrong: |
+      `while (fast != null) { fast = fast.next.next }` → fast.next null par crash.
+    right: |
+      `while (fast != null && fast.next != null)`.
+  - title: "Shuru mein hi slow == fast check"
+    type: logic
+    wrong: |
+      Loop ke shuru mein `if (slow == fast) return true` — dono head par → hamesha true.
+    right: |
+      Pehle dono ko chalao, phir compare.
+  - title: "Values compare kiye, nodes nahi"
+    type: logic
+    wrong: |
+      `slow.value == fast.value` — alag nodes ki same value se jhootha 'circle'.
+    right: |
+      Reference compare: Kotlin `===`, Java `==` (objects).
+  - title: "Middle — kaunsa beech?"
+    type: off-by-one
+    wrong: |
+      Even length mein pehla beech chahiye tha (list todne ke liye), mila doosra.
+    right: |
+      Pehle ke liye `while (fast.next != null && fast.next.next != null)`.
+  - title: "Khaali ya ek node"
+    type: empty
+    wrong: |
+      head = null par `head.next` padha.
+    right: |
+      Loop condition khud sambhaal leti hai — fast = null par loop chalega hi nahi.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Floyd cycle detection kaise kaam karta hai?"
+      a: |
+        slow 1, fast 2 kadam. Circle nahi to fast null tak. Circle mein dono andar aane ke baad faasla har kadam 1 ghatta hai → milna pakka. O(n), O(1).
+    - q: "Cycle start ka proof?"
+      followUp: true
+      a: |
+        a = head se start, b = start se meet, c = circle. 2(a + b) = a + b + kc → a = kc − b. Meet se a kadam = start; head se a kadam = start. Isliye dono 1-1 chalke start par milte hain.
+    - q: "Cycle ki length kaise?"
+      a: |
+        Milne ke baad ek pointer ko ghumao jab tak wapas milne wale node par na aaye — kadam = c.
+    - q: "Fast 3 kadam chale to?"
+      followUp: true
+      a: |
+        Faasla har kadam 2 ghatega — odd faasle par skip ho sakta hai aur kuch circle lengths par milna late ya mushkil. 2 kadam sabse simple aur guaranteed.
+    - q: "Palindrome linked list O(1) memory?"
+      a: |
+        Fast/slow se beech, second half reverse, dono halves compare, (chahe to) wapas reverse karke list theek.
+    - q: "Find the Duplicate mein linked list kahan hai?"
+      a: |
+        next(i) = nums[i]. Index 0 head (koi arrow nahi aata). Duplicate par do arrows aate hain = circle start. Floyd.
+    - q: "Happy number mein circle kyun?"
+      a: |
+        Digits ke squares ka sum ek limited range mein rehta hai — sequence ya 1 par rukega ya kisi circle mein ghoomega. Floyd se check.
+    - q: "Remove nth from end ek pass mein?"
+      a: |
+        Dummy node, fast ko n + 1 aage, phir dono saath; fast null par slow.next = slow.next.next.
+  mayAsk:
+    - "Happy Number."
+    - "Palindrome Linked List."
+    - "Reorder List."
+    - "Middle ka pehla vs doosra node."
+
+# 12. Practice
+practice:
+  - name: Middle of the Linked List
+    platform: LeetCode
+    num: 876
+    url: "https://leetcode.com/problems/middle-of-the-linked-list/"
+    level: easy
+    pattern: Slow 1, fast 2
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Linked List Cycle
+    platform: LeetCode
+    num: 141
+    url: "https://leetcode.com/problems/linked-list-cycle/"
+    level: easy
+    pattern: Floyd detection
+    hint: "Example 1."
+  - name: Happy Number
+    platform: LeetCode
+    num: 202
+    url: "https://leetcode.com/problems/happy-number/"
+    level: easy
+    pattern: Floyd on number sequence
+    hint: "next(x) = digits ke squares ka sum. slow = next(x), fast = next(next(x)). fast 1 par → happy; slow == fast (1 nahi) → circle."
+  - name: Linked List Cycle II
+    platform: LeetCode
+    num: 142
+    url: "https://leetcode.com/problems/linked-list-cycle-ii/"
+    level: medium
+    pattern: Floyd start
+    hint: "Example 2 — proof bhi bolo."
+  - name: Find the Duplicate Number
+    platform: LeetCode
+    num: 287
+    url: "https://leetcode.com/problems/find-the-duplicate-number/"
+    level: medium
+    pattern: Array as linked list + Floyd
+    hint: "Example 3."
+  - name: Remove Nth Node From End of List
+    platform: LeetCode
+    num: 19
+    url: "https://leetcode.com/problems/remove-nth-node-from-end-of-list/"
+    level: medium
+    pattern: Gap pointers + dummy
+    hint: "Code section wala."
+  - name: Reverse Nodes in k-Group
+    platform: LeetCode
+    num: 25
+    url: "https://leetcode.com/problems/reverse-nodes-in-k-group/"
+    level: hard
+    pattern: Count k with a pointer, reverse sublist
+    hint: "Pehle check: aage k nodes hain? (pointer k kadam). Haan to us tukde ko reverse karke jodo. Reverse Linked List topic ke baad."
+  - name: Design Skiplist
+    platform: LeetCode
+    num: 1206
+    url: "https://leetcode.com/problems/design-skiplist/"
+    level: hard
+    pattern: Multi-level linked lists (express lanes)
+    hint: "Upar ke levels 'fast lane' — kam nodes, lambi chhalaang. Search: upar se shuru, jab tak agla chhota ho aage, phir neeche level. Insert par random height."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "slow 1, fast 2 — dono head se; condition fast != null && fast.next != null."
+    - "Fast end par → slow beech mein."
+    - "Mil gaye → circle (faasla har kadam 1 ghatta hai)."
+    - "Circle start: milne ke baad p = head, p aur slow 1-1 kadam (a = kc − b)."
+    - "i → nums[i] graph banao to array problems bhi cycle problems."
+  cheatsheet: |
+    ```kotlin
+    // middle / cycle
+    var s = head; var f = head
+    while (f != null && f.next != null) {
+        s = s?.next; f = f.next?.next
+        if (s === f) { /* cycle */ }
+    }
+    // cycle start
+    var p = head; while (p !== s) { p = p?.next; s = s?.next }
+    // nth from end
+    var fast: ListNode? = dummy; for (i in 0..n) fast = fast?.next
+    var slow: ListNode? = dummy; while (fast != null) { fast = fast.next; slow = slow?.next }
+    slow?.next = slow?.next?.next
+    ```
+  quiz:
+    - q: "1 → 2 → 3 → 4 → 5 → 6 mein slow/fast (fast != null && fast.next != null) se middle?"
+      options: ["3", "4", "2", "5"]
+      answer: 1
+      explain: "Even length mein doosra beech wala."
+    - q: "Circle mein fast slow ko pakadta kyun hai?"
+      options: ["Fast tez hai", "Faasla har kadam 1 ghatta hai, skip nahi hota", "Random hai", "Hamesha nahi pakadta"]
+      answer: 1
+      explain: "Faasla k, k−1, … 0."
+    - q: "Cycle start dhoondhne ke liye milne ke baad kya?"
+      options: ["fast ko head par, 2-2 kadam", "Ek pointer head par, dono 1-1 kadam", "Length gino", "Reverse karo"]
+      answer: 1
+      explain: "a = kc − b."
+    - q: "Find Duplicate [3, 1, 3, 4, 2] mein head kaun sa index?"
+      options: ["0", "1", "3", "4"]
+      answer: 0
+      explain: "Values 1..n hain, index 0 par koi arrow nahi aata."
+    - q: "Loop condition mein sirf fast != null likha. Kya hoga?"
+      options: ["Kuch nahi", "fast.next.next par null crash", "Infinite loop", "Galat middle"]
+      answer: 1
+      explain: "fast.next null ho sakta hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: two-pointers-same
+      why: "Same direction pointers ka linked list roop."
+    - id: singly-linked-list
+      why: "Nodes, null checks."
+    - id: binary-search-on-answer
+      why: "Find Duplicate ka doosra tareeka."
+  usedLater:
+    - id: reverse-linked-list
+      how: "Palindrome check: middle + second half reverse."
+    - id: linked-list-techniques
+      how: "Reorder list, sort list — middle se todna."
+    - id: union-find
+      how: "Graphs mein cycle — doosra hathiyaar."

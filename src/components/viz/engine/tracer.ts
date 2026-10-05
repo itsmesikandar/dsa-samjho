@@ -1,4 +1,4 @@
-import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, RecursionPanel, Tone } from './types';
+import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, ListPanel, RecursionPanel, Tone } from './types';
 
 export const MAX_FRAMES = 400;
 
@@ -132,6 +132,37 @@ export function swap<T>(a: T[], i: number, j: number): void {
   const x = a[i];
   a[i] = a[j];
   a[j] = x;
+}
+
+export interface LNode {
+  id: string;
+  value: Cell;
+  next: string | null;
+  prev?: string | null;
+}
+
+/** list panel: nodes in traversal order from head (cycle-safe), then `extra` ids (e.g. a removed node) */
+export function listView(
+  nodes: Map<string, LNode>,
+  head: string | null,
+  opts: { label?: string; tones?: Record<string, Tone>; pointers?: Record<string, string | null | undefined>; extra?: string[]; doubly?: boolean } = {},
+): ListPanel {
+  const seen = new Set<string>();
+  const order: LNode[] = [];
+  for (let c = head; c && !seen.has(c) && nodes.has(c); c = nodes.get(c)!.next) {
+    seen.add(c);
+    order.push(nodes.get(c)!);
+  }
+  for (const e of opts.extra ?? []) if (!seen.has(e) && nodes.has(e)) order.push(nodes.get(e)!);
+  return {
+    kind: 'list',
+    label: opts.label,
+    doubly: opts.doubly,
+    nodes: order.map((n) => ({ id: n.id, value: n.value, next: n.next, ...(opts.doubly ? { prev: n.prev ?? null } : {}), tone: opts.tones?.[n.id] })),
+    pointers: Object.entries(opts.pointers ?? {})
+      .filter((e): e is [string, string | null] => e[1] !== undefined)
+      .map(([name, at]) => ({ name, at })),
+  };
 }
 
 /** recursion panel builder: push() marks parent waiting, done() marks parent active again */

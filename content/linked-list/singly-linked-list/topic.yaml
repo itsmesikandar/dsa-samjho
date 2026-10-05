@@ -1,0 +1,445 @@
+meta:
+  id: singly-linked-list
+  chapter: linked-list
+  title: Singly Linked List
+  subtitle: Memory mein bikhre nodes, har ek agle ka pata rakhta hai — jodna-todna O(1), dhoondhna O(n)
+  level: beginner
+  minutes: 35
+  prereqs: [memory-basics, array]
+  tags: [linked-list, nodes, pointers, traversal]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Linked list** = nodes ki chain. Har **node** mein do cheezein:
+    - `value` — data
+    - `next` — agle node ka **reference** (address). Aakhri ka `next = null`.
+
+    Pehle node ko **head** kehte hain — list tak pahunchne ka ek hi darwaza.
+
+    ```kotlin
+    class ListNode(var value: Int, var next: ListNode? = null)
+
+    // traverse: head se null tak
+    var cur = head
+    while (cur != null) {
+        println(cur.value)
+        cur = cur.next
+    }
+    ```
+
+    Array se fark:
+    - Array: memory mein **lagatar** → `a[i]` O(1). Beech mein daalna = sab khiskaana O(n).
+    - List: nodes **kahin bhi** → `get(i)` O(n) (chalna padta hai). Beech mein daalna = do arrows badalna O(1) (agar jagah pe pahunch gaye).
+
+    > [!yaad]
+    > Linked list problems = **pointers ka khel**. Har line likhne se pehle socho: "Ye arrow badla to kaunsa node kho jaayega?"
+  analogy: |
+    **Treasure hunt (khazana khoj).** Har chit par ek clue aur **agli chit kahan hai** ye likha hai. Chits ghar mein kahin bhi chhupi hain — lagatar nahi. Teesri chit chahiye? Pehli se shuru karo, clue follow karo.
+
+    Beech mein nayi chit daalni hai? Bas pichhli chit par naya pata likh do, aur nayi chit par purani wali ka pata. Baaki chits ko chhoona bhi nahi.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    - **Aage jodna / hatana O(1)** — array mein `add(0, x)` sab ko khiskata hai (O(n)).
+    - **Size pehle se nahi chahiye** — node banao, jod do. Dynamic array jaisa resize/copy nahi.
+    - Bahut saare data structures ki neev: **stack, queue, LRU cache, hash table ke buckets** (chaining), graph ki adjacency list.
+
+    Interview mein linked list isliye favourite hai: chhote code mein **pointer galtiyan** pakadna aasaan — null check, order of assignments, head ka case.
+
+    > [!socho]
+    > Java ka `LinkedList` aur `ArrayList` — `get(i)` loop mein (`for (i in 0 until n) list.get(i)`) kaunsa slow?
+    >
+    > `LinkedList`: har `get(i)` head se i kadam → total O(n²)! ArrayList O(n). Linked list ko hamesha **iterator / for-each** se chalao.
+
+# 3. Visual intro
+visual:
+  body: |
+    Upar **RAM**: nodes alag-alag addresses par bikhre hain, arrows next dikhate hain. Neeche wahi list jaisi hum sochte hain.
+
+    Aakhir mein dekho: index 2 tak pahunchne ke liye head se chalna padta hai.
+  viz: { tracer: scatteredNodes }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Position `pos` par naya node daalna:**
+    1. `pos == 0` → `naya.next = head`, naya hi head. O(1).
+    2. Warna `pos − 1` wale node (**prev**) tak chalo.
+    3. `naya.next = prev.next` — **pehle** naya node aage ki list pakde.
+    4. `prev.next = naya` — phir prev naye ko pakde.
+
+    > [!galti]
+    > Step 3 aur 4 ulte kiye → `prev.next = naya` pehle hua, to `prev.next` ka purana node (aur poori aage ki list) **kho gaya** — koi reference nahi bacha.
+
+    > [!tip]
+    > "Head badal sakta hai" → function **naya head return** kare (ya dummy node lo — Dummy node topic).
+  viz: { tracer: insertTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Aage jodna (addFirst)"
+    time: O(1)
+    space: O(1)
+    why: "naya.next = head; head = naya."
+  - op: "Peeche jodna (addLast)"
+    time: "O(1) tail ke saath, O(n) bina"
+    space: O(1)
+    why: "tail pointer rakho to seedha; warna end tak chalo."
+  - op: "Index i par pahunchna (get)"
+    time: O(n)
+    space: O(1)
+    why: "Head se i kadam."
+  - op: "Value dhoondhna"
+    time: O(n)
+    space: O(1)
+    why: "Sorted ho tab bhi binary search nahi — mid tak chalna O(n)."
+  - op: "Diye gaye node ke baad insert / delete"
+    time: O(1)
+    space: O(1)
+    why: "Sirf next badalna."
+  - op: "Aakhri node hatana (singly)"
+    time: O(n)
+    space: O(1)
+    why: "Aakhri se pehle wala chahiye — peeche ka pointer nahi hai."
+
+# 6. Code
+code:
+  - title: Apni LinkedList — head, tail, size
+    file: my-list
+    note: |
+      `tail` yaad rakhne se `addLast` O(1). `size` variable se `size()` O(1) (warna gin-na padta).
+
+      Dhyaan: `removeFirst` mein aakhri node hata to `tail = null` bhi karo — warna tail ek hataye hue node ko pakde rahega (bug).
+
+# 7. Examples
+examples:
+  - id: remove-elements
+    level: easy
+    title: Saare x wale nodes hatao
+    source: { name: Remove Linked List Elements, platform: LeetCode, url: "https://leetcode.com/problems/remove-linked-list-elements/" }
+    problem: |
+      List se jitne bhi node ki value `x` hai, sab hata do. Naya head return karo.
+
+      Example: `1 → 2 → 6 → 3 → 4 → 5 → 6`, x = 6 → `1 → 2 → 3 → 4 → 5`
+    intuition: |
+      Node hatane ke liye uska **pichhla** node chahiye (`prev.next = node.next`). Isliye `cur` par khade ho ke `cur.next` check karo.
+
+      Do hisse:
+      1. **Head khud x** ho (shayad kai baar) → head aage badhao.
+      2. Baaki: `cur.next.value == x` → `cur.next = cur.next.next` (**cur wahi raho** — naya next bhi x ho sakta hai). Warna `cur` aage.
+
+      > [!tip]
+      > Head ka alag case **dummy node** se gayab: `dummy.next = head`, `cur = dummy` se shuru, return `dummy.next`. Linked list techniques topic mein.
+    dryRun: |
+      x = 6
+
+      | cur | cur.next | Kya hua |
+      |---|---|---|
+      | 1 | 2 | aage |
+      | 2 | 6 | hatao → 2.next = 3 |
+      | 2 | 3 | aage |
+      | 3, 4 | … | aage |
+      | 5 | 6 | hatao → 5.next = null |
+      | 5 | null | khatam → **1 → 2 → 3 → 4 → 5** |
+    viz: { tracer: removeTrace }
+    code: ex1-remove
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass; koi naya node nahi."
+
+  - id: add-two-numbers
+    level: medium
+    title: Do numbers jodo (digits list mein)
+    source: { name: Add Two Numbers, platform: LeetCode, url: "https://leetcode.com/problems/add-two-numbers/" }
+    problem: |
+      Do non-negative numbers linked lists mein hain — digits **ulte** order mein (units pehle). Jod ke result bhi isi format mein do.
+
+      Example: `2 → 4 → 3` (342) + `5 → 6 → 4` (465) → `7 → 0 → 8` (807)
+    intuition: |
+      Ulta order = school ka jod! Units se shuru, carry aage le jao.
+
+      - Dono lists saath chalao. Ek khatam ho jaaye to uska digit **0** maano.
+      - `sum = x + y + carry` → node `sum % 10`, `carry = sum / 10`.
+      - Loop tab tak jab tak **koi list bachi ho ya carry bacha ho** (`999 + 1` mein aakhri carry naya digit banata hai).
+
+      Numbers ko Long mein badal ke jodna? 100 digits ka number Long mein nahi aata — isliye digit-by-digit.
+
+      > [!galti]
+      > Loop condition mein `carry != 0` bhool gaye → `5 + 5 = 0` (1 gayab).
+    dryRun: |
+      | A digit | B digit | carry | sum | Naya digit | Naya carry |
+      |---|---|---|---|---|---|
+      | 2 | 5 | 0 | 7 | 7 | 0 |
+      | 4 | 6 | 0 | 10 | 0 | 1 |
+      | 3 | 4 | 1 | 8 | 8 | 0 |
+
+      Result **7 → 0 → 8**
+    viz: { tracer: addTrace }
+    code: ex2-add
+    complexity:
+      time: O(max(m, n))
+      space: O(max(m, n))
+      why: "Har digit ek baar; result list naye nodes."
+
+  - id: intersection
+    level: tricky
+    title: Do lists kahan milti hain?
+    source: { name: Intersection of Two Linked Lists, platform: LeetCode, url: "https://leetcode.com/problems/intersection-of-two-linked-lists/" }
+    problem: |
+      Do lists kisi node par **ek ho jaati hain** (Y shape) — us node se aage dono same nodes share karti hain. Pehla saanjha **node** do (value nahi, same object). Na mile to null. O(1) extra memory.
+
+      Example: A = `4 → 1 → 8 → 4 → 5`, B = `5 → 6 → 1 → 8 → 4 → 5` (8 se aage saanjha) → **8 wala node**
+    intuition: |
+      HashSet mein A ke nodes daalo, B mein pehla jo set mein mile → O(m) memory.
+
+      **O(1) trick:** lambaiyan alag hain, isliye saath chalne par ek pehle pahunchta hai. Barabar kaise karein?
+
+      - `p` A par chale; A khatam → **B ke head** par kood jaaye.
+      - `q` B par chale; B khatam → **A ke head** par.
+
+      Dono total `(sirf A) + (saanjha) + (sirf B)` chalte hain — **barabar**! Isliye saanjhe hisse ki shuruaat par ek saath pahunchenge. Saanjha nahi to dono ek saath null par.
+
+      > [!galti]
+      > `p.value == q.value` se compare mat karo — alag nodes ki value same ho sakti hai (A ka 1 aur B ka 1). Same **object** chahiye: Kotlin `===`, Java `==` (references).
+    dryRun: |
+      A: 4 1 [8 4 5], B: 5 6 1 [8 4 5]
+
+      | Kadam | p | q |
+      |---|---|---|
+      | 0 | 4 (A) | 5 (B) |
+      | 3 | 4 (A) | 8 |
+      | 5 | null → | 5 |
+      | 6 | 5 (B) | null → |
+      | 7 | 6 (B) | 4 (A) |
+      | 8 | 1 (B) | 1 (A) |
+      | 9 | **8** | **8** ✓ |
+    viz: { tracer: intersectTrace }
+    code: ex3-intersection
+    complexity:
+      time: O(m + n)
+      space: O(1)
+      why: "Har pointer max m + n kadam."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Aage/beech mein bahut insert-delete, aur us jagah ka node haath mein hai."
+    - "Size pehle se nahi pata aur copy/resize se bachna hai."
+    - "Stack / queue / LRU cache / hash chaining banana hai."
+    - "Problem input hi linked list hai (interview)."
+  avoid:
+    - "Index se baar-baar access (get(i)) — array / ArrayList."
+    - "Binary search chahiye — mid tak pahunchna O(n)."
+    - "Memory tight — har node ka next pointer + object overhead (JVM par ~16+ bytes extra)."
+    - "Cache-friendly fast scan chahiye — array lagatar memory mein, list bikhri."
+  signals:
+    - keyword: "remove nodes with value / delete in list"
+      think: "Pichhle node se cur.next = cur.next.next; head case ya dummy."
+    - keyword: "digits stored in reverse order"
+      think: "Saath chalao, carry, loop tak jab tak carry bhi."
+    - keyword: "intersection / common node of two lists"
+      think: "Do pointers, khatam hone par doosri list ke head par."
+    - keyword: "insert at position k"
+      think: "k − 1 tak chalo; naya.next pehle, phir prev.next."
+
+# 9. Real-world
+realWorld:
+  - where: "Music player playlist"
+    how: "Agla gaana = next. Beech mein gaana jodna/hatana bina poori list khiskaaye."
+  - where: "Browser / app navigation"
+    how: "Undo history, back stack — nodes ki chain (aksar doubly)."
+  - where: "Java HashMap"
+    how: "Ek bucket mein takraane wale entries ek linked list mein (8 se zyada ho to tree)."
+  - where: "Operating systems"
+    how: "Free memory blocks ki list, process scheduling queues — linked lists."
+  - where: "Blockchain"
+    how: "Har block pichhle block ka hash rakhta hai — ek tarah ki linked list (peeche ki taraf)."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Null check bhool gaye"
+    type: "null"
+    wrong: |
+      `cur.next.value` jab `cur.next == null` → NullPointerException.
+    right: |
+      `while (cur != null && cur.next != null)` / Kotlin `?.`.
+  - title: "Assignment ka order ulta"
+    type: logic
+    wrong: |
+      `prev.next = node; node.next = prev.next` → node khud ko point kare, aage ki list gayi.
+    right: |
+      `node.next = prev.next` pehle, `prev.next = node` baad mein.
+  - title: "Head badla par return nahi kiya"
+    type: logic
+    wrong: |
+      Function mein `head = head.next` kiya, caller ke paas purana head hi raha.
+    right: |
+      Naya head **return** karo aur caller `head = f(head)` likhe.
+  - title: "Khaali list"
+    type: empty
+    wrong: |
+      `head.value` seedha padha jab head = null.
+    right: |
+      Shuru mein `if (head == null) return …`.
+  - title: "Delete ke baad bhi aage badh gaye"
+    type: logic
+    wrong: |
+      `[6, 6]` hatate waqt delete ke baad cur aage → doosra 6 chhoot gaya.
+    right: |
+      Delete kiya to cur wahi raho; nahi kiya tabhi aage.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Array vs linked list?"
+      a: |
+        Array: index O(1), lagatar memory, cache-friendly, beech mein insert O(n). List: index O(n), node haath mein ho to insert/delete O(1), extra pointer memory.
+    - q: "Linked list mein binary search kyun nahi?"
+      a: |
+        Mid tak pahunchna hi O(n) — total O(n log n) se bhi bura. (Skip list isi ka jugaad hai.)
+    - q: "Node diya hai (head nahi), use delete karo?"
+      followUp: true
+      a: |
+        Agle node ki value copy karo aur agle ko hata do: node.value = node.next.value; node.next = node.next.next. Aakhri node par kaam nahi karta.
+    - q: "Add Two Numbers — digits seedhe order mein ho to?"
+      followUp: true
+      a: |
+        Dono lists reverse karo (ya stack mein daalo), jodo, result reverse. Ya recursion se lambaai barabar karke peeche se.
+    - q: "Intersection trick kyun kaam karti hai?"
+      a: |
+        Dono pointers a + c + b kadam chalte hain (a, b = alag hisse, c = saanjha) — saanjhe hisse ke shuru par ek saath. Saanjha nahi to dono null par ek saath.
+    - q: "Java LinkedList kab use karte ho?"
+      a: |
+        Rarely — queue/deque ke liye ArrayDeque behtar (cache-friendly). LinkedList tab jab iterator se beech mein bahut add/remove.
+    - q: "Linked list ki length O(1) mein?"
+      a: |
+        Sirf agar size variable maintain karo. Warna O(n) traverse.
+    - q: "Singly mein aakhri node delete O(n) kyun?"
+      a: |
+        Aakhri se pehle wale ka next = null karna hai, aur usse peeche jaane ka raasta nahi. Doubly mein O(1) (tail.prev).
+  mayAsk:
+    - "Delete Node in a Linked List (sirf node diya)."
+    - "Remove Duplicates from Sorted List."
+    - "Design Linked List."
+    - "Convert Binary Number in a Linked List to Integer."
+
+# 12. Practice
+practice:
+  - name: Convert Binary Number in a Linked List to Integer
+    platform: LeetCode
+    num: 1290
+    url: "https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/"
+    level: easy
+    pattern: Traversal
+    hint: "ans = ans × 2 + bit, head se aage."
+  - name: Remove Duplicates from Sorted List
+    platform: LeetCode
+    num: 83
+    url: "https://leetcode.com/problems/remove-duplicates-from-sorted-list/"
+    level: easy
+    pattern: Skip next if same
+    hint: "cur.next.value == cur.value → cur.next = cur.next.next (cur wahi), warna aage."
+  - name: Remove Linked List Elements
+    platform: LeetCode
+    num: 203
+    url: "https://leetcode.com/problems/remove-linked-list-elements/"
+    level: easy
+    pattern: Delete via previous node
+    hint: "Example 1 — phir dummy node se dobara likho."
+  - name: Add Two Numbers
+    platform: LeetCode
+    num: 2
+    url: "https://leetcode.com/problems/add-two-numbers/"
+    level: medium
+    pattern: Parallel traversal + carry
+    hint: "Example 2."
+  - name: Design Linked List
+    platform: LeetCode
+    num: 707
+    url: "https://leetcode.com/problems/design-linked-list/"
+    level: medium
+    pattern: Full implementation
+    hint: "Code section jaisa; addAtIndex / deleteAtIndex mein index == size aur index 0 ke cases dhyaan se."
+  - name: Delete Node in a Linked List
+    platform: LeetCode
+    num: 237
+    url: "https://leetcode.com/problems/delete-node-in-a-linked-list/"
+    level: medium
+    pattern: Copy next and skip
+    hint: "Head nahi mila — agle node ki value apne mein copy karo, phir agle ko hatao."
+  - name: Merge k Sorted Lists
+    platform: LeetCode
+    num: 23
+    url: "https://leetcode.com/problems/merge-k-sorted-lists/"
+    level: hard
+    pattern: Heap ya pairwise merge
+    hint: "Har list ka head min-heap mein; chhota nikaalo, uska next daalo. Ya merge sort jaisa jode-jode merge. (Heap chapter ke baad.)"
+  - name: Reverse Nodes in k-Group
+    platform: LeetCode
+    num: 25
+    url: "https://leetcode.com/problems/reverse-nodes-in-k-group/"
+    level: hard
+    pattern: Reverse sublists
+    hint: "Reverse Linked List topic ke baad: har k nodes ka tukda ulta karo aur jodo; k se kam bache to waise hi chhodo."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Node = value + next; head se null tak chain."
+    - "get(i) O(n); node haath mein ho to insert/delete O(1)."
+    - "Insert: naya.next = prev.next PEHLE, phir prev.next = naya."
+    - "Delete: pichhle node se cur.next = cur.next.next; head case alag (ya dummy)."
+    - "Node compare = same object (===), value nahi."
+  cheatsheet: |
+    ```kotlin
+    class ListNode(var value: Int, var next: ListNode? = null)
+
+    var cur = head; while (cur != null) { /* use */ cur = cur.next }   // traverse
+    node.next = prev.next; prev.next = node                           // insert after prev
+    prev.next = prev.next?.next                                       // delete after prev
+    head = ListNode(x, head)                                          // addFirst
+    ```
+  quiz:
+    - q: "Linked list mein index 5 tak pahunchne ka time?"
+      options: ["O(1)", "O(log n)", "O(5) yaani O(i)", "O(n²)"]
+      answer: 2
+      explain: "Head se 5 kadam chalna padta hai."
+    - q: "prev ke baad node daalna — pehli line kya?"
+      options: ["prev.next = node", "node.next = prev.next", "node = prev", "head = node"]
+      answer: 1
+      explain: "Pehle naya node aage ki list pakde, warna wo kho jaayegi."
+    - q: "Intersection mein do nodes 'same' kab?"
+      options: ["Value same ho", "Same object (reference) ho", "Index same ho", "next same ho"]
+      answer: 1
+      explain: "Alag nodes ki value bhi same ho sakti hai."
+    - q: "addLast O(1) kaise?"
+      options: ["size variable", "tail pointer", "Recursion", "Sort"]
+      answer: 1
+      explain: "tail.next = naya; tail = naya."
+    - q: "999 + 1 (Add Two Numbers) mein result kitne digits?"
+      options: ["3", "4", "1", "2"]
+      answer: 1
+      explain: "1000 — aakhri carry naya digit banata hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: memory-basics
+      why: "Stack/heap, references — node kahan bante hain."
+    - id: dynamic-array
+      why: "ArrayList vs LinkedList ka fark."
+    - id: hashing-internals
+      why: "HashMap ke buckets mein chaining = linked list."
+  usedLater:
+    - id: doubly-linked-list
+      how: "prev pointer bhi — peeche jaana O(1)."
+    - id: fast-slow-pointers
+      how: "Middle, cycle — do speed ke pointers."
+    - id: reverse-linked-list
+      how: "Arrows ulte karna."
+    - id: linked-list-techniques
+      how: "Dummy node, merge, reorder."

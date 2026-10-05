@@ -1,0 +1,430 @@
+meta:
+  id: doubly-linked-list
+  chapter: linked-list
+  title: Doubly & Circular Linked List
+  subtitle: Aage-peeche dono arrows (O(1) delete), aur circle jahan aakhri wapas pehle se juda
+  level: intermediate
+  minutes: 35
+  prereqs: [singly-linked-list, hashmap]
+  tags: [linked-list, doubly, circular, sentinel, lru-cache]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Doubly linked list:** har node mein `prev` **aur** `next` — dono taraf chal sakte ho.
+
+    ```kotlin
+    class DNode(val value: Int) {
+        var prev: DNode? = null
+        var next: DNode? = null
+    }
+    ```
+
+    **Circular linked list:** aakhri node ka `next` wapas **pehle** ko (doubly mein pehle ka `prev` aakhri ko). Koi `null` end nahi.
+
+    **Sentinel (nakli) nodes:** list ke dono kinaron par ek-ek dummy node `head` aur `tail`. Asli data inke beech. Fayda: pehla/aakhri node hatana bhi beech wale jaisa — **koi null check nahi**.
+
+    > [!yaad]
+    > Doubly ka asli fayda: **node haath mein ho to O(1) delete** — pichhla node `node.prev` mein pehle se hai. Singly mein pichhla dhoondhne ko O(n).
+  analogy: |
+    **Metro ke coaches:** har coach aage aur peeche wale se juda — dono taraf chal sakte ho. Beech ka coach hatana: aage-peeche wale ko seedha jod do.
+
+    **Circular:** **ghanta (clock)** — 12 ke baad phir 1. Ya **ludo ke chaal** — board ka raasta ghoom ke wapas.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Singly list mein do kaam mehenge hain:
+    - Kisi node ko **hatana** jab sirf wahi node pata ho → pichhla dhoondhne O(n).
+    - **Peeche** jaana (back button, reverse iteration) → possible hi nahi.
+
+    Doubly dono O(1) bana deta hai — **ek extra pointer** ki memory ke badle.
+
+    Isliye real systems mein doubly bahut hai: **LRU cache** (Android `LruCache`, Java `LinkedHashMap`), browser history, text editor ka cursor, Java `LinkedList` (andar doubly).
+
+    > [!socho]
+    > LRU cache mein `get(key)` ke baad us item ko "sabse naya" banana hai — list mein **beech se nikaal ke aage** daalna. HashMap se node O(1) mein mil gaya. Singly hota to?
+    >
+    > Nikaalne ke liye pichhla node chahiye → O(n). Doubly mein `node.prev` → O(1). Isliye LRU = HashMap + **doubly** list.
+
+# 3. Visual intro
+visual:
+  body: |
+    Solid arrow = next, dashed = prev. Pehle aage chalo, phir tail se **peeche** — singly mein ye nahi hota tha.
+
+    Aakhir mein circular roop: aakhri ka next mud ke pehle par.
+  viz: { tracer: twoWay }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Node haath mein hai — O(1) mein hatao** (sentinels ke saath):
+
+    1. `p = node.prev`, `n = node.next` (sentinels ki wajah se kabhi null nahi).
+    2. `p.next = n` — aage chalne wale ab skip karenge.
+    3. `n.prev = p` — peeche chalne wale bhi.
+    4. `node.prev = node.next = null` — purana node saaf.
+
+    > [!tip]
+    > Sentinels ke bina: node pehla ho to `head = n`, aakhri ho to `tail = p` — 4 alag cases. Sentinels se ek hi code. LeetCode design problems mein hamesha sentinels lo.
+  viz: { tracer: dllRemoveTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Node haath mein ho to delete"
+    time: O(1)
+    space: O(1)
+    why: "prev aur next dono node ke paas."
+  - op: "addFirst / addLast (head + tail)"
+    time: O(1)
+    space: O(1)
+    why: "Sentinels ke saath 4 assignments."
+  - op: "Aakhri node delete"
+    time: O(1)
+    space: O(1)
+    why: "tail.prev seedha (singly mein O(n))."
+  - op: "Index / value dhoondhna"
+    time: O(n)
+    space: O(1)
+    why: "Abhi bhi chalna padta hai (dono kinaron se → n/2)."
+  - op: "Extra memory"
+    time: "lagu nahi"
+    space: "O(n) pointers"
+    why: "Har node ek extra reference."
+  - op: "Circular: k aage ginna"
+    time: O(k)
+    space: O(1)
+    why: "Kabhi null nahi — ghoomte raho."
+
+# 6. Code
+code:
+  - title: Circular list — Josephus game
+    file: circular
+    note: |
+      n log circle mein, har k-th bahar. Circular singly list: aakhri.next = pehla. Hum **hatane wale ke pichhle** par khade rehte hain (`prev`), taaki `prev.next = gone.next` se nikaal sakein.
+
+      Circular list mein loop `while (cur != null)` kabhi khatam nahi hoga — ginti (n baar) ya "wapas start par aaye?" se roko.
+
+# 7. Examples
+examples:
+  - id: reverse-dll
+    level: easy
+    title: Doubly list ulti karo
+    source: { name: Reverse a Doubly Linked List, platform: GFG, url: "https://www.geeksforgeeks.org/problems/reverse-a-doubly-linked-list/1" }
+    problem: |
+      Doubly linked list ko ulta karo — naya head return karo. `next` aur `prev` dono sahi hone chahiye.
+
+      Example: `1 ⇄ 2 ⇄ 3 ⇄ 4` → `4 ⇄ 3 ⇄ 2 ⇄ 1`
+    intuition: |
+      Doubly mein har node ke paas dono taraf ka pata hai. Ulta karna = **har node ke next aur prev swap**.
+
+      - `nxt = cur.next` bachao (swap ke baad cur.next badal jaayega).
+      - `cur.next = cur.prev`, `cur.prev = nxt`.
+      - Aakhri dekha node naya head.
+
+      > [!galti]
+      > Sirf `next` ulte kiye, `prev` bhool gaye → aage se padho to sahi, peeche se galat. Test mein **dono taraf** print karke check karo (code mein `backward`).
+    dryRun: |
+      | cur | Swap ke baad next | prev | newHead |
+      |---|---|---|---|
+      | 1 | null | 2 | 1 |
+      | 2 | 1 | 3 | 2 |
+      | 3 | 2 | 4 | 3 |
+      | 4 | 3 | null | **4** |
+    viz: { tracer: revDllTrace }
+    code: ex1-reverse
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Har node par ek swap."
+
+  - id: browser-history
+    level: medium
+    title: Browser history (back / forward)
+    source: { name: Design Browser History, platform: LeetCode, url: "https://leetcode.com/problems/design-browser-history/" }
+    problem: |
+      Browser banao: `visit(url)` (naya page; forward history mit jaati hai), `back(steps)`, `forward(steps)` — jitna ho sake utna jao, current url return karo.
+
+      Example: home → google → facebook → youtube; back(1) → **facebook.com**
+    intuition: |
+      Pages ki **doubly list**, `cur` pointer:
+      - `back` = `cur = cur.prev` (steps baar ya jab tak prev hai).
+      - `forward` = `cur = cur.next`.
+      - `visit` = naya node `cur` ke aage; `cur.next` ko seedha naye par — **purani forward history apne aap kat gayi** (koi pahunch nahi sakta).
+
+      > [!tip]
+      > Doosre tareeke: do stacks (back stack, forward stack), ya ek ArrayList + index + "valid till" counter (sabse fast, O(1) back/forward). Interview mein trade-off batao.
+    dryRun: |
+      | Op | cur | Return |
+      |---|---|---|
+      | visit ×3 | youtube | |
+      | back(1) | facebook | **facebook.com** |
+      | back(1) | google | google.com |
+      | forward(1) | facebook | facebook.com |
+      | visit(linkedin) | linkedin (youtube kat gaya) | |
+      | forward(2) | linkedin (aage kuch nahi) | linkedin.com |
+      | back(2) | google | google.com |
+      | back(7) | leetcode (shuru tak) | leetcode.com |
+    viz: { tracer: browserTrace }
+    code: ex2-browser
+    complexity:
+      time: "visit O(1), back/forward O(steps)"
+      space: O(n)
+      why: "Har page ek node; chalna steps jitna."
+
+  - id: lru-cache
+    level: tricky
+    title: LRU Cache — get/put O(1)
+    source: { name: LRU Cache, platform: LeetCode, url: "https://leetcode.com/problems/lru-cache/" }
+    problem: |
+      Fixed capacity ka cache banao: `get(key)` (na ho to −1) aur `put(key, value)`. Bhar jaaye to **sabse purana use hua** (least recently used) item nikaalo. Dono operations **O(1)**.
+
+      Example: capacity 2: put(1), put(2), get(1) → 1, put(3) → key 2 nikla, get(2) → −1
+    intuition: |
+      Do cheezein O(1) chahiye:
+      1. **Key se item dhoondhna** → HashMap.
+      2. **Use ka order** — kaun sabse purana, aur kisi ko "abhi use hua" banana → list jismein beech se nikaal ke aage daal sakein → **doubly list**.
+
+      **HashMap<key, Node> + doubly list (sentinels H, T):**
+      - H ke paas = sabse naya, T ke paas = sabse purana.
+      - `get`: map se node → `unlink` + `addFront`.
+      - `put` naya: bhara hai to `T.prev` (LRU) unlink + map se hatao; phir naya node aage.
+
+      > [!galti]
+      > Evict karte waqt **map se bhi** key hatana bhool gaye → map mein kachra, size galat, aur hataye hue node ko get mil jaata hai. Isliye node mein `key` bhi rakhte hain.
+
+      > [!tip]
+      > Java mein `LinkedHashMap(cap, 0.75f, true)` + `removeEldestEntry` = ready-made LRU. Interview mein pehle khud banao, phir ye batao.
+    dryRun: |
+      capacity 2 (list: naya → purana)
+
+      | Op | List | Output |
+      |---|---|---|
+      | put(1,1) | 1 | |
+      | put(2,2) | 2, 1 | |
+      | get(1) | 1, 2 | **1** |
+      | put(3,3) | 3, 1 (2 nikla) | |
+      | get(2) | 3, 1 | −1 |
+      | put(4,4) | 4, 3 (1 nikla) | |
+      | get(1), get(3), get(4) | … | −1, 3, 4 |
+    viz: { tracer: lruTrace }
+    code: ex3-lru
+    complexity:
+      time: O(1)
+      space: O(capacity)
+      why: "HashMap lookup + doubly unlink/addFront — sab constant."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Node haath mein aata hai (map se) aur use beech se nikaalna/aage karna hai — LRU, LFU."
+    - "Dono taraf chalna hai — back/forward, undo/redo, playlist prev/next."
+    - "Deque banana hai (dono kinaron par O(1))."
+    - "Circular: round-robin, baari-baari (Josephus), repeat playlist."
+  avoid:
+    - "Sirf aage chalna aur aage jodna — singly kaafi, kam memory."
+    - "Index access zyada — array."
+    - "Queue / stack chahiye — ArrayDeque (array based) zyada tez."
+  signals:
+    - keyword: "LRU / recently used / evict oldest"
+      think: "HashMap + doubly list with sentinels."
+    - keyword: "back / forward / undo / redo"
+      think: "Doubly list (ya do stacks)."
+    - keyword: "circle / round / every k-th removed"
+      think: "Circular list (ya Josephus formula)."
+    - keyword: "delete given node in O(1)"
+      think: "Doubly: node.prev.next = node.next."
+
+# 9. Real-world
+realWorld:
+  - where: "Android LruCache / image loaders"
+    how: "Bitmaps memory mein — bhar jaaye to sabse purana use hua bitmap nikaalo. Andar LinkedHashMap (HashMap + doubly list)."
+  - where: "Browser / app back stack"
+    how: "Back aur forward — doubly list jaisa (Android navigation back stack bhi)."
+  - where: "Music player"
+    how: "Previous / next gaana (doubly), repeat-all mode (circular)."
+  - where: "Operating system"
+    how: "Round-robin CPU scheduling — processes ki circular queue, har ek ko baari-baari time slice."
+  - where: "Text editors"
+    how: "Lines / characters ki doubly list — cursor aage-peeche, beech mein insert/delete."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Ek hi taraf ka link update kiya"
+    type: logic
+    wrong: |
+      Delete mein sirf `p.next = n` — `n.prev` abhi bhi hataye hue node ko point kare.
+    right: |
+      Dono: `p.next = n` aur `n.prev = p`. Insert mein 4 assignments.
+  - title: "Sentinels ke bina head/tail case"
+    type: "null"
+    wrong: |
+      Pehla node hataya → `node.prev.next` par NullPointerException (prev = null).
+    right: |
+      Dummy head/tail sentinels — har asli node ke dono taraf koi na koi node.
+  - title: "Circular list mein infinite loop"
+    type: logic
+    wrong: |
+      `while (cur != null)` — circle mein null kabhi nahi aata.
+    right: |
+      `do { … cur = cur.next } while (cur !== start)` ya ginti se roko.
+  - title: "LRU mein map se hatana bhool gaye"
+    type: logic
+    wrong: |
+      List se LRU node nikaala, map mein key rehne di → get() purani value de deta hai.
+    right: |
+      `map.remove(lru.key)` — isliye node mein key store karo.
+  - title: "Khaali / ek node wali list"
+    type: empty
+    wrong: |
+      Reverse ya delete mein `head.next.prev` — ek node par next null.
+    right: |
+      Sentinels lo, ya null checks; ek node par bhi test karo.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Singly vs doubly — kab kaunsa?"
+      a: |
+        Doubly: node se O(1) delete, peeche chalna — extra pointer memory. Singly: kam memory, simple, sirf aage.
+    - q: "Sentinel nodes kya aur kyun?"
+      a: |
+        Dummy head/tail jinke beech asli data. Pehla/aakhri node bhi 'beech' ka ban jaata hai — null checks aur special cases khatam.
+    - q: "LRU cache O(1) kaise?"
+      a: |
+        HashMap key → node, doubly list use-order. get: node nikaal ke aage. put: bhara ho to tail.prev nikaalo (map se bhi), naya aage.
+    - q: "LRU ko sirf HashMap + queue se?"
+      followUp: true
+      a: |
+        Queue mein beech se item O(1) nahi nikalta — get ke baad use aage karna O(n). Isliye doubly list.
+    - q: "LFU cache kaise?"
+      followUp: true
+      a: |
+        key → node, aur frequency → doubly list (har freq ki apni list), minFreq track. Hard problem (LC 460).
+    - q: "Circular list kahan use hoti hai?"
+      a: |
+        Round-robin scheduling, multiplayer turns, circular buffers, Josephus.
+    - q: "Josephus ka O(n) formula?"
+      a: |
+        J(1) = 0, J(n) = (J(n − 1) + k) % n. Winner = J(n) + 1. Elimination order ke liye simulation chahiye.
+    - q: "Java LinkedList singly hai ya doubly?"
+      a: |
+        Doubly — isliye addFirst/addLast/removeLast sab O(1), aur descendingIterator.
+  mayAsk:
+    - "Design Circular Deque."
+    - "Flatten a Multilevel Doubly Linked List."
+    - "All O`one Data Structure."
+    - "Convert BST to sorted doubly linked list."
+
+# 12. Practice
+practice:
+  - name: Reverse a Doubly Linked List
+    platform: GFG
+    url: "https://www.geeksforgeeks.org/problems/reverse-a-doubly-linked-list/1"
+    level: easy
+    pattern: Swap prev/next
+    hint: "Example 1."
+  - name: Delete node in Doubly Linked List
+    platform: GFG
+    url: "https://www.geeksforgeeks.org/problems/delete-node-in-doubly-linked-list/1"
+    level: easy
+    pattern: Unlink node
+    hint: "Position tak chalo; prev.next = next, next.prev = prev. Pehla node ho to head badlo."
+  - name: Insert a node in Doubly Linked List
+    platform: GFG
+    url: "https://www.geeksforgeeks.org/problems/insert-a-node-in-doubly-linked-list/1"
+    level: easy
+    pattern: Four-pointer insert
+    hint: "naya.prev = cur, naya.next = cur.next, cur.next?.prev = naya, cur.next = naya — order dhyaan se."
+  - name: Design Browser History
+    platform: LeetCode
+    num: 1472
+    url: "https://leetcode.com/problems/design-browser-history/"
+    level: medium
+    pattern: Doubly list with cursor
+    hint: "Example 2."
+  - name: LRU Cache
+    platform: LeetCode
+    num: 146
+    url: "https://leetcode.com/problems/lru-cache/"
+    level: medium
+    pattern: HashMap + doubly list
+    hint: "Example 3 — sentinels ke saath."
+  - name: Design Circular Deque
+    platform: LeetCode
+    num: 641
+    url: "https://leetcode.com/problems/design-circular-deque/"
+    level: medium
+    pattern: Doubly list (ya circular array)
+    hint: "Sentinels ke saath doubly: insertFront = H ke baad, insertLast = T se pehle. size aur capacity rakho."
+  - name: LFU Cache
+    platform: LeetCode
+    num: 460
+    url: "https://leetcode.com/problems/lfu-cache/"
+    level: hard
+    pattern: HashMap + per-frequency doubly lists
+    hint: "key → node, freq → doubly list (LRU order). minFreq rakho; get/put par node agli freq ki list mein."
+  - name: All O`one Data Structure
+    platform: LeetCode
+    num: 432
+    url: "https://leetcode.com/problems/all-oone-data-structure/"
+    level: hard
+    pattern: Doubly list of count buckets
+    hint: "Har count ka ek bucket node (keys ka set), buckets sorted doubly list mein. inc/dec par key padosi bucket mein — O(1). Max = tail.prev, min = head.next."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Doubly: prev + next; node haath mein ho to O(1) delete."
+    - "Delete: p.next = n, n.prev = p (dono!)."
+    - "Sentinels (dummy head/tail) = koi null check / special case nahi."
+    - "LRU = HashMap(key → node) + doubly list; evict tail.prev, map se bhi."
+    - "Circular: aakhri.next = pehla; loop ginti ya start se roko."
+  cheatsheet: |
+    ```kotlin
+    // sentinels
+    head.next = tail; tail.prev = head
+    // unlink
+    node.prev!!.next = node.next; node.next!!.prev = node.prev
+    // add after head
+    n.next = head.next; n.prev = head; head.next!!.prev = n; head.next = n
+    // LRU get: map[key] -> unlink -> addFront
+    // LRU put (full): lru = tail.prev; unlink(lru); map.remove(lru.key)
+    ```
+  quiz:
+    - q: "Doubly mein node haath mein ho to delete ki complexity?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n²)"]
+      answer: 0
+      explain: "prev aur next dono node ke paas hain."
+    - q: "LRU cache mein kaunsa node evict hota hai (H naya, T purana)?"
+      options: ["head.next", "tail.prev", "Random", "Sabse bada key"]
+      answer: 1
+      explain: "T ke theek pehle = sabse purana use hua."
+    - q: "Sentinel nodes ka fayda?"
+      options: ["Kam memory", "Pehle/aakhri node ke special cases khatam", "Fast search", "Sorting"]
+      answer: 1
+      explain: "Har asli node ke dono taraf koi node hota hai."
+    - q: "Josephus n = 5, k = 2 — sabse pehle kaun bahar?"
+      options: ["1", "2", "5", "3"]
+      answer: 1
+      explain: "1 se ginti: 1, 2 → 2 bahar."
+    - q: "Circular list traverse mein ruke kab?"
+      options: ["cur == null", "cur wapas start par aaye", "cur.value == 0", "Kabhi nahi"]
+      answer: 1
+      explain: "Circle mein null nahi aata."
+
+# 14. Connections
+connections:
+  related:
+    - id: singly-linked-list
+      why: "Basics — node, next, traverse."
+    - id: hashmap
+      why: "LRU ka doosra aadha."
+  usedLater:
+    - id: deque
+      how: "Deque ka ek roop doubly list hai (Java LinkedList)."
+    - id: circular-queue
+      how: "Circular idea — array ke saath."
+    - id: linked-list-techniques
+      how: "Dummy node (sentinel ka singly roop)."

@@ -1,0 +1,434 @@
+meta:
+  id: reverse-linked-list
+  chapter: linked-list
+  title: Reverse Linked List
+  subtitle: prev, cur, next — teen pointers se har arrow ulta. Palindrome, tukde ulte, k-group sab isi par
+  level: intermediate
+  minutes: 35
+  prereqs: [singly-linked-list, fast-slow-pointers]
+  tags: [linked-list, reverse, in-place, palindrome, k-group]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    List ulti karna = har node ka `next` arrow **ulta** karna. Nodes apni jagah rehte hain, naya node nahi banta.
+
+    **Teen pointers:**
+    ```kotlin
+    var prev: ListNode? = null
+    var cur = head
+    while (cur != null) {
+        val nxt = cur.next   // 1. aage ka raasta bachao
+        cur.next = prev      // 2. arrow ulta
+        prev = cur           // 3. dono aage
+        cur = nxt
+    }
+    return prev              // naya head
+    ```
+
+    Ye 5 line linked list ka **sabse zaroori** code hai — interview mein bina soche likhna aana chahiye.
+
+    > [!yaad]
+    > O(n) time, **O(1)** memory. Recursive version bhi hai (code section) par O(n) stack.
+  analogy: |
+    **Ek line mein khade log, sab aage wale ke kandhe par haath rakhe hain.** Ulta karna hai — sab peeche wale ke kandhe par haath rakhein.
+
+    Pehla insaan haath hatata hai (koi peeche nahi → null). Doosra insaan pehle ke kandhe par… Par haath hatane se **pehle** dekh lo ki aage kaun tha — warna line mein agla kaun hai, pata hi nahi chalega. Wahi `nxt`.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Singly list sirf aage chalti hai. "Peeche se padhna" chahiye to:
+    - Stack / array mein copy → O(n) memory.
+    - **In-place reverse** → O(1).
+
+    Aur reverse ek **building block** hai:
+    - Palindrome list (aadha ulta karke compare).
+    - Add two numbers (digits seedhe order mein ho to).
+    - Reorder list, k-group reverse, rotate list.
+
+    > [!socho]
+    > `cur.next = prev` pehle likh diya aur `nxt = cur.next` baad mein — kya hoga?
+    >
+    > `nxt` ab `prev` ban gaya (jo abhi likha) — aage ki puri list ka reference **kho gaya**. Garbage collector use le jaayega. Isliye hamesha **pehle bachao, phir badlo**.
+
+# 3. Visual intro
+visual:
+  body: |
+    Pehle seedha tareeka: sab values **stack** mein, phir nikaal ke nayi list. Kaam karta hai — par n naye nodes aur stack ki memory.
+
+    Agla section wahi kaam **bina extra memory** ke karega.
+  viz: { tracer: stackReverse }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    `1 → 2 → 3`:
+
+    | Kadam | nxt | cur.next = prev | prev | cur |
+    |---|---|---|---|---|
+    | 1 | 2 | 1 → null | 1 | 2 |
+    | 2 | 3 | 2 → 1 | 2 | 3 |
+    | 3 | null | 3 → 2 | 3 | null |
+    | – | | | **3 → 2 → 1** | |
+
+    Har kadam ka mantra: **bachao (nxt), ulta karo (cur.next), aage badho (prev, cur)**.
+
+    > [!tip]
+    > Animation mein nodes apni jagah rakhe hain — dekho arrows ek-ek karke peeche ki taraf mudte hain (upar wale curved arrows).
+  viz: { tracer: reverseTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Iterative reverse"
+    time: O(n)
+    space: O(1)
+    why: "Har node ek baar; teen pointers."
+  - op: "Recursive reverse"
+    time: O(n)
+    space: "O(n) stack"
+    why: "n calls gehri — badi list par StackOverflowError."
+  - op: "Stack / array se reverse"
+    time: O(n)
+    space: O(n)
+    why: "Saari values copy."
+  - op: "Sublist reverse (left..right)"
+    time: O(n)
+    space: O(1)
+    why: "Pahuncho + tukda ulta + do joints."
+  - op: "k-group reverse"
+    time: O(n)
+    space: O(1)
+    why: "Har node ek baar gina, ek baar ulta."
+  - op: "Palindrome check (aadha ulta)"
+    time: O(n)
+    space: O(1)
+    why: "Middle + reverse + compare."
+
+# 6. Code
+code:
+  - title: Recursive reverse
+    file: recursive
+    note: |
+      "Baaki list (head.next se) ulti ho gayi — maan lo (bharosa)." Tab `head.next` ab us ulti list ka **aakhri** node hai. Bas: `head.next.next = head`, `head.next = null`.
+
+      Saaf code, par O(n) stack — 10⁵ nodes par JVM mein StackOverflowError ho sakta hai. Interview mein dono likhna aana chahiye; production mein iterative.
+
+# 7. Examples
+examples:
+  - id: palindrome-list
+    level: easy
+    title: Palindrome linked list
+    source: { name: Palindrome Linked List, platform: LeetCode, url: "https://leetcode.com/problems/palindrome-linked-list/" }
+    problem: |
+      List aage se aur peeche se same padhti hai? O(n) time, O(1) memory.
+
+      Example: `1 → 2 → 2 → 1` → **true**
+    intuition: |
+      Array mein copy karke two pointers → O(n) memory. O(1) ke liye:
+
+      1. **Fast/slow** se beech.
+      2. **Doosra aadha reverse** — ab uske end se peeche padh sakte ho.
+      3. Head aur ulte aadhe ko saath-saath compare.
+
+      Odd length (`1 2 3 2 1`) mein beech wala (3) dono aadhon mein aa jaata hai — khud se compare, koi dikkat nahi.
+
+      > [!tip]
+      > Input list badal di! Achhe code mein compare ke baad doosra aadha **wapas reverse** karke jod do. Interview mein ye bolna plus point hai.
+    dryRun: |
+      `1 → 2 → 2 → 1`
+
+      | Kadam | Kya hua |
+      |---|---|
+      | middle | slow = doosra 2 (index 2) |
+      | reverse | doosra aadha: 1 → 2 |
+      | compare | 1 = 1 ✓, 2 = 2 ✓ → **true** |
+    viz: { tracer: palTrace }
+    code: ex1-palindrome
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Teen O(n) pass, koi copy nahi."
+
+  - id: reverse-between
+    level: medium
+    title: Sirf beech ka tukda ulta karo
+    source: { name: Reverse Linked List II, platform: LeetCode, url: "https://leetcode.com/problems/reverse-linked-list-ii/" }
+    problem: |
+      Position `left` se `right` tak (1 se ginti) wale nodes ulte karo, baaki waise hi. Ek pass mein.
+
+      Example: `1 → 2 → 3 → 4 → 5`, left = 2, right = 4 → `1 → 4 → 3 → 2 → 5`
+    intuition: |
+      Teen kaam:
+      1. **before** = tukde se theek pehle wala node (left − 1 kadam). `left = 1` ho to before kya? → **dummy node** (head se pehle nakli).
+      2. Tukde (`right − left + 1` nodes) ko normal reverse karo. `start` = tukde ka purana pehla.
+      3. **Do joints:** `before.next = prev` (tukde ka naya pehla), `start.next = cur` (tukde ke baad wala).
+
+      > [!galti]
+      > Joints bhool gaye → tukda ulta ho gaya par baaki list se kat gaya. Reverse ke baad `start` khud tukde ka aakhri hai — use agle node se jodna hai.
+    dryRun: |
+      before = 1, start = 2
+
+      | Kadam | Tukda (ulta hote hue) | cur |
+      |---|---|---|
+      | flip 2 | 2 → null | 3 |
+      | flip 3 | 3 → 2 | 4 |
+      | flip 4 | 4 → 3 → 2 | 5 |
+      | join | 1 → 4 … 2 → 5 | **1 → 4 → 3 → 2 → 5** |
+    viz: { tracer: betweenTrace }
+    code: ex2-between
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass; dummy ek node."
+
+  - id: k-group
+    level: tricky
+    title: k-k ke tukde ulte karo
+    source: { name: Reverse Nodes in k-Group, platform: LeetCode, url: "https://leetcode.com/problems/reverse-nodes-in-k-group/" }
+    problem: |
+      List ke har **k** nodes ka tukda ulta karo. Aakhir mein k se kam bache to unhe waise hi chhodo. Sirf links badlo (values nahi).
+
+      Example: `1 → 2 → 3 → 4 → 5`, k = 2 → `2 → 1 → 4 → 3 → 5`
+    intuition: |
+      Example 2 ko loop mein:
+
+      - `groupPrev` = pichhle tukde ka aakhri (shuru mein dummy).
+      - **Check:** groupPrev se k kadam → `kth`. Null mila → k se kam bache → ruko.
+      - `groupNext = kth.next`.
+      - Tukda ulta karo, par `prev = groupNext` se shuru — taaki tukde ka purana pehla seedha `groupNext` ko point kare (ek joint apne aap ho gaya!).
+      - `groupPrev.next = kth` (doosra joint), `groupPrev = tukde ka purana pehla`.
+
+      > [!tip]
+      > `prev = groupNext` wali trick yaad rakho — sublist reverse ka ek joint free mein. Example 2 mein bhi `prev = cur_after` se start kar sakte the.
+    dryRun: |
+      k = 2
+
+      | Tukda | kth | Ulta ke baad | List |
+      |---|---|---|---|
+      | 1, 2 | 2 | 2 → 1 → 3 | D → 2 → 1 → 3 → 4 → 5 |
+      | 3, 4 | 4 | 4 → 3 → 5 | D → 2 → 1 → 4 → 3 → 5 |
+      | 5 | null | – (k se kam) | **2 → 1 → 4 → 3 → 5** |
+    viz: { tracer: kGroupTrace }
+    code: ex3-k-group
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Har node ek baar gina (check), ek baar ulta."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "List ulti chahiye, ya kisi hisse ko ulta karna hai."
+    - "Peeche se padhna / compare karna hai (palindrome, twin sum) aur O(1) memory chahiye."
+    - "Digits seedhe order mein (most significant pehle) aur jodna hai — reverse, jodo, reverse."
+    - "Reorder list (L0 → Ln → L1 → Ln−1 …) — middle + reverse + merge."
+  avoid:
+    - "Input list badalna mana hai aur memory ki fikar nahi — stack lo."
+    - "Doubly list hai — tail se prev ki taraf chalo, reverse ki zaroorat nahi."
+    - "Bahut lambi list + recursive version — stack overflow; iterative lo."
+  signals:
+    - keyword: "reverse linked list / reverse between"
+      think: "prev, cur, nxt; tukde ke liye dummy + do joints."
+    - keyword: "palindrome linked list, O(1) space"
+      think: "Middle + second half reverse + compare."
+    - keyword: "reverse every k nodes"
+      think: "groupPrev, kth check, prev = groupNext."
+    - keyword: "reorder / twin sum / fold list"
+      think: "Middle + reverse second half."
+
+# 9. Real-world
+realWorld:
+  - where: "Undo history"
+    how: "Actions ki list ulti chalana — sabse naya pehle (stack jaisa)."
+  - where: "Number processing"
+    how: "Bade numbers (hazaaron digits) linked lists mein — jodne se pehle reverse karke units se shuru."
+  - where: "Chat apps"
+    how: "Messages naye-se-purane aate hain, dikhane hain purane-se-naye — list reverse (ya ulta iterate)."
+  - where: "Networking"
+    how: "Packet path record karna aur reply ke liye ulta raasta (reverse route)."
+  - where: "Text processing"
+    how: "Words ka order ulta karna (sentence reverse) — tokens ki list reverse."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "nxt bachaaye bina arrow ulta"
+    type: logic
+    wrong: |
+      `cur.next = prev; cur = cur.next` → cur peeche chala gaya, aage ki list kho gayi.
+    right: |
+      `val nxt = cur.next` pehle, phir `cur.next = prev`, `prev = cur`, `cur = nxt`.
+  - title: "Purana head return kiya"
+    type: logic
+    wrong: |
+      `return head` — head ab aakhri node hai (next = null) → sirf 1 node wali list.
+    right: |
+      `return prev` — loop ke baad wahi purana aakhri node hai.
+  - title: "Sublist reverse mein joints bhool gaye"
+    type: logic
+    wrong: |
+      Tukda ulta kiya, `before.next` aur `start.next` nahi jode → list toot gayi.
+    right: |
+      `before.next = prev`, `start.next = cur`. left = 1 ke liye dummy.
+  - title: "Recursive mein head.next = null bhool gaye"
+    type: logic
+    wrong: |
+      Do nodes ek doosre ko point karte rahe → circle ban gaya, print par infinite loop.
+    right: |
+      `head.next.next = head` ke baad `head.next = null`.
+  - title: "Khaali / ek node"
+    type: empty
+    wrong: |
+      `head.next` padha jab head = null.
+    right: |
+      Iterative loop khud handle karta hai (cur = null → prev = null return). Recursive: `if (head == null || head.next == null) return head`.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Linked list reverse karo — iterative aur recursive?"
+      a: |
+        Iterative: prev/cur/nxt, O(n) O(1). Recursive: baaki ulta karo, head.next.next = head, head.next = null — O(n) stack.
+    - q: "Recursive version ki space complexity?"
+      a: |
+        O(n) — har node ek stack frame. Badi list par stack overflow.
+    - q: "Palindrome list O(1) memory mein?"
+      a: |
+        Middle (fast/slow), second half reverse, compare, phir wapas reverse karke restore.
+    - q: "Reverse Linked List II mein dummy kyun?"
+      followUp: true
+      a: |
+        left = 1 par 'tukde se pehle wala' node nahi hota. Dummy se har case same; return dummy.next.
+    - q: "k-group mein aakhri adhoora tukda?"
+      a: |
+        Pehle k kadam check karo; k nodes nahi mile to us tukde ko chhod do. (Variant: usse bhi ulta karna ho to check hatao.)
+    - q: "Reorder List kaise?"
+      followUp: true
+      a: |
+        Middle se todo, second half reverse, phir dono ko baari-baari jodo (L0, Ln, L1, Ln−1 …). Teen O(n) kadam, O(1).
+    - q: "Doubly list reverse kaise alag hai?"
+      a: |
+        Har node ke prev aur next swap; naya head = purana aakhri. (Doubly topic.)
+    - q: "Add Two Numbers II (seedhe digits)?"
+      a: |
+        Dono reverse → Add Two Numbers → result reverse. Ya do stacks agar list badalna mana ho.
+  mayAsk:
+    - "Reorder List."
+    - "Swap Nodes in Pairs."
+    - "Rotate List."
+    - "Maximum Twin Sum of a Linked List."
+
+# 12. Practice
+practice:
+  - name: Reverse Linked List
+    platform: LeetCode
+    num: 206
+    url: "https://leetcode.com/problems/reverse-linked-list/"
+    level: easy
+    pattern: prev / cur / nxt
+    hint: "Iterative aur recursive dono likho."
+  - name: Palindrome Linked List
+    platform: LeetCode
+    num: 234
+    url: "https://leetcode.com/problems/palindrome-linked-list/"
+    level: easy
+    pattern: Middle + reverse half
+    hint: "Example 1."
+  - name: Merge Two Sorted Lists
+    platform: LeetCode
+    num: 21
+    url: "https://leetcode.com/problems/merge-two-sorted-lists/"
+    level: easy
+    pattern: Pointer rewiring warm-up
+    hint: "Dummy node; dono ke aage wale mein chhota jodo. Reverse jaisa hi 'pehle bachao, phir jodo' wala dhyaan."
+  - name: Reverse Linked List II
+    platform: LeetCode
+    num: 92
+    url: "https://leetcode.com/problems/reverse-linked-list-ii/"
+    level: medium
+    pattern: Sublist reverse + joints
+    hint: "Example 2."
+  - name: Maximum Twin Sum of a Linked List
+    platform: LeetCode
+    num: 2130
+    url: "https://leetcode.com/problems/maximum-twin-sum-of-a-linked-list/"
+    level: medium
+    pattern: Middle + reverse + pair walk
+    hint: "Palindrome jaisa: second half ulta, phir pehle aur doosre aadhe ke jode jodo, max lo."
+  - name: Swap Nodes in Pairs
+    platform: LeetCode
+    num: 24
+    url: "https://leetcode.com/problems/swap-nodes-in-pairs/"
+    level: medium
+    pattern: k-group with k = 2
+    hint: "Dummy; har jodi (a, b): prev.next = b, a.next = b.next, b.next = a; prev = a."
+  - name: Reverse Nodes in k-Group
+    platform: LeetCode
+    num: 25
+    url: "https://leetcode.com/problems/reverse-nodes-in-k-group/"
+    level: hard
+    pattern: Group check + reverse + join
+    hint: "Example 3."
+  - name: Merge k Sorted Lists
+    platform: LeetCode
+    num: 23
+    url: "https://leetcode.com/problems/merge-k-sorted-lists/"
+    level: hard
+    pattern: Pairwise merge (pointer rewiring at scale)
+    hint: "Lists ko jode-jode merge karo (1+2, 3+4 …) jab tak ek na bache — O(N log k). Ya heap (Heap chapter)."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "prev = null, cur = head; nxt bachao → cur.next = prev → prev = cur, cur = nxt; return prev."
+    - "Recursive: baaki ulta, head.next.next = head, head.next = null (O(n) stack)."
+    - "Palindrome: middle + second half reverse + compare."
+    - "Sublist: dummy, before, tukda ulta, do joints."
+    - "k-group: k kadam check, prev = groupNext se reverse, groupPrev.next = kth."
+  cheatsheet: |
+    ```kotlin
+    fun reverse(head: ListNode?): ListNode? {
+        var prev: ListNode? = null; var cur = head
+        while (cur != null) { val n = cur.next; cur.next = prev; prev = cur; cur = n }
+        return prev
+    }
+    // sublist [l, r]: before = dummy + (l-1) kadam; reverse (r-l+1) nodes;
+    // before.next = prev; start.next = cur
+    ```
+  quiz:
+    - q: "Reverse ke loop mein sabse pehli line?"
+      options: ["cur.next = prev", "nxt = cur.next", "prev = cur", "cur = nxt"]
+      answer: 1
+      explain: "Aage ka raasta pehle bachao."
+    - q: "Loop ke baad naya head kaun?"
+      options: ["head", "cur", "prev", "null"]
+      answer: 2
+      explain: "cur null hai; prev purana aakhri node."
+    - q: "Recursive reverse ki space?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n²)"]
+      answer: 2
+      explain: "n stack frames."
+    - q: "1→2→3→4→5, left = 2, right = 4 ka result?"
+      options: ["1→4→3→2→5", "4→3→2→1→5", "1→2→5→4→3", "5→4→3→2→1"]
+      answer: 0
+      explain: "Sirf 2..4 ulta."
+    - q: "k = 3, list 1..5 — k-group result?"
+      options: ["3→2→1→5→4", "3→2→1→4→5", "1→2→3→4→5", "5→4→3→2→1"]
+      answer: 1
+      explain: "Aakhri 4, 5 (k se kam) waise hi."
+
+# 14. Connections
+connections:
+  related:
+    - id: fast-slow-pointers
+      why: "Middle nikaal ke aadha reverse."
+    - id: recursion-basics
+      why: "Recursive reverse = leap of faith."
+    - id: doubly-linked-list
+      why: "Doubly reverse = prev/next swap."
+  usedLater:
+    - id: linked-list-techniques
+      how: "Dummy node, reorder list, merge."
+    - id: stack
+      how: "Stack se reverse — LIFO ka seedha use."
