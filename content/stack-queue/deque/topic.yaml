@@ -1,0 +1,432 @@
+meta:
+  id: deque
+  chapter: stack-queue
+  title: Deque
+  subtitle: Dono kinaron par O(1) — aur monotonic deque se har window ka max/min O(n) mein
+  level: intermediate
+  minutes: 40
+  prereqs: [queue, stack, sliding-window-fixed]
+  tags: [deque, monotonic-deque, sliding-window-maximum, prefix-sum]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Deque** (Double-Ended Queue, "deck" bolte hain) = dono kinaron par jodo **aur** nikaalo, sab O(1):
+
+    | Kaam | Kotlin `ArrayDeque` | Java `ArrayDeque` |
+    |---|---|---|
+    | Aage jodo / nikaalo | `addFirst` / `removeFirst` | `offerFirst` / `pollFirst` |
+    | Peeche jodo / nikaalo | `addLast` / `removeLast` | `offerLast` / `pollLast` |
+    | Dekho | `first()` / `last()` | `peekFirst` / `peekLast` |
+
+    Ek hi structure stack (ek kinara) bhi hai aur queue (do kinare) bhi.
+
+    **Monotonic deque** — sabse kaam ka roop: deque mein items hamesha **sorted** (badhte ya ghatte) rakho. Naya item aaye to peeche se woh hatao jo order todte hain. Aage wala = window ka **max** (ya min).
+
+    > [!yaad]
+    > Sliding window ka max/min → monotonic deque, O(n). (Sum to subtract ho jaata hai, max nahi — isliye deque.)
+  analogy: |
+    **Taash ki gaddi** — upar se bhi patta nikaal sakte ho, neeche se bhi; dono taraf rakh bhi sakte ho.
+
+    **Monotonic deque = selection committee:** naya, zyada talented ladka aaya to purane kam talented (jo usse pehle aaye the) kabhi select nahi honge — unhe abhi hata do. Aur jo "umar" (window) se bahar ho gaya, use aage se hata do.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    **Sliding Window Maximum:** har k-size window ka max. Brute force har window mein k items → O(n·k). Heap → O(n log n). **Monotonic deque → O(n).**
+
+    Do kaam ek saath chahiye the:
+    - Window se bahar gaya purana → **aage** se hatao (queue).
+    - Naya bada aaya to bekaar chhote → **peeche** se hatao (stack).
+
+    Dono kinaron par kaam = deque.
+
+    > [!socho]
+    > Window [3, 1, 2], naya 5 aaya. 3, 1, 2 ab kabhi max ban sakte hain?
+    >
+    > Nahi! 5 unse bada hai aur **baad** mein aaya hai — wo unse zyada der window mein rahega. Jab tak 5 hai, wo kabhi max nahi. Isliye hamesha ke liye hatao. Har item max ek baar hatega → O(n).
+
+# 3. Visual intro
+visual:
+  body: |
+    Baari-baari peeche aur aage jodo, phir dono kinaron se nikaalo. Stack aur queue dono ki taakat ek saath.
+  viz: { tracer: deqDemo }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Sliding Window Maximum** (deque mein **indexes**, unki values ghatti hui):
+
+    Har naye index `i` par:
+    1. **Drop:** aage wala index window se bahar (`≤ i − k`)? Aage se hatao.
+    2. **Pop:** peeche wale jinki value `≤ nums[i]` — hatao (ab kabhi max nahi).
+    3. **Push:** `i` peeche jodo.
+    4. **Max:** window poori (`i ≥ k − 1`) → `nums[dq.first()]`.
+
+    `[1, 3, −1, −3, 5, 3, 6, 7]`, k = 3 → `[3, 3, 5, 5, 6, 7]`
+
+    > [!tip]
+    > Indexes rakho, values nahi — window se bahar hai ya nahi, ye index se hi pata chalta hai.
+  viz: { tracer: windowMaxTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "addFirst / addLast / removeFirst / removeLast"
+    time: O(1)
+    space: O(1)
+    why: "Circular array (ArrayDeque)."
+  - op: "Sliding window max / min (monotonic deque)"
+    time: O(n)
+    space: O(k)
+    why: "Har index ek push, max ek pop."
+  - op: "Sliding window max — brute force"
+    time: O(n·k)
+    space: O(1)
+    why: "Har window k items."
+  - op: "Sliding window max — heap"
+    time: O(n log n)
+    space: O(n)
+    why: "Lazy deletion; deque se slow."
+  - op: "Shortest subarray sum ≥ k (negatives)"
+    time: O(n)
+    space: O(n)
+    why: "Prefix sums + monotonic deque."
+  - op: "Beech mein access / insert"
+    time: O(n)
+    space: O(1)
+    why: "Deque sirf kinaron ke liye."
+
+# 6. Code
+code:
+  - title: Deque — dono kinare
+    file: deque-api
+    note: |
+      Kotlin `ArrayDeque` aur Java `ArrayDeque` dono circular array hain (Circular Queue topic). Java `LinkedList` bhi `Deque` hai par slow (har node alag object) — ArrayDeque lo.
+
+      Java ArrayDeque mein **null** nahi daal sakte (null = "khaali" ka signal).
+
+# 7. Examples
+examples:
+  - id: faulty-keyboard
+    level: easy
+    title: Kharab keyboard — 'i' se text ulta
+    source: { name: Faulty Keyboard, platform: LeetCode, url: "https://leetcode.com/problems/faulty-keyboard/" }
+    problem: |
+      String type kar rahe ho; jab bhi `'i'` dabate ho, ab tak ka text **ulta** ho jaata hai ('i' khud nahi likha jaata). Aakhri text?
+
+      Example: `"string"` → `"rtsng"`
+    intuition: |
+      Har 'i' par sach mein ulta karo → O(n) har baar → O(n²).
+
+      **Trick:** text ulta mat karo, bas **flag** rakho `flipped`.
+      - Seedha hai → naya char **peeche** (`addLast`).
+      - Ulta hai → screen par naya char end mein dikhta hai, par asal (seedhe) order mein wo **aage** hai (`addFirst`).
+      - Aakhir mein flipped hai to ek baar ulta karo.
+
+      > [!tip]
+      > "Baar-baar ulta" → flag + deque. Reverse ka kharcha sirf ek baar.
+    dryRun: |
+      `string`
+
+      | Char | flipped | Deque (asal) |
+      |---|---|---|
+      | s, t, r | F | s t r |
+      | i | T | s t r |
+      | n | T | n s t r (aage) |
+      | g | T | g n s t r |
+      | end | T → ulta | **rtsng** |
+    viz: { tracer: keyboardTrace }
+    code: ex1-keyboard
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har char ek O(1) add; aakhir mein ek reverse."
+
+  - id: abs-diff-limit
+    level: medium
+    title: Sabse lamba subarray jismein max − min ≤ limit
+    source: { name: Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit, platform: LeetCode, url: "https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/" }
+    problem: |
+      Sabse lamba lagatar subarray jismein kisi bhi do numbers ka farak `≤ limit` ho (yaani `max − min ≤ limit`).
+
+      Example: `[10, 1, 2, 4, 7, 2]`, limit = 5 → **4** (`[2, 4, 7, 2]`)
+    intuition: |
+      **Variable sliding window** (r failao, invalid ho to l sikodo) — par window ka **max aur min** chahiye har kadam.
+
+      Do monotonic deques:
+      - `maxD` — values ghatti hui → aage = max.
+      - `minD` — values badhti hui → aage = min.
+
+      Window sikodte waqt: bahar jaane wala `nums[l]` kisi deque ke aage hai to wahan se bhi hatao.
+
+      > [!galti]
+      > Deque mein strict `<` / `>` se pop karo (barabar wale rakho) — warna duplicate max hat gaya aur l badhne par galat value hata di.
+    dryRun: |
+      limit = 5
+
+      | r | Window | max | min | Kya hua | best |
+      |---|---|---|---|---|---|
+      | 0 | 10 | 10 | 10 | | 1 |
+      | 1 | 10 1 | 10 | 1 | 9 > 5 → l = 1 | 1 |
+      | 2 | 1 2 | 2 | 1 | | 2 |
+      | 3 | 1 2 4 | 4 | 1 | | 3 |
+      | 4 | 1 2 4 7 | 7 | 1 | 6 > 5 → l = 2 | 3 |
+      | 5 | 2 4 7 2 | 7 | 2 | | **4** |
+    viz: { tracer: limitTrace }
+    code: ex2-limit
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har item har deque mein max ek baar aata-jaata."
+
+  - id: shortest-subarray-k
+    level: tricky
+    title: Sum ≥ k wala sabse chhota subarray (negatives ke saath)
+    source: { name: Shortest Subarray with Sum at Least K, platform: LeetCode, url: "https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/" }
+    problem: |
+      Sabse chhota lagatar subarray jiska sum `≥ k`. Numbers **negative** bhi ho sakte hain. Na ho to −1.
+
+      Example: `[2, −1, 2]`, k = 3 → **3**
+    intuition: |
+      Positive numbers hote to variable window (Sliding Window topic). Negatives ke saath sikodne se sum **badh** bhi sakta hai — window toot jaata hai.
+
+      **Prefix sums:** sum(i..j−1) = `pre[j] − pre[i]`. Har j ke liye sabse **paas** wala i chahiye jahan `pre[j] − pre[i] ≥ k`.
+
+      Deque mein start indexes, `pre` **badhte hue**:
+      - **Aage se:** `pre[j] − pre[first] ≥ k` → answer `j − first`; ab first ko hatao (aage ka koi j isse chhota answer nahi dega).
+      - **Peeche se:** `pre[last] ≥ pre[j]` → hatao — j behtar start hai (chhota pre = bada sum, aur baad mein = chhoti length).
+
+      > [!tip]
+      > Dono pops ka "kyun" interview mein bolna — yahi problem ko Hard banata hai.
+    dryRun: |
+      `[2, −1, 2]` → pre = `[0, 2, 1, 3]`, k = 3
+
+      | j | pre[j] | Aage se (found) | Peeche se pop | Deque |
+      |---|---|---|---|---|
+      | 0 | 0 | – | – | 0 |
+      | 1 | 2 | 2 − 0 < 3 | – | 0, 1 |
+      | 2 | 1 | 1 − 0 < 3 | 1 (pre 2 ≥ 1) | 0, 2 |
+      | 3 | 3 | 3 − 0 ≥ 3 → len **3** | – | 2, 3 |
+    viz: { tracer: shortestTrace }
+    code: ex3-shortest
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Prefix array + har index ek push, max ek pop."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Dono kinaron par jodna/nikaalna (palindrome check, undo + redo, work stealing)."
+    - "Sliding window ka max / min."
+    - "Variable window jismein max/min ya monotonic condition chahiye."
+    - "Prefix sums + 'sabse paas wala chhota/bada' (negatives ke saath)."
+  avoid:
+    - "Sirf ek kinara — stack ya queue simple hai."
+    - "Window ka median / k-th — deque nahi; do heaps ya TreeMap."
+    - "Beech ke items ke saath kaam — list/array."
+  signals:
+    - keyword: "max / min of every window of size k"
+      think: "Monotonic deque of indexes."
+    - keyword: "longest subarray with max − min ≤ limit"
+      think: "Do monotonic deques + variable window."
+    - keyword: "shortest subarray sum ≥ k with negatives"
+      think: "Prefix sums + increasing deque."
+    - keyword: "DP with max over last k states (Jump Game VI)"
+      think: "dp[i] = nums[i] + max(dp[i−k..i−1]) → deque."
+
+# 9. Real-world
+realWorld:
+  - where: "Stock / crypto charts"
+    how: "Pichhle N din ka high / low (rolling max/min) — har naye din O(1) amortized."
+  - where: "Network monitoring"
+    how: "Last 1 minute ka peak latency / bandwidth — sliding window max."
+  - where: "Thread pools (work stealing)"
+    how: "Har worker apne deque ke ek kinare se kaam leta hai, doosre workers dusre kinare se 'chura' lete hain (Java ForkJoinPool)."
+  - where: "Text editors"
+    how: "Undo/redo history ki fixed size — purana aage se hatao, naya peeche jodo."
+  - where: "Browsers"
+    how: "Tab history mein dono taraf jaana."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Values rakhi, indexes nahi"
+    type: logic
+    wrong: |
+      Deque mein values — window se bahar kaun gaya, pata nahi chalta (duplicates mein aur bhi gadbad).
+    right: |
+      Indexes rakho; value `nums[idx]` se.
+  - title: "Drop ki condition off-by-one"
+    type: off-by-one
+    wrong: |
+      `dq.first() < i - k` → ek purana index window mein reh gaya.
+    right: |
+      Window `i − k + 1 .. i` → bahar = `≤ i − k`.
+  - title: "Answer window poori hone se pehle"
+    type: off-by-one
+    wrong: |
+      Har i par res mein daala → pehle k − 1 galat entries.
+    right: |
+      `if (i >= k - 1)` — tabhi window mein poore k items hain.
+  - title: "Khaali deque par first()"
+    type: empty
+    wrong: |
+      Kotlin `first()` / Java `peekFirst()` khaali par exception / null.
+    right: |
+      Har jagah `isNotEmpty()` check pehle.
+  - title: "Prefix sum Int mein"
+    type: overflow
+    right: |
+      10⁵ numbers × 10⁵ value → `Long` prefix sums.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Deque kya hai, kahan use?"
+      a: |
+        Double-ended queue — dono kinaron par O(1) add/remove. Stack + queue dono. Sliding window max/min, palindrome, BFS 0-1 weights.
+    - q: "Sliding Window Maximum O(n) kaise?"
+      a: |
+        Monotonic deque of indexes (values decreasing). Aage se window ke bahar wale, peeche se naye se chhote hatao. Aage = max. Har index ek push, max ek pop.
+    - q: "Peeche se chhote kyun hata sakte hain?"
+      followUp: true
+      a: |
+        Naya item bada hai aur baad mein aaya — window mein unse zyada der rahega. Jab tak wo hai, wo chhote kabhi max nahi.
+    - q: "Heap vs deque for window max?"
+      a: |
+        Heap O(n log n), lazy deletion chahiye. Deque O(n), simple. Median/k-th ke liye heap/TreeMap.
+    - q: "0-1 BFS kya hai?"
+      followUp: true
+      a: |
+        Edge weight 0 ya 1: weight 0 wale node ko deque ke AAGE, 1 wale ko PEECHE. Dijkstra jaisa result O(V + E) mein. (Graphs chapter.)
+    - q: "Shortest Subarray ≥ K mein variable window kyun nahi?"
+      a: |
+        Negatives se window sikodne par sum badh sakta hai — monotonic nahi. Prefix sums + increasing deque se O(n).
+    - q: "Java mein deque ke liye kaunsa class?"
+      a: |
+        ArrayDeque (fast, circular array). LinkedList bhi Deque hai par slow. ArrayDeque mein null nahi.
+    - q: "Jump Game VI deque se kaise?"
+      a: |
+        dp[i] = nums[i] + max(dp[i − k .. i − 1]). Pichhle k dp ka max = sliding window max → deque. O(n).
+  mayAsk:
+    - "Jump Game VI."
+    - "Constrained Subsequence Sum."
+    - "Implement Stack using Queues."
+    - "Continuous Subarrays."
+
+# 12. Practice
+practice:
+  - name: Faulty Keyboard
+    platform: LeetCode
+    num: 2810
+    url: "https://leetcode.com/problems/faulty-keyboard/"
+    level: easy
+    pattern: Flag + addFirst / addLast
+    hint: "Example 1."
+  - name: Implement Stack using Queues
+    platform: LeetCode
+    num: 225
+    url: "https://leetcode.com/problems/implement-stack-using-queues/"
+    level: easy
+    pattern: Rotate queue after push
+    hint: "Ek queue: push ke baad pehle ke saare (size − 1) items aage se nikaal ke peeche daalo — naya aage aa gaya."
+  - name: Make The String Great
+    platform: LeetCode
+    num: 1544
+    url: "https://leetcode.com/problems/make-the-string-great/"
+    level: easy
+    pattern: Stack / deque top cancel
+    hint: "Top aur naya char same letter, alag case (jaise aA) → pop; warna push."
+  - name: Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit
+    platform: LeetCode
+    num: 1438
+    url: "https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/"
+    level: medium
+    pattern: Two monotonic deques + window
+    hint: "Example 2."
+  - name: Jump Game VI
+    platform: LeetCode
+    num: 1696
+    url: "https://leetcode.com/problems/jump-game-vi/"
+    level: medium
+    pattern: DP + window max deque
+    hint: "dp[i] = nums[i] + pichhle k dp ka max. Deque mein dp ke indexes, dp values ghatti hui."
+  - name: Continuous Subarrays
+    platform: LeetCode
+    num: 2762
+    url: "https://leetcode.com/problems/continuous-subarrays/"
+    level: medium
+    pattern: Window max/min deques + count
+    hint: "Example 2 jaisa (limit = 2), par har r par valid windows gino: r − l + 1 jodo."
+  - name: Sliding Window Maximum
+    platform: LeetCode
+    num: 239
+    url: "https://leetcode.com/problems/sliding-window-maximum/"
+    level: hard
+    pattern: Monotonic deque
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Shortest Subarray with Sum at Least K
+    platform: LeetCode
+    num: 862
+    url: "https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/"
+    level: hard
+    pattern: Prefix sums + increasing deque
+    hint: "Example 3 — dono pops ka kyun."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Deque: dono kinaron par add/remove O(1); ArrayDeque."
+    - "Monotonic deque: order todne wale peeche se hatao, purane aage se."
+    - "Window max: indexes, values ghatti; drop ≤ i − k; ans = nums[first]."
+    - "Window max + min: do deques (max − min ≤ limit)."
+    - "Negatives + sum ≥ k: prefix sums + pre badhte deque."
+  cheatsheet: |
+    ```kotlin
+    val dq = ArrayDeque<Int>()          // indexes
+    for (i in nums.indices) {
+        if (dq.isNotEmpty() && dq.first() <= i - k) dq.removeFirst()
+        while (dq.isNotEmpty() && nums[dq.last()] <= nums[i]) dq.removeLast()
+        dq.addLast(i)
+        if (i >= k - 1) res += nums[dq.first()]
+    }
+    ```
+  quiz:
+    - q: "Sliding window max ke deque mein values kaise rakhte hain?"
+      options: ["Badhte order", "Ghatte order (aage = max)", "Random", "Sorted by index ulta"]
+      answer: 1
+      explain: "Aage wala hamesha window ka max."
+    - q: "Window i − k + 1..i. Aage wala index kab hatao?"
+      options: ["< i − k + 1 yaani ≤ i − k", "< i", "> i − k", "Kabhi nahi"]
+      answer: 0
+      explain: "Window se bahar."
+    - q: "[1, 3, −1], k = 3 — pehli window ka max?"
+      options: ["1", "3", "−1", "4"]
+      answer: 1
+      explain: "max(1, 3, −1) = 3."
+    - q: "Sliding window max ki complexity (deque)?"
+      options: ["O(n·k)", "O(n log n)", "O(n)", "O(k)"]
+      answer: 2
+      explain: "Har index max ek baar push aur pop."
+    - q: "Negatives ke saath 'sum ≥ k sabse chhota' — kya chahiye?"
+      options: ["Simple sliding window", "Prefix sums + monotonic deque", "Sorting", "Binary search hamesha"]
+      answer: 1
+      explain: "Window monotonic nahi rehta."
+
+# 14. Connections
+connections:
+  related:
+    - id: circular-queue
+      why: "ArrayDeque andar circular array."
+    - id: sliding-window-variable
+      why: "Example 2 — window + deque."
+    - id: prefix-sum
+      why: "Example 3 ka base."
+  usedLater:
+    - id: monotonic-stack
+      how: "Sirf peeche wala kinara — next greater element."
+    - id: bfs
+      how: "0-1 BFS deque se."
+    - id: dp-1d
+      how: "Window-max DP (Jump Game VI)."

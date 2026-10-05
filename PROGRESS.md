@@ -4,8 +4,8 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–6 done (34 topics).
-- Next action: chapter 7 → `stack` (stack panel: items bottom→top; LinearPanel kind 'stack' | 'queue' | 'deque').
+- Step: 3 (Content). Chapters 0–7 done (39 topics).
+- Next action: chapter 8 → `backtracking-basics` (recursion panel via `callTree`; text panel for current path).
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
 - Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
@@ -86,11 +86,11 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] linked-list-techniques
 
 ### 7. Stack & Queue
-- [ ] stack
-- [ ] queue
-- [ ] circular-queue
-- [ ] deque
-- [ ] monotonic-stack
+- [x] stack
+- [x] queue
+- [x] circular-queue
+- [x] deque
+- [x] monotonic-stack
 
 ### 8. Backtracking
 - [ ] backtracking-basics

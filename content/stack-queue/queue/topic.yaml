@@ -1,0 +1,424 @@
+meta:
+  id: queue
+  chapter: stack-queue
+  title: Queue
+  subtitle: Jo pehle aaya, wo pehle jaayega (FIFO) — line, baari, stream aur BFS ki neev
+  level: beginner
+  minutes: 30
+  prereqs: [stack]
+  tags: [queue, fifo, two-stacks, stream, simulation]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Queue** = line. Do kinare:
+    - **Peeche (rear)** se jodo — `enqueue` / `offer` / `addLast`
+    - **Aage (front)** se nikaalo — `dequeue` / `poll` / `removeFirst`
+    - Aage wala dekho — `peek` / `first()`
+
+    Sab **O(1)**. Order: **FIFO** — First In, First Out.
+
+    ```kotlin
+    val q = ArrayDeque<Int>()   // Kotlin
+    q.addLast(5)                // enqueue
+    q.first()                   // peek
+    q.removeFirst()             // dequeue
+    ```
+    ```java
+    Queue<Integer> q = new ArrayDeque<>();   // Java
+    q.offer(5); q.peek(); q.poll();          // khaali par peek/poll null dete hain
+    ```
+
+    > [!yaad]
+    > Array ki `removeAt(0)` O(n) hai (sab khiskte hain). Isliye queue ke liye **ArrayDeque** (circular array andar) ya linked list — dono kinaron par O(1).
+  analogy: |
+    **Railway ticket counter ki line.** Naya aadmi peeche lagta hai, ticket aage wale ko milta hai. Koi beech mein ghus nahi sakta (warna jhagda!).
+
+    Ya **WhatsApp messages ka bhejna** — jo pehle type kiya, wo pehle pahunchta hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Jab bhi **aane ka order hi kaam ka order** ho:
+    - Printer jobs, download queue, task scheduler.
+    - **Stream / sliding window** — purane items aage se hatao, naye peeche jodo.
+    - **BFS** (graphs, trees ke level) — sabse kareeb wale pehle (Graphs chapter).
+    - Baari-baari simulation (round robin, games).
+
+    > [!socho]
+    > `ArrayList` ko queue banao: `add` peeche, `removeAt(0)` aage se. 10⁵ items par kya hoga?
+    >
+    > Har `removeAt(0)` baaki sab ko ek jagah khiskata hai → O(n). 10⁵ dequeues = 10¹⁰/2 kaam → TLE. ArrayDeque mein head index aage badhta hai bas → O(1).
+
+# 3. Visual intro
+visual:
+  body: |
+    Ticket line: log peeche jud rahe hain, ticket aage wale ko. Dekho **pehle aaya, pehle gaya** — stack ka ulta.
+  viz: { tracer: ticketLine }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Do stacks se queue** (interview favourite):
+    - `push` → `inbox` stack par.
+    - `pop / peek` → `outbox` se. Agar `outbox` **khaali** hai, tab hi `inbox` ke saare items pop karke `outbox` mein push karo — order ulta ho jaata hai, sabse purana top par aa jaata hai.
+
+    Ek stack = ulta, do baar ulta = **seedha** (FIFO).
+
+    > [!tip]
+    > "Outbox khaali ho **tabhi** shift" — yahi amortized O(1) ka raaz. Har item zindagi mein max ek baar inbox → outbox jaata hai. Har pop par shift karoge to O(n) per op.
+  viz: { tracer: twoStacksTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "enqueue / dequeue / peek (ArrayDeque)"
+    time: O(1)
+    space: O(1)
+    why: "Circular array — head/tail index."
+  - op: "Two-stack queue: push"
+    time: O(1)
+    space: O(1)
+    why: "inbox par."
+  - op: "Two-stack queue: pop / peek"
+    time: "O(1) amortized"
+    space: O(1)
+    why: "Har item ek hi baar shift; ek pop kabhi O(n)."
+  - op: "ArrayList.removeAt(0)"
+    time: O(n)
+    space: O(1)
+    why: "Sab items khiskte hain — queue ke liye mat lo."
+  - op: "Beech ka item / search"
+    time: O(n)
+    space: O(1)
+    why: "Queue iske liye nahi bani."
+  - op: "Sliding window (time / count)"
+    time: "O(1) amortized per item"
+    space: O(window)
+    why: "Har item ek baar aata, ek baar jaata."
+
+# 6. Code
+code:
+  - title: Queue Kotlin aur Java mein
+    file: queue-api
+    note: |
+      Kotlin `ArrayDeque`: `addLast` / `removeFirst` / `first()`. Java `Queue<…> = ArrayDeque`: `offer` / `poll` / `peek`.
+
+      Java mein `add/remove/element` bhi hain — ye khaali/full par **exception** dete hain; `offer/poll/peek` **null/false** dete hain. Interview mein `offer/poll/peek` likho.
+
+# 7. Examples
+examples:
+  - id: recent-calls
+    level: easy
+    title: Pichhle 3000 ms mein kitni calls?
+    source: { name: Number of Recent Calls, platform: LeetCode, url: "https://leetcode.com/problems/number-of-recent-calls/" }
+    problem: |
+      `ping(t)` — time `t` par ek request aayi (t hamesha badhta hai). Batao `[t − 3000, t]` mein kitni requests aayi hain (abhi wali samet).
+
+      Example: ping(1) → 1, ping(100) → 2, ping(3001) → 3, ping(3002) → **3**
+    intuition: |
+      Sliding window — **time** ka. Queue mein window ke andar ki calls:
+      - Nayi call peeche jodo.
+      - Aage se woh hatao jo `t − 3000` se purani hain (times badhte hain, to purane hamesha aage hi milenge).
+      - `size` = answer.
+
+      Har call ek baar aati hai, ek baar jaati hai → amortized O(1).
+
+      > [!tip]
+      > Rate limiter ("1 minute mein max 100 requests") bilkul yahi hai.
+    dryRun: |
+      | ping | Queue | Window | Answer |
+      |---|---|---|---|
+      | 1 | 1 | −2999..1 | 1 |
+      | 100 | 1, 100 | −2900..100 | 2 |
+      | 3001 | 1, 100, 3001 | 1..3001 | 3 |
+      | 3002 | 100, 3001, 3002 (1 gaya) | 2..3002 | **3** |
+    viz: { tracer: recentTrace }
+    code: ex1-recent
+    complexity:
+      time: "O(1) amortized per ping"
+      space: O(window)
+      why: "Har call ek push, max ek pop."
+
+  - id: dota-senate
+    level: medium
+    title: Dota2 Senate — baari-baari haq chheeno
+    source: { name: Dota2 Senate, platform: LeetCode, url: "https://leetcode.com/problems/dota2-senate/" }
+    problem: |
+      Senators ki line (R = Radiant, D = Dire). Har round mein baari-baari har zinda senator ek kaam karta hai: kisi **virodhi** senator ka haq hamesha ke liye chheen leta hai. Jab sirf ek party bache, wo jeet. Dono best khelte hain. Kaun jeetega?
+
+      Example: `"RDD"` → **"Dire"**
+    intuition: |
+      **Greedy:** apni baari par **agle bolne wale virodhi** ko hatao (wo sabse pehle nuksaan karega).
+
+      **Do queues** (har party ke senators ke index, bolne ke order mein):
+      - Dono ke aage wale aamne-saamne. Chhota index pehle bola → doosre ko hataya.
+      - Jeetne wala agle round mein phir bolega → `index + n` ke saath peeche jodo (taaki is round wale sab uske pehle aayein).
+
+      > [!tip]
+      > "Baari-baari, round-robin, chakkar" → queue. `+ n` wali trick se rounds ka order bina alag loop ke sambhal jaata hai.
+    dryRun: |
+      `RDD` (n = 3): R = [0], D = [1, 2]
+
+      | R aage | D aage | Kaun pehle | Baad mein |
+      |---|---|---|---|
+      | 0 | 1 | R → D(1) gaya | R = [3], D = [2] |
+      | 3 | 2 | D → R gaya | R = [], D = [5] |
+      | – | | | **Dire** |
+    viz: { tracer: senateTrace }
+    code: ex2-senate
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har face-off ek senator hamesha ke liye hataata hai."
+
+  - id: stream-first-unique
+    level: tricky
+    title: Stream mein pehla non-repeating character
+    source: { name: First non-repeating character in a stream, platform: GFG, url: "https://www.geeksforgeeks.org/problems/first-non-repeating-character-in-a-stream1216/1" }
+    problem: |
+      Characters ek-ek karke stream mein aa rahe hain. Har char ke **baad** batao: ab tak ka **sabse pehla** char jo sirf **ek baar** aaya hai. Koi na ho to `#`.
+
+      Example: `"aabc"` → `"a#bb"`
+    intuition: |
+      Har baar poora string scan → O(n²). Chahiye "pehla" (order) + "unique" (count):
+      - `count` array — kitni baar aaya.
+      - **Queue** — candidates, aane ke order mein.
+
+      Naya char: count++, queue mein peeche. Phir **aage se** woh hatao jinka count > 1 (repeat ho chuke — kabhi wapas unique nahi honge). Queue ka aage wala = answer.
+
+      > [!tip]
+      > Stack nahi, queue — kyunki "sabse **pehla**" chahiye, "sabse taaza" nahi.
+    dryRun: |
+      | Char | count | Queue (hatane ke baad) | Output |
+      |---|---|---|---|
+      | a | a1 | a | a |
+      | a | a2 | (a, a hate) | # |
+      | b | b1 | b | b |
+      | c | c1 | b, c | **b** |
+    viz: { tracer: streamTrace }
+    code: ex3-stream
+    complexity:
+      time: O(n)
+      space: O(26)
+      why: "Har char queue mein ek baar aata, max ek baar jaata."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Aane ka order hi process ka order (FIFO) — tasks, requests, messages."
+    - "Time / count wali sliding window — purane aage se hatao."
+    - "Baari-baari simulation (round robin, games)."
+    - "BFS — level by level (Graphs, Trees)."
+  avoid:
+    - "Sabse taaza pehle chahiye — stack."
+    - "Sabse chhota/bada pehle chahiye — priority queue (heap)."
+    - "Dono kinaron par kaam — deque (agla topic)."
+  signals:
+    - keyword: "in order of arrival / first come first served"
+      think: "Queue (ArrayDeque)."
+    - keyword: "last X seconds / recent requests / rate limit"
+      think: "Queue of timestamps, aage se purane hatao."
+    - keyword: "rounds / turns / circle"
+      think: "Queue; jeetne wala wapas peeche."
+    - keyword: "implement queue using stacks"
+      think: "inbox + outbox; outbox khaali ho tabhi shift."
+
+# 9. Real-world
+realWorld:
+  - where: "Android main thread (Looper / MessageQueue)"
+    how: "UI events aur posted Runnables ek message queue mein — aane ke order mein ek-ek chalte hain."
+  - where: "Printers, downloads"
+    how: "Print jobs / download tasks line mein."
+  - where: "Backend systems"
+    how: "Kafka, RabbitMQ, SQS — services ke beech message queues; order mein process."
+  - where: "Rate limiting (API gateway)"
+    how: "Pichhle 60 second ki requests ki queue — Recent Calls jaisa."
+  - where: "Games / OS"
+    how: "Multiplayer turns, CPU round-robin scheduling."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "ArrayList ko queue banaya"
+    type: other
+    wrong: |
+      `list.removeAt(0)` har dequeue par → O(n) → bade input par TLE.
+    right: |
+      `ArrayDeque` — `removeFirst` / `poll` O(1).
+  - title: "Khaali queue par remove"
+    type: empty
+    wrong: |
+      Kotlin `removeFirst()` / Java `remove()` khaali par exception.
+    right: |
+      Pehle `isEmpty()` check, ya `removeFirstOrNull()` / `poll()`.
+  - title: "Two-stack queue mein har baar shift"
+    type: logic
+    wrong: |
+      Har pop par inbox → outbox aur wapas — O(n) per op.
+    right: |
+      Sirf jab outbox khaali ho tab shift; wapas kabhi nahi.
+  - title: "Java Queue mein null daala"
+    type: "null"
+    wrong: |
+      `ArrayDeque` null allow nahi karta → NullPointerException (aur poll ka null 'khaali' se confuse).
+    right: |
+      Null mat daalo; 'kuch nahi' ke liye sentinel value lo.
+  - title: "Stream mein stack lagaya"
+    type: logic
+    wrong: |
+      'Pehla unique' ke liye stack → sabse taaza unique mil gaya.
+    right: |
+      Pehla = FIFO = queue.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Stack vs queue?"
+      a: |
+        Stack LIFO (sabse taaza pehle), queue FIFO (sabse purana pehle). Dono ke main ops O(1).
+    - q: "Queue ko do stacks se kaise?"
+      a: |
+        inbox mein push; pop/peek par outbox khaali ho to inbox ke saare items outbox mein daalo. Amortized O(1).
+    - q: "Amortized O(1) ka matlab?"
+      followUp: true
+      a: |
+        Kabhi ek op O(n) (shift) hota hai, par n ops ka total O(n) — kyunki har item max ek baar shift. Average O(1).
+    - q: "Stack ko queues se?"
+      followUp: true
+      a: |
+        Ek queue: push ke baad pehle ke sab items ko ghuma ke peeche daalo (size − 1 baar) — naya aage aa jaata hai. Push O(n), pop O(1).
+    - q: "Java mein offer vs add, poll vs remove?"
+      a: |
+        offer/poll/peek fail par false/null; add/remove/element exception. Capacity-bound queues mein farak dikhta hai.
+    - q: "Queue andar se kaise bani hai (ArrayDeque)?"
+      a: |
+        Circular array: head aur tail index, bhar jaaye to double. Circular Queue topic mein khud banayenge.
+    - q: "BFS mein queue hi kyun?"
+      a: |
+        Kareeb wale nodes pehle discover hote hain aur unhe pehle process karna hai — FIFO. Stack lagao to DFS ban jaata hai.
+    - q: "Thread-safe queue?"
+      a: |
+        java.util.concurrent — ConcurrentLinkedQueue, LinkedBlockingQueue (producer-consumer). Kotlin coroutines mein Channel.
+  mayAsk:
+    - "Implement Stack using Queues."
+    - "Number of Students Unable to Eat Lunch."
+    - "Reveal Cards In Increasing Order."
+    - "Moving Average from Data Stream."
+
+# 12. Practice
+practice:
+  - name: Implement Queue using Stacks
+    platform: LeetCode
+    num: 232
+    url: "https://leetcode.com/problems/implement-queue-using-stacks/"
+    level: easy
+    pattern: inbox / outbox
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Number of Recent Calls
+    platform: LeetCode
+    num: 933
+    url: "https://leetcode.com/problems/number-of-recent-calls/"
+    level: easy
+    pattern: Time window queue
+    hint: "Example 1."
+  - name: Number of Students Unable to Eat Lunch
+    platform: LeetCode
+    num: 1700
+    url: "https://leetcode.com/problems/number-of-students-unable-to-eat-lunch/"
+    level: easy
+    pattern: Queue simulation (ya counting)
+    hint: "Simulation chalega; smart: sirf gino kitne 0 aur 1 wale students hain — sandwich stack top jis type ka ho, us type ka koi student na bache to ruk jao."
+  - name: Dota2 Senate
+    platform: LeetCode
+    num: 649
+    url: "https://leetcode.com/problems/dota2-senate/"
+    level: medium
+    pattern: Two queues + index + n
+    hint: "Example 2."
+  - name: Reveal Cards In Increasing Order
+    platform: LeetCode
+    num: 950
+    url: "https://leetcode.com/problems/reveal-cards-in-increasing-order/"
+    level: medium
+    pattern: Simulate on indexes
+    hint: "Queue mein indexes 0..n−1. Sorted cards ke liye: aage wala index lo, wahan card rakho; phir agla aage wala peeche bhejo."
+  - name: Design Front Middle Back Queue
+    platform: LeetCode
+    num: 1670
+    url: "https://leetcode.com/problems/design-front-middle-back-queue/"
+    level: medium
+    pattern: Two deques balanced
+    hint: "Left aur right do deques; left.size == right.size ya right.size == left.size + 1 rakho. Middle = jodo-todo."
+  - name: Minimum Number of K Consecutive Bit Flips
+    platform: LeetCode
+    num: 995
+    url: "https://leetcode.com/problems/minimum-number-of-k-consecutive-bit-flips/"
+    level: hard
+    pattern: Queue of active flips
+    hint: "Left se chalo. Queue mein un flips ke start index jo abhi bhi i ko cover karte hain (start > i − k). Asli bit = nums[i] xor (queue size % 2). 0 ho to yahin se flip shuru (i + k > n → −1)."
+  - name: Max Value of Equation
+    platform: LeetCode
+    num: 1499
+    url: "https://leetcode.com/problems/max-value-of-equation/"
+    level: hard
+    pattern: Monotonic queue over a window
+    hint: "xi < xj ho to yi + yj + xj − xi = (yi − xi) + (yj + xj). Har j ke liye window (xj − xi ≤ k) mein (yi − xi) ka max chahiye — deque mein (y − x) decreasing rakho, door wale (xj − xi > k) aage se hatao."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Queue = FIFO; peeche jodo, aage se nikaalo; O(1)."
+    - "ArrayDeque lo — ArrayList.removeAt(0) O(n)."
+    - "Two stacks: outbox khaali ho tabhi shift → amortized O(1)."
+    - "Time window / stream: aage se purane hatao."
+    - "Round-robin: jeetne wala wapas peeche (index + n)."
+  cheatsheet: |
+    ```kotlin
+    val q = ArrayDeque<Int>()
+    q.addLast(x); q.first(); q.removeFirst(); q.removeFirstOrNull()
+
+    // window of last W ms
+    q.addLast(t); while (q.first() < t - W) q.removeFirst(); q.size
+    ```
+    ```java
+    Queue<Integer> q = new ArrayDeque<>();
+    q.offer(x); q.peek(); q.poll();     // null on empty
+    ```
+  quiz:
+    - q: "Enqueue 1, 2, 3 phir dequeue. Kya nikla?"
+      options: ["3", "1", "2", "Kuch nahi"]
+      answer: 1
+      explain: "FIFO — pehla aaya pehle gaya."
+    - q: "ArrayList.removeAt(0) ki complexity?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n²)"]
+      answer: 2
+      explain: "Baaki sab ek jagah khiskte hain."
+    - q: "Two-stack queue mein inbox → outbox shift kab?"
+      options: ["Har push par", "Har pop par", "Sirf jab outbox khaali ho", "Kabhi nahi"]
+      answer: 2
+      explain: "Isse har item ek hi baar shift hota hai."
+    - q: "Java queue khaali hai, poll() kya dega?"
+      options: ["Exception", "null", "0", "-1"]
+      answer: 1
+      explain: "remove() exception deta, poll() null."
+    - q: "\"Pehla non-repeating char\" stream mein — kaunsa structure?"
+      options: ["Stack", "Queue + count", "Sirf HashSet", "Heap"]
+      answer: 1
+      explain: "Pehla (order) chahiye — FIFO."
+
+# 14. Connections
+connections:
+  related:
+    - id: stack
+      why: "LIFO bhai; do stacks se queue."
+    - id: sliding-window-fixed
+      why: "Window ke purane items hatana — queue jaisa."
+  usedLater:
+    - id: circular-queue
+      how: "Queue andar se kaise bani — circular array."
+    - id: deque
+      how: "Dono kinaron par add/remove."
+    - id: bfs
+      how: "Level by level traversal = queue."
+    - id: level-order
+      how: "Tree ki level order traversal."

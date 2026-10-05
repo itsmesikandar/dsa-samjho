@@ -1,0 +1,420 @@
+meta:
+  id: monotonic-stack
+  chapter: stack-queue
+  title: Monotonic Stack
+  subtitle: Stack jo hamesha sorted rehta hai — "next greater / previous smaller" O(n) mein
+  level: intermediate
+  minutes: 40
+  prereqs: [stack]
+  tags: [monotonic-stack, next-greater, histogram, stock-span]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Monotonic stack** = aisa stack jiske items neeche se upar hamesha **badhte** (increasing) ya **ghatte** (decreasing) rehte hain. Naya item order todta hai to pehle top se woh items **pop** karo jo order tod rahe hain.
+
+    Ye ek sawaal ka jawab sabke liye O(n) mein deta hai:
+
+    | Sawaal | Stack ka order | Kab jawab milta hai |
+    |---|---|---|
+    | Daayein pehla **bada** | ghatta (decreasing) | pop hote waqt |
+    | Daayein pehla **chhota** | badhta (increasing) | pop hote waqt |
+    | Baayein pehla **bada** | ghatta | push se pehle top |
+    | Baayein pehla **chhota** | badhta | push se pehle top |
+
+    > [!yaad]
+    > Har item **ek baar push, max ek baar pop** → andar `while` hone ke bawajood O(n).
+  analogy: |
+    **Line mein khade log, har ek aage dekhta hai:** "Mujhse lamba pehla insaan kaun?" Jab tak koi lamba nahi aata, log intezaar karte hain (stack mein). Jaise hi ek lamba aata hai, uske peeche khade saare chhote log ek saath jawab paa jaate hain — "ye raha!" — aur line chhod dete hain.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    "Har element ke liye next greater" — brute force: har i se aage scan → **O(n²)**. n = 10⁵ → 10¹⁰ — TLE.
+
+    Monotonic stack **O(n)**. Aur ye pattern bahut jagah:
+    - Daily temperatures, stock span (finance).
+    - Largest rectangle in histogram, maximal rectangle.
+    - Trapping rain water (stack wala tareeka).
+    - "Sum of subarray minimums" — har item kitne subarrays ka min hai.
+
+    > [!socho]
+    > Stack mein `[5, 3]` (neeche 5) hain, naya 4 aaya (next greater dhoondh rahe). 3 ko pop karo — kyun? Aur 5 ko kyun nahi?
+    >
+    > 3 ka jawab mil gaya (4 > 3). 5 ka nahi (4 < 5) — wo intezaar karega. Aur 4 push hoga: stack `[5, 4]` — ab bhi ghatta. Order kabhi nahi tootta.
+
+# 3. Visual intro
+visual:
+  body: |
+    Imaartein: har ek ki chhat se daayein **pehli lambi imaarat**. Narangi = intezaar mein (stack). Jaise hi lambi aati hai, peeche ki chhoti saari ek saath jawab paa leti hain.
+  viz: { tracer: buildingsView }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Next Greater Element** (stack mein indexes, values ghatti hui):
+
+    Har `i` par:
+    1. Jab tak top ki value `< nums[i]`: `res[top] = nums[i]`, pop.
+    2. `i` push (iska jawab baad mein).
+    3. Aakhir mein stack mein bache → −1.
+
+    `[2, 1, 2, 4, 3]` → `[4, 2, 4, −1, −1]`
+
+    > [!tip]
+    > `<` vs `<=` dhyaan se: barabar wala "greater" nahi hai, to `<` par pop. "Greater or equal" chahiye to `<=`. Duplicates wale test cases yahin pakadte hain.
+  viz: { tracer: ngTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Next / previous greater ya smaller (sab items)"
+    time: O(n)
+    space: O(n)
+    why: "Har index ek push, max ek pop."
+  - op: "Brute force (har item aage scan)"
+    time: O(n²)
+    space: O(1)
+    why: "Har i ke liye j > i."
+  - op: "Circular array next greater"
+    time: O(n)
+    space: O(n)
+    why: "Index 0..2n − 1, a[i % n]."
+  - op: "Largest rectangle in histogram"
+    time: O(n)
+    space: O(n)
+    why: "Pop par left/right deewar dono pata."
+  - op: "Online stock span (har naya din)"
+    time: "O(1) amortized"
+    space: O(n)
+    why: "Chhote pichhle din pop, span jodo."
+  - op: "Sum of subarray minimums"
+    time: O(n)
+    space: O(n)
+    why: "Har item ke left/right chhote se uska 'kitne subarrays ka min'."
+
+# 6. Code
+code:
+  - title: Previous smaller element (baayein pehla chhota)
+    file: prev-smaller
+    note: |
+      "Baayein" wale sawaal mein jawab **push se pehle** milta hai: order todne wale (x se bade/barabar) pop karo, jo top par bacha wahi x ka baayein pehla chhota. Stack yahan **badhta** hua.
+
+      Yaad rakhne ka tareeka: **daayein = pop hote waqt jawab**, **baayein = push se pehle top**.
+
+# 7. Examples
+examples:
+  - id: next-greater-1
+    level: easy
+    title: Next Greater Element I
+    source: { name: Next Greater Element I, platform: LeetCode, url: "https://leetcode.com/problems/next-greater-element-i/" }
+    problem: |
+      `nums1` ke har number ke liye: `nums2` mein **usi number ke daayein** pehla bada number (na ho to −1). `nums1` ke saare numbers `nums2` mein hain; sab distinct.
+
+      Example: `nums1 = [4, 1, 2]`, `nums2 = [1, 3, 4, 2]` → `[−1, 3, −1]`
+    intuition: |
+      `nums2` par ek baar next greater nikaal lo (monotonic stack), result **HashMap** (value → next greater) mein. Phir `nums1` ke liye bas lookup.
+
+      Values distinct hain isliye value hi key ban sakti hai (warna index rakhte).
+
+      > [!tip]
+      > "Kuch queries, ek base array" → base par ek baar precompute (stack), queries O(1) lookup.
+    dryRun: |
+      nums2 = `[1, 3, 4, 2]`
+
+      | x | Pop (next set) | Stack |
+      |---|---|---|
+      | 1 | – | 1 |
+      | 3 | next[1] = 3 | 3 |
+      | 4 | next[3] = 4 | 4 |
+      | 2 | – | 4, 2 |
+
+      nums1 [4, 1, 2] → [−1, 3, −1]
+    viz: { tracer: nge1Trace }
+    code: ex1-nge
+    complexity:
+      time: O(n + m)
+      space: O(m)
+      why: "nums2 ek pass + nums1 lookups; map + stack."
+
+  - id: daily-temperatures
+    level: medium
+    title: Daily Temperatures — kitne din baad garmi?
+    source: { name: Daily Temperatures, platform: LeetCode, url: "https://leetcode.com/problems/daily-temperatures/" }
+    problem: |
+      Rozana ke temperatures. Har din ke liye: kitne din baad **zyada garam** din aayega? Kabhi na aaye to 0.
+
+      Example: `[73, 74, 75, 71, 69, 72, 76, 73]` → `[1, 1, 4, 2, 1, 1, 0, 0]`
+    intuition: |
+      Next greater hi hai — par **value nahi, doori** chahiye. Isliye stack mein **index** (din) rakho: pop karte waqt `res[d] = i − d`.
+
+      Stack mein din jinke liye garam din abhi nahi aaya — unke temps neeche se upar ghatte hue.
+
+      > [!galti]
+      > Stack mein temperature (value) rakh di → doori nikaal hi nahi sakte. Monotonic stack mein hamesha **index** rakho; value `arr[index]` se mil jaati hai.
+    dryRun: |
+      | Din i | Temp | Pop (res) | Stack (din) |
+      |---|---|---|---|
+      | 0 | 73 | – | 0 |
+      | 1 | 74 | 0 → 1 | 1 |
+      | 2 | 75 | 1 → 1 | 2 |
+      | 3, 4 | 71, 69 | – | 2, 3, 4 |
+      | 5 | 72 | 4 → 1, 3 → 2 | 2, 5 |
+      | 6 | 76 | 5 → 1, 2 → 4 | 6 |
+      | 7 | 73 | – | 6, 7 → baaki 0 |
+    viz: { tracer: tempsTrace }
+    code: ex2-temps
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har din ek push, max ek pop."
+
+  - id: histogram
+    level: tricky
+    title: Histogram ka sabse bada rectangle
+    source: { name: Largest Rectangle in Histogram, platform: LeetCode, url: "https://leetcode.com/problems/largest-rectangle-in-histogram/" }
+    problem: |
+      Bars ki heights (har bar ki width 1). In bars ke andar banne wala **sabse bada rectangle** — area?
+
+      Example: `[2, 1, 5, 6, 2, 3]` → **10** (heights 5 aur 6 par, 5 × 2)
+    intuition: |
+      Har bar ko "rectangle ki height" maano. Wo kitna chauda ho sakta hai? Left mein jab tak bars `≥` hain, right mein bhi. Yaani **previous smaller** aur **next smaller** ke beech.
+
+      Dono ek pass mein — **badhta hua** stack (indexes):
+      - Naya bar top se chhota/barabar → top pop. Uski height ke liye: **right deewar = i** (next smaller), **left deewar = stack mein uske neeche wala** (previous smaller). Width = `i − left − 1`.
+      - Aakhir mein nakli 0 height daalo — bache sab pop ho jaayein.
+
+      > [!tip]
+      > Maximal Rectangle (0/1 matrix) = har row ko histogram banao (upar ki taraf lagatar 1s ki ginti) aur yahi function chalao.
+    dryRun: |
+      `[2, 1, 5, 6, 2, 3]`
+
+      | i (cur) | Pop | left | Area |
+      |---|---|---|---|
+      | 1 (1) | 0 (h 2) | −1 | 2 × 1 = 2 |
+      | 4 (2) | 3 (h 6) | 2 | 6 × 1 = 6 |
+      | 4 (2) | 2 (h 5) | 1 | 5 × 2 = **10** |
+      | 6 (0) | 5 (h 3) | 4 | 3 × 1 = 3 |
+      | 6 (0) | 4 (h 2) | 1 | 2 × 4 = 8 |
+      | 6 (0) | 1 (h 1) | −1 | 1 × 6 = 6 |
+    viz: { tracer: histTrace }
+    code: ex3-histogram
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har bar ek push, ek pop; pop par area O(1)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Har element ke liye next/previous greater/smaller."
+    - "'Kitne din tak', 'kitna door tak' — span / doori (index rakho)."
+    - "Rectangle / area jismein har bar ki left-right seema chahiye."
+    - "Subarray min/max ka contribution (sum of subarray minimums)."
+  avoid:
+    - "Sliding window ka max/min — deque (purane aage se bhi hatane hain)."
+    - "Sirf ek element ka next greater — seedha scan kaafi."
+    - "k-th next greater ya range queries — sparse table / segment tree."
+  signals:
+    - keyword: "next greater / next smaller / previous greater"
+      think: "Monotonic stack of indexes; daayein = pop par, baayein = push se pehle."
+    - keyword: "how many days until warmer / span"
+      think: "Index stack, doori = i − index."
+    - keyword: "largest rectangle / histogram / maximal rectangle"
+      think: "Increasing stack, pop par area."
+    - keyword: "circular array next greater"
+      think: "0..2n − 1, a[i % n]."
+
+# 9. Real-world
+realWorld:
+  - where: "Stock market apps"
+    how: "Stock span: aaj ka price kitne pichhle dino se zyada hai — monotonic stack se live."
+  - where: "Weather apps"
+    how: "'Agla garam din kab' jaise insights."
+  - where: "Image processing"
+    how: "Binary image mein sabse bada khaali rectangle (Maximal Rectangle) — UI layout / ad placement."
+  - where: "Compilers"
+    how: "Operator precedence parsing mein stack jo precedence order banaye rakhta hai."
+  - where: "Skyline / city views"
+    how: "Kaunsi imaartein samundar dekh sakti hain (right se monotonic)."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Values rakhi, indexes nahi"
+    type: logic
+    wrong: |
+      Stack mein temperatures → doori nahi nikal sakti, duplicates mein confusion.
+    right: |
+      Index rakho; value `arr[idx]`.
+  - title: "< aur <= ka confusion"
+    type: off-by-one
+    wrong: |
+      Strictly greater chahiye tha, `<=` par pop kiya → barabar wale ko 'greater' maan liya.
+    right: |
+      Sawaal padho: strictly greater → `top < cur` par pop.
+  - title: "Bache hue stack items bhool gaye"
+    type: logic
+    wrong: |
+      Loop ke baad stack mein bache items ka answer set nahi kiya (default 0 rah gaya jahan −1 chahiye tha).
+    right: |
+      Res ko shuru mein −1 se bharo, ya loop ke baad bache sab ko set karo.
+  - title: "Histogram mein aakhri bars"
+    type: logic
+    wrong: |
+      Loop khatam, stack mein badhte bars bache — unke area kabhi nahi gine.
+    right: |
+      Aakhir mein nakli 0 height (i = n) — sab pop ho jaate hain.
+  - title: "Area overflow"
+    type: overflow
+    right: |
+      Height 10⁴ × width 10⁵ = 10⁹ Int mein theek; bade constraints par Long.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Monotonic stack kya hai, complexity?"
+      a: |
+        Stack jiske items hamesha sorted (inc/dec). Naya item order tode to pop. Har item ek push, ek pop → O(n).
+    - q: "Next greater ke liye stack increasing ya decreasing?"
+      a: |
+        Decreasing (neeche bada). Bada aaya to chhote pop — unka jawab mil gaya.
+    - q: "Previous smaller kaise?"
+      a: |
+        Increasing stack; push se pehle x se bade/barabar pop; top = previous smaller.
+    - q: "Circular array mein next greater?"
+      followUp: true
+      a: |
+        i = 0..2n − 1 chalao, a[i % n] use karo; res sirf i < n wale set karo (ya pehle pass mein push sirf i < n).
+    - q: "Histogram O(n) mein kyun sahi?"
+      a: |
+        Pop hote bar ka right boundary current i (pehla chhota), left boundary stack mein neeche wala (pichhla chhota). Har bar ka max rectangle exactly ek baar gina.
+    - q: "Trapping rain water stack se?"
+      followUp: true
+      a: |
+        Decreasing stack; bada bar aaya to beech ka pop (bottom), left = naya top, right = i: paani = (min(h[left], h[i]) − h[bottom]) × (i − left − 1).
+    - q: "Sum of subarray minimums?"
+      a: |
+        Har a[i] kitne subarrays ka min: left (pichhle chhote tak) × right (agle chhote tak). Duplicates ke liye ek taraf < aur doosri taraf <=.
+    - q: "Deque vs monotonic stack?"
+      a: |
+        Stack: sirf ek kinare se pop (next/prev greater). Deque: window se bahar wale aage se bhi hatane hon (sliding window max).
+  mayAsk:
+    - "Online Stock Span."
+    - "Next Greater Element II."
+    - "Remove K Digits."
+    - "Sum of Subarray Minimums."
+
+# 12. Practice
+practice:
+  - name: Next Greater Element I
+    platform: LeetCode
+    num: 496
+    url: "https://leetcode.com/problems/next-greater-element-i/"
+    level: easy
+    pattern: Stack + map
+    hint: "Example 1."
+  - name: Final Prices With a Special Discount in a Shop
+    platform: LeetCode
+    num: 1475
+    url: "https://leetcode.com/problems/final-prices-with-a-special-discount-in-a-shop/"
+    level: easy
+    pattern: Next smaller or equal
+    hint: "Har item ka daayein pehla <= wala discount hai. Increasing stack; prices[top] >= cur par pop aur discount do."
+  - name: Clear Digits
+    platform: LeetCode
+    num: 3174
+    url: "https://leetcode.com/problems/clear-digits/"
+    level: easy
+    pattern: Stack pop on digit
+    hint: "Letter → push; digit → pop (sabse paas wala baayein letter gaya)."
+  - name: Daily Temperatures
+    platform: LeetCode
+    num: 739
+    url: "https://leetcode.com/problems/daily-temperatures/"
+    level: medium
+    pattern: Index stack, distance
+    hint: "Example 2."
+  - name: Next Greater Element II
+    platform: LeetCode
+    num: 503
+    url: "https://leetcode.com/problems/next-greater-element-ii/"
+    level: medium
+    pattern: Circular via 2n loop
+    hint: "i = 0 until 2n, x = nums[i % n]; push sirf i < n wale indexes."
+  - name: Online Stock Span
+    platform: LeetCode
+    num: 901
+    url: "https://leetcode.com/problems/online-stock-span/"
+    level: medium
+    pattern: Stack of (price, span)
+    hint: "Naye price se chhote/barabar pichhle (price, span) pop karo aur unke span jodo; phir (price, total span) push."
+  - name: Largest Rectangle in Histogram
+    platform: LeetCode
+    num: 84
+    url: "https://leetcode.com/problems/largest-rectangle-in-histogram/"
+    level: hard
+    pattern: Increasing stack, area on pop
+    hint: "Example 3."
+  - name: Maximal Rectangle
+    platform: LeetCode
+    num: 85
+    url: "https://leetcode.com/problems/maximal-rectangle/"
+    level: hard
+    pattern: Rows as histograms
+    hint: "Har row tak har column mein upar lagatar 1s ki ginti = heights. Har row par Largest Rectangle chalao."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Monotonic stack = sorted stack; naya order tode to pop."
+    - "Daayein pehla bada: decreasing stack, jawab pop par."
+    - "Baayein pehla chhota: increasing stack, jawab push se pehle top."
+    - "Index rakho (doori/width ke liye); har item ek push ek pop → O(n)."
+    - "Histogram: pop par width = i − (neeche wala) − 1; aakhir mein 0 height."
+  cheatsheet: |
+    ```kotlin
+    // next greater
+    val res = IntArray(n) { -1 }; val st = ArrayDeque<Int>()
+    for (i in 0 until n) {
+        while (st.isNotEmpty() && a[st.last()] < a[i]) res[st.removeLast()] = a[i]
+        st.addLast(i)
+    }
+    // previous smaller
+    while (st.isNotEmpty() && st.last() >= x) st.removeLast(); prev = st.lastOrNull() ?: -1
+    ```
+  quiz:
+    - q: "[3, 1, 4] mein 3 ka next greater?"
+      options: ["1", "4", "−1", "3"]
+      answer: 1
+      explain: "Daayein pehla bada 4."
+    - q: "Next greater ke liye stack (neeche se upar)?"
+      options: ["Badhta", "Ghatta", "Random", "Sorted by index"]
+      answer: 1
+      explain: "Bada aate hi chhote pop hote hain — bache ghatte order mein."
+    - q: "Daily temps [70, 71, 69, 72] — din 2 (69) ka answer?"
+      options: ["0", "1", "2", "3"]
+      answer: 1
+      explain: "Agle din 72 — 1 din baad."
+    - q: "Monotonic stack ki complexity (andar while ke saath)?"
+      options: ["O(n²)", "O(n log n)", "O(n)", "O(1)"]
+      answer: 2
+      explain: "Har item max ek baar pop."
+    - q: "Histogram [2, 4] ka sabse bada rectangle?"
+      options: ["2", "4", "6", "8"]
+      answer: 1
+      explain: "4 × 1 = 4 ya 2 × 2 = 4."
+
+# 14. Connections
+connections:
+  related:
+    - id: stack
+      why: "Basic LIFO."
+    - id: deque
+      why: "Monotonic deque — window wala bhai."
+    - id: two-pointers-opposite
+      why: "Trapping rain water ka doosra tareeka."
+  usedLater:
+    - id: greedy-classics
+      how: "Remove K Digits jaisa greedy + stack."
+    - id: dp-1d
+      how: "Kuch DP transitions (next smaller) stack se tez."

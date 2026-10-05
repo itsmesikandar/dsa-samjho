@@ -1,0 +1,444 @@
+meta:
+  id: stack
+  chapter: stack-queue
+  title: Stack
+  subtitle: Jo baad mein aaya, wo pehle jaayega (LIFO) — brackets, undo, nested cheezein
+  level: beginner
+  minutes: 30
+  prereqs: [array, dynamic-array]
+  tags: [stack, lifo, parentheses, rpn, nested]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Stack** = ek dher jahan sirf **upar (top)** se kaam hota hai:
+    - `push(x)` — upar rakho
+    - `pop()` — upar wala nikaalo
+    - `peek()` — upar wala dekho (nikaalo mat)
+
+    Sab **O(1)**. Order: **LIFO** — Last In, First Out.
+
+    ```kotlin
+    val st = ArrayDeque<Int>()   // Kotlin: top = last
+    st.addLast(5)                // push
+    st.last()                    // peek
+    st.removeLast()              // pop
+    ```
+
+    Andar se ye bas ek **dynamic array** hai jiske end par kaam hota hai (ya linked list ka head).
+
+    > [!yaad]
+    > Java mein `java.util.Stack` mat lo (purana, synchronized → slow). `ArrayDeque` lo: `push / pop / peek`.
+  analogy: |
+    **Shaadi ke buffet ki plates ka dher.** Dhuli plate upar rakhi jaati hai, aur lene wala bhi upar se uthata hai. Sabse neeche wali plate sabse baad mein niklegi.
+
+    Ya **Ctrl+Z (undo)** — sabse aakhri kaam pehle undo hota hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Jab bhi problem mein **"sabse taaza wala pehle"** ya **nesting** (andar ke andar) ho, stack lagta hai:
+    - Brackets `( [ { } ] )` — sabse andar wala pehle band hota hai.
+    - Function calls — call stack (Recursion chapter).
+    - Undo / back button.
+    - Expressions evaluate karna, HTML/XML tags check.
+
+    Stack recursion ka **manual** roop hai: recursion ko loop + stack se likh sakte ho (gehri recursion par StackOverflowError se bachne ke liye).
+
+    > [!socho]
+    > `"([)]"` mein har bracket ka joda maujood hai (2 round, 2 square). Phir bhi galat kyun?
+    >
+    > `)` aaya tab sabse **taaza** khula `[` tha — pehle use band hona chahiye tha. Ginti kaafi nahi, **order** chahiye — aur "sabse taaza" = stack ka top.
+
+# 3. Visual intro
+visual:
+  body: |
+    Plates push karo, phir kuch pop. Dekho jo **sabse baad** mein aaya wahi pehle nikla.
+
+    Beech ki plate chahiye? Upar ki sab hatani padengi — stack mein sirf top tak pahunch hai.
+  viz: { tracer: plates }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Valid Parentheses:**
+    1. Khulne wala bracket → **push**.
+    2. Band karne wala → stack khaali? galat. Warna **pop** karo — wo isi ka joda hona chahiye, warna galat.
+    3. Aakhir mein stack **khaali** hona chahiye (koi khula na bache).
+
+    `([]{})`: push `(`, push `[`, `]` pop `[` ✓, push `{`, `}` pop `{` ✓, `)` pop `(` ✓, khaali → **sahi**.
+
+    > [!tip]
+    > Teeno galat cases yaad rakho: (1) band wala aaya par stack khaali, (2) top se joda nahi bana, (3) aakhir mein stack bacha. Interview mein inhe test cases ki tarah bolo.
+  viz: { tracer: parenTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "push / pop / peek"
+    time: O(1)
+    space: O(1)
+    why: "Sirf top par kaam (array ka end)."
+  - op: "isEmpty / size"
+    time: O(1)
+    space: O(1)
+    why: "Size variable."
+  - op: "Beech ka item dhoondhna"
+    time: O(n)
+    space: O(1)
+    why: "Stack iske liye nahi bana — pop karte jaana padega."
+  - op: "Valid parentheses / adjacent removal"
+    time: O(n)
+    space: O(n)
+    why: "Har char ek push, max ek pop."
+  - op: "Recursion → loop + stack"
+    time: "same"
+    space: "O(gehraai) heap par"
+    why: "Call stack ki jagah apna stack — StackOverflowError nahi."
+  - op: "Amortized push (dynamic array)"
+    time: "O(1) amortized"
+    space: O(n)
+    why: "Kabhi-kabhi resize (copy), average O(1)."
+
+# 6. Code
+code:
+  - title: Stack Kotlin aur Java mein
+    file: deque
+    note: |
+      Kotlin: `ArrayDeque` — `addLast` (push), `removeLast` (pop), `last()` (peek), top = **end**.
+      Java: `ArrayDeque` — `push`, `pop`, `peek`, top = **front**.
+
+      Khaali stack par `removeLast()` / `pop()` exception deta hai. Safe dekhna ho to Kotlin `lastOrNull()`, Java `peek()` (null deta hai).
+
+# 7. Examples
+examples:
+  - id: adjacent-duplicates
+    level: easy
+    title: Paas-paas ke duplicate letters hatao
+    source: { name: Remove All Adjacent Duplicates In String, platform: LeetCode, url: "https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/" }
+    problem: |
+      String mein jahan bhi **do same letters paas-paas** hain, dono hata do. Hatane se naye jode ban sakte hain — tab tak karo jab tak koi na bache.
+
+      Example: `"abbaca"` → `"ca"` (bb gaya → "aaca", phir aa gaya → "ca")
+    intuition: |
+      Baar-baar string scan → O(n²). **Stack**: abhi tak ka saaf result stack mein.
+      - Naya letter top jaisa → **pop** (dono gaye). Ab jo neeche tha wo top — agle letter se jodi bana sakta hai (yahi "chain reaction").
+      - Alag → push.
+
+      StringBuilder hi stack ka kaam kar deta hai (end = top).
+
+      > [!tip]
+      > "Kuch hata do, aur hatane se naye jode ban sakte hain" → stack. Asteroid collision, candy crush jaisa — sab isi family.
+    dryRun: |
+      `abbaca`
+
+      | Char | Stack ke baad |
+      |---|---|
+      | a | a |
+      | b | a b |
+      | b | a (bb gaya) |
+      | a | (khaali, aa gaya) |
+      | c | c |
+      | a | c a → **"ca"** |
+    viz: { tracer: adjTrace }
+    code: ex1-adjacent
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har char ek baar push, max ek baar pop."
+
+  - id: rpn
+    level: medium
+    title: Reverse Polish Notation evaluate karo
+    source: { name: Evaluate Reverse Polish Notation, platform: LeetCode, url: "https://leetcode.com/problems/evaluate-reverse-polish-notation/" }
+    problem: |
+      Expression **postfix** mein hai — operator apne do numbers ke **baad** aata hai. Brackets nahi. Value nikaalo (division zero ki taraf truncate).
+
+      Example: `["2", "1", "+", "3", "*"]` → `(2 + 1) × 3` = **9**
+    intuition: |
+      - Number → push.
+      - Operator → do pop: **pehla nikla = b (doosra operand)**, doosra nikla = a. `a op b` → push.
+      - Aakhir mein stack mein ek number = answer.
+
+      Brackets ki zaroorat nahi kyunki order hi bata deta hai pehle kya karna hai.
+
+      > [!galti]
+      > `a` aur `b` ulte → `13 5 /` mein `5 / 13 = 0` aa gaya (sahi 2). Minus aur divide mein order matter karta hai.
+    dryRun: |
+      `4 13 5 / +`
+
+      | Token | Stack |
+      |---|---|
+      | 4 | 4 |
+      | 13 | 4 13 |
+      | 5 | 4 13 5 |
+      | / | 4 2 (13 / 5) |
+      | + | **6** |
+    viz: { tracer: rpnTrace }
+    code: ex2-rpn
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Har token ek push/pop."
+
+  - id: decode-string
+    level: tricky
+    title: Encoded string kholo — 3[a2[c]]
+    source: { name: Decode String, platform: LeetCode, url: "https://leetcode.com/problems/decode-string/" }
+    problem: |
+      `k[andar]` ka matlab andar wala string `k` baar. Nesting ho sakti hai. Pura string decode karo.
+
+      Example: `"3[a2[c]]"` → `"accaccacc"`
+    intuition: |
+      Nesting = stack (ya recursion). Do stacks:
+      - `counts` — har khule bracket ka k.
+      - `outs` — bracket khulne se **pehle** tak ka bana hua string.
+
+      Chalo:
+      - Digit → `k = k*10 + d` (number kai digits ka ho sakta hai!).
+      - `[` → `k` aur `cur` save (push), naya level: `cur = ""`, `k = 0`.
+      - `]` → `cur = outs.pop() + cur × counts.pop()`.
+      - Letter → `cur += letter`.
+
+      > [!galti]
+      > Sirf ek digit maana → `12[a]` mein 1 aur 2 alag ho gaye. `k = k * 10 + d`.
+
+      > [!tip]
+      > Same problem recursion se: `[` par function khud ko call kare aur `]` par return. Stack = recursion ka manual roop.
+    dryRun: |
+      `3[a2[c]]`
+
+      | Char | counts | outs | cur |
+      |---|---|---|---|
+      | 3, [ | 3 | "" | "" |
+      | a | 3 | "" | a |
+      | 2, [ | 3 2 | "" a | "" |
+      | c | 3 2 | "" a | c |
+      | ] | 3 | "" | a + cc = acc |
+      | ] | – | – | "" + acc×3 = **accaccacc** |
+    viz: { tracer: decodeTrace }
+    code: ex3-decode
+    complexity:
+      time: O(output length)
+      space: O(output length)
+      why: "Har output char ek baar banta hai; stacks nesting jitne."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Sabse taaza item pehle chahiye (undo, back)."
+    - "Brackets / tags / nesting match karni hai."
+    - "Hatane se naye jode bante hain (adjacent duplicates, asteroids)."
+    - "Recursion ko iterative banana hai (DFS, tree traversal)."
+    - "Expression evaluate (postfix, calculator)."
+  avoid:
+    - "Pehle aaye ko pehle nikaalna (line) — queue."
+    - "Beech ke items baar-baar chahiye — array / list."
+    - "Sabse chhota/bada baar-baar — heap (ya min stack agar sirf push/pop ke saath)."
+  signals:
+    - keyword: "valid parentheses / balanced"
+      think: "Khula → push, band → pop + match, end par khaali."
+    - keyword: "remove adjacent / collide / cancel"
+      think: "Stack top se compare."
+    - keyword: "postfix / RPN / calculator"
+      think: "Numbers push, operator par do pop."
+    - keyword: "nested k[...] / decode"
+      think: "Do stacks (count + pichhla string) ya recursion."
+
+# 9. Real-world
+realWorld:
+  - where: "Undo / redo (editors, Photoshop)"
+    how: "Har action undo stack par; undo = pop (aur redo stack par push)."
+  - where: "Android back stack"
+    how: "Activities / screens ek stack mein — back press = pop, naya screen = push."
+  - where: "Function calls"
+    how: "Har function call ek stack frame — JVM call stack."
+  - where: "Compilers / IDE"
+    how: "Brackets match karna, expressions parse karna (shunting-yard algorithm)."
+  - where: "Browser"
+    how: "Back history (sabse taaza page pehle)."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Khaali stack par pop"
+    type: empty
+    wrong: |
+      `)` aaya aur seedha `st.removeLast()` → khaali par exception.
+    right: |
+      Pehle `st.isEmpty()` check — khaali hai to galat.
+  - title: "Aakhir mein khaali check bhool gaye"
+    type: logic
+    wrong: |
+      `"(("` par loop mein koi galti nahi pakdi → true return.
+    right: |
+      `return st.isEmpty()`.
+  - title: "java.util.Stack use kiya"
+    type: other
+    wrong: |
+      `Stack<Integer>` — Vector par bana, har method synchronized → bekaar slow.
+    right: |
+      `Deque<Integer> st = new ArrayDeque<>()`.
+  - title: "RPN mein operands ulte"
+    type: logic
+    wrong: |
+      `val a = pop(); val b = pop(); a - b` → `5 3 -` = −2 (sahi 2).
+    right: |
+      Pehla pop = b, doosra = a; `a - b`.
+  - title: "Multi-digit numbers"
+    type: logic
+    wrong: |
+      Decode string mein `12[a]` — har digit alag maana.
+    right: |
+      `k = k * 10 + digit`, `[` par reset.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Stack ke operations aur complexity?"
+      a: |
+        push, pop, peek, isEmpty — sab O(1). Andar dynamic array (amortized O(1) push) ya linked list.
+    - q: "Valid parentheses ke galat cases?"
+      a: |
+        Band wala aaya par stack khaali; top se joda nahi; aakhir mein stack bacha.
+    - q: "Stack ko array se kaise banaoge?"
+      a: |
+        Array + top index. push: a[++top] = x (bhar jaaye to double size); pop: a[top--].
+    - q: "Min Stack — getMin O(1)?"
+      followUp: true
+      a: |
+        Har push ke saath 'ab tak ka min' bhi push karo (doosra stack ya pair). Pop par dono pop. getMin = top ka min.
+    - q: "Do stacks se queue?"
+      followUp: true
+      a: |
+        in-stack mein push; out-stack khaali ho to in se sab out mein ulte daalo; pop out se. Amortized O(1). (Queue topic.)
+    - q: "Recursion aur stack ka rishta?"
+      a: |
+        Har recursive call call-stack par frame hai. Koi bhi recursion apne stack + loop se likh sakte ho — gehri recursion ka StackOverflowError hata ke.
+    - q: "Infix (2 + 3 * 4) kaise evaluate?"
+      a: |
+        Do stacks (numbers, operators) + precedence (shunting-yard), ya pehle postfix mein badlo phir RPN.
+    - q: "Kotlin aur Java ArrayDeque mein top kahan?"
+      a: |
+        Kotlin addLast/removeLast → end. Java push/pop → front. Dono O(1).
+  mayAsk:
+    - "Min Stack."
+    - "Baseball Game."
+    - "Asteroid Collision."
+    - "Simplify Path."
+
+# 12. Practice
+practice:
+  - name: Valid Parentheses
+    platform: LeetCode
+    num: 20
+    url: "https://leetcode.com/problems/valid-parentheses/"
+    level: easy
+    pattern: Push open, pop + match close
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Remove All Adjacent Duplicates In String
+    platform: LeetCode
+    num: 1047
+    url: "https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/"
+    level: easy
+    pattern: Stack top compare
+    hint: "Example 1."
+  - name: Baseball Game
+    platform: LeetCode
+    num: 682
+    url: "https://leetcode.com/problems/baseball-game/"
+    level: easy
+    pattern: Stack of scores
+    hint: "Number → push; '+' → top do ka jod push; 'D' → top × 2; 'C' → pop. Aakhir mein sum."
+  - name: Min Stack
+    platform: LeetCode
+    num: 155
+    url: "https://leetcode.com/problems/min-stack/"
+    level: medium
+    pattern: Stack with running min
+    hint: "Har push par (value, ab tak ka min) ka jodi push karo. getMin = top ka min."
+  - name: Evaluate Reverse Polish Notation
+    platform: LeetCode
+    num: 150
+    url: "https://leetcode.com/problems/evaluate-reverse-polish-notation/"
+    level: medium
+    pattern: Operand stack
+    hint: "Example 2 — operand order."
+  - name: Decode String
+    platform: LeetCode
+    num: 394
+    url: "https://leetcode.com/problems/decode-string/"
+    level: medium
+    pattern: Two stacks for nesting
+    hint: "Example 3."
+  - name: Longest Valid Parentheses
+    platform: LeetCode
+    num: 32
+    url: "https://leetcode.com/problems/longest-valid-parentheses/"
+    level: hard
+    pattern: Stack of indexes
+    hint: "Stack mein -1 daal ke shuru karo. '(' → index push. ')' → pop; khaali ho gaya to current index push (naya base), warna length = i − top."
+  - name: Number of Atoms
+    platform: LeetCode
+    num: 726
+    url: "https://leetcode.com/problems/number-of-atoms/"
+    level: hard
+    pattern: Stack of count maps
+    hint: "'(' par naya map push; ')' ke baad number padho, top map ke saare counts us se guna karke neeche wale map mein jodo. Atom = Capital + lowercase*, phir digits."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Stack = LIFO; push/pop/peek O(1); top par hi kaam."
+    - "Kotlin ArrayDeque (addLast/removeLast), Java ArrayDeque (push/pop) — Stack class nahi."
+    - "Brackets: khula push, band pop + match, end par khaali."
+    - "'Sabse taaza pehle', nesting, hatane se chain reaction → stack."
+    - "Stack = recursion ka manual roop."
+  cheatsheet: |
+    ```kotlin
+    val st = ArrayDeque<Char>()
+    for (c in s) when (c) {
+        '(', '[', '{' -> st.addLast(c)
+        else -> if (st.isEmpty() || st.removeLast() != pairOf(c)) return false
+    }
+    return st.isEmpty()
+
+    // RPN: num -> push; op -> b = pop, a = pop, push(a op b)
+    ```
+  quiz:
+    - q: "Push 1, 2, 3, phir pop. Kya nikla?"
+      options: ["1", "2", "3", "Kuch nahi"]
+      answer: 2
+      explain: "LIFO — sabse baad wala pehle."
+    - q: "\"([)]\" valid hai?"
+      options: ["Haan", "Nahi", "Sirf round brackets ke liye", "Pata nahi chal sakta"]
+      answer: 1
+      explain: "')' ke waqt top '[' hai — joda nahi."
+    - q: "RPN \"6 2 /\" ka result?"
+      options: ["3", "0", "12", "4"]
+      answer: 0
+      explain: "b = 2, a = 6 → 6 / 2."
+    - q: "Java mein stack ke liye kaunsa class?"
+      options: ["java.util.Stack", "ArrayDeque", "LinkedList hamesha", "Vector"]
+      answer: 1
+      explain: "Stack purana aur synchronized hai."
+    - q: "\"abbaca\" se adjacent duplicates hatane ke baad?"
+      options: ["aca", "ca", "abca", "a"]
+      answer: 1
+      explain: "bb gaya → aaca, aa gaya → ca."
+
+# 14. Connections
+connections:
+  related:
+    - id: dynamic-array
+      why: "Stack andar se array ka end hai."
+    - id: recursion-basics
+      why: "Call stack — same LIFO."
+  usedLater:
+    - id: queue
+      how: "FIFO bhai; do stacks se queue."
+    - id: monotonic-stack
+      how: "Stack jo hamesha sorted rehta hai — next greater element."
+    - id: dfs
+      how: "Iterative DFS = stack."
+    - id: tree-traversals
+      how: "Inorder/preorder bina recursion — stack se."

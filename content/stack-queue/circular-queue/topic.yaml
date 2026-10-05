@@ -1,0 +1,425 @@
+meta:
+  id: circular-queue
+  chapter: stack-queue
+  title: Circular Queue
+  subtitle: Array ko gol mod do — head aur tail ghoomte hain, kuch khiskta nahi, sab O(1)
+  level: intermediate
+  minutes: 30
+  prereqs: [queue, array]
+  tags: [queue, circular-buffer, ring-buffer, modulo]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Array se queue banao to dequeue par problem: aage se nikaala to ya to sab khiskao (O(n)), ya aage ki jagah **bekaar** chhod do.
+
+    **Circular queue:** array ko **gol** maano — aakhri index ke baad wapas 0.
+    - `head` = aage wala item.
+    - `count` = kitne bhare.
+    - Agli khaali jagah (tail) = `(head + count) % k`.
+    - Dequeue = `head = (head + 1) % k` — kuch khiskaana nahi.
+
+    ```kotlin
+    a[(head + count) % k] = x; count++        // enqueue
+    head = (head + 1) % k; count--            // dequeue
+    ```
+
+    > [!yaad]
+    > `%` (modulo) se index ghoomta hai. `head == tail` ka matlab **khaali bhi** ho sakta hai aur **bhara bhi** — isliye `count` rakho (ya ek jagah hamesha khaali chhodo).
+  analogy: |
+    **Merry-go-round (jhoola).** Seats gol ghoom rahi hain. Jo seat khaali hui, agla bachcha usi par baithta hai — seats kahin khiskti nahi.
+
+    Ya **ghadi** — 12 ke baad phir 1. `% 12` wala hisaab.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    - **Fixed memory, koi resize nahi** — audio/video buffers, network packets, logs ke liye perfect (ring buffer).
+    - **Sab O(1)** — koi shift nahi.
+    - Java/Kotlin ka `ArrayDeque` andar se yahi hai (bhar jaaye to double karta hai).
+
+    Interview mein "Design Circular Queue / Deque" seedha poochte hain — modulo aur full/empty ki pehchaan dekhne ke liye.
+
+    > [!socho]
+    > Size 3 ka simple array queue: 3 enqueue, 3 dequeue. Ab ek aur enqueue? Head aur tail dono end par hain — array "bhara" lagta hai, par saari jagah khaali hai!
+    >
+    > Ye "false full" problem hai. Circular queue mein tail ghoom ke index 0 par aa jaata hai — khaali jagah dobara kaam aati hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    Gol array: front = aage wala, rear = aakhri. Kuch enqueue, kuch dequeue — dekho rear end ke baad **wapas 0** par aata hai aur khaali hui jagah bharta hai.
+  viz: { tracer: ringDemo }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Design Circular Queue (capacity k):**
+    - `enQueue(x)`: full (`count == k`)? false. Warna `a[(head + count) % k] = x`, `count++`.
+    - `deQueue()`: khaali? false. Warna `head = (head + 1) % k`, `count--`.
+    - `Front() = a[head]`, `Rear() = a[(head + count − 1) % k]`.
+
+    k = 3: enQueue 1, 2, 3 ✓, enQueue 4 ✗ (full), deQueue (1 gaya, head = 1), enQueue 4 → index **0** par (wrap) ✓.
+
+    > [!tip]
+    > Peeche jaana (insertFront, deque mein) ho to `(head − 1 + k) % k`. Java/Kotlin mein `-1 % 3 = -1` (negative!) — isliye `+ k`.
+  viz: { tracer: cqTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "enqueue / dequeue / front / rear"
+    time: O(1)
+    space: O(1)
+    why: "Sirf index ka hisaab (%)."
+  - op: "isFull / isEmpty"
+    time: O(1)
+    space: O(1)
+    why: "count == k / count == 0."
+  - op: "Simple array queue mein dequeue (shift)"
+    time: O(n)
+    space: O(1)
+    why: "Sab items aage khiskte — circular mein nahi."
+  - op: "Moving average (ring buffer)"
+    time: O(1)
+    space: O(k)
+    why: "Purani value overwrite, running sum update."
+  - op: "Resize (ArrayDeque bhar gaya)"
+    time: "O(n) kabhi-kabhi, amortized O(1)"
+    space: O(n)
+    why: "Naya double array, items order mein copy."
+  - op: "Memory"
+    time: "lagu nahi"
+    space: O(k)
+    why: "Fixed — kabhi badhta nahi (design wala)."
+
+# 6. Code
+code:
+  - title: Ring buffer — moving average
+    file: moving-avg
+    note: |
+      Pichhli `size` values ka average. Ring buffer mein nayi value **sabse purani** ki jagah likhi jaati hai (`idx` ghoomta hai). Running `sum` mein purani ghatao, nayi jodo → har `next` O(1).
+
+      Sensors (accelerometer smoothing), FPS counter, network speed meter — sab isi se.
+
+# 7. Examples
+examples:
+  - id: buy-tickets
+    level: easy
+    title: Ticket line — k-th insaan kab free?
+    source: { name: Time Needed to Buy Tickets, platform: LeetCode, url: "https://leetcode.com/problems/time-needed-to-buy-tickets/" }
+    problem: |
+      Line mein i-th insaan ko `tickets[i]` chahiye. Har baar aage wala **ek** ticket leta hai (1 second), phir line ke **peeche** chala jaata hai (tickets poore ho gaye to line chhod deta hai). k-th insaan ke saare tickets kitne second mein?
+
+      Example: `[2, 3, 2]`, k = 2 → **6**
+    intuition: |
+      Line baar-baar ghoomti hai — **circular index**: `i = (i + 1) % n`, jinke tickets khatam unhe skip. Ek-ek second simulate karo jab tak k ke tickets 0 na ho jaayein.
+
+      Simulation O(n × max tickets). **O(n) formula** bhi hai: k ke saath har round mein k se pehle wale (aur k khud) aate hain → `min(t[i], t[k])`; k ke **baad** wale k ke aakhri round mein nahi aate → `min(t[i], t[k] − 1)`. Sab jodo.
+
+      > [!tip]
+      > Interview mein pehle simulation (sahi), phir formula (tez) — dono batao.
+    dryRun: |
+      `[2, 3, 2]`, k = 2
+
+      | Round | Line ke baad tickets | time |
+      |---|---|---|
+      | 1 | 1, 2, 1 | 3 |
+      | 2 | 0, 1, 0 → k done | **6** |
+
+      Formula: min(2, 2) + min(3, 2) + min(2, 2) = 2 + 2 + 2 = 6 ✓
+    viz: { tracer: ticketsTrace }
+    code: ex1-tickets
+    complexity:
+      time: "O(n × max) simulation, O(n) formula"
+      space: O(n)
+      why: "Har second ek ticket; copy array."
+
+  - id: circular-deque
+    level: medium
+    title: Design Circular Deque
+    source: { name: Design Circular Deque, platform: LeetCode, url: "https://leetcode.com/problems/design-circular-deque/" }
+    problem: |
+      Fixed capacity ka deque banao: `insertFront`, `insertLast`, `deleteFront`, `deleteLast`, `getFront`, `getRear`, `isEmpty`, `isFull` — sab O(1).
+
+      Example: k = 3: insertLast(1), insertLast(2), insertFront(3) ✓, insertFront(4) ✗ (full), getRear() → **2**
+    intuition: |
+      Circular queue + do naye kaam:
+      - **insertFront:** head ek **peeche** → `head = (head − 1 + k) % k`, wahan likho.
+      - **deleteLast:** sirf `count--` — rear `(head + count − 1)` apne aap ek peeche aa gaya.
+
+      `head` aur `count` se sab kuch nikalta hai — alag `tail` variable ki zaroorat nahi (bugs kam).
+
+      > [!galti]
+      > `(head − 1) % k` jab head = 0 → −1 (Kotlin/Java mein modulo negative rehta hai) → ArrayIndexOutOfBounds. `+ k` lagao.
+    dryRun: |
+      k = 3
+
+      | Op | head | count | Array (index 0, 1, 2) |
+      |---|---|---|---|
+      | insertLast(1) | 0 | 1 | 1 _ _ |
+      | insertLast(2) | 0 | 2 | 1 2 _ |
+      | insertFront(3) | 2 | 3 | 1 2 3 (front = index 2) |
+      | insertFront(4) | – | – | full → false |
+      | getRear() | | | a[(2 + 3 − 1) % 3] = a[1] = **2** |
+    viz: { tracer: cdequeTrace }
+    code: ex2-deque
+    complexity:
+      time: O(1)
+      space: O(k)
+      why: "Har op index ka hisaab."
+
+  - id: gas-station
+    level: tricky
+    title: Gas station — gol raaste par kahan se shuru?
+    source: { name: Gas Station, platform: LeetCode, url: "https://leetcode.com/problems/gas-station/" }
+    problem: |
+      Gol raaste par stations. Station i par `gas[i]` milta hai, agle station tak `cost[i]` lagta hai. Khaali tank se kis station se shuru karo ki **poora chakkar** laga sako? Na ho to −1 (answer ho to ek hi hota hai).
+
+      Example: gas `[1, 2, 3, 4, 5]`, cost `[3, 4, 5, 1, 2]` → **3**
+    intuition: |
+      Har start try karo, poora chakkar simulate (circular index) → O(n²).
+
+      **Do observations:**
+      1. Poore chakkar ka `total = Σ(gas − cost)` < 0 → kahin se bhi namumkin.
+      2. Start `s` se chale aur `i` par tank minus ho gaya → `s..i` mein **kisi se bhi** shuru karke `i + 1` tak nahi pahunchoge (beech ke station tak tank ≥ 0 tha — wahan se shuru karna matlab kam fuel). To seedha `start = i + 1`.
+
+      Ek pass: tank minus → reset. Aakhir mein total ≥ 0 to bacha hua start sahi (ghoom ke bhi).
+
+      > [!tip]
+      > Circular problem ko kabhi-kabhi "array do baar" (`i % n`, 0..2n) chala ke seedha banate hain. Yahan total wali trick se ek hi pass kaafi.
+    dryRun: |
+      diff = gas − cost = `[−2, −2, −2, 3, 3]`
+
+      | i | tank | Kya hua | start |
+      |---|---|---|---|
+      | 0 | −2 | minus → reset | 1 |
+      | 1 | −2 | reset | 2 |
+      | 2 | −2 | reset | 3 |
+      | 3 | 3 | | 3 |
+      | 4 | 6 | | 3 |
+
+      total = 0 ≥ 0 → **3**
+    viz: { tracer: gasTrace }
+    code: ex3-gas
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass; tank, total, start."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Fixed size buffer chahiye (last k values, streaming, logs)."
+    - "Queue/deque ko array par O(1) mein banana hai (design problems)."
+    - "Problem mein line/raasta gol hai — index % n."
+    - "Producer-consumer buffers (audio, network)."
+  avoid:
+    - "Size pehle se nahi pata aur badh sakta hai — ArrayDeque (khud resize karta hai)."
+    - "Beech mein insert/delete — circular buffer iske liye nahi."
+  signals:
+    - keyword: "design circular queue / deque"
+      think: "head + count; tail = (head + count) % k; front par (head − 1 + k) % k."
+    - keyword: "last k values / moving average / ring buffer"
+      think: "Overwrite oldest, running sum."
+    - keyword: "circular array / route / line repeats"
+      think: "i = (i + 1) % n, ya array 2 baar chalao."
+    - keyword: "fixed capacity, overwrite oldest"
+      think: "Ring buffer."
+
+# 9. Real-world
+realWorld:
+  - where: "Audio / video streaming"
+    how: "Player ek ring buffer mein aage ka data bharta hai aur peeche se chalata hai — buffering bar wahi hai."
+  - where: "Android / OS logs"
+    how: "logcat ka fixed size buffer — bhar jaaye to sabse purani lines overwrite."
+  - where: "Network cards"
+    how: "Packets ke liye ring buffers (RX/TX rings) — hardware aur driver dono ghoomte indexes use karte hain."
+  - where: "Games"
+    how: "Last 60 frames ka FPS average, replay buffer (pichhle 10 second)."
+  - where: "Keyboard input"
+    how: "Keypresses ek chhote circular buffer mein jab tak program padh na le."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Full aur empty mein confusion"
+    type: logic
+    wrong: |
+      Sirf head aur tail rakhe — `head == tail` khaali ke liye bhi aur bhare ke liye bhi.
+    right: |
+      `count` rakho, ya ek slot hamesha khaali chhodo (full = (tail + 1) % k == head).
+  - title: "Negative modulo"
+    type: off-by-one
+    wrong: |
+      `head = (head - 1) % k` jab head = 0 → −1 → crash.
+    right: |
+      `(head - 1 + k) % k`.
+  - title: "% bhool gaye"
+    type: off-by-one
+    wrong: |
+      `a[head + count] = x` → end ke baad index bahar.
+    right: |
+      Har index par `% k`.
+  - title: "Rear ka formula"
+    type: off-by-one
+    wrong: |
+      `a[(head + count) % k]` ko rear maan liya — wo agli KHAALI jagah hai.
+    right: |
+      Rear = `(head + count − 1) % k` (count > 0 par).
+  - title: "Khaali par Front/Rear"
+    type: empty
+    wrong: |
+      Khaali queue mein `a[head]` — purana kachra value return.
+    right: |
+      Pehle `isEmpty()` check, −1 return.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Circular queue kyun, simple array queue kyun nahi?"
+      a: |
+        Simple mein dequeue ke baad aage ki jagah bekaar (ya shift O(n)). Circular mein index ghoom ke khaali jagah dobara use — sab O(1), fixed memory.
+    - q: "Full aur empty kaise pehchanoge?"
+      a: |
+        count variable (count == 0 / count == k). Ya ek slot khaali chhodo: empty = head == tail, full = (tail + 1) % k == head.
+    - q: "ArrayDeque andar kaise kaam karta hai?"
+      followUp: true
+      a: |
+        Circular array, head/tail index. Bhar jaaye to double size ka naya array, items order mein copy (head se). Amortized O(1).
+    - q: "Ring buffer vs queue?"
+      a: |
+        Ring buffer fixed size, bhar jaaye to sabse purana overwrite (ya reject). Queue usually badh sakti hai.
+    - q: "Gas Station greedy kyun sahi?"
+      followUp: true
+      a: |
+        Tank s se i tak minus hua to s..i ka koi bhi start fail (beech tak tank ≥ 0 tha). Aur total ≥ 0 ho to bacha start ghoom ke bhi kaafi fuel rakhta hai.
+    - q: "Circular array ke problems (Next Greater II) kaise?"
+      a: |
+        Index 0..2n − 1 chalao, a[i % n] use karo — jaise array do baar likha ho.
+    - q: "Thread-safe ring buffer?"
+      a: |
+        Single producer/consumer ke liye lock-free (do atomic indexes). Warna ArrayBlockingQueue (Java) — andar circular array + locks.
+    - q: "Moving average O(1) kaise?"
+      a: |
+        Ring buffer of size k + running sum: nayi value jodo, overwrite hone wali ghatao.
+  mayAsk:
+    - "Design Hit Counter."
+    - "Next Greater Element II."
+    - "Maximum Sum Circular Subarray."
+    - "Defuse the Bomb."
+
+# 12. Practice
+practice:
+  - name: Time Needed to Buy Tickets
+    platform: LeetCode
+    num: 2073
+    url: "https://leetcode.com/problems/time-needed-to-buy-tickets/"
+    level: easy
+    pattern: Circular simulation / formula
+    hint: "Example 1 — phir O(n) formula."
+  - name: Defuse the Bomb
+    platform: LeetCode
+    num: 1652
+    url: "https://leetcode.com/problems/defuse-the-bomb/"
+    level: easy
+    pattern: Circular window sum
+    hint: "Har i ke liye agle/pichhle |k| items ka sum — index (i + j + n) % n. Sliding window se O(n)."
+  - name: Shortest Distance to Target String in a Circular Array
+    platform: LeetCode
+    num: 2515
+    url: "https://leetcode.com/problems/shortest-distance-to-target-string-in-a-circular-array/"
+    level: easy
+    pattern: Circular distance
+    hint: "Har target index j ke liye doori = min(|i − j|, n − |i − j|)."
+  - name: Design Circular Queue
+    platform: LeetCode
+    num: 622
+    url: "https://leetcode.com/problems/design-circular-queue/"
+    level: medium
+    pattern: head + count + modulo
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Design Circular Deque
+    platform: LeetCode
+    num: 641
+    url: "https://leetcode.com/problems/design-circular-deque/"
+    level: medium
+    pattern: Head moves both ways
+    hint: "Example 2."
+  - name: Gas Station
+    platform: LeetCode
+    num: 134
+    url: "https://leetcode.com/problems/gas-station/"
+    level: medium
+    pattern: Circular greedy
+    hint: "Example 3."
+  - name: Find Servers That Handled Most Number of Requests
+    platform: LeetCode
+    num: 1606
+    url: "https://leetcode.com/problems/find-servers-that-handled-most-number-of-requests/"
+    level: hard
+    pattern: Circular 'next free' with TreeSet + heap
+    hint: "Request i pehle server i % k try kare, phir aage ghoom ke. Free servers TreeSet mein: ceiling(i % k) ya na mile to first(). Busy servers min-heap (end time) se free karo."
+  - name: Time Taken to Cross the Door
+    platform: LeetCode
+    num: 2534
+    url: "https://leetcode.com/problems/time-taken-to-cross-the-door/"
+    level: hard
+    pattern: Two queues simulation
+    hint: "Enter aur exit ki do queues; har second rule ke hisaab se kaunsi queue jaaye (pichhle second ka use dekho). Khaali seconds par reset."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Array ko gol maano: index % k."
+    - "head + count se sab: tail = (head + count) % k, rear = (head + count − 1) % k."
+    - "Dequeue = head aage; insertFront = (head − 1 + k) % k."
+    - "Full/empty: count se (head == tail dono mein hota hai)."
+    - "Ring buffer: purana overwrite, running sum — moving average O(1)."
+  cheatsheet: |
+    ```kotlin
+    val a = IntArray(k); var head = 0; var count = 0
+    // enqueue
+    if (count < k) { a[(head + count) % k] = x; count++ }
+    // dequeue
+    if (count > 0) { head = (head + 1) % k; count-- }
+    // front / rear
+    a[head]; a[(head + count - 1) % k]
+    // insertFront (deque)
+    head = (head - 1 + k) % k; a[head] = x; count++
+    ```
+  quiz:
+    - q: "k = 5, head = 3, count = 4. Agla enqueue kis index par?"
+      options: ["7", "2", "1", "0"]
+      answer: 1
+      explain: "(3 + 4) % 5 = 2."
+    - q: "Rear item ka index (head = 3, count = 4, k = 5)?"
+      options: ["1", "2", "6", "0"]
+      answer: 0
+      explain: "(3 + 4 − 1) % 5 = 1."
+    - q: "head = 0 par insertFront ke baad head (k = 4)?"
+      options: ["-1", "3", "1", "0"]
+      answer: 1
+      explain: "(0 − 1 + 4) % 4 = 3."
+    - q: "head == tail ka matlab?"
+      options: ["Hamesha khaali", "Hamesha bhara", "Khaali ya bhara — count se pata chalega", "Error"]
+      answer: 2
+      explain: "Isliye count rakhte hain."
+    - q: "Gas Station: diff = [−1, 2, −3, 4], total?"
+      options: ["2", "−2", "10", "0"]
+      answer: 0
+      explain: "−1 + 2 − 3 + 4 = 2 ≥ 0 → answer exist karta hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: queue
+      why: "Wahi FIFO, array par O(1)."
+    - id: sliding-window-fixed
+      why: "Moving average = fixed window sum."
+  usedLater:
+    - id: deque
+      how: "Dono kinaron par O(1) — ArrayDeque yahi circular array hai."
+    - id: monotonic-stack
+      how: "Next Greater II — circular array do baar chalana."
+    - id: greedy-classics
+      how: "Gas Station jaisa greedy proof."
