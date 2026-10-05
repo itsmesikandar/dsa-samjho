@@ -1,0 +1,435 @@
+meta:
+  id: kadane
+  chapter: arrays-strings
+  title: Kadane's Algorithm
+  subtitle: Sabse bada subarray sum — "jodun ya naya shuru karun?" har step par
+  level: intermediate
+  minutes: 30
+  prereqs: [array, prefix-sum]
+  tags: [kadane, max-subarray, greedy, dp]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Maximum subarray problem:** array mein wo **lagatar (contiguous) hissa** dhoondho jiska sum sabse bada ho.
+
+    `[-2, 1, -3, 4, -1, 2, 1, -5, 4]` → best hissa `[4, -1, 2, 1]` → sum **6**.
+
+    **Kadane's algorithm** ise **ek hi pass** mein (O(n)) karta hai. Har index par sirf ek sawaal:
+
+    > Kya pichla running sum saath le jaun, ya yahin se naya subarray shuru karun?
+
+    `cur = max(nums[i], cur + nums[i])` — aur ab tak ka sabse bada `best` mein yaad rakho.
+
+    > [!yaad]
+    > **Subarray** = lagatar hissa (beech se chhoda nahi ja sakta). **Subsequence** = beech se chhod sakte ho. Kadane subarray ke liye hai.
+  analogy: |
+    **Cricket mein batsman ki "achhi form"** socho. Tum lagatar matches ka sabse achha streak (total runs) dhoondh rahe ho.
+
+    Agar pichle kuch matches ka total **minus mein** chala gaya (bahut kharab form), to us bojh ko aage le jaane ka koi fayda nahi — **naye sire se ginti shuru** karo. Aur jab bhi streak record todti hai, use yaad rakh lo. Bas yahi Kadane hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    "Maximum Subarray" interview ke **sabse famous** questions mein se hai (LeetCode 53). Aur iska idea bahut jagah lagta hai:
+    - Stock buy-sell (max profit)
+    - Circular array ka max subarray
+    - 2D mein max-sum rectangle
+    - DP ka pehla taste — "is index par khatam hone wala best"
+
+    Approaches ka fark:
+    - Saare subarrays + har ek ka sum alag se → **O(n³)**
+    - Running sum ke saath → **O(n²)**
+    - Kadane → **O(n)**, O(1) space
+
+    > [!socho]
+    > Prefix sum se bhi ho sakta hai kya?
+    >
+    > Haan! sum(i..j) = pre[j+1] − pre[i]. Har j par sabse **chhota pehle wala pre** ghatao → best. Ye bhi O(n) hai — asal mein Kadane ka hi doosra roop. Stock problem bilkul yahi hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    Pehle **brute force** dekho: grid ki har cell (i, j) = `arr[i..j]` ka sum. Saare ~n²/2 subarrays — unme se sabse bada dhoondhna padta hai.
+
+    Kadane is poore grid ko bina banaye, ek line mein chal ke answer nikaal leta hai.
+  viz: { tracer: subarraysMap }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Do variables:
+    - **cur** = jo subarray **abhi index i par khatam** hota hai, uska best sum.
+    - **best** = ab tak ka sabse bada sum (record).
+
+    Har i par:
+    1. `cur = max(nums[i], cur + nums[i])` — agar purana `cur` negative hai to wo bojh hai, chhod do aur `nums[i]` se naya shuru karo.
+    2. `best = max(best, cur)`.
+
+    > [!galti]
+    > `cur = 0`, `best = 0` se shuru mat karo — saare numbers negative hon (`[-3, -1, -2]`) to answer −1 hona chahiye, 0 nahi (khaali subarray allowed nahi). `nums[0]` se shuru karo.
+
+    > [!tip]
+    > Ye asal mein **DP** hai: `dp[i] = max(nums[i], dp[i-1] + nums[i])`. Bas pichla `dp[i-1]` hi chahiye, isliye array ki jagah ek variable (`cur`).
+  viz: { tracer: kadaneTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Brute force: saare subarrays, har sum alag se"
+    time: O(n³)
+    space: O(1)
+    why: "~n²/2 subarrays × har ek ko jodna O(n)."
+  - op: "Brute force with running sum"
+    time: O(n²)
+    space: O(1)
+    why: "Har start se end badhate hue sum mein ek-ek item jodo."
+  - op: "Kadane"
+    time: O(n)
+    space: O(1)
+    why: "Har item par ek faisla; sirf cur aur best."
+  - op: "Kadane + range (start, end)"
+    time: O(n)
+    space: O(1)
+    why: "Ek extra variable — cur kahan se shuru hua."
+  - op: "Circular max subarray"
+    time: O(n)
+    space: O(1)
+    why: "Max-Kadane + Min-Kadane + total, ek hi pass."
+  - op: "Prefix-sum version (pre[j] − min pre[i])"
+    time: O(n)
+    space: "O(1) (running min)"
+    why: "Har j par ab tak ka sabse chhota prefix ghatao."
+
+# 6. Code
+code:
+  - title: Brute force (O(n²)) — compare karne ke liye
+    file: brute
+    note: |
+      9 items ke 45 subarrays check hue. n = 10⁵ par ~5 × 10⁹ — TLE. Kadane wahi answer 10⁵ steps mein deta hai.
+
+# 7. Examples
+examples:
+  - id: stock
+    level: easy
+    title: Stock — ek baar kharido, ek baar becho
+    source: { name: Best Time to Buy and Sell Stock, platform: LeetCode, url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/" }
+    problem: |
+      `prices[i]` = din i par share ka daam. Ek din kharido aur **baad ke** kisi din becho. Sabse zyada profit kitna? Profit na ho to 0.
+
+      Example: `[7, 1, 5, 3, 6, 4]` → din 1 (1) kharido, din 4 (6) becho → **5**.
+    intuition: |
+      Brute force: har (kharido, becho) pair → O(n²).
+
+      Kadane wali soch: har din par sirf ek sawaal — **"agar aaj bechun, to ab tak ke sabse saste din kharida hona chahiye tha."** Profit = aaj ka daam − **ab tak ka minimum**.
+
+      Bas do cheezein yaad rakho: `minPrice` aur `best`. Ek pass → O(n).
+
+      > [!galti]
+      > Pehle `minPrice` update karke phir profit nikaala to "aaj kharido, aaj becho" ho jaata hai (profit 0) — chalega, par order samajhna zaroori hai. Pehle becho (profit), phir min update — saaf logic.
+    dryRun: |
+      `[7, 1, 5, 3, 6, 4]`
+
+      | Din | Daam | minPrice (pehle) | Aaj beche to | best |
+      |---|---|---|---|---|
+      | 0 | 7 | 7 | – | 0 |
+      | 1 | 1 | 7 | −6 | 0 → min = 1 |
+      | 2 | 5 | 1 | 4 | 4 |
+      | 3 | 3 | 1 | 2 | 4 |
+      | 4 | 6 | 1 | 5 | **5** |
+      | 5 | 4 | 1 | 3 | 5 |
+    viz: { tracer: stockTrace }
+    code: ex1-stock
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass; sirf minPrice aur best."
+
+  - id: range
+    level: medium
+    title: Max subarray ke saath uski range bhi batao
+    problem: |
+      Sabse bada subarray sum to nikaalo hi, saath mein batao wo subarray **kahan se kahan tak** hai: `[sum, start, end]`.
+
+      Example: `[-2, 1, -3, 4, -1, 2, 1, -5, 4]` → `[6, 3, 6]`
+    intuition: |
+      Kadane mein `cur` jab bhi **naya shuru** hota hai (purana negative tha), wahi naye subarray ki **shuruaat** hai. Use `curStart` mein yaad rakho.
+
+      Jab bhi `cur > best` ho → record toota: `best = cur`, `bestL = curStart`, `bestR = i`.
+
+      Logic same rehta hai — `cur < 0` ho to restart, warna extend.
+
+      > [!tip]
+      > Ties ka dhyaan: agar do subarrays ka sum barabar ho to kaunsa chahiye (pehla? chhota?) — interviewer se poocho. `cur > best` (strictly) pehle wale ko rakhta hai.
+    dryRun: |
+      | i | nums[i] | Faisla | cur | curStart | best (L..R) |
+      |---|---|---|---|---|---|
+      | 0 | −2 | shuru | −2 | 0 | −2 (0..0) |
+      | 1 | 1 | cur < 0 → restart | 1 | 1 | 1 (1..1) |
+      | 2 | −3 | extend | −2 | 1 | 1 |
+      | 3 | 4 | cur < 0 → restart | 4 | 3 | 4 (3..3) |
+      | 4 | −1 | extend | 3 | 3 | 4 |
+      | 5 | 2 | extend | 5 | 3 | 5 (3..5) |
+      | 6 | 1 | extend | 6 | 3 | **6 (3..6)** |
+      | 7 | −5 | extend | 1 | 3 | 6 |
+      | 8 | 4 | extend | 5 | 3 | 6 |
+    viz: { tracer: rangeTrace }
+    code: ex2-range
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Same ek pass; bas teen extra index variables."
+
+  - id: circular
+    level: tricky
+    title: Circular array mein max subarray
+    source: { name: Maximum Sum Circular Subarray, platform: LeetCode, url: "https://leetcode.com/problems/maximum-sum-circular-subarray/" }
+    problem: |
+      Array **circular** hai — last item ke baad wapas pehla aata hai. Ab subarray "wrap" bhi kar sakta hai (end ke kuch items + shuru ke kuch items). Max subarray sum?
+
+      Examples: `[5, -3, 5]` → **10** (5 + 5, wrap karke), `[-3, -2, -3]` → **−2**.
+    intuition: |
+      Do tarah ke answer ho sakte hain:
+      1. **Bina wrap** — normal Kadane (best).
+      2. **Wrap ke saath** — dono kinaron ka hissa lo = **total − (beech ka koi hissa)**. Ye sabse bada tab hoga jab beech ka chhoda hua hissa **sabse chhota** ho → **total − (min subarray sum)**.
+
+      Min subarray bhi Kadane se hi — bas max ki jagah min.
+
+      Answer = `max(best, total − worst)`.
+
+      > [!galti]
+      > Saare numbers negative hon to `total − worst = 0` aata hai — matlab "kuch mat lo" (khaali subarray), jo allowed nahi. Isliye `best < 0` ho to seedha `best` return karo.
+    dryRun: |
+      `[5, -3, 5]`
+
+      | | Value |
+      |---|---|
+      | best (normal Kadane) | 5 + (−3) + 5 = 7 |
+      | worst (min subarray) | −3 |
+      | total | 7 |
+      | total − worst | 7 − (−3) = **10** |
+      | Answer | max(7, 10) = **10** |
+    viz: { tracer: circularTrace }
+    code: ex3-circular
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek hi pass mein do Kadane aur total; sirf kuch variables."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "**Contiguous** subarray ka max (ya min) sum chahiye."
+    - "\"Ab tak ka best/min\" yaad rakh ke har step par faisla — stock profit jaisa."
+    - "Circular array — max + min Kadane combo."
+  avoid:
+    - "**Subsequence** (beech se chhod sakte ho) ka max sum — tab bas saare positive jodo (ya DP)."
+    - "Fixed length k ka max sum — sliding window simple hai."
+    - "Product chahiye (max product subarray) — negative × negative = positive; max aur min dono track karne padte hain (Kadane variant)."
+  signals:
+    - keyword: "maximum sum subarray / contiguous"
+      think: "Kadane, O(n)."
+    - keyword: "buy once, sell once"
+      think: "Running min + best profit (Kadane jaisa)."
+    - keyword: "circular array, max subarray"
+      think: "max(Kadane max, total − Kadane min), sab-negative case alag."
+    - keyword: "maximum product subarray"
+      think: "Kadane jaisa par curMax aur curMin dono rakho (negative flip)."
+
+# 9. Real-world
+realWorld:
+  - where: "Stock / crypto apps"
+    how: "\"Is period mein sabse achha buy-sell window\" — running min + max profit, ek pass."
+  - where: "Sales / analytics"
+    how: "Daily profit-loss ki list mein sabse lamba \"achha daur\" (max sum streak) — Kadane."
+  - where: "Signal processing / sensors"
+    how: "Noisy data mein sabse strong lagatar signal wala hissa dhoondhna — max subarray."
+  - where: "Genomics (DNA analysis)"
+    how: "Sequence ke scores mein sabse 'interesting' lagatar region — maximum scoring segment."
+  - where: "Game scoring"
+    how: "Player ka best lagatar streak (wins/points minus losses) — Kadane."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "`cur = 0`, `best = 0` se shuru"
+    type: empty
+    wrong: |
+      Sab negative `[-3, -1, -2]` → answer 0 aa gaya (khaali subarray maan liya).
+    right: |
+      `cur = best = nums[0]`, loop i = 1 se. (Agar question khaali subarray allow kare tabhi 0 se shuru.)
+  - title: "Subarray aur subsequence mein confusion"
+    type: logic
+    wrong: |
+      Kadane se "max sum subsequence" nikaala.
+    right: |
+      Subsequence mein beech se chhod sakte ho → bas saare positive numbers jodo (sab negative ho to sabse bada ek number).
+  - title: "Circular mein sab-negative case"
+    type: logic
+    wrong: |
+      `max(best, total - worst)` seedha return → `[-3, -2, -3]` par 0.
+    right: |
+      `if (best < 0) return best`.
+  - title: "Bade sums Int mein"
+    type: overflow
+    right: |
+      n = 10⁵ aur values 10⁹ tak → sum 10¹⁴ tak → `Long` lo (cur aur best dono).
+  - title: "Range track karte waqt galat jagah start update"
+    type: off-by-one
+    wrong: |
+      Har baar `cur > best` par `start = i` kar diya.
+    right: |
+      `curStart` sirf **restart** par badlo; `bestL = curStart` sirf **record** par.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Kadane's algorithm samjhao."
+      a: |
+        Har index par: `cur = max(nums[i], cur + nums[i])` — pichla sum faydemand ho to saath lo, negative ho to chhodo. `best = max(best, cur)`. O(n) time, O(1) space.
+    - q: "Kadane greedy hai ya DP?"
+      a: |
+        DP hai: `dp[i]` = i par khatam hone wala max subarray sum, `dp[i] = max(nums[i], dp[i-1] + nums[i])`. Sirf pichla state chahiye, isliye O(1) space — isliye greedy jaisa dikhta hai.
+    - q: "Sab numbers negative hon to Kadane kya dega?"
+      a: |
+        Sabse bada (sabse kam negative) single element — agar init `nums[0]` se kiya ho. 0 se init kiya to galat 0.
+    - q: "Subarray ki range bhi chahiye to?"
+      a: |
+        `curStart` restart par update karo; record todne par `bestL = curStart, bestR = i`.
+    - q: "Circular array mein max subarray?"
+      followUp: true
+      a: |
+        `max(normalMax, total − minSubarray)`, aur agar normalMax < 0 (sab negative) to normalMax hi. Min subarray bhi Kadane se.
+    - q: "Maximum product subarray kaise karoge?"
+      followUp: true
+      a: |
+        Negative number max ko min aur min ko max bana deta hai — isliye har step par curMax aur curMin dono rakho: `curMax = max(x, x*curMax, x*curMin)`, same for min. Zero par reset.
+    - q: "Kadane aur prefix sum ka rishta?"
+      a: |
+        sum(i..j) = pre[j+1] − pre[i]. Har j par sabse chhota pehle wala prefix ghatao → max. Stock problem exactly yahi hai (prices = prefix).
+    - q: "2D mein max sum rectangle?"
+      a: |
+        Do rows (top, bottom) fix karo, columns ka sum ek 1D array banao, us par Kadane. O(R² × C).
+    - q: "Divide and conquer se bhi kar sakte ho?"
+      a: |
+        Haan — beech se baanto, left best, right best, aur beech ko cross karne wala best. O(n log n). Kadane O(n) behtar hai, par segment tree mein yahi idea aata hai.
+  mayAsk:
+    - "Kam se kam k length wala max subarray."
+    - "Ek element delete karne ki chhoot ho to max subarray (LC 1186)."
+    - "Max absolute sum of any subarray."
+    - "Stock problem — kitni bhi baar buy-sell (LC 122)."
+
+# 12. Practice
+practice:
+  - name: Maximum Subarray
+    platform: LeetCode
+    num: 53
+    url: "https://leetcode.com/problems/maximum-subarray/"
+    level: easy
+    pattern: Kadane
+    hint: "cur = max(x, cur + x), best = max(best, cur). nums[0] se init."
+  - name: Best Time to Buy and Sell Stock
+    platform: LeetCode
+    num: 121
+    url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"
+    level: easy
+    pattern: Running min + best
+    hint: "Example 1. Pehle profit, phir min update."
+  - name: Maximum Ascending Subarray Sum
+    platform: LeetCode
+    num: 1800
+    url: "https://leetcode.com/problems/maximum-ascending-subarray-sum/"
+    level: easy
+    pattern: Kadane-style reset condition
+    hint: "Agar nums[i] > nums[i-1] to cur += nums[i], warna cur = nums[i]. best track karo."
+  - name: Maximum Product Subarray
+    platform: LeetCode
+    num: 152
+    url: "https://leetcode.com/problems/maximum-product-subarray/"
+    level: medium
+    pattern: Kadane with max and min
+    hint: "Har x par naye curMax/curMin = max/min(x, x*curMax, x*curMin). Negative x swap jaisa asar karta hai."
+  - name: Maximum Sum Circular Subarray
+    platform: LeetCode
+    num: 918
+    url: "https://leetcode.com/problems/maximum-sum-circular-subarray/"
+    level: medium
+    pattern: Max-Kadane + Min-Kadane
+    hint: "Example 3. Sab negative case mat bhoolo."
+  - name: Maximum Subarray Sum with One Deletion
+    platform: LeetCode
+    num: 1186
+    url: "https://leetcode.com/problems/maximum-subarray-sum-with-one-deletion/"
+    level: medium
+    pattern: Kadane with two states
+    hint: "Do states: noDelete[i] (normal Kadane) aur oneDelete[i] = max(noDelete[i-1], oneDelete[i-1] + x)."
+  - name: Max Sum of Rectangle No Larger Than K
+    platform: LeetCode
+    num: 363
+    url: "https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/"
+    level: hard
+    pattern: 2D → 1D + Kadane/prefix + TreeSet
+    hint: "Do rows fix, column sums 1D array. 'Max sum ≤ k' ke liye Kadane nahi chalega — prefix sums + TreeSet.ceiling(pre − k)."
+  - name: Best Time to Buy and Sell Stock III
+    platform: LeetCode
+    num: 123
+    url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/"
+    level: hard
+    pattern: Do transactions — left best + right best (ya 4 states)
+    hint: "Har din tak ka best profit (left se, Example 1) aur har din ke baad ka best (right se). Dono ka max sum."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Subarray = lagatar hissa; Kadane uska max sum O(n) mein deta hai."
+    - "cur = max(nums[i], cur + nums[i]); best = max(best, cur)."
+    - "Init nums[0] se — sab-negative case ke liye."
+    - "Range chahiye → curStart restart par, best ke saath L/R save."
+    - "Circular → max(best, total − minSubarray), best < 0 ho to best."
+  cheatsheet: |
+    ```
+    cur = best = nums[0]
+    for i in 1..n-1:
+        cur  = max(nums[i], cur + nums[i])   // naya shuru ya jodo
+        best = max(best, cur)
+
+    // stock:  best = max(best, p - minSoFar); minSoFar = min(minSoFar, p)
+    // circular: ans = best < 0 ? best : max(best, total - minSub)
+    ```
+  quiz:
+    - q: "[-2, 1, -3, 4, -1, 2, 1, -5, 4] ka max subarray sum?"
+      options: ["4", "5", "6", "7"]
+      answer: 2
+      explain: "[4, −1, 2, 1] = 6."
+    - q: "Kadane mein cur kab \"restart\" hota hai?"
+      options: ["Jab nums[i] negative ho", "Jab purana cur negative ho", "Har 2 step par", "Jab best badhe"]
+      answer: 1
+      explain: "Negative running sum aage le jaana nuksaan hai."
+    - q: "[-5, -2, -8] par sahi Kadane ka answer?"
+      options: ["0", "-2", "-15", "-5"]
+      answer: 1
+      explain: "Sabse kam negative single element. 0 tabhi jab khaali subarray allowed ho."
+    - q: "Kadane ki time aur space complexity?"
+      options: ["O(n²), O(1)", "O(n), O(n)", "O(n), O(1)", "O(n log n), O(1)"]
+      answer: 2
+      explain: "Ek pass, do variables."
+    - q: "Circular [5, -3, 5] ka answer?"
+      options: ["7", "5", "10", "13"]
+      answer: 2
+      explain: "total 7 − min (−3) = 10 (wrap: 5 + 5)."
+
+# 14. Connections
+connections:
+  related:
+    - id: prefix-sum
+      why: "Max subarray = max(pre[j] − min pre[i]) — dono ek hi idea ke do roop."
+    - id: sliding-window-fixed
+      why: "Fixed length window ka max sum — Kadane ka simple bhai."
+  usedLater:
+    - id: dp-intro
+      how: "Kadane = 1D DP jisme sirf pichla state chahiye."
+    - id: greedy-classics
+      how: "Stock buy-sell II jaise greedy problems."
+    - id: dp-1d
+      how: "House robber jaise 'is index tak ka best' wale DP."
+    - id: matrix
+      how: "2D max-sum rectangle = rows fix karke columns par Kadane."
