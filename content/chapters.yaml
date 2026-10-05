@@ -1,0 +1,146 @@
+# Chapter + topic order for the whole site. Reorder here; folder names never change.
+- id: foundations
+  title: Foundations
+  subtitle: Memory, Big-O, code analyze karna aur problem approach karne ka tareeka
+  topics:
+    - { id: memory-basics, title: Memory kaise kaam karti hai }
+    - { id: big-o-time, title: Time Complexity & Big-O }
+    - { id: space-complexity, title: Space Complexity }
+    - { id: analyze-code, title: Code analyze kaise karein }
+    - { id: problem-solving, title: Problem kaise approach karein }
+    - { id: kotlin-java-toolkit, title: DSA ke liye Kotlin & Java toolkit }
+
+- id: arrays-strings
+  title: Arrays & Strings
+  subtitle: Sabse basic aur sabse zyada use hone wala data structure
+  topics:
+    - { id: array, title: Array }
+    - { id: dynamic-array, title: Dynamic Array (ArrayList) }
+    - { id: strings, title: Strings }
+    - { id: matrix, title: 2D Array / Matrix }
+    - { id: prefix-sum, title: Prefix Sum }
+    - { id: kadane, title: Kadane's Algorithm }
+
+- id: hashing
+  title: Hashing
+  subtitle: O(1) mein dhoondhne ka jaadu — HashMap aur HashSet
+  topics:
+    - { id: hashing-internals, title: Hashing andar se kaise kaam karta hai }
+    - { id: hashmap, title: HashMap }
+    - { id: hashset, title: HashSet }
+    - { id: frequency-count, title: Frequency Counting }
+
+- id: two-pointers-window
+  title: Two Pointers & Sliding Window
+  subtitle: O(n²) ko O(n) banane ke do sabse kaam ke patterns
+  topics:
+    - { id: two-pointers-opposite, title: Two Pointers (dono kinaron se) }
+    - { id: two-pointers-same, title: Two Pointers (same direction) }
+    - { id: sliding-window-fixed, title: Sliding Window (fixed size) }
+    - { id: sliding-window-variable, title: Sliding Window (variable size) }
+
+- id: recursion
+  title: Recursion
+  subtitle: Function jo khud ko call kare — call stack ko dekh ke samjho
+  topics:
+    - { id: recursion-basics, title: Recursion basics }
+    - { id: recursion-patterns, title: Recursion patterns }
+
+- id: sorting-searching
+  title: Sorting & Searching
+  subtitle: Bubble se Merge/Quick sort tak, aur Binary Search ke saare roop
+  topics:
+    - { id: simple-sorts, title: "Bubble, Selection, Insertion Sort" }
+    - { id: merge-sort, title: Merge Sort }
+    - { id: quick-sort, title: Quick Sort }
+    - { id: sorting-in-practice, title: Sorting in practice }
+    - { id: binary-search, title: Binary Search }
+    - { id: binary-search-variations, title: Binary Search variations }
+    - { id: binary-search-on-answer, title: Binary Search on Answer }
+
+- id: linked-list
+  title: Linked List
+  subtitle: Memory mein bikhre nodes, pointers se jude hue
+  topics:
+    - { id: singly-linked-list, title: Singly Linked List }
+    - { id: doubly-linked-list, title: Doubly & Circular Linked List }
+    - { id: fast-slow-pointers, title: Fast & Slow Pointers }
+    - { id: reverse-linked-list, title: Reverse Linked List }
+    - { id: linked-list-techniques, title: Dummy node & merge techniques }
+
+- id: stack-queue
+  title: Stack & Queue
+  subtitle: LIFO, FIFO, deque aur monotonic stack
+  topics:
+    - { id: stack, title: Stack }
+    - { id: queue, title: Queue }
+    - { id: circular-queue, title: Circular Queue }
+    - { id: deque, title: Deque }
+    - { id: monotonic-stack, title: Monotonic Stack }
+
+- id: backtracking
+  title: Backtracking
+  subtitle: Choose, explore, un-choose — saare options try karne ka smart tareeka
+  topics:
+    - { id: backtracking-basics, title: Backtracking basics }
+    - { id: permutations-combinations, title: Permutations & Combinations }
+    - { id: constraint-backtracking, title: Grid & constraint backtracking }
+
+- id: trees
+  title: Trees
+  subtitle: Binary tree, traversals, BST aur LCA
+  topics:
+    - { id: binary-tree-basics, title: Binary Tree basics }
+    - { id: tree-traversals, title: DFS Traversals }
+    - { id: level-order, title: Level Order (BFS) }
+    - { id: tree-recursion, title: "Height, Balance & Diameter" }
+    - { id: bst, title: Binary Search Tree }
+    - { id: lca, title: Lowest Common Ancestor }
+
+- id: heap
+  title: Heap / Priority Queue
+  subtitle: Hamesha sabse chhota (ya bada) turant chahiye? Heap lo
+  topics:
+    - { id: heap-basics, title: Heap basics }
+    - { id: priority-queue, title: PriorityQueue & Heap Sort }
+    - { id: top-k, title: Top-K & K-way merge }
+    - { id: two-heaps, title: Two Heaps }
+
+- id: graphs
+  title: Graphs
+  subtitle: BFS, DFS, topological sort, Dijkstra aur union-find
+  topics:
+    - { id: graph-basics, title: Graph basics }
+    - { id: bfs, title: BFS }
+    - { id: dfs, title: DFS }
+    - { id: topological-sort, title: Topological Sort }
+    - { id: dijkstra, title: Dijkstra }
+    - { id: union-find, title: Union-Find (DSU) }
+
+- id: greedy
+  title: Greedy
+  subtitle: Har step pe abhi ka best choice — kab kaam karta hai, kab nahi
+  topics:
+    - { id: greedy-basics, title: Greedy basics }
+    - { id: intervals, title: Intervals }
+    - { id: greedy-classics, title: Greedy classics }
+
+- id: dp
+  title: Dynamic Programming
+  subtitle: Recursion + yaaddasht = DP. Memoization se tabulation tak
+  topics:
+    - { id: dp-intro, title: DP introduction }
+    - { id: dp-1d, title: 1D DP }
+    - { id: dp-grid, title: Grid DP }
+    - { id: knapsack-01, title: 0/1 Knapsack }
+    - { id: unbounded-knapsack, title: Unbounded Knapsack }
+    - { id: dp-strings, title: DP on Strings }
+    - { id: lis, title: Longest Increasing Subsequence }
+
+- id: trie-bits
+  title: Trie & Bits (bonus)
+  subtitle: Prefix search aur bits ke tricks
+  topics:
+    - { id: trie, title: Trie }
+    - { id: bit-basics, title: Bit Manipulation basics }
+    - { id: bit-tricks, title: XOR tricks & Bitmasks }
