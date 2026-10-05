@@ -1,0 +1,433 @@
+meta:
+  id: bst
+  chapter: trees
+  title: Binary Search Tree
+  subtitle: Left mein chhote, right mein bade — har node par binary search, search / insert / delete O(h)
+  level: intermediate
+  minutes: 45
+  prereqs: [binary-tree-basics, tree-traversals, binary-search]
+  tags: [tree, bst, binary-search, inorder, ordered]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **BST (Binary Search Tree)** = binary tree jisme **har node** par:
+    - Left subtree ke **saare** nodes < node.
+    - Right subtree ke **saare** nodes > node.
+
+    "Saare" zaroori hai — sirf seedha bachcha nahi, poora subtree. (Duplicates aam taur par allowed nahi.)
+
+    Fayda: search mein har node par ek taraf **poora subtree** chhoot jaata hai — bilkul binary search jaisa. Kaam = **O(h)**, h = height.
+
+    > [!yaad]
+    > BST ka **inorder** (L N R) = **sorted** order. Ye ek line bahut sawaalon ki chaabi hai.
+  analogy: |
+    **Number guess game:**
+    Dost ne 1–100 mein number socha. Tum 50 bolte ho, wo kehta "chhota". Ab 51–100 ki taraf dekhna hi bekaar. Phir 25… har jawab aadhe options khatam karta hai.
+
+    BST mein har node ek guess hai. "Chhota" = left, "bada" = right. Tree jitna santulit (balanced), utne kam guess.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Sorted data rakhna hai jisme search, insert, delete teeno tez hon:
+
+    | Structure | Search | Insert / Delete |
+    |---|---|---|
+    | Sorted array | O(log n) | O(n) — shift karna padta |
+    | Linked list | O(n) | O(1) jagah mile to, par jagah dhoondhna O(n) |
+    | HashMap | O(1) | O(1) — par **order nahi** |
+    | **Balanced BST** | O(log n) | O(log n) — **aur order bhi** |
+
+    Order chahiye (min, max, "x se chhota sabse bada", range query) → BST. Java `TreeMap` / `TreeSet` aur Kotlin mein `java.util.TreeMap` andar se **Red-Black tree** (self-balancing BST) hain.
+
+    > [!socho]
+    > 1, 2, 3, 4, 5 ko isi order mein BST mein insert karo. Tree kaisa dikhega, search kitna time?
+    >
+    > Har naya node pichhle ka right → **line** (skewed). h = n → search O(n). Isliye asli libraries **self-balancing** (AVL / Red-Black) use karti hain.
+
+# 3. Visual intro
+visual:
+  body: |
+    Har node ki ek **range** hoti hai — upar ke saare ancestors ki shartein milkar. Badge = (lo..hi). Left mein jaate hi `hi` chhota hota hai, right mein `lo` bada.
+  viz: { tracer: bstRanges }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Search:** root se shuru. key chhota → left, bada → right, barabar → mil gaya. Null aa gaya → nahi hai.
+
+    **Insert:** search ka hi raasta. Jahan **null** mile, wahi naya node — naya node hamesha **leaf** banta hai, koi purana node hilta nahi.
+
+    Recursion ka trick: `node.left = insert(node.left, key)` — function naye subtree ka root lautaata hai, parent use jod leta hai. Null par naya node lautaya → apne aap jud gaya.
+
+    > [!tip]
+    > Search iterative likho (code section) — O(1) space. Insert / delete recursive saaf lagte hain; interview mein dono chalenge.
+  viz: { tracer: insertTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Search"
+    time: "O(h)"
+    space: "O(1) iterative"
+    why: "Har level par ek compare, ek taraf."
+  - op: "Insert"
+    time: "O(h)"
+    space: "O(h) recursive"
+    why: "Search ka raasta + null par naya leaf."
+  - op: "Delete"
+    time: "O(h)"
+    space: "O(h)"
+    why: "Node tak raasta + successor tak raasta."
+  - op: "Min / max"
+    time: "O(h)"
+    space: O(1)
+    why: "Left-left-left / right-right-right."
+  - op: "Sorted order (inorder)"
+    time: O(n)
+    space: O(h)
+    why: "Har node ek baar."
+  - op: "h kitna?"
+    time: "log n se n"
+    space: O(n)
+    why: "Balanced par log n; sorted order mein insert kiya to line (n). TreeMap guarantee log n deta hai. Tree khud O(n) memory."
+
+# 6. Code
+code:
+  - title: Search (iterative)
+    file: search
+    note: |
+      Loop mein `cur` ko ek taraf badhao jab tak mil na jaaye ya null na ho. Stack nahi lagta → O(1) space.
+
+      `contains` / `get` in `TreeMap` andar se yahi karta hai.
+
+# 7. Examples
+examples:
+  - id: range-sum
+    level: easy
+    title: Range ke andar wale nodes ka sum
+    source: { name: Range Sum of BST, platform: LeetCode, url: "https://leetcode.com/problems/range-sum-of-bst/" }
+    problem: |
+      BST aur do numbers `low`, `high` diye hain. Jin nodes ki value `[low, high]` mein hai, unka sum batao.
+
+      Example: `[10, 5, 15, 3, 7, #, 18]`, low = 7, high = 15 → **32** (7 + 10 + 15)
+    intuition: |
+      Har node dekhna (DFS) bhi chalega — O(n). Par BST ka order use karo:
+      - node < low → iska **poora left** subtree aur bhi chhota → sirf right mein jao.
+      - node > high → poora right aur bhi bada → sirf left mein.
+      - Range mein → jodo, dono taraf jao.
+
+      > [!galti]
+      > node < low par node ka right bhi skip kar diya. Right mein bade values hain — wahan range waale ho sakte hain!
+    dryRun: |
+      | Node | Faisla | sum |
+      |---|---|---|
+      | 10 | range mein → jodo, dono taraf | 10 |
+      | 5 | 5 < 7 → left (3) skip, right jao | 10 |
+      | 7 | range mein | 17 |
+      | 15 | range mein | 32 |
+      | 18 | 18 > 15 → sirf left (null) | 32 |
+
+      Node 3 dekha hi nahi.
+    viz: { tracer: rangeSumTrace }
+    code: ex1-range-sum
+    complexity:
+      time: "O(n) worst, aksar kam"
+      space: O(h)
+      why: "Range bahar wale subtrees chhoot jaate hain; sab range mein ho to sab dekhne padenge."
+
+  - id: validate
+    level: medium
+    title: Kya ye sach mein BST hai?
+    source: { name: Validate Binary Search Tree, platform: LeetCode, url: "https://leetcode.com/problems/validate-binary-search-tree/" }
+    problem: |
+      Binary tree diya hai. Batao ye valid BST hai ya nahi (har node ke left subtree mein sab chhote, right mein sab bade, duplicates nahi).
+
+      Example: `[5, 1, 6, #, #, 3, 7]` → **false** (3 right subtree mein hai par 5 se chhota)
+    intuition: |
+      Sirf "left bachcha < node < right bachcha" check karna **galat** hai — upar example mein har parent-bachcha joda theek dikhta hai (3 < 6), par 3 ko 5 se bhi bada hona tha.
+
+      Fix: har node ko ek **range** `(lo, hi)` do. Left mein jao → `hi = node`. Right mein → `lo = node`. Upar ki shartein neeche saath chalti hain.
+
+      Doosra tareeka: inorder nikaalo, check karo ki strictly badhta hai (pichhla < abhi).
+
+      > [!galti]
+      > Range `Int.MIN_VALUE` / `Int.MAX_VALUE` se shuru ki. Node ki value khud `Int.MAX_VALUE` ho to `>= hi` galat false de dega. `Long` ya nullable bounds lo.
+    dryRun: |
+      | Node | Range | Theek? |
+      |---|---|---|
+      | 5 | (-∞, ∞) | haan |
+      | 1 | (-∞, 5) | haan |
+      | 6 | (5, ∞) | haan |
+      | 3 | (5, 6) | **nahi** → false |
+    viz: { tracer: validateTrace }
+    code: ex2-validate
+    complexity:
+      time: O(n)
+      space: O(h)
+      why: "Har node ek baar, range parameter mein."
+
+  - id: delete
+    level: tricky
+    title: BST se node hatao
+    source: { name: Delete Node in a BST, platform: LeetCode, url: "https://leetcode.com/problems/delete-node-in-a-bst/" }
+    problem: |
+      BST aur ek `key` diya hai. Wo node hatao (agar hai) aur tree BST hi rahe. Naya root lautao.
+
+      Example: `[8, 3, 12, 1, 6, 10, 15, #, #, #, #, #, 11]`, key = 8 → preorder `[10, 3, 1, 6, 12, 11, 15]`
+    intuition: |
+      Pehle search se node tak pahuncho. Phir teen case:
+      1. **Leaf** → bas hata do (null lautao).
+      2. **Ek bachcha** → bachcha seedha jagah le (uska poora subtree already sahi range mein hai).
+      3. **Do bachche** → right subtree ka **sabse chhota** (inorder successor) dhoondho. Uski value yahan copy karo, phir right subtree se successor ko delete karo.
+
+      Successor kyun? Wo left ke sab se bada aur right ke baaki sab se chhota — jagah ke liye bilkul fit. Aur uska **left kabhi nahi** hota → uska delete case 1 ya 2 hai.
+
+      > [!galti]
+      > Do bachche wale case mein left subtree ko right ke neeche chipka diya. Tree BST rehta hai par height badh jaati hai — successor wala tareeka height nahi badhata.
+    dryRun: |
+      | Step | Kya hua |
+      |---|---|
+      | 8 mila | do bachche (3, 12) |
+      | successor | 12 → left 10 → left null → **10** |
+      | copy | root ki value 10 |
+      | right se 10 hatao | 12 → left → 10 mila, left null → right (11) lautao |
+      | 12.left = 11 | preorder `[10, 3, 1, 6, 12, 11, 15]` |
+    viz: { tracer: deleteTrace }
+    code: ex3-delete
+    complexity:
+      time: O(h)
+      space: O(h)
+      why: "Node tak ek raasta, phir successor tak ek raasta; recursion stack height jitna."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Sorted order ke saath insert / delete bhi chahiye → TreeMap / TreeSet."
+    - "'x se chhota sabse bada' (floor), 'x se bada sabse chhota' (ceiling), range query."
+    - "Sawaal mein BST diya hai → order use karo: subtree skip, inorder sorted, range bounds."
+  avoid:
+    - "Sirf 'hai ya nahi' / count chahiye, order nahi → HashMap / HashSet (O(1))."
+    - "Data ek baar bana, phir sirf search → sorted array + binary search (kam memory, cache friendly)."
+    - "Khud likha BST bina balancing ke sorted input par → line ban jaata hai, O(n). Library wala lo."
+  signals:
+    - keyword: "BST diya hai"
+      think: "Inorder sorted; har node par ek taraf skip."
+    - keyword: "validate / is BST"
+      think: "Range (lo, hi) neeche bhejo, ya inorder strictly increasing."
+    - keyword: "kth smallest / closest value / floor / ceiling"
+      think: "Inorder count, ya search raaste par best track."
+    - keyword: "sorted array / list se BST banao"
+      think: "Beech wala root, dono aadhe recursively → balanced."
+
+# 9. Real-world
+realWorld:
+  - where: "Java TreeMap / TreeSet"
+    how: "Red-Black tree — leaderboard, time-ordered events, 'is time se pehle wala aakhri event' (floorKey)."
+  - where: "Database index"
+    how: "B-tree / B+ tree — BST ka bhai, har node mein bahut keys. WHERE age BETWEEN 20 AND 30 = range query."
+  - where: "Linux scheduler (CFS)"
+    how: "Red-Black tree mein processes runtime ke order mein; sabse kam chala process = leftmost node."
+  - where: "Stock order book"
+    how: "Price ke order mein buy / sell orders — best price = min / max node, insert / cancel O(log n)."
+  - where: "Autocomplete / dictionary (sorted)"
+    how: "Shabd sorted order mein; 'ab' se shuru hone wale = ek range."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Validate mein sirf parent-bachcha check"
+    type: logic
+    wrong: |
+      `node.left.value < node.value < node.right.value` har node par → `[5, 1, 6, #, #, 3, 7]` ko true bolega.
+    right: |
+      Range `(lo, hi)` neeche bhejo — har ancestor ki shart.
+  - title: "Range bounds Int ke kinaare se"
+    type: overflow
+    wrong: |
+      `valid(root, Int.MIN_VALUE, Int.MAX_VALUE)` → node = `Int.MAX_VALUE` hai to galat false.
+    right: |
+      `Long.MIN_VALUE` / `Long.MAX_VALUE`, ya nullable `Int?` bounds (null = koi shart nahi).
+  - title: "Insert ka return jodna bhool gaye"
+    type: "null"
+    wrong: |
+      `insert(node.left, key)` likha, `node.left =` nahi → naya node bana par kisi se juda hi nahi.
+    right: |
+      `node.left = insert(node.left, key)` — aur khaali tree ke liye `root = insert(root, key)`.
+  - title: "Delete mein successor ko copy ke baad nahi hataya"
+    type: logic
+    wrong: |
+      Value copy ki, par right subtree se successor delete nahi kiya → duplicate.
+    right: |
+      `node.right = delete(node.right, s.value)`.
+  - title: "Duplicates ka rule tay nahi kiya"
+    type: other
+    wrong: |
+      Kabhi left mein, kabhi right mein barabar value → search galat taraf jaata hai.
+    right: |
+      Ek rule rakho (ignore karo, ya count field, ya hamesha right) aur har jagah wahi.
+  - title: "Sorted input se seedha BST"
+    type: other
+    wrong: |
+      1..n order mein insert → line, sab operations O(n).
+    right: |
+      Sorted array se banana ho to beech wala root (balanced). Asli kaam mein TreeMap.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "BST vs HashMap — kab kya?"
+      a: |
+        HashMap: O(1) average, order nahi. BST (TreeMap): O(log n), par sorted order, min/max, floor/ceiling, range. Order chahiye → BST.
+    - q: "BST mein search ki complexity?"
+      a: |
+        O(h). Balanced par O(log n), skewed (sorted insert) par O(n).
+    - q: "BST validate kaise? Sirf bachchon se compare kyun nahi?"
+      a: |
+        Range (lo, hi) bhejo, ya inorder strictly increasing check. Sirf bachche check karna ancestors ki shart miss karta hai.
+    - q: "Delete ke teen case?"
+      a: |
+        Leaf → hata do. Ek bachcha → bachcha jagah le. Do bachche → inorder successor (right ka min) ki value copy, phir successor delete.
+    - q: "Kth smallest in BST?"
+      a: |
+        Inorder mein ginte jao, k-th par ruko. O(h + k). Baar baar poochha jaaye to har node par left subtree size rakho → O(h).
+    - q: "Sorted array se balanced BST?"
+      a: |
+        Beech wala element root, left aadha → left subtree, right aadha → right subtree (recursively). O(n).
+    - q: "BST mein x ke sabse paas wali value?"
+      followUp: true
+      a: |
+        Search ke raaste par chalo, har node par `|node − x|` se best update. O(h).
+    - q: "Self-balancing BST kya hai?"
+      followUp: true
+      a: |
+        AVL / Red-Black — insert / delete ke baad rotations se height O(log n) rakhte hain. Java TreeMap = Red-Black.
+    - q: "Inorder successor kisi node ka?"
+      a: |
+        Right subtree hai → uska leftmost. Nahi hai → root se search karo; jahan left mude wo last node = successor.
+    - q: "Do nodes galti se swap ho gaye BST mein — kaise theek karoge?"
+      followUp: true
+      a: |
+        Inorder mein do jagah order toota milega (ya ek, agar bagal wale the). Pehli galti ka bada aur aakhri galti ka chhota → swap values.
+  mayAsk:
+    - "Kth Smallest Element in a BST."
+    - "Convert Sorted Array to BST."
+    - "Inorder Successor in BST."
+    - "Recover Binary Search Tree."
+
+# 12. Practice
+practice:
+  - name: Search in a Binary Search Tree
+    platform: LeetCode
+    num: 700
+    url: "https://leetcode.com/problems/search-in-a-binary-search-tree/"
+    level: easy
+    pattern: Ek taraf jao
+    hint: "Code section wala."
+  - name: Range Sum of BST
+    platform: LeetCode
+    num: 938
+    url: "https://leetcode.com/problems/range-sum-of-bst/"
+    level: easy
+    pattern: Subtree skip
+    hint: "Example 1."
+  - name: Convert Sorted Array to Binary Search Tree
+    platform: LeetCode
+    num: 108
+    url: "https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/"
+    level: easy
+    pattern: Beech wala root
+    hint: "mid = (lo + hi) / 2 root; left half se left subtree, right half se right."
+  - name: Insert into a Binary Search Tree
+    platform: LeetCode
+    num: 701
+    url: "https://leetcode.com/problems/insert-into-a-binary-search-tree/"
+    level: medium
+    pattern: Search raasta + null par node
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Validate Binary Search Tree
+    platform: LeetCode
+    num: 98
+    url: "https://leetcode.com/problems/validate-binary-search-tree/"
+    level: medium
+    pattern: Range (lo, hi)
+    hint: "Example 2. Long bounds."
+  - name: Kth Smallest Element in a BST
+    platform: LeetCode
+    num: 230
+    url: "https://leetcode.com/problems/kth-smallest-element-in-a-bst/"
+    level: medium
+    pattern: Inorder count
+    hint: "Iterative inorder (stack) mein ginti; k par return."
+  - name: Recover Binary Search Tree
+    platform: LeetCode
+    num: 99
+    url: "https://leetcode.com/problems/recover-binary-search-tree/"
+    level: hard
+    pattern: Inorder mein do galtiyan
+    hint: "Inorder mein prev > cur jahan ho: pehli baar first = prev, har baar second = cur. Aakhir mein first aur second ki values swap."
+  - name: Count of Smaller Numbers After Self
+    platform: LeetCode
+    num: 315
+    url: "https://leetcode.com/problems/count-of-smaller-numbers-after-self/"
+    level: hard
+    pattern: BST with left-size count
+    hint: "Peeche se insert karo. Har node par left subtree ka size rakho; right mudte waqt (leftSize + 1) jodo. Skewed se bachne ke liye merge sort / BIT bhi option."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "BST: har node par left subtree sab chhote, right subtree sab bade (poora subtree)."
+    - "Inorder = sorted. Search / insert / delete = O(h)."
+    - "Insert: search raasta, null par naya leaf; node.left = insert(node.left, key)."
+    - "Delete: leaf / ek bachcha / do bachche (successor copy + delete)."
+    - "Validate: range (lo, hi) Long mein. Sorted insert = line → TreeMap (Red-Black) use karo."
+  cheatsheet: |
+    ```kotlin
+    fun insert(n: TreeNode?, k: Int): TreeNode {
+        if (n == null) return TreeNode(k)
+        if (k < n.value) n.left = insert(n.left, k)
+        else if (k > n.value) n.right = insert(n.right, k)
+        return n
+    }
+    fun valid(n: TreeNode?, lo: Long, hi: Long): Boolean =
+        n == null || (n.value > lo && n.value < hi &&
+            valid(n.left, lo, n.value.toLong()) && valid(n.right, n.value.toLong(), hi))
+    // delete, 2 bachche: s = right ka leftmost; n.value = s.value; n.right = delete(n.right, s.value)
+    ```
+  quiz:
+    - q: "BST [8, 3, 10, 1, 6] ka inorder?"
+      options: ["[8, 3, 10, 1, 6]", "[1, 3, 6, 8, 10]", "[1, 6, 3, 10, 8]", "[8, 3, 1, 6, 10]"]
+      answer: 1
+      explain: "BST ka inorder hamesha sorted."
+    - q: "1, 2, 3, 4, 5 order mein insert kiya. Search ka worst time?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
+      answer: 2
+      explain: "Har node right mein — line ban gayi, h = n."
+    - q: "[5, 1, 6, #, #, 3, 7] valid BST hai?"
+      options: ["Haan", "Nahi — 3 right subtree mein 5 se chhota", "Nahi — 1 galat jagah", "Haan, kyunki 3 < 6"]
+      answer: 1
+      explain: "Poore right subtree ko 5 se bada hona chahiye."
+    - q: "Do bachchon wale node ko delete karte waqt kiski value copy karte hain?"
+      options: ["Left bachcha", "Right bachcha", "Inorder successor (right ka min)", "Root"]
+      answer: 2
+      explain: "Successor (ya predecessor) — order bana rehta hai, height nahi badhti."
+    - q: "Naya node insert ke baad hamesha kya hota hai?"
+      options: ["Root", "Leaf", "Do bachchon wala", "Kahin bhi"]
+      answer: 1
+      explain: "Search raaste par pehli null jagah — wahan leaf banta hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: binary-search
+      why: "Wahi 'aadha chhodo' idea — array ki jagah tree."
+    - id: tree-traversals
+      why: "Inorder = sorted; validate, kth smallest."
+  usedLater:
+    - id: lca
+      how: "BST mein LCA: dono chhote → left, dono bade → right, warna yahi."
+    - id: heap-basics
+      how: "Heap bhi tree — par order alag (parent ≤ bachche), sorted nahi."
+    - id: trie
+      how: "String keys ke liye tree — prefix se search."

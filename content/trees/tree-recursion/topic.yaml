@@ -1,0 +1,436 @@
+meta:
+  id: tree-recursion
+  chapter: trees
+  title: "Height, Balance & Diameter"
+  subtitle: Bachchon se jawab lo, milao, upar bhejo — aur jo jawab upar nahi ja sakta use global mein rakho
+  level: intermediate
+  minutes: 40
+  prereqs: [binary-tree-basics, tree-traversals]
+  tags: [tree, recursion, postorder, bottom-up, diameter, balanced]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Return-value recursion** (bottom-up, postorder) = har node pehle dono bachchon se jawab leta hai, phir unhe mila ke **apna** jawab upar bhejta hai.
+
+    Height to dekh chuke ho: `1 + max(left, right)`. Asli khel ye sawaal hai — **har call kya return kare?** Chaar pattern:
+
+    | Pattern | Return kya | Jawab kahaan | Example |
+    |---|---|---|---|
+    | Seedha | jawab hi | return value | height, size, sum |
+    | Signal | height **ya -1** (toot gaya) | return value | balanced tree |
+    | Global | sirf ek-taraf ka hissa | bahar ka variable `best` | diameter, max path sum |
+    | Pair | do jawab ek saath | root ka max | house robber III |
+
+    > [!yaad]
+    > Return value = **parent ko kya chahiye**. Jawab = **sawaal kya pooch raha hai**. Dono alag ho sakte hain — tab jawab global mein rakho.
+  analogy: |
+    **Company ki monthly report:**
+    Har team lead apni team se numbers leta hai, jod ke apne manager ko bhejta hai. Manager apni teams ka jod ke director ko. Kisi ko poori company dobara ginni nahi padti — har level bas neeche se aaya summary jodta hai.
+
+    Par HR ko "sabse acchi team" chahiye. Wo report mein upar nahi jaati (manager ko sirf total chahiye) — HR ek **alag register** (global `best`) mein har level par likh leta hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Seedha tareeka aksar dobara kaam karta hai. "Tree balanced hai?" — har node par `height(left)` aur `height(right)` alag se nikaalo → neeche ke nodes har ancestor ke liye **dobara** gine jaate hain. O(n × h), bure case mein O(n²).
+
+    Fix: ek hi postorder pass mein height ke **saath** extra info bhejo (balanced hai ya nahi). Har node ek baar → **O(n)**.
+
+    Ye soch har jagah: diameter, max path sum, tree DP (house robber), cameras, coins — sab "bachche kya bhejein?" ka sawaal hai.
+
+    > [!socho]
+    > Diameter ke liye har node par `height(left) + height(right)` naive tareeke se nikaalo to kitna time?
+    >
+    > Har node par height O(subtree size) → kul O(n × h), skewed tree mein O(n²). Height nikaalte-nikaalte hi `l + r` check kar lo → O(n).
+
+# 3. Visual intro
+visual:
+  body: |
+    Naive balanced check chalao. Badge `×k` = height() ne node ko kitni baar gina. Laal = dobara gina — bekaar kaam.
+  viz: { tracer: naiveVisits }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Balanced tree, ek pass** (har node par left aur right height ka fark ≤ 1):
+    1. Null → height 0.
+    2. Left se pucho. `-1` aaya → neeche kahin toota, seedha `-1` upar (right dekho bhi mat).
+    3. Right se pucho, wahi rule.
+    4. `|l − r| > 1` → yahin toota → `-1`.
+    5. Warna height `1 + max(l, r)` bhejo.
+
+    Root par `-1` nahi aaya → balanced.
+
+    **-1 kyun?** Height kabhi negative nahi hoti — to -1 ek "error code" ban jaata hai. Ek hi `Int` mein do baatein: height bhi, fail bhi.
+
+    > [!tip]
+    > Interview template: "Har node apne bachchon se **kya** sunna chahta hai?" Wahi return type. Ek number kam pade to pair / class return karo.
+  viz: { tracer: balancedTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Height / size / sum"
+    time: O(n)
+    space: O(h)
+    why: "Har node ek baar; stack gehraai = height."
+  - op: "Balanced check (naive)"
+    time: "O(n × h), worst O(n²)"
+    space: O(h)
+    why: "Har node par poore subtrees ki height dobara."
+  - op: "Balanced check (height ya -1)"
+    time: O(n)
+    space: O(h)
+    why: "Ek postorder pass, -1 milte hi ruk jaata hai."
+  - op: "Diameter"
+    time: O(n)
+    space: O(h)
+    why: "Height nikaalte waqt har node par l + r se best update."
+  - op: "Max path sum"
+    time: O(n)
+    space: O(h)
+    why: "Diameter jaisa — height ki jagah gain, negative ko 0."
+  - op: "Tree DP (pair return)"
+    time: O(n)
+    space: O(h)
+    why: "Har node do jawab ek baar banata hai — memo map ki zaroorat nahi."
+
+# 6. Code
+code:
+  - title: Naive balanced check — kitna dobara kaam?
+    file: naive
+    note: |
+      Har node par `height()` dobara poore subtree mein jaata hai. 10 nodes ke tree mein `visits = 19`. Gehra tree ho to ye gap bahut bada.
+
+      'Kaise kaam karta hai' wala `check()` same jawab **har node ek baar** dekh ke deta hai.
+
+# 7. Examples
+examples:
+  - id: diameter
+    level: easy
+    title: Tree ke do sabse door nodes
+    source: { name: Diameter of Binary Tree, platform: LeetCode, url: "https://leetcode.com/problems/diameter-of-binary-tree/" }
+    problem: |
+      Tree mein kinhi bhi do nodes ke beech sabse lamba raasta kitne **edges** ka hai? Raasta root se guzre, zaroori nahi.
+
+      Example: `[1, 2, 3, 4, 5, #, #, 6, #, #, 7, 8, #, #, 9]` → **6** (8 → 6 → 4 → 2 → 5 → 7 → 9)
+    intuition: |
+      Har raasta kisi ek node par **mudta** hai (sabse upar wala node). Us node par raasta = `left height + right height` edges.
+
+      To height nikaalte waqt har node par `best = max(best, l + r)`. Return phir bhi **height** — kyunki parent ke liye raasta ek hi bachche se aa sakta hai, mud ke wapas nahi ja sakta.
+
+      > [!galti]
+      > Sirf root par `l + r` dekha. Upar example mein root par 4 + 1 = 5, par asli jawab 6 node **2** par mudta hai.
+    dryRun: |
+      | Node (postorder) | l | r | l + r | best | Return h |
+      |---|---|---|---|---|---|
+      | 8 | 0 | 0 | 0 | 0 | 1 |
+      | 6 | 1 | 0 | 1 | 1 | 2 |
+      | 4 | 2 | 0 | 2 | 2 | 3 |
+      | 9 | 0 | 0 | 0 | 2 | 1 |
+      | 7 | 0 | 1 | 1 | 2 | 2 |
+      | 5 | 0 | 2 | 2 | 2 | 3 |
+      | 2 | 3 | 3 | **6** | **6** | 4 |
+      | 3 | 0 | 0 | 0 | 6 | 1 |
+      | 1 | 4 | 1 | 5 | 6 | 5 |
+    viz: { tracer: diameterTrace }
+    code: ex1-diameter
+    complexity:
+      time: O(n)
+      space: O(h)
+      why: "Ek postorder pass; stack mein height jitni calls."
+
+  - id: house-robber-tree
+    level: medium
+    title: Chor aur tree jaisi colony
+    source: { name: House Robber III, platform: LeetCode, url: "https://leetcode.com/problems/house-robber-iii/" }
+    problem: |
+      Colony ke ghar ek binary tree jaise jude hain; har node = ghar mein kitna paisa. Agar **seedhe jude** do ghar (parent aur bachcha) ek hi raat loote to alarm. Bina alarm ke max kitna loot sakte ho?
+
+      Example: `[3, 4, 5, 1, 3, #, 1]` → **9** (4 + 5)
+    intuition: |
+      Har node par do raaste:
+      - **Looto** → bachche nahi loot sakte: `value + left.skip + right.skip`.
+      - **Chhodo** → har bachcha apna best de: `max(left) + max(right)`.
+
+      Parent ko dono chahiye (wo khud loote to bachche ka "skip" chahiye), isliye **pair** return karo: `(take, skip)`.
+
+      > [!galti]
+      > "Level chhod ke looto" (alternate levels) → galat! Ek node ka left bachcha loot sakte ho aur right ka pota — level se nahi, har node par alag faisla.
+    dryRun: |
+      | Node | take | skip | Kyun |
+      |---|---|---|---|
+      | 1 (4 ka) | 1 | 0 | leaf |
+      | 3 (4 ka) | 3 | 0 | leaf |
+      | 4 | 4 + 0 + 0 = 4 | 1 + 3 = 4 | |
+      | 1 (5 ka) | 1 | 0 | leaf |
+      | 5 | 5 + 0 = 5 | 0 + 1 = 1 | |
+      | 3 (root) | 3 + 4 + 1 = 8 | 4 + 5 = **9** | root chhodo |
+    viz: { tracer: robTrace }
+    code: ex2-rob
+    complexity:
+      time: O(n)
+      space: O(h)
+      why: "Har node ek baar, do number banata hai. Memo map nahi chahiye — pair hi memo hai."
+
+  - id: max-path-sum
+    level: tricky
+    title: Sabse bada path sum (negative bhi)
+    source: { name: Binary Tree Maximum Path Sum, platform: LeetCode, url: "https://leetcode.com/problems/binary-tree-maximum-path-sum/" }
+    problem: |
+      Path = nodes ki chain (har node max ek baar, kahin se bhi shuru, kahin bhi khatam). Values negative bhi ho sakti hain. Sabse bada path sum batao (kam se kam ek node).
+
+      Example: `[-10, 9, 20, #, #, 15, 7]` → **42** (15 → 20 → 7)
+    intuition: |
+      Diameter wala hi dhaancha — height ki jagah **gain** = is node se neeche ek taraf jaane ka sabse accha sum.
+      - Bachche ka gain negative → `max(0, gain)`: bura hissa jodo hi mat.
+      - Yahan mudta raasta: `value + l + r` → `best` update.
+      - Upar: `value + max(l, r)` (sirf ek taraf).
+
+      > [!galti]
+      > `best = 0` se shuru kiya. Sab values negative (`[-3]`) → jawab -3, par code 0 dega. `Int.MIN_VALUE` se shuru karo.
+    dryRun: |
+      | Node | l | r | value + l + r | best | Return gain |
+      |---|---|---|---|---|---|
+      | 9 | 0 | 0 | 9 | 9 | 9 |
+      | 15 | 0 | 0 | 15 | 15 | 15 |
+      | 7 | 0 | 0 | 7 | 15 | 7 |
+      | 20 | 15 | 7 | **42** | **42** | 35 |
+      | -10 | 9 | 35 | 34 | 42 | 25 |
+    viz: { tracer: maxPathTrace }
+    code: ex3-max-path
+    complexity:
+      time: O(n)
+      space: O(h)
+      why: "Ek postorder pass; har node par O(1) kaam."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Jawab subtree se banta hai (height, size, sum, balanced) → postorder return."
+    - "'Kinhi do nodes ke beech' raasta (diameter, max path) → return ek-taraf, global best."
+    - "Node lena / na lena, parent-bachche ki shart → pair return (tree DP)."
+  avoid:
+    - "Jaankari upar se neeche chahiye (root se path sum, good nodes) → top-down parameter."
+    - "Level wale sawaal (right view, min depth jaldi) → BFS."
+    - "Tree bahut gehra (10^5 skewed) → recursion stack overflow; iterative postorder ya BFS order ulta."
+  signals:
+    - keyword: "height / depth / balanced"
+      think: "1 + max; balanced → height ya -1."
+    - keyword: "longest path between any two nodes"
+      think: "Har node par l + r, return 1 + max."
+    - keyword: "path sum anywhere, negative values"
+      think: "Gain = max(0, child); best = v + l + r; best MIN se shuru."
+    - keyword: "adjacent nodes not both / pick or skip"
+      think: "Pair (take, skip) return."
+
+# 9. Real-world
+realWorld:
+  - where: "Disk usage (du / Storage settings)"
+    how: "Folder ka size = apni files + har subfolder ka size — har folder ek baar, bottom-up."
+  - where: "Database index (AVL / Red-Black tree)"
+    how: "Insert ke baad neeche se upar height update; fark > 1 to rotation. Wahi 'height ya toota' check."
+  - where: "Network / org latency"
+    how: "Tree network mein do sabse door machines = diameter — worst-case message delay."
+  - where: "Compiler"
+    how: "Expression tree mein har node bachchon ka type / value lekar apna banata hai (constant folding)."
+  - where: "Company bonus planning"
+    how: "Manager aur uska direct report dono ko ek saath nahi bhej sakte — pair (bheja, nahi bheja) wala tree DP."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Diameter sirf root par dekha"
+    type: logic
+    wrong: |
+      `height(root.left) + height(root.right)` → raasta kisi neeche wale node par mud sakta hai.
+    right: |
+      Har node par `best = max(best, l + r)`.
+  - title: "Return mein l + r bhej diya"
+    type: logic
+    wrong: |
+      Diameter mein `return l + r` → parent ek mude hue raaste ko aage badha raha hai — aisa path banta hi nahi.
+    right: |
+      Return `1 + max(l, r)` (ek taraf). `l + r` sirf `best` ke liye.
+  - title: "Max path sum mein best = 0"
+    type: other
+    wrong: |
+      Sab values negative → 0 aata hai, jabki koi node chuna hi nahi.
+    right: |
+      `best = Int.MIN_VALUE` (Java `Integer.MIN_VALUE`).
+  - title: "Negative gain jod diya"
+    type: logic
+    wrong: |
+      `value + gain(left) + gain(right)` → -5 wala subtree bhi jud gaya.
+    right: |
+      `l = max(0, gain(left))` — nuksaan wala hissa chhodo.
+  - title: "Global variable reset nahi kiya"
+    type: other
+    wrong: |
+      `best` top-level / static — doosre test case mein pichhla best bacha reh gaya.
+    right: |
+      Wrapper function mein har baar `best = 0` (ya MIN) phir recursion.
+  - title: "Edges vs nodes"
+    type: off-by-one
+    wrong: |
+      Diameter nodes mein gina (`l + r + 1`) jabki sawaal edges pooch raha tha.
+    right: |
+      Height nodes mein ho to `l + r` = edges. Sawaal dhyaan se padho.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Balanced tree check ki complexity — naive vs optimal?"
+      a: |
+        Naive: har node par height dobara → O(n × h), worst O(n²). Optimal: height ke saath -1 signal, ek pass → O(n) time, O(h) stack.
+    - q: "Diameter mein return aur jawab alag kyun?"
+      a: |
+        Parent ko ek-taraf ki height chahiye (raasta upar badhane ke liye). Jawab mude hue raaste ka hai (l + r) — wo upar nahi ja sakta, isliye global best.
+    - q: "Global variable ke bina diameter?"
+      followUp: true
+      a: |
+        Pair return karo `(height, bestInSubtree)`, ya ek size-1 array / class pass karo. Kotlin mein local `var` + nested function bhi chalta hai.
+    - q: "Max path sum mein max(0, gain) kyun?"
+      a: |
+        Path kahin bhi khatam ho sakta hai. Negative hissa jodne se sum ghatta hai — use chhod do (gain 0).
+    - q: "Sab values negative ho to?"
+      a: |
+        Jawab = sabse bada single node. Isliye best MIN se shuru, aur `value + l + r` mein l, r 0 ho jaate hain.
+    - q: "House robber III mein memo map vs pair?"
+      a: |
+        Memo map (node → best) bhi O(n), par pair return zyada saaf — har node ek baar, extra map nahi.
+    - q: "Tree 10^5 nodes ka skewed ho to?"
+      followUp: true
+      a: |
+        Recursion stack overflow. Iterative postorder (stack + visited / do stacks), ya BFS order nikaal ke ulta chalo aur bachchon ka jawab map mein rakho.
+    - q: "Diameter n-ary tree mein?"
+      followUp: true
+      a: |
+        Har node par bachchon ki heights mein top-2 lo; best = top1 + top2. Return 1 + top1.
+    - q: "Top-down vs bottom-up kab?"
+      a: |
+        Jaankari root se chahiye (path sum till here, max so far) → parameter. Bachchon se chahiye (height, size) → return. Kai baar dono saath.
+    - q: "Longest univalue path kaise?"
+      a: |
+        Diameter jaisa; bachche ka height tabhi gino jab uski value node ke barabar ho, warna 0.
+  mayAsk:
+    - "Binary Tree Tilt."
+    - "Longest Univalue Path."
+    - "Distribute Coins in Binary Tree."
+    - "Binary Tree Cameras."
+
+# 12. Practice
+practice:
+  - name: Balanced Binary Tree
+    platform: LeetCode
+    num: 110
+    url: "https://leetcode.com/problems/balanced-binary-tree/"
+    level: easy
+    pattern: Height ya -1
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Diameter of Binary Tree
+    platform: LeetCode
+    num: 543
+    url: "https://leetcode.com/problems/diameter-of-binary-tree/"
+    level: easy
+    pattern: Return height, global best
+    hint: "Example 1."
+  - name: Binary Tree Tilt
+    platform: LeetCode
+    num: 563
+    url: "https://leetcode.com/problems/binary-tree-tilt/"
+    level: easy
+    pattern: Return sum, global total
+    hint: "Return subtree ka sum. Har node par |leftSum − rightSum| total mein jodo."
+  - name: House Robber III
+    platform: LeetCode
+    num: 337
+    url: "https://leetcode.com/problems/house-robber-iii/"
+    level: medium
+    pattern: Pair (take, skip)
+    hint: "Example 2."
+  - name: Longest Univalue Path
+    platform: LeetCode
+    num: 687
+    url: "https://leetcode.com/problems/longest-univalue-path/"
+    level: medium
+    pattern: Diameter + shart
+    hint: "Bachche ki arm tabhi jodo jab uski value node jaisi ho, warna 0. best = l + r, return 1 + max wali arm."
+  - name: Distribute Coins in Binary Tree
+    platform: LeetCode
+    num: 979
+    url: "https://leetcode.com/problems/distribute-coins-in-binary-tree/"
+    level: medium
+    pattern: Return extra coins
+    hint: "Return = coins − 1 + left + right (faltu ya kami). Har edge par |left| + |right| moves jodo."
+  - name: Binary Tree Maximum Path Sum
+    platform: LeetCode
+    num: 124
+    url: "https://leetcode.com/problems/binary-tree-maximum-path-sum/"
+    level: hard
+    pattern: Gain, max(0, ·), global best
+    hint: "Example 3. best MIN se shuru."
+  - name: Binary Tree Cameras
+    platform: LeetCode
+    num: 968
+    url: "https://leetcode.com/problems/binary-tree-cameras/"
+    level: hard
+    pattern: State return (0/1/2)
+    hint: "Return state: 0 = dhaka nahi, 1 = camera hai, 2 = dhaka hua. Koi bachcha 0 → yahan camera. Null = 2. Root 0 aaye to ek aur camera."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Bottom-up = postorder: bachchon se lo, milao, upar bhejo. O(n) time, O(h) stack."
+    - "Return value = parent ko kya chahiye; jawab alag ho to global best."
+    - "Balanced: height ya -1 — ek pass, -1 milte hi ruko."
+    - "Diameter: best = l + r, return 1 + max(l, r). Max path: gain = max(0, ·), best MIN se."
+    - "Ek number kam pade → pair return (take, skip) = tree DP."
+  cheatsheet: |
+    ```kotlin
+    var best = 0
+    fun go(n: TreeNode?): Int {
+        if (n == null) return 0
+        val l = go(n.left); val r = go(n.right)
+        best = maxOf(best, l + r)   // jo yahan mudta hai
+        return 1 + maxOf(l, r)      // parent ko ek taraf
+    }
+    // balanced: l/r == -1 ya |l - r| > 1 → return -1
+    // pair: return intArrayOf(take, skip)
+    ```
+  quiz:
+    - q: "Naive balanced check (har node par height) ka worst time?"
+      options: ["O(n)", "O(n log n) hamesha", "O(n × h), worst O(n²)", "O(h)"]
+      answer: 2
+      explain: "Har node apne har ancestor ke liye dobara gina jaata hai."
+    - q: "Diameter function parent ko kya return karta hai?"
+      options: ["l + r", "1 + max(l, r)", "best", "l + r + 1"]
+      answer: 1
+      explain: "Parent ke liye raasta ek taraf se hi aa sakta hai. l + r sirf best ke liye."
+    - q: "Tree [1, 2, 3, 4, 5] ka diameter (edges)?"
+      options: ["2", "3", "4", "5"]
+      answer: 1
+      explain: "4 → 2 → 1 → 3 (ya 5 → 2 → 1 → 3) = 3 edges."
+    - q: "Max path sum mein best ki shuruaati value?"
+      options: ["0", "root.value", "Int.MIN_VALUE", "-1"]
+      answer: 2
+      explain: "Sab negative ho to bhi sahi max milna chahiye. (root.value bhi chal jaata, par MIN sabse simple.)"
+    - q: "House Robber III mein node kya return karta hai?"
+      options: ["Sirf max", "(take, skip) pair", "Height", "Loote gaye ghar ki list"]
+      answer: 1
+      explain: "Parent loote to bachche ka skip chahiye, na loote to max — dono chahiye."
+
+# 14. Connections
+connections:
+  related:
+    - id: binary-tree-basics
+      why: "Height aur bottom-up soch yahin se shuru."
+    - id: recursion-patterns
+      why: "Divide & combine — bachchon ke jawab milao."
+  usedLater:
+    - id: bst
+      how: "AVL balance, BST validate — neeche se range / height bhejna."
+    - id: lca
+      how: "LCA bhi return-value recursion: bachche bataate hain 'p ya q mila?'."
+    - id: dp-1d
+      how: "House robber (array) → tree par pair return = tree DP."

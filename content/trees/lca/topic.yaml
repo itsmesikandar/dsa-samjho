@@ -1,0 +1,423 @@
+meta:
+  id: lca
+  chapter: trees
+  title: Lowest Common Ancestor
+  subtitle: Do nodes ka sabse neeche wala common "daada" — ek DFS mein, BST mein ek raaste mein
+  level: intermediate
+  minutes: 40
+  prereqs: [tree-recursion, bst]
+  tags: [tree, lca, ancestor, recursion, bst]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Ancestor** = root se kisi node tak ke raaste ka har node (node khud ka bhi ancestor maana jaata hai).
+
+    **LCA(p, q)** = p aur q dono ka common ancestor jo **sabse neeche** (root se sabse door) ho.
+
+    Tree `[3, 5, 1, 6, 2, 0, 8, #, #, 7, 4]` mein:
+    - LCA(6, 4) = **5** (6 left mein, 4 right mein).
+    - LCA(5, 4) = **5** (4 to 5 ke neeche hi hai — node apna ancestor khud).
+    - LCA(7, 8) = **3** (root).
+
+    > [!yaad]
+    > LCA = wo node jahan p aur q ke **raaste alag hote hain** — ek left jaata hai, ek right (ya ek wahi node hai).
+  analogy: |
+    **Family tree mein cousins:**
+    Tum aur tumhara cousin — dono ke papa alag, par daada same. Wo daada = LCA. Agar tumhara bhai hai to LCA papa (aur paas). Aur agar puchha "tum aur tumhare papa" — to LCA papa khud.
+
+    Ghar se dono ke ghar tak ka raasta likho — jahan tak same chala, uska aakhri mod = LCA.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    - **Do nodes ki doori** = depth(p) + depth(q) − 2 × depth(LCA). Raasta LCA par hi mudta hai.
+    - **Git** `merge-base` — do branches ka common commit dhoondhna (commit graph mein LCA).
+    - **File system** — do files ka common folder (relative path `../../x`).
+    - **Org chart** — do logon ka common manager (approval kise jaaye).
+
+    Naive: dono ke raaste nikaalo, compare karo — O(n) time, O(h) extra list. Ek DFS se bina list ke bhi ho jaata hai. BST mein to sirf ek raasta — O(h).
+
+    > [!socho]
+    > Har node ka parent pointer ho to?
+    >
+    > p se upar chalte hue saare ancestors set mein daalo. Phir q se upar chalo — pehla node jo set mein mile wahi LCA. (Ya linked list intersection jaisa do pointer.)
+
+# 3. Visual intro
+visual:
+  body: |
+    Root se p tak ka raasta, root se q tak ka raasta. Shuru ka hissa common hai. Common ka **aakhri** node = LCA.
+  viz: { tracer: ancestorPaths }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Ek DFS** — har call apne subtree ke baare mein bataata hai:
+    1. Null → `null`. Node khud p ya q → **khud ko** lautao.
+    2. Left aur right se pucho.
+    3. **Dono** se kuch aaya → p ek taraf, q doosri taraf → **yahi LCA**.
+    4. Ek se aaya → wahi upar bhejo (LCA neeche mil chuka, ya ek hi mila — upar kahin milega).
+
+    Step 1 mein node p hai to neeche q dhoondhte bhi nahi — kyunki q neeche hua to bhi jawab p hi hai, aur kahin aur hua to upar wala node dono taraf se dekh lega.
+
+    > [!galti]
+    > Ye trick maan kar chalti hai ki p aur q **dono tree mein hain**. Ek missing ho sakta hai to pehle dono ko dhoondh ke confirm karo (ya count lautao).
+  viz: { tracer: lcaTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "LCA (binary tree, ek DFS)"
+    time: O(n)
+    space: O(h)
+    why: "Har node max ek baar; stack height jitna."
+  - op: "LCA (do raaste compare)"
+    time: O(n)
+    space: O(h)
+    why: "Do DFS + do lists."
+  - op: "LCA in BST"
+    time: O(h)
+    space: "O(1) iterative"
+    why: "Value se pata chalta hai kis taraf jaana — ek raasta."
+  - op: "Parent pointers ke saath"
+    time: O(h)
+    space: "O(h) set (ya O(1) do pointer)"
+    why: "Neeche se upar chalo, pehla common."
+  - op: "Distance(p, q)"
+    time: O(n)
+    space: O(h)
+    why: "LCA + do depth search."
+  - op: "Bahut saare LCA queries"
+    time: "O(n log n) prep, O(log n) query"
+    space: O(n log n)
+    why: "Binary lifting — har node ke 2^k-th ancestor pehle se rakho."
+
+# 6. Code
+code:
+  - title: Do raaste compare karke (visual wala tareeka)
+    file: paths
+    note: |
+      `pathTo` backtracking jaisa hai — node jodo, nahi mila to hatao. Dono lists ka common shuru, aakhri common = LCA.
+
+      Samajhne mein aasaan, par do DFS aur extra lists. 'Kaise kaam karta hai' wala ek hi DFS mein kar deta hai.
+
+# 7. Examples
+examples:
+  - id: bst-lca
+    level: easy
+    title: BST mein LCA
+    source: { name: Lowest Common Ancestor of a Binary Search Tree, platform: LeetCode, url: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" }
+    problem: |
+      BST aur do values `p`, `q` (dono tree mein hain). Unka LCA batao.
+
+      Example: `[6, 2, 8, 0, 4, 7, 9, #, #, 3, 5]`, p = 3, q = 5 → **4**
+    intuition: |
+      BST mein value dekh ke pata chalta hai p, q kis taraf hain:
+      - Dono < node → dono left mein → LCA bhi left mein.
+      - Dono > node → right mein.
+      - Warna (ek chhota ek bada, ya ek yahi) → raaste **yahin** alag → ye LCA.
+
+      Poora tree nahi ghoomna — sirf ek raasta neeche.
+
+      > [!galti]
+      > Binary tree wala O(n) DFS likh diya. Chalega, par interviewer BST ka faayda (O(h)) dekhna chahta hai.
+    dryRun: |
+      | Node | p = 3, q = 5 | Faisla |
+      |---|---|---|
+      | 6 | dono < 6 | left |
+      | 2 | dono > 2 | right |
+      | 4 | 3 < 4 < 5 | **LCA = 4** |
+    viz: { tracer: bstLcaTrace }
+    code: ex1-bst-lca
+    complexity:
+      time: O(h)
+      space: O(1)
+      why: "Ek raasta, loop mein — stack nahi."
+
+  - id: distance
+    level: medium
+    title: Do nodes ke beech kitne edges?
+    source: { name: Find distance between two nodes of a Binary Tree, platform: GFG, url: "https://www.geeksforgeeks.org/find-distance-between-two-nodes-of-a-binary-tree/" }
+    problem: |
+      Binary tree aur do values `p`, `q` (dono tree mein). Unke beech raaste mein kitne edges hain?
+
+      Example: `[3, 5, 1, 6, 2, 0, 8, #, #, 7, 4]`, p = 7, q = 0 → **5** (7 → 2 → 5 → 3 → 1 → 0)
+    intuition: |
+      Tree mein do nodes ke beech **ek hi** raasta hota hai — p se upar LCA tak, phir neeche q tak.
+
+      Distance = (LCA se p) + (LCA se q). LCA se depth ek simple DFS hai: mila to `d`, nahi to bachchon mein `d + 1`.
+
+      Formula version: `depth(p) + depth(q) − 2 × depth(LCA)` (root se depth).
+
+      > [!galti]
+      > Root se dono depths jod di (`depth(p) + depth(q)`) → LCA ke upar ka hissa do baar gina. LCA root ho tabhi sahi.
+    dryRun: |
+      | Step | Value |
+      |---|---|
+      | LCA(7, 0) | 3 |
+      | 3 se 7 | 3 → 5 → 2 → 7 = 3 |
+      | 3 se 0 | 3 → 1 → 0 = 2 |
+      | Distance | 3 + 2 = **5** |
+    viz: { tracer: distanceTrace }
+    code: ex2-distance
+    complexity:
+      time: O(n)
+      space: O(h)
+      why: "LCA ek DFS, depth do aur DFS — teeno O(n)."
+
+  - id: deepest-leaves
+    level: tricky
+    title: Sabse gehre leaves ka LCA
+    source: { name: Lowest Common Ancestor of Deepest Leaves, platform: LeetCode, url: "https://leetcode.com/problems/lowest-common-ancestor-of-deepest-leaves/" }
+    problem: |
+      Tree ke **sabse gehre** level par jitne bhi leaves hain, un sab ka LCA batao. (Ek hi sabse gehra leaf ho to wahi jawab.)
+
+      Example: `[3, 5, 1, 6, 2, 0, 8, #, #, 7, 4]` → **2** (sabse gehre 7 aur 4)
+    intuition: |
+      Pehle gehre leaves dhoondhna, phir LCA — do pass. Ek pass mein: har node **pair** lautaye — `(height, LCA)`.
+      - Left height = right height → sabse gehre dono taraf → **ye node** LCA.
+      - Ek taraf zyada gehri → gehre leaves sirf wahin → usi taraf ka LCA upar bhejo.
+
+      Ye tree-recursion wala pair-return pattern hai — height ke saath ek aur cheez.
+
+      > [!galti]
+      > Sirf height compare karke `node` lautaya, neeche wala LCA aage nahi bheja → root ya galat node aata hai. Gehri taraf ka **jawab** (second) hi upar jaana chahiye.
+    dryRun: |
+      | Node | Left (h, lca) | Right (h, lca) | Return |
+      |---|---|---|---|
+      | 6 | (0, -) | (0, -) | (1, 6) |
+      | 7, 4 | leaf | leaf | (1, 7), (1, 4) |
+      | 2 | (1, 7) | (1, 4) | **(2, 2)** barabar |
+      | 5 | (1, 6) | (2, 2) | (3, 2) |
+      | 1 | (1, 0) | (1, 8) | (2, 1) |
+      | 3 | (3, 2) | (2, 1) | (4, **2**) |
+    viz: { tracer: deepestTrace }
+    code: ex3-deepest
+    complexity:
+      time: O(n)
+      space: O(h)
+      why: "Ek postorder pass, har node par O(1)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Do nodes ka common ancestor / common manager / merge base."
+    - "Tree mein do nodes ki doori, ya unke beech ka raasta."
+    - "Kai nodes ka common ancestor (deepest leaves, ek set ke nodes) — wahi DFS, set ke saath."
+  avoid:
+    - "Graph mein cycles hain → tree wala LCA nahi chalega (DAG mein bhi kai LCA ho sakte)."
+    - "Bahut saari queries (10^5) ek hi tree par → har baar O(n) DFS mehnga; binary lifting / Euler tour + RMQ."
+    - "BST hai → O(n) DFS mat likho, value se ek raasta (O(h))."
+  signals:
+    - keyword: "lowest common ancestor"
+      think: "Binary tree: DFS, dono taraf mila → yahi. BST: value se ek raasta."
+    - keyword: "distance between two nodes"
+      think: "LCA se dono ki depth jodo."
+    - keyword: "deepest leaves / all deepest nodes"
+      think: "Pair (height, lca) postorder."
+    - keyword: "parent pointer diya hai"
+      think: "Upar chalo: ancestors set, ya do pointer (list intersection)."
+
+# 9. Real-world
+realWorld:
+  - where: "Git"
+    how: "`git merge-base` do branches ka sabse naya common commit dhoondhta hai — 3-way merge usi se hota hai."
+  - where: "File system"
+    how: "Do paths ka common folder → relative path banana (`../../docs/a.md`)."
+  - where: "Org chart / approvals"
+    how: "Do teams ke logon ki request — dono ka common manager approve kare."
+  - where: "Biology"
+    how: "Evolution tree mein do species ka sabse naya common ancestor."
+  - where: "Network routing (tree topology)"
+    how: "Do machines ke beech hop count = depth(a) + depth(b) − 2 × depth(LCA)."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Node apna ancestor khud — bhool gaye"
+    type: logic
+    wrong: |
+      LCA(5, 4) mein 5 ka parent 3 jawab diya, kyunki "ancestor upar hota hai".
+    right: |
+      Node khud apna ancestor hai. p ke neeche q ho to LCA = p.
+  - title: "p ya q tree mein nahi"
+    type: "null"
+    wrong: |
+      Standard DFS ek mila to wahi lauta deta hai → galat "LCA".
+    right: |
+      Pehle dono ka hona confirm karo, ya DFS mein count rakho (dono mile tabhi valid).
+  - title: "BST mein dono ek taraf hone ki shart ulti"
+    type: logic
+    wrong: |
+      `p < node || q < node` → left. Ek chhota ek bada hone par bhi left chala gaya.
+    right: |
+      `p < node && q < node` (dono) → left; dono bade → right; warna yahi.
+  - title: "Distance mein LCA ke upar ka hissa jod diya"
+    type: logic
+    wrong: |
+      Root se depth(p) + depth(q).
+    right: |
+      depth(p) + depth(q) − 2 × depth(LCA), ya LCA se dono ki depth.
+  - title: "Duplicate values se pehchaan"
+    type: other
+    wrong: |
+      Values se compare kiya jabki tree mein same value do jagah → galat node.
+    right: |
+      LeetCode mein node reference (`node == p`) compare hota hai. Values unique hon tabhi value se compare.
+  - title: "Khaali tree"
+    type: empty
+    wrong: |
+      Root null aur seedha `root.value` padha → crash.
+    right: |
+      Base case `node == null → null` sabse pehle.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Binary tree mein LCA kaise, complexity?"
+      a: |
+        Ek DFS: node p/q ho to khud lautao; left aur right dono non-null → yahi; warna jo non-null. O(n) time, O(h) stack.
+    - q: "BST mein kya fark?"
+      a: |
+        Values se direction pata — dono chhote left, dono bade right, warna yahi. O(h), O(1) space (iterative).
+    - q: "p ya q tree mein na ho to?"
+      followUp: true
+      a: |
+        DFS mein (node, count) lautao ya alag se dono dhoondho. Dono mile (count = 2) tabhi LCA valid.
+    - q: "Parent pointer ho to?"
+      a: |
+        p se upar ke saare ancestors set mein, phir q se upar — pehla common. Ya do pointer: depths barabar karo, phir saath upar (linked list intersection jaisa).
+    - q: "Bahut saari LCA queries?"
+      followUp: true
+      a: |
+        Binary lifting: `up[v][k]` = v ka 2^k-th ancestor. Depth barabar karo, phir bade jump se neeche aate hue saath upar. O(n log n) prep, O(log n) query.
+    - q: "N-ary tree mein LCA?"
+      a: |
+        Wahi DFS — bachchon mein se kitno ne non-null lautaya gino. 2 ya zyada → yahi LCA.
+    - q: "Distance between two nodes?"
+      a: |
+        LCA nikaalo; distance = depth(LCA→p) + depth(LCA→q).
+    - q: "Kai nodes (list) ka LCA?"
+      followUp: true
+      a: |
+        Set mein daalo; DFS mein node set mein ho to khud lautao, do ya zyada bachche non-null → yahi. Wahi logic.
+    - q: "Visual wala path tareeka vs ek DFS — kaun behtar?"
+      a: |
+        Dono O(n). Path tareeka do DFS aur O(h) lists; ek DFS zyada saaf aur interview standard. Path tareeka samjhaane mein aasaan.
+  mayAsk:
+    - "Lowest Common Ancestor of a Binary Tree III (parent pointer)."
+    - "Smallest Subtree with all the Deepest Nodes."
+    - "Step-By-Step Directions From a Binary Tree Node to Another."
+    - "Kth Ancestor of a Tree Node (binary lifting)."
+
+# 12. Practice
+practice:
+  - name: Lowest Common Ancestor of a Binary Search Tree
+    platform: LeetCode
+    num: 235
+    url: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/"
+    level: easy
+    pattern: Value se direction
+    hint: "Example 1."
+  - name: Find distance between two nodes of a Binary Tree
+    platform: GFG
+    url: "https://www.geeksforgeeks.org/find-distance-between-two-nodes-of-a-binary-tree/"
+    level: easy
+    pattern: LCA + depth
+    hint: "Example 2."
+  - name: Cousins in Binary Tree
+    platform: LeetCode
+    num: 993
+    url: "https://leetcode.com/problems/cousins-in-binary-tree/"
+    level: easy
+    pattern: Depth + parent
+    hint: "Dono ki depth aur parent nikaalo. Depth same, parent alag → cousins (LCA unka parent nahi)."
+  - name: Lowest Common Ancestor of a Binary Tree
+    platform: LeetCode
+    num: 236
+    url: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/"
+    level: medium
+    pattern: Ek DFS, dono taraf mila
+    hint: "'Kaise kaam karta hai' wala. Node reference compare karo."
+  - name: Lowest Common Ancestor of Deepest Leaves
+    platform: LeetCode
+    num: 1123
+    url: "https://leetcode.com/problems/lowest-common-ancestor-of-deepest-leaves/"
+    level: medium
+    pattern: Pair (height, lca)
+    hint: "Example 3."
+  - name: Step-By-Step Directions From a Binary Tree Node to Another
+    platform: LeetCode
+    num: 2096
+    url: "https://leetcode.com/problems/step-by-step-directions-from-a-binary-tree-node-to-another/"
+    level: medium
+    pattern: Do raaste, common prefix hatao
+    hint: "Root se dono tak L/R string banao. Common shuru hatao. Start ke bache hisse ki jagah utne 'U', phir dest ka bacha hissa."
+  - name: Kth Ancestor of a Tree Node
+    platform: LeetCode
+    num: 1483
+    url: "https://leetcode.com/problems/kth-ancestor-of-a-tree-node/"
+    level: hard
+    pattern: Binary lifting
+    hint: "up[k][v] = up[k-1][ up[k-1][v] ]. Query mein k ke har set bit par us jump se upar."
+  - name: Minimum Edge Weight Equilibrium Queries in a Tree
+    platform: LeetCode
+    num: 2846
+    url: "https://leetcode.com/problems/minimum-edge-weight-equilibrium-queries-in-a-tree/"
+    level: hard
+    pattern: LCA + prefix count
+    hint: "Root se har node tak har weight (1..26) ka count rakho. Query (a, b) - count = cnt[a] + cnt[b] - 2 x cnt[lca]. Jawab = raaste ke edges - sabse zyada wale weight ka count. LCA binary lifting se."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "LCA = p aur q ka sabse neeche wala common ancestor; node apna ancestor khud."
+    - "Binary tree: p/q mila to khud lautao; dono taraf se aaya → yahi LCA; warna jo aaya. O(n)."
+    - "BST: dono chhote → left, dono bade → right, warna yahi. O(h)."
+    - "Distance = LCA se p + LCA se q."
+    - "Maan ke chalta hai p, q dono hain; bahut queries → binary lifting."
+  cheatsheet: |
+    ```kotlin
+    fun lca(n: TreeNode?, p: Int, q: Int): TreeNode? {
+        if (n == null || n.value == p || n.value == q) return n
+        val l = lca(n.left, p, q); val r = lca(n.right, p, q)
+        return if (l != null && r != null) n else l ?: r
+    }
+    // BST: while (cur) { dono < cur → left; dono > cur → right; warna return cur }
+    // dist = depth(lca, p) + depth(lca, q)
+    ```
+  quiz:
+    - q: "Tree [3, 5, 1, 6, 2, 0, 8, #, #, 7, 4] mein LCA(6, 4)?"
+      options: ["3", "5", "2", "6"]
+      answer: 1
+      explain: "6 = 5 ka left, 4 = 5 ke right (2) ke neeche — raaste 5 par alag."
+    - q: "LCA(5, 4) usi tree mein?"
+      options: ["3", "5", "2", "4"]
+      answer: 1
+      explain: "4 to 5 ke neeche hai — node apna ancestor khud."
+    - q: "BST mein LCA ki complexity?"
+      options: ["O(1)", "O(h)", "O(n)", "O(n log n)"]
+      answer: 1
+      explain: "Value se direction — sirf ek raasta neeche."
+    - q: "DFS mein ek node par left se x aur right se y aaya. Matlab?"
+      options: ["x LCA hai", "y LCA hai", "Ye node LCA hai", "LCA upar hai"]
+      answer: 2
+      explain: "p aur q alag taraf — raaste yahin milte hain."
+    - q: "Distance(7, 0) — LCA 3, 3 se 7 = 3 edges, 3 se 0 = 2 edges?"
+      options: ["3", "5", "6", "2"]
+      answer: 1
+      explain: "Raasta LCA par mudta hai: 3 + 2."
+
+# 14. Connections
+connections:
+  related:
+    - id: tree-recursion
+      why: "Bachche jawab lautate hain, node milata hai — wahi pattern."
+    - id: bst
+      why: "BST ka order LCA ko O(h) bana deta hai."
+    - id: linked-list-techniques
+      why: "Parent pointer wala LCA = do lists ka intersection."
+  usedLater:
+    - id: graph-basics
+      how: "Tree = cycle-free graph; LCA, depth, parent array graph mein bhi."
+    - id: union-find
+      how: "Offline LCA (Tarjan) union-find use karta hai."
