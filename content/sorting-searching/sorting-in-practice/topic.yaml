@@ -1,0 +1,443 @@
+meta:
+  id: sorting-in-practice
+  chapter: sorting-searching
+  title: Sorting in practice
+  subtitle: Built-in sort, comparators, stability, counting sort — asli code aur interview mein sort kaise likhte hain
+  level: intermediate
+  minutes: 35
+  prereqs: [merge-sort, quick-sort, kotlin-java-toolkit]
+  tags: [sorting, comparator, stable, counting-sort, custom-order]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Interview aur real code mein sort khud nahi likhte — **built-in** use karte hain. Asli skill: **kis order mein** sort karna hai, wo sahi batana (comparator).
+
+    | Kaam | Kotlin | Java |
+    |---|---|---|
+    | Array in-place | `arr.sort()` | `Arrays.sort(arr)` |
+    | Nayi sorted list | `list.sorted()` | `new ArrayList<>(list)` + `sort` |
+    | Ulta | `sortedDescending()` | `Collections.reverseOrder()` (sirf objects) |
+    | Ek key se | `sortedBy { it.age }` | `Comparator.comparingInt(P::age)` |
+    | Kai keys | `compareBy({ it.a }, { it.b })` / `.thenBy {}` | `.thenComparing(...)` |
+    | Apna rule | `sortedWith { a, b -> ... }` | `(a, b) -> ...` |
+
+    Andar kya chalta hai:
+    - **Primitives** (`IntArray`, `int[]`): dual-pivot quick sort — tez, unstable (primitives mein farak hi nahi padta).
+    - **Objects** (`List`, `Integer[]`): **TimSort** — merge + insertion, **stable**, O(n log n).
+
+    > [!yaad]
+    > Comparator ka rule: `compare(a, b)` **negative** → a pehle, **0** → barabar, **positive** → b pehle.
+  analogy: |
+    **Flipkart / Amazon par sort:** "Price: Low to High" — ek key. "Rating, phir price" — do keys: pehle rating dekho, rating barabar ho to sasta pehle.
+
+    Comparator yahi batata hai: do cheezein di — kaun pehle aayega?
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Bahut saare medium problems ka 80% kaam **sahi order mein sort** karna hai — intervals, meetings, people queue, "largest number". Sort ke baad baaki simple loop.
+
+    Saath mein teen baatein jo galti karwaati hain:
+    1. **Stability:** pehle naam se sort kiya, phir marks se — barabar marks walon ka naam-order bacha? Sirf stable sort mein.
+    2. **Overflow:** `(a, b) -> a - b` comparator — bade numbers par `a - b` overflow hokar ulta answer! `Integer.compare(a, b)` lo.
+    3. **Range chhoti ho** (0..100, 'a'..'z') to compare ki zaroorat hi nahi — **counting sort** O(n + k).
+
+    > [!socho]
+    > `a = 2_000_000_000`, `b = -2_000_000_000`. `a - b` kya hoga Int mein?
+    >
+    > 4 × 10⁹ Int mein fit nahi → overflow → **negative**! Comparator kahega a < b — galat. Isliye `a - b` comparator kabhi mat likho.
+
+# 3. Visual intro
+visual:
+  body: |
+    Students naam-order (A, B, C…) mein hain. Marks se sort kiya:
+    - **Stable** sort: barabar marks walon ka A-B-C order bacha raha.
+    - **Unstable** sort: laal jodi — order toot gaya.
+
+    Apne marks daal ke dekho (1..5 rakho taaki ties banein).
+  viz: { tracer: stableDemo }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Counting sort** — jab values chhoti range mein hon (jaise 0..9, ages 0..120, lowercase letters):
+
+    1. `count[v]` = value v kitni baar aayi (ek pass).
+    2. v = 0 se max tak: v ko `count[v]` baar likho.
+
+    Koi compare nahi → comparison sorts ki O(n log n) wali limit lagu nahi. Time **O(n + k)**, space **O(k)** (k = range).
+
+    > [!tip]
+    > Sirf numbers nahi, objects ko bhi stable counting sort se sort kar sakte ho (prefix sums se positions nikaal ke) — **radix sort** isi par chalta hai.
+  viz: { tracer: countingTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "IntArray.sort() / Arrays.sort(int[])"
+    time: O(n log n)
+    space: O(log n)
+    why: "Dual-pivot quick sort; unstable (primitives mein farak nahi)."
+  - op: "List.sortedBy / Collections.sort / Arrays.sort(Object[])"
+    time: O(n log n)
+    space: O(n)
+    why: "TimSort — stable; lagbhag sorted par O(n) ke paas."
+  - op: "Counting sort"
+    time: O(n + k)
+    space: O(k)
+    why: "k = values ki range; chhoti range mein sabse tez."
+  - op: "Radix sort (d digits)"
+    time: O(d·(n + base))
+    space: O(n + base)
+    why: "Har digit par stable counting sort."
+  - op: "Bucket sort (uniform data)"
+    time: "O(n) average"
+    space: O(n)
+    why: "Range ko buckets mein baanto, har bucket chhota sort."
+  - op: "Comparison sort ki limit"
+    time: "Ω(n log n)"
+    space: "lagu nahi"
+    why: "n! orders, har compare 2 raaste → log₂ n! ≈ n log n."
+
+# 6. Code
+code:
+  - title: Comparators — kai keys, ulta order
+    file: comparators
+    note: |
+      `compareByDescending { it.age }.thenBy { it.name }` — pehle age (bade pehle), barabar ho to naam. Java mein `Comparator.comparingInt(...).reversed().thenComparing(...)`.
+
+      Java mein `int[]` ko ulta sort karne ka seedha tareeka nahi — `Integer[]` + `Collections.reverseOrder()`, ya sort karke reverse.
+
+# 7. Examples
+examples:
+  - id: freq-sort
+    level: easy
+    title: Frequency ke hisaab se sort
+    source: { name: Sort Array by Increasing Frequency, platform: LeetCode, url: "https://leetcode.com/problems/sort-array-by-increasing-frequency/" }
+    problem: |
+      Numbers ko unki **frequency** (kitni baar aaye) ke badhte order mein lagao. Frequency barabar ho to **bada number pehle**.
+
+      Example: `[2, 3, 1, 3, 2]` → `[1, 3, 3, 2, 2]`
+    intuition: |
+      Do kadam:
+      1. HashMap se frequency gino.
+      2. Do-key comparator: **pehle** frequency (chhoti pehle), **barabar ho to** value (badi pehle).
+
+      Kotlin: `compareBy<Int> { freq[it] }.thenByDescending { it }`.
+
+      > [!tip]
+      > Har "sort by X, then by Y" problem = `compareBy { X }.thenBy { Y }`. Ulta chahiye to `Descending` wala.
+    dryRun: |
+      freq: 2 → 2, 3 → 2, 1 → 1
+
+      | Number | Key (freq ↑, value ↓) |
+      |---|---|
+      | 1 | (1, 1) |
+      | 3 | (2, 3) |
+      | 3 | (2, 3) |
+      | 2 | (2, 2) |
+      | 2 | (2, 2) |
+
+      Result: **[1, 3, 3, 2, 2]**
+    viz: { tracer: freqTrace }
+    code: ex1-freq
+    complexity:
+      time: O(n log n)
+      space: O(n)
+      why: "Ginti O(n) + sort O(n log n); map aur boxed copy O(n)."
+
+  - id: largest-number
+    level: medium
+    title: Sabse bada number banao
+    source: { name: Largest Number, platform: LeetCode, url: "https://leetcode.com/problems/largest-number/" }
+    problem: |
+      Non-negative numbers ko kisi order mein **jod ke** (string ki tarah) sabse bada number banao. Answer string mein.
+
+      Example: `[3, 30, 34, 5, 9]` → `"9534330"`
+    intuition: |
+      Seedha bade se chhota sort galat: `[30, 3]` → "303", par "330" bada hai.
+
+      **Rule:** `a` pehle aaye ya `b`? Dono jod ke dekho — `a + b` vs `b + a` (strings). Jo bada bane, wahi order.
+
+      `"3" + "30" = "330"` > `"30" + "3" = "303"` → 3 pehle.
+
+      Ye rule **transitive** hai (a pehle b, b pehle c → a pehle c), isliye normal sort is comparator ke saath sahi kaam karta hai.
+
+      > [!galti]
+      > `[0, 0]` → "00" galat. Sabse aage "0" ho to sab zero hain → "0" return.
+    dryRun: |
+      | Compare | a+b | b+a | Kaun pehle |
+      |---|---|---|---|
+      | 3 vs 30 | 330 | 303 | 3 |
+      | 3 vs 34 | 334 | 343 | 34 |
+      | 5 vs 9 | 59 | 95 | 9 |
+
+      Sorted: 9, 5, 34, 3, 30 → **"9534330"**
+    viz: { tracer: largestTrace }
+    code: ex2-largest
+    complexity:
+      time: O(n log n · L)
+      space: O(n · L)
+      why: "Har compare do strings jodta hai (L = digits, max 10)."
+
+  - id: queue-reconstruction
+    level: tricky
+    title: Height se line dobara banao
+    source: { name: Queue Reconstruction by Height, platform: LeetCode, url: "https://leetcode.com/problems/queue-reconstruction-by-height/" }
+    problem: |
+      Har insaan ke paas `[h, k]`: height `h`, aur `k` = line mein uske **aage** kitne log hain jinki height **≥ h**. List ulta-pulta di hai — asli line wapas banao.
+
+      Example: `[[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]` → `[[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]`
+    intuition: |
+      Chhote log lambon ke `k` ko **affect nahi** karte (wo ginti mein aate hi nahi). To **lambe pehle** bithao:
+
+      1. Sort: height **ulta** (lambe pehle); same height par `k` **chhota pehle**.
+      2. Ek-ek karke line mein **index k par insert** karo.
+
+      Kyun sahi? Jab `[h, k]` ko daal rahe hain, line mein sab log `≥ h` hain. Index k par ghusa → aage thik k log `≥ h`. Baad mein aane wale sab chhote hain — unke ghusne se ye ginti nahi badalti.
+
+      > [!tip]
+      > Do-key sort + greedy insertion — "kis order mein process karun ki pehle wale faisle na bigdein?" Ye soch greedy chapter mein bahut aayegi.
+    dryRun: |
+      Sorted: [7,0] [7,1] [6,1] [5,0] [5,2] [4,4]
+
+      | Insert | Index | Line |
+      |---|---|---|
+      | [7,0] | 0 | [7,0] |
+      | [7,1] | 1 | [7,0] [7,1] |
+      | [6,1] | 1 | [7,0] [6,1] [7,1] |
+      | [5,0] | 0 | [5,0] [7,0] [6,1] [7,1] |
+      | [5,2] | 2 | [5,0] [7,0] [5,2] [6,1] [7,1] |
+      | [4,4] | 4 | **[5,0] [7,0] [5,2] [6,1] [4,4] [7,1]** |
+    viz: { tracer: queueTrace }
+    code: ex3-queue
+    complexity:
+      time: O(n²)
+      space: O(n)
+      why: "Sort O(n log n) + n inserts, har ek O(n) (ArrayList shift)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Problem mein order/ranking ka rule diya hai — comparator likho, built-in sort."
+    - "Kai criteria: pehle X, phir Y — thenBy."
+    - "Values chhoti range mein (letters, ages, 0..1000) — counting sort."
+    - "Sort ke baad greedy / two pointers / binary search — bahut problems ka pehla kadam."
+  avoid:
+    - "Sirf min/max ya k-th chahiye — sort O(n log n) faltu; scan O(n) ya quickselect/heap."
+    - "Data stream mein aata rahe aur har baar sorted chahiye — heap / TreeMap."
+    - "Comparator mein a − b — overflow; Integer.compare lo."
+  signals:
+    - keyword: "sort by frequency / custom order"
+      think: "HashMap count + compareBy(...).thenBy(...)."
+    - keyword: "arrange to form largest / smallest"
+      think: "Comparator: a + b vs b + a."
+    - keyword: "reconstruct / arrange people by height & count"
+      think: "Do-key sort + insert at index."
+    - keyword: "values in small range"
+      think: "Counting sort / bucket."
+
+# 9. Real-world
+realWorld:
+  - where: "E-commerce apps"
+    how: "Sort by relevance, phir rating, phir price — multi-key comparator (server par ya RecyclerView list mein)."
+  - where: "Android contacts / WhatsApp chats"
+    how: "Chats: pinned pehle, phir last message time ulta — stable sort se pinned ka andar ka order bana rehta hai."
+  - where: "Excel / Google Sheets"
+    how: "Pehle column B se sort, phir column A se — stable sort ki wajah se B ka order A ke andar bacha rehta hai."
+  - where: "Exam results"
+    how: "Marks ulta, barabar ho to roll number — do-key comparator. Marks 0..100 → counting sort bhi."
+  - where: "Databases"
+    how: "ORDER BY price DESC, name ASC — wahi multi-key comparator."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Comparator mein a − b"
+    type: overflow
+    wrong: |
+      `Arrays.sort(arr, (a, b) -> a - b)` — bade positive/negative numbers par overflow → galat order.
+    right: |
+      `Integer.compare(a, b)` / Kotlin `compareBy` / `a.compareTo(b)`.
+  - title: "sorted() vs sort() confusion"
+    type: logic
+    wrong: |
+      `list.sorted()` likha aur maana list badal gayi — `sorted()` nayi list deta hai, purani wahi.
+    right: |
+      In-place chahiye: `mutableList.sort()` / `arr.sort()`. Nayi chahiye: `sorted()`.
+  - title: "int[] ko reverseOrder se sort"
+    type: other
+    wrong: |
+      `Arrays.sort(intArr, Collections.reverseOrder())` → compile error (primitive par comparator nahi).
+    right: |
+      `Integer[]` lo, ya sort karke ulta loop / reverse.
+  - title: "Inconsistent comparator"
+    type: logic
+    wrong: |
+      Kabhi `compare(a, b) > 0` aur `compare(b, a) > 0` dono — TimSort error de sakta hai ("Comparison method violates its general contract").
+    right: |
+      Rule symmetric aur transitive rakho; ties ke liye doosri key do.
+  - title: "Largest Number mein sab zero"
+    type: empty
+    wrong: |
+      `[0, 0]` → "00" return kar diya (number mein aage zero nahi hote).
+    right: |
+      Pehla item "0" ho to "0" return.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Java/Kotlin ka built-in sort kaunsa algorithm hai?"
+      a: |
+        Primitives: dual-pivot quick sort (unstable, tez). Objects: TimSort (stable, merge + insertion, O(n log n), lagbhag sorted par tez).
+    - q: "Stable sort kab zaroori hai?"
+      a: |
+        Jab kai keys se baari-baari sort karo, ya barabar items ka original order matter kare (pehle naam se sorted list ko marks se sort karna).
+    - q: "Comparator mein a − b kyun nahi?"
+      a: |
+        Int overflow — 2×10⁹ − (−2×10⁹) negative ban jaata hai. Integer.compare use karo.
+    - q: "Counting sort kab, aur limit?"
+      followUp: true
+      a: |
+        Values ki range k chhoti ho (k ~ n ya kam). O(n + k). k bahut bada (10⁹) to count array ban hi nahi sakta — radix ya comparison sort.
+    - q: "O(n log n) se tez comparison sort kyun nahi?"
+      a: |
+        n! possible orders; har compare 2 raaste kholta hai → log₂(n!) ≈ n log n compares chahiye (decision tree).
+    - q: "Largest Number ka comparator sahi kyun hai?"
+      followUp: true
+      a: |
+        a+b vs b+a ek total order deta hai (transitive) — isliye sort consistent rehta hai aur har adjacent jodi optimal hai.
+    - q: "Do arrays ko ek dusre ke 'relative order' se sort kaise?"
+      a: |
+        Order wale array ka index map banao (value → position), comparator mein us index se compare; jo map mein nahi wo end mein value se.
+    - q: "1 crore numbers 0..1000 ke beech — fastest sort?"
+      a: |
+        Counting sort: O(n + 1001), ek pass ginti, ek pass likhna.
+  mayAsk:
+    - "Relative Sort Array."
+    - "Sort Characters By Frequency."
+    - "Merge Intervals (sort by start)."
+    - "Custom Sort String."
+
+# 12. Practice
+practice:
+  - name: Sort Array by Increasing Frequency
+    platform: LeetCode
+    num: 1636
+    url: "https://leetcode.com/problems/sort-array-by-increasing-frequency/"
+    level: easy
+    pattern: Count + two-key comparator
+    hint: "Example 1."
+  - name: Relative Sort Array
+    platform: LeetCode
+    num: 1122
+    url: "https://leetcode.com/problems/relative-sort-array/"
+    level: easy
+    pattern: Custom order / counting sort
+    hint: "Values 0..1000 → counting. arr2 ke order mein count se likho, baaki badhte order mein end mein."
+  - name: Sort the People
+    platform: LeetCode
+    num: 2418
+    url: "https://leetcode.com/problems/sort-the-people/"
+    level: easy
+    pattern: Sort indexes by key
+    hint: "Indexes 0..n−1 ko heights[i] ulta se sort karo, phir names us order mein."
+  - name: Largest Number
+    platform: LeetCode
+    num: 179
+    url: "https://leetcode.com/problems/largest-number/"
+    level: medium
+    pattern: Custom comparator a+b vs b+a
+    hint: "Example 2 — sab zero wala case."
+  - name: Queue Reconstruction by Height
+    platform: LeetCode
+    num: 406
+    url: "https://leetcode.com/problems/queue-reconstruction-by-height/"
+    level: medium
+    pattern: Two-key sort + insert at index
+    hint: "Example 3."
+  - name: Sort Characters By Frequency
+    platform: LeetCode
+    num: 451
+    url: "https://leetcode.com/problems/sort-characters-by-frequency/"
+    level: medium
+    pattern: Count + sort (ya bucket by frequency)
+    hint: "Char counts gino; frequency ulta sort karke har char ko utni baar jodo. Bucket sort se O(n)."
+  - name: Maximum Gap
+    platform: LeetCode
+    num: 164
+    url: "https://leetcode.com/problems/maximum-gap/"
+    level: hard
+    pattern: Bucket sort (pigeonhole)
+    hint: "O(n) chahiye. n − 1 buckets of size ⌈(max − min)/(n − 1)⌉; max gap kabhi ek bucket ke andar nahi hoga — sirf buckets ke min/max rakho."
+  - name: Contains Duplicate III
+    platform: LeetCode
+    num: 220
+    url: "https://leetcode.com/problems/contains-duplicate-iii/"
+    level: hard
+    pattern: Buckets of width valueDiff + 1 in a sliding window
+    hint: "Value ko bucket = floor(x / (t + 1)) mein daalo. Same bucket = jawab; padosi bucket check karo. Window size indexDiff rakho (purana bucket hatao)."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Built-in: primitives → dual-pivot quick (unstable), objects → TimSort (stable)."
+    - "compare(a, b) < 0 → a pehle. Multi-key: compareBy { }.thenBy { }."
+    - "a − b comparator = overflow bug; Integer.compare lo."
+    - "Chhoti range → counting sort O(n + k)."
+    - "sorted() nayi list, sort() in-place."
+  cheatsheet: |
+    ```kotlin
+    list.sortedBy { it.age }
+    list.sortedWith(compareByDescending<P> { it.age }.thenBy { it.name })
+    arr.sortedWith { a, b -> (b + a).compareTo(a + b) }   // custom rule
+    intArr.sort(); intArr.sortDescending()
+
+    // counting sort (0..k)
+    val c = IntArray(k + 1); for (x in a) c[x]++
+    var i = 0; for (v in 0..k) repeat(c[v]) { a[i++] = v }
+    ```
+    ```java
+    Arrays.sort(objs, Comparator.comparingInt(P::age).reversed().thenComparing(P::name));
+    Arrays.sort(boxed, (a, b) -> Integer.compare(b, a));
+    ```
+  quiz:
+    - q: "compare(a, b) = −3 ka matlab?"
+      options: ["b pehle", "a pehle", "Barabar", "Error"]
+      answer: 1
+      explain: "Negative → a chhota → a pehle."
+    - q: "Kotlin List<Person>.sortedBy kaunsa sort use karta hai?"
+      options: ["Quick sort (unstable)", "TimSort (stable)", "Counting sort", "Bubble"]
+      answer: 1
+      explain: "Objects ke liye stable TimSort."
+    - q: "\"3\" aur \"30\" — Largest Number mein kaun pehle?"
+      options: ["30", "3", "Koi bhi", "Dono hatao"]
+      answer: 1
+      explain: "\"330\" > \"303\"."
+    - q: "10⁷ ages (0..120) sort karne ka best tareeka?"
+      options: ["Merge sort", "Quick sort", "Counting sort", "Bubble sort"]
+      answer: 2
+      explain: "Range 121 — O(n + 121)."
+    - q: "(a, b) -> a - b comparator ki problem?"
+      options: ["Slow hai", "Overflow se galat order", "Stable nahi", "Compile nahi hota"]
+      answer: 1
+      explain: "Bade numbers par a − b Int se bahar."
+
+# 14. Connections
+connections:
+  related:
+    - id: kotlin-java-toolkit
+      why: "sortedBy, compareBy, Comparator wahan dekhe the."
+    - id: frequency-count
+      why: "Frequency sort ka pehla hissa."
+    - id: quick-sort
+      why: "Primitives ka built-in sort."
+    - id: merge-sort
+      why: "TimSort ka base, stability."
+  usedLater:
+    - id: binary-search
+      how: "Sort ke baad O(log n) search."
+    - id: intervals
+      how: "Har interval problem: pehle start se sort."
+    - id: greedy-basics
+      how: "Greedy = sahi order mein sort + ek pass."

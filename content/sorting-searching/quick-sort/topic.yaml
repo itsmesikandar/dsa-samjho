@@ -1,0 +1,443 @@
+meta:
+  id: quick-sort
+  chapter: sorting-searching
+  title: Quick Sort
+  subtitle: Pivot chuno, chhote left — bade right, phir dono taraf wahi. Partition hi asli hathiyaar hai
+  level: intermediate
+  minutes: 40
+  prereqs: [merge-sort, two-pointers-same]
+  tags: [sorting, quick-sort, partition, quickselect, dutch-flag]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Quick sort** bhi divide & conquer hai, par ulta tareeka:
+    - Merge sort: todna aasaan (beech se), **jodna** mehnat (merge).
+    - Quick sort: **todna** mehnat (partition), jodna kuch nahi.
+
+    Kadam:
+    1. Ek **pivot** chuno.
+    2. **Partition:** pivot se chhote items left, bade right. Pivot apni **pakki jagah** par pahunch jaata hai.
+    3. Left aur right hisson par wahi (recursion).
+
+    ```kotlin
+    fun quickSort(a: IntArray, l: Int, r: Int) {
+        if (l >= r) return
+        val p = partition(a, l, r)  // pivot ab index p par pakka
+        quickSort(a, l, p - 1)
+        quickSort(a, p + 1, r)
+    }
+    ```
+
+    > [!yaad]
+    > Average **O(n log n)**, **in-place** (O(log n) stack), practically sabse tez. Par worst case **O(n²)** (pivot baar-baar sabse chhota/bada), aur **stable nahi**.
+  analogy: |
+    **PT class mein line lagana.** Sir ek bachche ko "pivot" bana ke khada kar dete hain: "Isse chhote left, bade right!" Sab ek baar mein apni taraf.
+
+    Ab wo pivot bachcha apni sahi jagah par hai — usse pehle sab chhote, baad mein sab bade. Phir left group mein naya pivot, right group mein naya pivot… jab tak sab group 1 bachche ke na ho jaayein.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Merge sort guaranteed O(n log n) hai, phir quick sort kyun?
+    - **In-place:** extra array nahi (merge ko O(n) chahiye).
+    - **Cache-friendly:** array par seedha aage-peeche chalta hai — real machines par 2-3x tez.
+    - Java ka `Arrays.sort(int[])` **dual-pivot quick sort** hai.
+
+    Aur **partition** khud ek bada tool hai:
+    - Even/odd, 0/1/2 alag karna (Example 1, 2).
+    - **k-th sabse bada** O(n) average mein — quickselect (Example 3).
+
+    > [!socho]
+    > Pivot hamesha **pehla item** liya aur array pehle se **sorted** hai. Kya hoga?
+    >
+    > Har partition mein pivot sabse chhota → left khaali, right mein n − 1. Levels = n, har level O(n) → **O(n²)**! Isliye pivot **beech wala** ya **random** lo.
+
+# 3. Visual intro
+visual:
+  body: |
+    Ek **partition** dekho. Pivot (neela) end par. Hare = pivot se chhote (aage aa gaye), grey = bade.
+
+    Aakhir mein pivot hare aur grey ke beech — uski **pakki jagah**. Apna array daal ke try karo.
+  viz: { tracer: partitionBars }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Lomuto partition** (samajhne mein sabse aasaan):
+    1. Pivot (beech wala) ko end par rakho.
+    2. `s` = chhoton ke hisse ka end (shuru mein `l`).
+    3. `i` ko `l` se `r − 1` tak chalao: `a[i] < pivot` → `a[i]` aur `a[s]` swap, `s++`.
+    4. Aakhir mein pivot ko `s` par swap. Return `s`.
+
+    Ye wahi **read/write pointers** hai (Two Pointers same-direction) — `i` padhta hai, `s` likhta hai.
+
+    > [!tip]
+    > Pivot ke baad wo item **kabhi nahi hilta**. Isliye har partition kam se kam ek item pakka karta hai — recursion zaroor khatam hoti hai.
+  viz: { tracer: quickSortTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Quick sort (average)"
+    time: O(n log n)
+    space: "O(log n) stack"
+    why: "Pivot lagbhag beech ka → log n levels."
+  - op: "Quick sort (worst)"
+    time: O(n²)
+    space: "O(n) stack"
+    why: "Pivot baar-baar kinare ka (sorted input + pehla pivot, ya sab barabar + Lomuto)."
+  - op: "Partition (ek baar)"
+    time: O(n)
+    space: O(1)
+    why: "Ek pass, swaps."
+  - op: "Quickselect (k-th element)"
+    time: "O(n) average, O(n²) worst"
+    space: O(1)
+    why: "Sirf ek taraf jaate hain: n + n/2 + n/4 … ≈ 2n."
+  - op: "Dutch flag (3-way partition)"
+    time: O(n)
+    space: O(1)
+    why: "low / mid / high — ek pass mein teen hisse."
+  - op: "Stable?"
+    time: "lagu nahi"
+    space: "lagu nahi"
+    why: "Nahi — lambe swaps barabar items ka order badal dete hain."
+
+# 6. Code
+code:
+  - title: Hoare-style partition (dono kinaron se)
+    file: hoare
+    note: |
+      `i` left se aage badhta hai jab tak item pivot se chhota hai; `j` right se peeche jab tak bada hai. Dono ruk gaye = dono **galat taraf** → swap. Lomuto se ~3 guna kam swaps.
+
+      **Sab items barabar** ho to Lomuto har baar pivot ko kinare par rakhta hai (O(n²)), par ye version beech mein todta hai — O(n log n). Interview mein ye fark bolo.
+
+# 7. Examples
+examples:
+  - id: parity
+    level: easy
+    title: Even pehle, odd baad mein
+    source: { name: Sort Array By Parity, platform: LeetCode, url: "https://leetcode.com/problems/sort-array-by-parity/" }
+    problem: |
+      Array ke saare **even** numbers pehle aur **odd** baad mein lagao (in-place). Order koi bhi chalega.
+
+      Example: `[3, 1, 2, 4]` → `[2, 4, 3, 1]` (ya `[4, 2, 1, 3]` bhi sahi)
+    intuition: |
+      Ye **partition** hi hai — pivot ki jagah condition "even hai?".
+
+      - `s` = even zone ka end.
+      - `i` har item padhe: even → `a[i]` ↔ `a[s]`, `s++`.
+
+      Ek pass, koi extra array nahi.
+
+      > [!tip]
+      > "Do group mein baanto (condition se), order matter nahi" → partition. Order bhi bachana ho (stable) → Move Zeroes jaisa read/write copy, ya extra array.
+    dryRun: |
+      | i | a[i] | Even? | Array | s |
+      |---|---|---|---|---|
+      | 0 | 3 | ✗ | 3 1 2 4 | 0 |
+      | 1 | 1 | ✗ | 3 1 2 4 | 0 |
+      | 2 | 2 | ✓ swap a[0] | 2 1 3 4 | 1 |
+      | 3 | 4 | ✓ swap a[1] | **2 4 3 1** | 2 |
+    viz: { tracer: parityTrace }
+    code: ex1-parity
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Ek pass, in-place swaps."
+
+  - id: sort-colors
+    level: medium
+    title: Sort Colors — 0, 1, 2 ek pass mein
+    source: { name: Sort Colors, platform: LeetCode, url: "https://leetcode.com/problems/sort-colors/" }
+    problem: |
+      Array mein sirf `0`, `1`, `2` hain (teen rang). Inhe **ek hi pass** mein sort karo, in-place, library sort ke bina.
+
+      Example: `[2, 0, 2, 1, 1, 0]` → `[0, 0, 1, 1, 2, 2]`
+    intuition: |
+      Counting (kitne 0, 1, 2) se do pass mein ho jaata hai. **Ek pass** ke liye **3-way partition** (Dijkstra ka Dutch National Flag):
+
+      - `[0, low)` = 0s, `[low, mid)` = 1s, `[mid, high]` = abhi dekhe nahi, `(high, end]` = 2s.
+      - `a[mid] == 0` → `low` se swap, `low++`, `mid++`.
+      - `a[mid] == 1` → `mid++`.
+      - `a[mid] == 2` → `high` se swap, `high--` — **mid mat badhao**.
+
+      > [!galti]
+      > 2 wale case mein `mid++` kar diya → high se aaya item (jo 0 bhi ho sakta hai) bina dekhe chhoot gaya. 0 wale case mein `mid++` safe hai kyunki low se aaya item pakka 1 hai (ya khud mid).
+
+      > [!tip]
+      > Yahi 3-way partition quick sort mein **bahut saare duplicates** ka ilaaj hai: `< pivot`, `= pivot`, `> pivot` — beech wala hissa dobara sort hi nahi karna.
+    dryRun: |
+      `[2, 0, 2, 1, 1, 0]`
+
+      | low | mid | high | a[mid] | Kya hua | Array |
+      |---|---|---|---|---|---|
+      | 0 | 0 | 5 | 2 | swap high, high− | 0 0 2 1 1 2 |
+      | 0 | 0 | 4 | 0 | swap low, low+ mid+ | 0 0 2 1 1 2 |
+      | 1 | 1 | 4 | 0 | swap low, low+ mid+ | 0 0 2 1 1 2 |
+      | 2 | 2 | 4 | 2 | swap high, high− | 0 0 1 1 2 2 |
+      | 2 | 2 | 3 | 1 | mid+ | |
+      | 2 | 3 | 3 | 1 | mid+ → mid > high, ruko | **0 0 1 1 2 2** |
+    viz: { tracer: colorsTrace }
+    code: ex2-colors
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Har kadam mid badhta hai ya high ghatta hai — max n kadam."
+
+  - id: kth-largest
+    level: tricky
+    title: k-th sabse bada — bina poora sort kiye
+    source: { name: Kth Largest Element in an Array, platform: LeetCode, url: "https://leetcode.com/problems/kth-largest-element-in-an-array/" }
+    problem: |
+      Array mein **k-th sabse bada** number do (sorted order ke hisaab se — distinct nahi). Poora sort kiye bina kar sakte ho?
+
+      Example: `[3, 2, 1, 5, 6, 4]`, k = 2 → **5**
+    intuition: |
+      Sort karke `a[n − k]` → O(n log n). Par hamein sirf **ek** position chahiye.
+
+      **Quickselect:** partition karo. Pivot apni pakki jagah `p` par aa gaya.
+      - `p == n − k` → yahi answer!
+      - `p < n − k` → answer right mein — **left ko bhool jao**.
+      - `p > n − k` → answer left mein.
+
+      Quick sort dono taraf jaata hai; quickselect **sirf ek** taraf. Kaam: n + n/2 + n/4 + … ≈ **2n → O(n)** average.
+
+      > [!galti]
+      > Worst case O(n²) — buri pivot (aur LeetCode par sab-barabar wale tests). Random pivot ya 3-way partition lagao. Guaranteed chahiye to **min-heap of size k**: O(n log k) (Heap chapter).
+    dryRun: |
+      `[3, 2, 1, 5, 6, 4]`, k = 2 → target index = 6 − 2 = 4
+
+      | Range | Pivot | Pakki jagah p | Faisla |
+      |---|---|---|---|
+      | 0..5 | 1 | 0 | p < 4 → right |
+      | 1..5 | 5 | 4 | p == 4 → **5** |
+    viz: { tracer: quickselectTrace }
+    code: ex3-kth
+    complexity:
+      time: "O(n) average, O(n²) worst"
+      space: O(1)
+      why: "Har baar ek hi hissa aage jaata hai; loop iterative hai, stack nahi."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Array (primitives) ko fast, in-place sort karna hai."
+    - "Do/teen group mein baantna hai (partition, Dutch flag)."
+    - "k-th smallest / largest, median — quickselect O(n) average."
+    - "Top k items chahiye, order zaroori nahi — quickselect se partition."
+  avoid:
+    - "Stable sort chahiye — merge sort."
+    - "Worst case guarantee chahiye (real-time system) — merge / heap sort."
+    - "Linked list — random access nahi; merge sort."
+    - "Bahut duplicates aur simple Lomuto — 3-way partition lo."
+  signals:
+    - keyword: "kth largest / kth smallest / median"
+      think: "Quickselect (avg O(n)) ya heap (O(n log k))."
+    - keyword: "0s, 1s, 2s / three groups in one pass"
+      think: "Dutch flag: low, mid, high."
+    - keyword: "move all X to front/back, order doesn't matter"
+      think: "Partition with condition."
+    - keyword: "k closest / top k without order"
+      think: "Quickselect par distance."
+
+# 9. Real-world
+realWorld:
+  - where: "Java Arrays.sort(int[])"
+    how: "Dual-pivot quick sort — do pivot, teen hisse. Primitives ke liye kyunki stability ka matlab nahi."
+  - where: "C++ std::sort"
+    how: "Introsort: quick sort, par recursion bahut gehri ho to heap sort par switch (worst O(n log n) guarantee)."
+  - where: "Databases / analytics"
+    how: "Median, percentile (p95 latency) nikaalna — quickselect jaisa, poora sort nahi."
+  - where: "Image processing"
+    how: "Median filter (noise hatana) — har window ka median quickselect se."
+  - where: "Maps / games"
+    how: "k nearest dukaanein / players — distance par quickselect."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Hamesha pehla/aakhri item pivot"
+    type: logic
+    wrong: |
+      Sorted ya ulta-sorted input → har partition mein ek taraf khaali → O(n²) aur gehri recursion (StackOverflowError).
+    right: |
+      Beech wala ya random pivot.
+  - title: "Recursion mein pivot bhi shamil"
+    type: off-by-one
+    wrong: |
+      `quickSort(l, p)` aur `quickSort(p, r)` (Lomuto ke saath) → pivot dobara, kabhi-kabhi infinite recursion.
+    right: |
+      Lomuto: `quickSort(l, p - 1)` + `quickSort(p + 1, r)`. Hoare-style: `(l, j)` + `(i, r)`.
+  - title: "Dutch flag mein 2 ke baad mid++"
+    type: logic
+    wrong: |
+      High se aaya item bina dekhe chhoot gaya.
+    right: |
+      2 par sirf `high--`.
+  - title: "Bahut saare duplicates"
+    type: logic
+    wrong: |
+      `[5, 5, 5, 5, …]` par Lomuto: har baar pivot end par → O(n²).
+    right: |
+      3-way partition ya Hoare-style.
+  - title: "Quickselect mein k ka index"
+    type: off-by-one
+    wrong: |
+      k-th largest ke liye target = k − 1 (wo k-th smallest hai).
+    right: |
+      Badhte order mein target = n − k.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Quick sort ki average aur worst complexity? Worst kab?"
+      a: |
+        Average O(n log n), worst O(n²) — jab pivot baar-baar sabse chhota/bada ho (sorted input + kinare ka pivot, ya sab barabar + Lomuto).
+    - q: "Worst case se kaise bachoge?"
+      a: |
+        Random pivot / median-of-three, duplicates ke liye 3-way partition, aur introsort (gehraai zyada → heap sort).
+    - q: "Quick sort vs merge sort?"
+      followUp: true
+      a: |
+        Quick: in-place, cache-friendly, practically tez, unstable, worst O(n²). Merge: stable, guaranteed O(n log n), O(n) memory, linked list ke liye best.
+    - q: "Quickselect ki complexity kyun O(n)?"
+      a: |
+        Har baar sirf ek hissa: n + n/2 + n/4 + … = 2n (average). Worst O(n²); median-of-medians se guaranteed O(n) (par slow constant).
+    - q: "Lomuto vs Hoare partition?"
+      a: |
+        Lomuto: ek pointer, samajhna aasaan, zyada swaps, duplicates par kharab. Hoare: do pointers kinaron se, kam swaps, duplicates par behtar.
+    - q: "Quick sort stable kyun nahi?"
+      a: |
+        Partition mein door ke swaps barabar items ka relative order badal dete hain.
+    - q: "Kth largest — heap ya quickselect?"
+      followUp: true
+      a: |
+        Quickselect O(n) avg, array badalta hai. Heap O(n log k), stream par bhi chalta hai, guaranteed. Interview mein dono batao.
+    - q: "Java Arrays.sort int[] aur Integer[] mein alag algorithm kyun?"
+      a: |
+        Primitives: dual-pivot quick sort (stability bekaar, speed chahiye). Objects: TimSort (stable chahiye).
+  mayAsk:
+    - "K Closest Points to Origin."
+    - "Wiggle Sort II."
+    - "Top K Frequent Elements (bucket / quickselect)."
+    - "Partition Array According to Given Pivot (stable)."
+
+# 12. Practice
+practice:
+  - name: Sort Array By Parity
+    platform: LeetCode
+    num: 905
+    url: "https://leetcode.com/problems/sort-array-by-parity/"
+    level: easy
+    pattern: Partition by condition
+    hint: "Example 1."
+  - name: Sort Array By Parity II
+    platform: LeetCode
+    num: 922
+    url: "https://leetcode.com/problems/sort-array-by-parity-ii/"
+    level: easy
+    pattern: Two pointers on even/odd indexes
+    hint: "i even indexes par, j odd par. Even index par odd mila aur odd index par even → swap."
+  - name: Move Zeroes
+    platform: LeetCode
+    num: 283
+    url: "https://leetcode.com/problems/move-zeroes/"
+    level: easy
+    pattern: Stable partition
+    hint: "Partition jaisa, par order bachana hai — read/write pointers."
+  - name: Sort Colors
+    platform: LeetCode
+    num: 75
+    url: "https://leetcode.com/problems/sort-colors/"
+    level: medium
+    pattern: Dutch national flag
+    hint: "Example 2."
+  - name: Kth Largest Element in an Array
+    platform: LeetCode
+    num: 215
+    url: "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+    level: medium
+    pattern: Quickselect
+    hint: "Example 3 — duplicates wale tests ke liye 3-way partition ya random pivot."
+  - name: K Closest Points to Origin
+    platform: LeetCode
+    num: 973
+    url: "https://leetcode.com/problems/k-closest-points-to-origin/"
+    level: medium
+    pattern: Quickselect on distance
+    hint: "x² + y² par quickselect; pehle k points answer (order nahi chahiye)."
+  - name: Median of Two Sorted Arrays
+    platform: LeetCode
+    num: 4
+    url: "https://leetcode.com/problems/median-of-two-sorted-arrays/"
+    level: hard
+    pattern: k-th element by discarding halves
+    hint: "k-th chhota dhoondho: dono arrays ka k/2-th compare karo, chhote wale ke pehle k/2 hata do — quickselect jaisa 'ek hissa bhool jao'. Ya binary search on partition."
+  - name: First Missing Positive
+    platform: LeetCode
+    num: 41
+    url: "https://leetcode.com/problems/first-missing-positive/"
+    level: hard
+    pattern: In-place placement (partition ka cousin)
+    hint: "Har x (1..n) ko index x − 1 par swap karte raho jab tak sahi na ho. Phir pehla i jahan a[i] != i + 1."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Pivot → partition (chhote left, bade right) → dono taraf recursion."
+    - "Average O(n log n), worst O(n²); in-place; unstable."
+    - "Pivot beech/random; duplicates → 3-way / Hoare."
+    - "Dutch flag: low/mid/high; 2 par mid mat badhao."
+    - "Quickselect: sirf ek taraf → avg O(n); target = n − k."
+  cheatsheet: |
+    ```kotlin
+    fun partition(a: IntArray, l: Int, r: Int): Int {
+        swap(a, (l + r) / 2, r); val pv = a[r]; var s = l
+        for (i in l until r) if (a[i] < pv) { swap(a, i, s); s++ }
+        swap(a, s, r); return s
+    }
+    fun qs(a: IntArray, l: Int, r: Int) {
+        if (l >= r) return
+        val p = partition(a, l, r); qs(a, l, p - 1); qs(a, p + 1, r)
+    }
+    // Dutch flag: 0 -> swap(low++, mid++); 1 -> mid++; 2 -> swap(mid, high--)
+    ```
+  quiz:
+    - q: "Partition ke baad pivot ke baare mein kya pakka hai?"
+      options: ["Wo array ka median hai", "Wo apni final sorted jagah par hai", "Wo index 0 par hai", "Kuch nahi"]
+      answer: 1
+      explain: "Left sab chhote, right sab bade — yahi uski sorted jagah."
+    - q: "Sorted array, pivot = pehla item. Complexity?"
+      options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"]
+      answer: 2
+      explain: "Har baar ek taraf khaali → n levels."
+    - q: "Dutch flag mein a[mid] = 2 par kya karte hain?"
+      options: ["swap(mid, high); mid++; high--", "swap(mid, high); high--", "mid++", "swap(low, mid); low++"]
+      answer: 1
+      explain: "High se aaya item abhi dekhna baaki hai."
+    - q: "n = 10, k-th largest k = 3 — quickselect ka target index (0-based, badhta order)?"
+      options: ["2", "3", "7", "8"]
+      answer: 2
+      explain: "n − k = 7."
+    - q: "Kaunsa quick sort ka fayda NAHI hai?"
+      options: ["In-place", "Cache-friendly", "Stable", "Average fast"]
+      answer: 2
+      explain: "Quick sort unstable hai."
+
+# 14. Connections
+connections:
+  related:
+    - id: merge-sort
+      why: "Doosra D&C sort — kaam jodne mein."
+    - id: two-pointers-same
+      why: "Lomuto partition = read/write pointers; Sort Colors wahan practice mein bhi."
+    - id: two-pointers-opposite
+      why: "Hoare partition = dono kinaron se pointers."
+  usedLater:
+    - id: sorting-in-practice
+      how: "Dual-pivot quick sort, introsort, kab kaunsa."
+    - id: top-k
+      how: "Kth largest heap se — quickselect ka doosra tareeka."
+    - id: binary-search-on-answer
+      how: "k-th smallest jaisa sawaal answer par binary search se bhi."

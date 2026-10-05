@@ -1,0 +1,442 @@
+meta:
+  id: binary-search
+  chapter: sorting-searching
+  title: Binary Search
+  subtitle: Sorted data mein har kadam aadha hissa khatam — 10 lakh mein se 20 kadam
+  level: beginner
+  minutes: 30
+  prereqs: [array, big-o-time]
+  tags: [binary-search, sorted, log-n, search-insert]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Binary search** = **sorted** array mein dhoondhne ka tareeka: beech wala item dekho.
+    - Wahi target → mil gaya.
+    - Target bada → answer **right** aadhe mein (left aadha bekaar).
+    - Target chhota → answer **left** aadhe mein.
+
+    Har kadam range **aadhi**. n = 10⁶ → sirf ~20 kadam.
+
+    ```kotlin
+    var lo = 0; var hi = a.size - 1
+    while (lo <= hi) {
+        val mid = lo + (hi - lo) / 2
+        when {
+            a[mid] == target -> return mid
+            a[mid] < target  -> lo = mid + 1
+            else             -> hi = mid - 1
+        }
+    }
+    return -1
+    ```
+
+    > [!yaad]
+    > Shart: data **sorted** (ya koi monotonic property — aage ke topics mein). Time **O(log n)**, space O(1).
+  analogy: |
+    **Dictionary mein "pani" dhoondhna.** Pehle panne se ek-ek nahi palatte — beech mein kholte ho. "m" wala page aaya → "p" aage hai → aage ka aadha. Phir uska beech… 1000 pages ki dictionary mein ~10 baar kholna.
+
+    Ya **number guess game**: dost 1-100 mein number soche, tum hamesha beech wala bolo — 7 guess mein pakka.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Linear search O(n): 10⁶ items = 10⁶ compares. Binary search O(log n): **20**. Kai interview problems isi ek fark par tike hain.
+
+    Aur ye sirf "array mein dhoondhna" nahi:
+    - **Insert position** — kahan daalein ki sorted rahe.
+    - **First / last occurrence**, rotated array — agla topic.
+    - **Answer par binary search** — "minimum speed", "minimum capacity" — teesra topic.
+
+    > [!socho]
+    > Unsorted array mein binary search karo to? `[5, 1, 9, 3]`, target 1: mid = 1 (index) → value 1 — mil gaya, lucky. Target 3: mid value 1 < 3 → right jaao → 9 > 3 → khatam, **nahi mila** — jabki 3 hai! Sorted hone ki shart ke bina "aadha bekaar" wala faisla galat hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    1 se 16 mein number socho. Har guess beech wala — aur har jawab ("bada"/"chhota") aadhe numbers **grey** kar deta hai.
+
+    Koi bhi number lo — 4 se zyada guess kabhi nahi (log₂ 16 = 4).
+  viz: { tracer: guessGame }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    `[-1, 0, 3, 5, 9, 12]`, target 9:
+
+    | lo | hi | mid | a[mid] | Faisla |
+    |---|---|---|---|---|
+    | 0 | 5 | 2 | 3 | 3 < 9 → lo = 3 |
+    | 3 | 5 | 4 | 9 | **mil gaya** → 4 |
+
+    **Template ke teen niyam:**
+    1. `[lo, hi]` = jahan answer **ho sakta** hai (dono shamil). Isliye `while (lo <= hi)`.
+    2. `mid` dekh liya → agli range mein **mid nahi** aata: `mid + 1` / `mid − 1`.
+    3. `mid = lo + (hi − lo) / 2` — `(lo + hi) / 2` mein bade index par overflow.
+
+    > [!tip]
+    > Loop khatam hua aur nahi mila → `lo` us jagah par hai jahan target **aata** (insert position). Example 1 isi ka use hai.
+  viz: { tracer: bsTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Binary search (sorted array)"
+    time: O(log n)
+    space: O(1)
+    why: "Har kadam range aadhi."
+  - op: "Linear search"
+    time: O(n)
+    space: O(1)
+    why: "Sorted ho ya nahi, ek-ek dekho."
+  - op: "Sort + binary search (k queries)"
+    time: "O(n log n + k log n)"
+    space: O(1)
+    why: "Ek baar sort, phir har query log n. Bahut queries ho tab fayda."
+  - op: "Recursive binary search"
+    time: O(log n)
+    space: "O(log n) stack"
+    why: "Same kaam; loop wala behtar."
+  - op: "2D sorted matrix (row-wise line)"
+    time: O(log(m·n))
+    space: O(1)
+    why: "Index i → (i / cols, i % cols)."
+  - op: "Unknown size (exponential search)"
+    time: O(log p)
+    space: O(1)
+    why: "p = target ki position; range double karke dhoondho."
+
+# 6. Code
+code:
+  - title: Built-in binarySearch aur insertion point
+    file: builtin
+    note: |
+      Kotlin `arr.binarySearch(x)` / Java `Arrays.binarySearch(arr, x)`: mila to index, **nahi mila** to `-(insertionPoint) - 1` (negative). Insertion point wapas: `-(r + 1)`.
+
+      Dhyaan: duplicates ho to **koi bhi** matching index aa sakta hai (pehla nahi) — first/last chahiye to khud likho (agla topic).
+
+# 7. Examples
+examples:
+  - id: search-insert
+    level: easy
+    title: Search insert position
+    source: { name: Search Insert Position, platform: LeetCode, url: "https://leetcode.com/problems/search-insert-position/" }
+    problem: |
+      Sorted (distinct) array aur target. Target ho to uska index; na ho to wo index jahan **daalne** par array sorted rahe. O(log n) chahiye.
+
+      Example: `[1, 3, 5, 6]`, target 2 → **1**; target 7 → **4**
+    intuition: |
+      Normal binary search. Mil gaya → index. Nahi mila → **lo** return.
+
+      Kyun `lo`? Loop ke dauraan hamesha sach hai:
+      - `lo` se pehle sab **< target**.
+      - `hi` ke baad sab **> target**.
+
+      Loop khatam hone par `lo = hi + 1` — yaani lo pehla item hai jo target se bada hai (ya end). Wahi jagah.
+
+      > [!tip]
+      > Is "loop ke baad lo kahan hai" wale sawaal ka jawab yaad rakho — binary search ke saare variations isi soch se bante hain.
+    dryRun: |
+      `[1, 3, 5, 6]`, target 2
+
+      | lo | hi | mid | a[mid] | Faisla |
+      |---|---|---|---|---|
+      | 0 | 3 | 1 | 3 | 3 > 2 → hi = 0 |
+      | 0 | 0 | 0 | 1 | 1 < 2 → lo = 1 |
+      | 1 | 0 | – | – | lo > hi → return **1** |
+    viz: { tracer: insertTrace }
+    code: ex1-insert
+    complexity:
+      time: O(log n)
+      space: O(1)
+      why: "Sirf binary search."
+
+  - id: search-2d
+    level: medium
+    title: Sorted 2D matrix mein dhoondho
+    source: { name: Search a 2D Matrix, platform: LeetCode, url: "https://leetcode.com/problems/search-a-2d-matrix/" }
+    problem: |
+      `m × n` matrix: har row sorted, aur har row ka pehla number pichhli row ke aakhri se bada. Target hai ya nahi?
+
+      Example: `[[1,3,5,7],[10,11,16,20],[23,30,34,60]]`, target 16 → **true**
+    intuition: |
+      Row-by-row padho: `1 3 5 7 10 11 16 20 23 30 34 60` — ek hi **sorted line**! To matrix ko line maan ke binary search, index `0..m·n − 1`.
+
+      Line ka index `i` matrix mein kahan? `row = i / cols`, `col = i % cols`.
+
+      > [!galti]
+      > Do baar binary search (pehle row, phir col) bhi sahi hai, par edge cases zyada. Ek line wala trick saaf hai.
+
+      > [!socho]
+      > Agar sirf rows sorted aur columns sorted ho (row ka pehla, pichhli row ke aakhri se bada **nahi**)? Tab ek line nahi banti — top-right corner se "staircase" walk: bada → left, chhota → neeche. O(m + n). (LeetCode 240)
+    dryRun: |
+      cols = 4, target 16
+
+      | lo | hi | mid | (row, col) | Value | Faisla |
+      |---|---|---|---|---|---|
+      | 0 | 11 | 5 | (1, 1) | 11 | 11 < 16 → lo = 6 |
+      | 6 | 11 | 8 | (2, 0) | 23 | 23 > 16 → hi = 7 |
+      | 6 | 7 | 6 | (1, 2) | 16 | **true** |
+    viz: { tracer: matrixTrace }
+    code: ex2-matrix
+    complexity:
+      time: O(log(m·n))
+      space: O(1)
+      why: "m·n items ki line par binary search."
+
+  - id: unknown-size
+    level: tricky
+    title: Size pata nahi — phir bhi binary search
+    source: { name: Search in a Sorted Array of Unknown Size, platform: LeetCode, url: "https://leetcode.com/problems/search-in-a-sorted-array-of-unknown-size/" }
+    problem: |
+      Sorted array hai par uska **size nahi pata**. Sirf `reader.get(i)` milta hai — bahar ka index ho to bahut bada number (∞) deta hai. Target ka index do (na ho to −1).
+
+      Example: array `[-1, 0, 3, 5, 9, 12, 15, 20, 25, 31, 40]`, target 25 → **8**
+    intuition: |
+      Binary search ko `hi` chahiye. Size nahi pata → pehle **range dhoondho**:
+
+      **Exponential search:** `hi = 1, 2, 4, 8, …` jab tak `get(hi) ≥ target`. Ab target `hi/2 .. hi` mein pakka. Phir normal binary search.
+
+      Bahar wale index par ∞ — wo "target se bada" maana jaata hai, to search khud left aa jaata hai.
+
+      > [!tip]
+      > Doubling ke kadam = log(p), binary ke = log(p). Total **O(log p)** — p = target ki position, size n nahi. "Infinite / stream / unknown length" + sorted → exponential search.
+    dryRun: |
+      target 25
+
+      | Kadam | hi | get(hi) | |
+      |---|---|---|---|
+      | grow | 1 | 0 | < 25 |
+      | grow | 2 | 3 | < 25 |
+      | grow | 4 | 9 | < 25 |
+      | grow | 8 | 25 | ≥ 25 → ruko, range 4..8 |
+      | binary | mid 6 → 15, mid 7 → 20, mid 8 → **25** | | index **8** |
+    viz: { tracer: unknownTrace }
+    code: ex3-unknown
+    complexity:
+      time: O(log p)
+      space: O(1)
+      why: "Doubling log p + binary log p."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Data **sorted** hai aur dhoondhna / jagah nikaalni hai."
+    - "Ek baar sort, phir bahut saari queries."
+    - "Constraints n = 10⁵–10⁹ aur 'O(log n)' maanga."
+    - "Koi bhi monotonic yes/no sawaal (aage ke topics)."
+  avoid:
+    - "Unsorted aur sirf ek baar dhoondhna — O(n) scan, sort karna mehenga."
+    - "Linked list — mid tak pahunchna hi O(n)."
+    - "Exact value chahiye aur HashSet already bana hai — O(1)."
+  signals:
+    - keyword: "sorted array, find / exists"
+      think: "Classic binary search, lo <= hi."
+    - keyword: "insert position / where would it go"
+      think: "Loop ke baad lo."
+    - keyword: "O(log n) required"
+      think: "Binary search pakka."
+    - keyword: "unknown size / infinite sorted"
+      think: "Exponential search: hi double karo."
+
+# 9. Real-world
+realWorld:
+  - where: "Git bisect"
+    how: "Kaunse commit ne bug daala? 1000 commits mein beech wala test karo — ~10 tests mein mil jaata hai."
+  - where: "Databases (B-tree index)"
+    how: "Har node ke andar sorted keys par binary search — crore rows mein bhi kuch hi disk reads."
+  - where: "Android / Java libraries"
+    how: "`Collections.binarySearch`, `SparseArray` (Android) andar sorted keys par binary search karta hai — HashMap se kam memory."
+  - where: "Contacts / dictionary apps"
+    how: "Sorted list mein naam dhoondhna ya A-Z fast scroll."
+  - where: "Video player seek"
+    how: "Keyframe timestamps sorted hain — 'is time se pehle wala keyframe' binary search se."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "(lo + hi) / 2 overflow"
+    type: overflow
+    wrong: |
+      `val mid = (lo + hi) / 2` — lo, hi dono ~2×10⁹ ke paas ho to jod Int se bahar.
+    right: |
+      `lo + (hi - lo) / 2`.
+  - title: "lo = mid / hi = mid (with lo <= hi)"
+    type: off-by-one
+    wrong: |
+      `lo = mid` → lo = hi = mid par range kabhi chhoti nahi hoti → infinite loop.
+    right: |
+      Mid dekh liya to bahar karo: `mid + 1`, `mid - 1`.
+  - title: "while (lo < hi) ke saath aakhri item chhoot gaya"
+    type: off-by-one
+    wrong: |
+      Is template mein `lo < hi` → lo == hi wala item kabhi check nahi hua.
+    right: |
+      `[lo, hi]` closed range ke saath `lo <= hi`.
+  - title: "Khaali array"
+    type: empty
+    wrong: |
+      `a[0]` ya `m[0].size` pehle hi padh liya → crash.
+    right: |
+      `hi = -1` se loop chalega hi nahi → -1. 2D mein pehle `if (m.isEmpty())` check.
+  - title: "Unsorted data par binary search"
+    type: logic
+    wrong: |
+      Input sorted hai maan liya — answer kabhi aata, kabhi nahi.
+    right: |
+      Pehle confirm karo ya sort karo (aur index chahiye to original index saath rakho).
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Binary search ki complexity aur kyun?"
+      a: |
+        O(log n) — har kadam range aadhi: n, n/2, n/4 … 1 → log₂ n kadam. Space O(1) (loop).
+    - q: "mid = lo + (hi − lo) / 2 kyun?"
+      a: |
+        lo + hi bade index par Int overflow kar sakta hai. Ye form same value deta hai bina overflow ke.
+    - q: "lo <= hi aur lo < hi mein fark?"
+      followUp: true
+      a: |
+        Closed range [lo, hi] → lo <= hi, update mid ± 1. Half-open [lo, hi) ya 'first true' template → lo < hi, hi = mid. Ek template chuno aur uske niyam pakdo.
+    - q: "Loop khatam hone par lo kahan hota hai?"
+      a: |
+        Pehla index jahan a[i] > target (agar target nahi mila) — insert position. hi = lo − 1 = aakhri index jahan a[i] < target.
+    - q: "Built-in binarySearch nahi mila to kya deta hai?"
+      a: |
+        -(insertionPoint) − 1. Duplicates mein koi bhi index aa sakta hai.
+    - q: "2D matrix mein binary search?"
+      a: |
+        Fully sorted (row-wise line): index i → (i / cols, i % cols). Sirf rows/cols sorted: top-right se staircase O(m + n).
+    - q: "Size na pata ho to?"
+      a: |
+        Exponential search: hi = 1, 2, 4… jab tak get(hi) ≥ target, phir hi/2..hi mein binary.
+    - q: "Recursive ya iterative?"
+      a: |
+        Iterative — O(1) space, stack nahi. Recursive bhi O(log n) time, par O(log n) stack.
+  mayAsk:
+    - "Guess Number Higher or Lower."
+    - "Valid Perfect Square (bina sqrt)."
+    - "Two Sum II (binary search se O(n log n))."
+    - "Search a 2D Matrix II (staircase)."
+
+# 12. Practice
+practice:
+  - name: Binary Search
+    platform: LeetCode
+    num: 704
+    url: "https://leetcode.com/problems/binary-search/"
+    level: easy
+    pattern: Classic template
+    hint: "'Kaise kaam karta hai' wala code — bina dekhe likho."
+  - name: Search Insert Position
+    platform: LeetCode
+    num: 35
+    url: "https://leetcode.com/problems/search-insert-position/"
+    level: easy
+    pattern: Return lo after loop
+    hint: "Example 1."
+  - name: Guess Number Higher or Lower
+    platform: LeetCode
+    num: 374
+    url: "https://leetcode.com/problems/guess-number-higher-or-lower/"
+    level: easy
+    pattern: Binary search with an API
+    hint: "guess(mid) ka −1 / 1 / 0 dhyaan se padho (kiske hisaab se bada)."
+  - name: Search a 2D Matrix
+    platform: LeetCode
+    num: 74
+    url: "https://leetcode.com/problems/search-a-2d-matrix/"
+    level: medium
+    pattern: Flattened index
+    hint: "Example 2."
+  - name: Successful Pairs of Spells and Potions
+    platform: LeetCode
+    num: 2300
+    url: "https://leetcode.com/problems/successful-pairs-of-spells-and-potions/"
+    level: medium
+    pattern: Sort + binary search per query
+    hint: "Potions sort karo. Har spell ke liye pehla potion jahan spell × potion ≥ success (Long!) — uske baad wale sab successful."
+  - name: Maximum Distance Between a Pair of Values
+    platform: LeetCode
+    num: 1855
+    url: "https://leetcode.com/problems/maximum-distance-between-a-pair-of-values/"
+    level: medium
+    pattern: Binary search on non-increasing array
+    hint: "Har i ke liye nums2 mein sabse door j ≥ i jahan nums2[j] ≥ nums1[i] — nums2 non-increasing hai. Two pointers bhi chalega."
+  - name: Median of Two Sorted Arrays
+    platform: LeetCode
+    num: 4
+    url: "https://leetcode.com/problems/median-of-two-sorted-arrays/"
+    level: hard
+    pattern: Binary search on partition
+    hint: "Chhote array mein cut i par binary search; doosre ka cut j = half − i. Left ke max ≤ right ke min hona chahiye."
+  - name: Number of Flowers in Full Bloom
+    platform: LeetCode
+    num: 2251
+    url: "https://leetcode.com/problems/number-of-flowers-in-full-bloom/"
+    level: hard
+    pattern: Two sorted arrays + binary search counts
+    hint: "Starts aur ends alag sort. Time t par khile = (start ≤ t wale) − (end < t wale) — dono binary search se."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Sorted + beech dekho + aadha hatao = O(log n)."
+    - "Closed template: lo <= hi, mid ± 1."
+    - "mid = lo + (hi − lo) / 2 (overflow se bachao)."
+    - "Nahi mila to lo = insert position."
+    - "2D: i → (i / cols, i % cols); unknown size: hi double karo."
+  cheatsheet: |
+    ```kotlin
+    fun bs(a: IntArray, t: Int): Int {
+        var lo = 0; var hi = a.size - 1
+        while (lo <= hi) {
+            val m = lo + (hi - lo) / 2
+            when {
+                a[m] == t -> return m
+                a[m] < t  -> lo = m + 1
+                else      -> hi = m - 1
+            }
+        }
+        return -1      // ya insert position: lo
+    }
+    // built-in: a.binarySearch(x)  -> nahi mila: -(ins) - 1
+    ```
+  quiz:
+    - q: "10⁶ sorted items mein binary search ke max kadam (lagbhag)?"
+      options: ["10", "20", "1000", "10⁶"]
+      answer: 1
+      explain: "log₂ 10⁶ ≈ 20."
+    - q: "[2, 4, 6, 8], target 5 — loop ke baad lo?"
+      options: ["1", "2", "3", "-1"]
+      answer: 1
+      explain: "5 ki jagah index 2 (4 aur 6 ke beech)."
+    - q: "lo <= hi template mein a[mid] < target par kya?"
+      options: ["lo = mid", "lo = mid + 1", "hi = mid", "hi = mid − 1"]
+      answer: 1
+      explain: "mid dekh liya, wo answer nahi — use bhi hatao."
+    - q: "3×4 matrix, line index 7 kahan hai?"
+      options: ["(1, 3)", "(2, 1)", "(1, 2)", "(0, 7)"]
+      answer: 0
+      explain: "7 / 4 = 1, 7 % 4 = 3."
+    - q: "arr.binarySearch(25) ne −3 diya. Insertion point?"
+      options: ["3", "2", "−2", "4"]
+      answer: 1
+      explain: "−(−3 + 1) = 2."
+
+# 14. Connections
+connections:
+  related:
+    - id: big-o-time
+      why: "O(log n) ka matlab — har kadam aadha."
+    - id: sorting-in-practice
+      why: "Sort + binary search bahut problems ka combo."
+    - id: two-pointers-opposite
+      why: "Sorted array ka doosra hathiyaar."
+  usedLater:
+    - id: binary-search-variations
+      how: "First/last occurrence, rotated array, peak."
+    - id: binary-search-on-answer
+      how: "Answer ki range par binary search."
+    - id: bst
+      how: "Binary search tree = binary search ka data structure roop."

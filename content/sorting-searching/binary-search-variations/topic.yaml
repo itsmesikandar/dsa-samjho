@@ -1,0 +1,455 @@
+meta:
+  id: binary-search-variations
+  chapter: sorting-searching
+  title: Binary Search variations
+  subtitle: 'Pehla TRUE dhoondho — lower/upper bound, first/last position, rotated array, sab ek template se'
+  level: intermediate
+  minutes: 40
+  prereqs: [binary-search]
+  tags: [binary-search, lower-bound, upper-bound, first-true, rotated-array]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Classic binary search sirf "hai ya nahi" batata hai. Asli problems poochte hain:
+    - Target ki **pehli** / **aakhri** position (duplicates ke saath)?
+    - Pehla item jo **≥ x** hai (lower bound)? Pehla jo **> x** (upper bound)?
+    - Pehla **kharab** version? Ghumaye hue (rotated) array mein dhoondho?
+
+    Sab ek hi idea: ek **yes/no sawaal** (predicate) jo array par aisa dikhe:
+
+    ```
+    F  F  F  F  T  T  T  T
+                ^ pehla T — yahi chahiye
+    ```
+
+    **"First true" template:**
+    ```kotlin
+    var lo = 0; var hi = n          // answer [lo, hi] mein; hi = n = "koi nahi"
+    while (lo < hi) {
+        val mid = lo + (hi - lo) / 2
+        if (pred(mid)) hi = mid      // mid T: answer mid ya pehle — mid ko rakho
+        else lo = mid + 1            // mid F: answer pakka baad mein
+    }
+    return lo                        // pehla T (ya n)
+    ```
+
+    > [!yaad]
+    > Shart sirf itni: predicate **monotonic** ho — ek baar T hua to aage sab T. Array sorted ho, ye zaroori bhi nahi (rotated, versions, answer range…).
+  analogy: |
+    **Board exam ki merit list** (marks ke ulte order mein). "60% se upar kitne bachche?" Har naam padhne ki zaroorat nahi — beech ka naam dekho: 60+ hai? Haan → boundary neeche hai. Nahi → upar. Pehla "nahi" wala naam = boundary.
+
+    Ya **paudhe ki lambai**: roz badhta hai. "Kis din pehli baar 10cm paar?" — roz naapne ki jagah beech wala din naapo.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Classic template (`lo <= hi`, `mid ± 1`) duplicates mein **koi bhi** matching index deta hai. `[5, 7, 7, 8, 8, 8, 10]` mein 8 dhoondha → index 4 mila, par pehla 8 index 3 par hai.
+
+    Linear scan karke pehla dhoondho → worst O(n) (saare 8 hon to). First-true template **O(log n)** mein seedha boundary deta hai.
+
+    Aur yahi template aage:
+    - Rotated array, peak element, mountain array.
+    - **Binary search on answer** (agla topic) — wahan array hi nahi hota, sirf predicate.
+
+    > [!socho]
+    > First-true mein `hi = mid` kyun, `mid − 1` kyun nahi?
+    >
+    > Mid **T** tha — ho sakta hai yahi pehla T ho. `mid − 1` karte to answer range se bahar chala jaata. Isliye mid ko range mein **rakhte** hain, aur loop `lo < hi` (warna lo == hi == mid par atak jaate).
+
+# 3. Visual intro
+visual:
+  body: |
+    Paudha roz badhta hai. Kis din pehli baar 10cm paar kiya? Answer `F F F … T T T` jaisa hai.
+
+    Dekho: har baar beech wala din naapo. T → boundary left mein (ya yahi), F → right mein. `?` = abhi naapa nahi — zyada tar din kabhi naapne hi nahi padte.
+  viz: { tracer: boundaryViz }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Lower bound** = pehla index jahan `a[i] ≥ x`. Predicate: `a[i] >= x` (sorted array par F…F T…T).
+
+    `[1, 2, 4, 4, 4, 7, 9]`, x = 4:
+
+    | lo | hi | mid | a[mid] ≥ 4? | Kya |
+    |---|---|---|---|---|
+    | 0 | 7 | 3 | T | hi = 3 |
+    | 0 | 3 | 1 | F | lo = 2 |
+    | 2 | 3 | 2 | T | hi = 2 |
+    | 2 | 2 | – | – | **pehla 4 index 2** |
+
+    Predicate badlo, sab kuch milta hai:
+    - `a[i] >= x` → lower bound (pehla x, ya insert position).
+    - `a[i] > x` → upper bound (x ke baad wala pehla).
+    - x kitni baar = `upper − lower`.
+
+    > [!tip]
+    > Template ratt lo: `lo < hi`, T par `hi = mid`, F par `lo = mid + 1`, return `lo`. Kabhi infinite loop nahi — mid hamesha `< hi` hai.
+  viz: { tracer: lowerTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Lower bound (pehla ≥ x)"
+    time: O(log n)
+    space: O(1)
+    why: "First-true, pred = a[i] >= x."
+  - op: "Upper bound (pehla > x)"
+    time: O(log n)
+    space: O(1)
+    why: "First-true, pred = a[i] > x."
+  - op: "x ki ginti (sorted, duplicates)"
+    time: O(log n)
+    space: O(1)
+    why: "upper − lower, do binary search."
+  - op: "First / last position"
+    time: O(log n)
+    space: O(1)
+    why: "first = lower; last = upper − 1."
+  - op: "Rotated sorted array search"
+    time: O(log n)
+    space: O(1)
+    why: "Har mid par ek half sorted — usse faisla."
+  - op: "Linear scan for first occurrence"
+    time: O(n)
+    space: O(1)
+    why: "Saare duplicates ho to poora array."
+
+# 6. Code
+code:
+  - title: Lower aur upper bound — ginti aur floor
+    file: bounds
+    note: |
+      Do function, bas ek symbol ka fark (`>=` vs `>`). Inse:
+      - x kitni baar: `upper(x) − lower(x)`
+      - Aakhri index jahan `a[i] < x` (floor jaisa): `lower(x) − 1`
+      - Aakhri index jahan `a[i] ≤ x`: `upper(x) − 1`
+
+      Java/Kotlin mein seedha lower_bound nahi hai (C++ jaisa). `TreeMap.ceilingKey` / `floorKey` milte hain — par wo tree hai, array nahi.
+
+# 7. Examples
+examples:
+  - id: first-bad
+    level: easy
+    title: Pehla kharab version
+    source: { name: First Bad Version, platform: LeetCode, url: "https://leetcode.com/problems/first-bad-version/" }
+    problem: |
+      App ke versions 1..n. Kisi ek version mein bug aaya — uske baad ke **saare** versions kharab. `isBadVersion(v)` API se pata chalta hai. **Pehla kharab** version dhoondho, API calls kam se kam.
+
+      Example: n = 5, pehla kharab 4 → **4**
+    intuition: |
+      Versions par predicate `isBad(v)`: `F F F T T` — first-true!
+
+      - `lo = 1, hi = n` (n kharab hai hi, to answer range mein pakka).
+      - mid kharab → `hi = mid`; theek → `lo = mid + 1`.
+      - `lo == hi` → answer.
+
+      Calls ≈ log₂ n: n = 2³¹ par sirf ~31.
+
+      > [!galti]
+      > `(lo + hi) / 2` — n ≈ 2.1 × 10⁹ par jod Int se bahar → negative mid → galat API call ya TLE. `lo + (hi − lo) / 2`.
+    dryRun: |
+      n = 5, pehla kharab = 4
+
+      | lo | hi | mid | isBad(mid) | Kya |
+      |---|---|---|---|---|
+      | 1 | 5 | 3 | F | lo = 4 |
+      | 4 | 5 | 4 | T | hi = 4 |
+      | 4 | 4 | – | – | **4** (2 calls) |
+    viz: { tracer: badTrace }
+    code: ex1-bad
+    complexity:
+      time: O(log n)
+      space: O(1)
+      why: "Har call range aadhi."
+
+  - id: first-last
+    level: medium
+    title: Target ki pehli aur aakhri position
+    source: { name: Find First and Last Position of Element in Sorted Array, platform: LeetCode, url: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/" }
+    problem: |
+      Sorted array (duplicates ho sakte hain) mein target ki **pehli** aur **aakhri** position do. Na ho to `[-1, -1]`. O(log n) chahiye.
+
+      Example: `[5, 7, 7, 8, 8, 10]`, target 8 → **[3, 4]**
+    intuition: |
+      Do first-true searches:
+      1. **first** = lowerBound(target) — pehla `≥ target`. Agar wahan target nahi (ya end) → target hai hi nahi.
+      2. **last** = upperBound(target) − 1 — pehla `> target` ke theek pehle.
+
+      Ek mil gaya, phir dono taraf linear phailana → saare duplicates par O(n). Do binary search → hamesha O(log n).
+
+      > [!galti]
+      > `lowerBound(target + 1) − 1` bhi chalta hai, par target = Int.MAX_VALUE par `+1` overflow. upperBound safe hai.
+    dryRun: |
+      `[5, 7, 7, 8, 8, 10]`, target 8
+
+      | Search | Predicate | Result |
+      |---|---|---|
+      | lower | a[i] ≥ 8 → F F F T T T | 3 |
+      | check | a[3] = 8 ✓ | |
+      | upper | a[i] > 8 → F F F F F T | 5 |
+      | last | 5 − 1 | **[3, 4]** |
+    viz: { tracer: rangeTrace }
+    code: ex2-range
+    complexity:
+      time: O(log n)
+      space: O(1)
+      why: "Do binary search."
+
+  - id: rotated
+    level: tricky
+    title: Ghumaye hue sorted array mein dhoondho
+    source: { name: Search in Rotated Sorted Array, platform: LeetCode, url: "https://leetcode.com/problems/search-in-rotated-sorted-array/" }
+    problem: |
+      Sorted array (distinct) ko kisi point par **ghuma** diya: `[0, 1, 2, 4, 5, 6, 7]` → `[4, 5, 6, 7, 0, 1, 2]`. Target ka index do, na ho to −1. O(log n).
+
+      Example: `[4, 5, 6, 7, 0, 1, 2]`, target 0 → **4**
+    intuition: |
+      Poora array sorted nahi — par **mid se todo to kam se kam ek half sorted** hota hai (rotation ka "jhatka" sirf ek taraf ho sakta hai).
+
+      Kaun sa half sorted? `a[lo] <= a[mid]` → **left** sorted, warna **right**.
+
+      Sorted half ki range pata hai (`a[lo]..a[mid]` ya `a[mid]..a[hi]`):
+      - Target usi range mein → wahin jao.
+      - Nahi → doosre half mein (wahan rotation hai, par wo agle kadam par phir aadha hoga).
+
+      > [!galti]
+      > `a[lo] < a[mid]` (strict) likha → lo == mid (2 items bache) par galat half chuna. `<=` lo.
+
+      > [!tip]
+      > Duplicates ho (LeetCode 81) to `a[lo] == a[mid] == a[hi]` par pata nahi chalta kaun sorted hai — `lo++, hi--` karo. Worst case O(n).
+    dryRun: |
+      `[4, 5, 6, 7, 0, 1, 2]`, target 0
+
+      | lo | hi | mid | a[mid] | Sorted half | Target wahan? | Kya |
+      |---|---|---|---|---|---|---|
+      | 0 | 6 | 3 | 7 | left (4..7) | nahi | lo = 4 |
+      | 4 | 6 | 5 | 1 | left (0..1) | haan (0 ≥ 0, < 1) | hi = 4 |
+      | 4 | 4 | 4 | 0 | – | – | **4** |
+    viz: { tracer: rotatedTrace }
+    code: ex3-rotated
+    complexity:
+      time: O(log n)
+      space: O(1)
+      why: "Har kadam aadha hissa hata."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Duplicates wale sorted array mein pehla / aakhri / ginti."
+    - "\"Pehla ≥ x\", \"aakhri ≤ x\", \"kitne < x\" — bounds."
+    - "Koi bhi F…F T…T jaisa sawaal (versions, din, capacity)."
+    - "Rotated / mountain / bitonic array — mid se ek taraf ka structure pakka pata ho."
+  avoid:
+    - "Predicate monotonic nahi (T F T F) — binary search galat answer dega."
+    - "Unsorted aur koi structure nahi — linear ya HashMap."
+    - "Bahut saare insert/delete ke saath bounds — TreeMap / TreeSet (floor, ceiling)."
+  signals:
+    - keyword: "first / last occurrence, count of x in sorted"
+      think: "lowerBound, upperBound."
+    - keyword: "first bad / first day / minimum index where condition holds"
+      think: "First-true template."
+    - keyword: "rotated sorted array"
+      think: "Mid par kaunsa half sorted? Uski range check."
+    - keyword: "peak / mountain"
+      think: "a[mid] < a[mid + 1] ? right : left (slope par first-true)."
+
+# 9. Real-world
+realWorld:
+  - where: "Git bisect"
+    how: "Pehla kharab commit — First Bad Version hi hai. `git bisect good/bad` har baar range aadhi karta hai."
+  - where: "Analytics / logs"
+    how: "Sorted timestamps mein '10:00 se 11:00 ke beech kitne events' = upper(11:00) − lower(10:00)."
+  - where: "Stock / price apps"
+    how: "Price history (time se sorted) mein 'is din ke baad pehla trade' — lower bound."
+  - where: "Ring buffer / circular logs"
+    how: "Ghumaya hua sorted data (rotated) — sabse purana entry dhoondhna min-in-rotated search hai."
+  - where: "Android SparseArray"
+    how: "Key na mile to binary search ka insertion point (~lo) wapas deta hai — wahi lower bound."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Do templates mila diye"
+    type: logic
+    wrong: |
+      `while (lo <= hi)` ke saath `hi = mid` → lo == hi == mid par infinite loop.
+    right: |
+      First-true: `lo < hi` + `hi = mid`. Classic: `lo <= hi` + `mid ± 1`. Mix mat karo.
+  - title: "hi = n - 1 rakh diya (first-true mein)"
+    type: off-by-one
+    wrong: |
+      Sab F ho (koi ≥ x nahi) to bhi answer n − 1 aa gaya — "nahi mila" pata hi nahi chala.
+    right: |
+      `hi = n` — lo == n matlab koi T nahi.
+  - title: "lowerBound ke baad check bhool gaye"
+    type: logic
+    wrong: |
+      `first = lowerBound(a, t)` seedha return — t na ho to bhi kuch index aa gaya.
+    right: |
+      `if (first == n || a[first] != t) return -1`.
+  - title: "Rotated mein < vs <="
+    type: off-by-one
+    wrong: |
+      `if (a[lo] < a[mid])` → do items bache (lo == mid) to right ko sorted maan liya.
+    right: |
+      `a[lo] <= a[mid]` — lo == mid par ek item wala left half bhi sorted hi hai.
+  - title: "Khaali array"
+    type: empty
+    wrong: |
+      `a[first]` padha jab first = 0 aur array khaali → crash.
+    right: |
+      `first == n` check pehle (n = 0 par turant).
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Lower bound aur upper bound mein fark?"
+      a: |
+        Lower: pehla index jahan a[i] ≥ x. Upper: pehla jahan a[i] > x. x ki ginti = upper − lower.
+    - q: "First-true template mein lo < hi aur hi = mid kyun?"
+      a: |
+        Mid T ho sakta hai pehla T — use range mein rakhna hai, isliye hi = mid. Range [lo, hi] tab tak chhoti hoti hai jab tak ek candidate na bache; lo == hi par ruko.
+    - q: "Template ka infinite loop kaise nahi hota?"
+      followUp: true
+      a: |
+        mid = lo + (hi − lo)/2 hamesha < hi (jab lo < hi). To hi = mid range ghatata hai, lo = mid + 1 bhi. Agar 'last true' chahiye to mid upar round karo: lo + (hi − lo + 1)/2.
+    - q: "Rotated array mein minimum kaise?"
+      a: |
+        a[mid] > a[hi] → min right mein (lo = mid + 1), warna mid ya left (hi = mid). First-true jaisa. O(log n).
+    - q: "Peak element O(log n) mein kaise, array sorted nahi hai?"
+      followUp: true
+      a: |
+        a[mid] < a[mid + 1] → upar chadh rahe hain, right mein peak pakka. Warna mid ya left. Slope ka predicate monotonic jaisa kaam karta hai.
+    - q: "Duplicates wale rotated array (LC 81) ki complexity?"
+      a: |
+        Worst O(n) — a[lo] == a[mid] == a[hi] par kaunsa half sorted pata nahi, ek-ek ghatana padta hai.
+    - q: "Sorted array mein x se chhote kitne?"
+      a: |
+        lowerBound(x) — index hi ginti hai.
+    - q: "Insert ke saath bounds chahiye to?"
+      a: |
+        Array mein insert O(n). TreeSet / TreeMap — floor, ceiling, higher, lower O(log n).
+  mayAsk:
+    - "Find Minimum in Rotated Sorted Array."
+    - "Find Peak Element."
+    - "Single Element in a Sorted Array."
+    - "Find K Closest Elements."
+
+# 12. Practice
+practice:
+  - name: First Bad Version
+    platform: LeetCode
+    num: 278
+    url: "https://leetcode.com/problems/first-bad-version/"
+    level: easy
+    pattern: First-true
+    hint: "Example 1."
+  - name: Find Smallest Letter Greater Than Target
+    platform: LeetCode
+    num: 744
+    url: "https://leetcode.com/problems/find-smallest-letter-greater-than-target/"
+    level: easy
+    pattern: Upper bound with wrap-around
+    hint: "Pehla letter > target (upper bound). Index == size ho to pehla letter (wrap)."
+  - name: Maximum Count of Positive Integer and Negative Integer
+    platform: LeetCode
+    num: 2529
+    url: "https://leetcode.com/problems/maximum-count-of-positive-integer-and-negative-integer/"
+    level: easy
+    pattern: Two bounds
+    hint: "Negatives = lowerBound(0). Positives = n − upperBound(0). Max lo."
+  - name: Find First and Last Position of Element in Sorted Array
+    platform: LeetCode
+    num: 34
+    url: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
+    level: medium
+    pattern: Lower + upper bound
+    hint: "Example 2."
+  - name: Search in Rotated Sorted Array
+    platform: LeetCode
+    num: 33
+    url: "https://leetcode.com/problems/search-in-rotated-sorted-array/"
+    level: medium
+    pattern: Sorted half check
+    hint: "Example 3."
+  - name: Find Peak Element
+    platform: LeetCode
+    num: 162
+    url: "https://leetcode.com/problems/find-peak-element/"
+    level: medium
+    pattern: Binary search on slope
+    hint: "lo = 0, hi = n − 1, lo < hi. a[mid] < a[mid + 1] → lo = mid + 1, warna hi = mid."
+  - name: Find Minimum in Rotated Sorted Array II
+    platform: LeetCode
+    num: 154
+    url: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/"
+    level: hard
+    pattern: Rotated min with duplicates
+    hint: "a[mid] > a[hi] → right; a[mid] < a[hi] → hi = mid; barabar → sirf hi-- (min kho nahi sakta)."
+  - name: Find in Mountain Array
+    platform: LeetCode
+    num: 1095
+    url: "https://leetcode.com/problems/find-in-mountain-array/"
+    level: hard
+    pattern: Peak + two binary searches
+    hint: "Pehle peak (slope wala search). Phir left (badhta) mein search; na mile to right (ghatta — comparison ulta) mein. API calls ~3 log n."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Har variation = monotonic predicate ka pehla T."
+    - "First-true: lo = 0, hi = n, lo < hi; T → hi = mid; F → lo = mid + 1; return lo."
+    - "lower = pehla ≥ x; upper = pehla > x; ginti = upper − lower."
+    - "First/last: lower aur upper − 1 (pehle check ki target hai)."
+    - "Rotated: a[lo] <= a[mid] → left sorted; target uski range mein? Wahin jao."
+  cheatsheet: |
+    ```kotlin
+    fun firstTrue(lo0: Int, hi0: Int, p: (Int) -> Boolean): Int {
+        var lo = lo0; var hi = hi0          // hi0 = "koi nahi"
+        while (lo < hi) {
+            val m = lo + (hi - lo) / 2
+            if (p(m)) hi = m else lo = m + 1
+        }
+        return lo
+    }
+    val lower = firstTrue(0, n) { a[it] >= x }
+    val upper = firstTrue(0, n) { a[it] > x }
+    // rotated: if (a[lo] <= a[mid]) left sorted else right sorted
+    ```
+  quiz:
+    - q: "[1, 3, 3, 3, 5] — lowerBound(3) aur upperBound(3)?"
+      options: ["1 aur 3", "1 aur 4", "0 aur 4", "1 aur 5"]
+      answer: 1
+      explain: "Pehla 3 index 1; pehla > 3 (5) index 4."
+    - q: "First-true template mein mid T ho to?"
+      options: ["lo = mid + 1", "hi = mid", "hi = mid − 1", "return mid"]
+      answer: 1
+      explain: "Mid khud pehla T ho sakta hai."
+    - q: "Koi bhi item ≥ x nahi — lowerBound kya dega?"
+      options: ["−1", "0", "n", "n − 1"]
+      answer: 2
+      explain: "hi = n se shuru; lo n tak pahunchta hai = 'koi nahi'."
+    - q: "[6, 7, 1, 2, 3, 4, 5], lo = 0, hi = 6, mid = 3 — kaunsa half sorted?"
+      options: ["Left", "Right", "Dono", "Koi nahi"]
+      answer: 1
+      explain: "a[lo] = 6 > a[mid] = 2 → right half [2..5] sorted."
+    - q: "Sorted array mein 7 kitni baar — formula?"
+      options: ["lower(7) − upper(7)", "upper(7) − lower(7)", "upper(7) + 1", "lower(8)"]
+      answer: 1
+      explain: "Pehla > 7 minus pehla ≥ 7."
+
+# 14. Connections
+connections:
+  related:
+    - id: binary-search
+      why: "Classic template aur 'loop ke baad lo' wali soch."
+    - id: sorting-in-practice
+      why: "Sort ke baad bounds se ginti."
+  usedLater:
+    - id: binary-search-on-answer
+      how: "Same first-true — array ki jagah answer ki range."
+    - id: bst
+      how: "BST mein floor/ceiling — wahi lower/upper bound."
+    - id: lis
+      how: "LIS O(n log n) — tails array par lower bound."

@@ -1,0 +1,443 @@
+meta:
+  id: merge-sort
+  chapter: sorting-searching
+  title: Merge Sort
+  subtitle: Aadha karo, dono ko sort karo, phir jodo — hamesha O(n log n), stable
+  level: intermediate
+  minutes: 40
+  prereqs: [simple-sorts, recursion-patterns, two-pointers-same]
+  tags: [sorting, merge-sort, divide-and-conquer, stable, inversions]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Merge sort** = divide & conquer sorting:
+    1. **Divide:** array ko beech se do halves mein todo.
+    2. **Conquer:** dono halves ko recursion se sort karo (1 item bache to wo sorted hai).
+    3. **Combine (merge):** do **sorted** halves ko ek sorted array mein jodo — do pointers se, O(n).
+
+    ```kotlin
+    fun mergeSort(a: IntArray, l: Int, r: Int) {
+        if (l >= r) return
+        val mid = (l + r) / 2
+        mergeSort(a, l, mid)
+        mergeSort(a, mid + 1, r)
+        merge(a, l, mid, r)   // asli kaam yahan
+    }
+    ```
+
+    > [!yaad]
+    > Hamesha **O(n log n)** — best, average, worst sab. **Stable**. Par **O(n) extra memory** (tmp array).
+  analogy: |
+    **Exam ki copies roll number se lagani hain** — 100 copies, 2 teachers.
+
+    Head teacher copies aadhi-aadhi baant deta hai. Har teacher apna dher aur aadha karke assistants ko… jab tak har kisi ke paas 1 copy (wo to sorted hai!).
+
+    Wapas aate waqt: do sorted dher saamne rakho, dono ke **upar wali** copy dekho, chhota roll number utha ke naye dher par rakho. Do sorted dher → ek sorted dher. Yahi **merge** hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Simple sorts O(n²) hain — n = 10⁵ par 10¹⁰ kaam. Merge sort **O(n log n)** ≈ 1.7 × 10⁶. Bahut bada fark.
+
+    Aur khaas baatein:
+    - **Guarantee:** kisi bhi input par O(n log n) (quick sort ka worst O(n²) hai).
+    - **Stable:** barabar values ka order bana rehta hai — objects ko multiple fields se sort karne mein zaroori. Java ka `Collections.sort` / Kotlin ka `sortedBy` (objects) merge sort family (TimSort) hai.
+    - **Linked list** sort karne ka best tareeka (random access nahi chahiye).
+    - **Merge step** khud ek tool hai — inversions ginna, do sorted lists jodna, external sorting.
+
+    > [!socho]
+    > O(n log n) kahan se aaya?
+    >
+    > Har level par todne se **log₂ n levels** bante hain (8 → 4 → 2 → 1: 3 levels). Har level par saare merges milaake **n** items chhoote hain. To n × log n.
+
+# 3. Visual intro
+visual:
+  body: |
+    Merge sort ka dil — **do sorted lines ko jodna**. Dono ka sabse chhota hamesha **aage** hai, to sirf do numbers compare karne hain.
+
+    Apni do sorted lists daal ke dekho: har compare mein ek item result mein jaata hai → total O(n).
+  viz: { tracer: mergeTwo }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    `[38, 27, 43, 3, 9, 82, 10]`:
+
+    1. Todte jao: `[38 27 43 3]` `[9 82 10]` → `[38 27]` `[43 3]` … → single items.
+    2. Lautte waqt merge: `[27 38]`, `[3 43]` → `[3 27 38 43]`; `[9 82]`, `[10]` → `[9 10 82]`.
+    3. Aakhri merge → `[3 9 10 27 38 43 82]`.
+
+    **Merge ka code** (sabse zaroori hissa):
+    - `i` left half par, `j` right half par, `k` tmp mein.
+    - `a[i] <= a[j]` → left wala tmp mein (barabar par left — **stable**).
+    - Ek half khatam → doosre ke bache seedhe copy.
+    - tmp se wapas `a[l..r]`.
+
+    > [!tip]
+    > tmp array **ek baar** banao aur har call ko pass karo. Har merge mein naya array banaoge to bahut saare allocations — slow aur GC ka bojh.
+  viz: { tracer: mergeSortTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Merge sort (har case)"
+    time: O(n log n)
+    space: O(n)
+    why: "log n levels × O(n) merge; tmp array n ka."
+  - op: "Merge (do sorted, sizes m, n)"
+    time: O(m + n)
+    space: O(m + n)
+    why: "Har item ek baar result mein."
+  - op: "Recursion stack"
+    time: "lagu nahi"
+    space: O(log n)
+    why: "Gehraai log₂ n."
+  - op: "Bottom-up merge sort"
+    time: O(n log n)
+    space: O(n)
+    why: "Same kaam, recursion nahi — width 1, 2, 4…"
+  - op: "Inversions count (merge ke saath)"
+    time: O(n log n)
+    space: O(n)
+    why: "Cross inversions ek baar mein mid − i + 1."
+  - op: "Linked list merge sort"
+    time: O(n log n)
+    space: "O(log n) stack"
+    why: "Merge mein naya array nahi — sirf pointers jodo."
+
+# 6. Code
+code:
+  - title: Bottom-up merge sort (bina recursion)
+    file: bottom-up
+    note: |
+      Pehle size 1 ke jode merge (→ size 2 sorted tukde), phir size 2 ke (→ 4), phir 4 ke… `width` double hota jaata hai. Recursion ka stack nahi lagta — aur external sorting (disk par bade files) isi tarah hoti hai.
+
+# 7. Examples
+examples:
+  - id: intersection
+    level: easy
+    title: Do arrays ka common hissa (gintiyon ke saath)
+    source: { name: Intersection of Two Arrays II, platform: LeetCode, url: "https://leetcode.com/problems/intersection-of-two-arrays-ii/" }
+    problem: |
+      Do arrays. Jo numbers **dono** mein hain, wo do — jitni baar dono mein (kam se kam) aaye, utni baar. Order kuch bhi.
+
+      Example: `[4, 9, 5]`, `[9, 4, 9, 8, 4]` → `[4, 9]`
+    intuition: |
+      HashMap se bhi hota hai (O(n + m)). Par **sorted** ho to merge jaisa walk — O(1) extra memory:
+
+      - Dono sort.
+      - `a[i] < b[j]` → `a[i]` ab b mein kabhi nahi milega (b aage aur bada hoga) → `i++`.
+      - `a[i] > b[j]` → `j++`.
+      - Barabar → result mein, dono aage.
+
+      > [!tip]
+      > Interview follow-up: "Arrays pehle se sorted hain" → yahi walk best. "Ek array disk par hai, memory kam" → chhote wale ka HashMap, bade ko stream karo.
+    dryRun: |
+      Sorted: `[4, 5, 9]`, `[4, 4, 8, 9, 9]`
+
+      | i | j | Compare | Kya hua | res |
+      |---|---|---|---|---|
+      | 0 | 0 | 4 = 4 | dono aage | [4] |
+      | 1 | 1 | 5 > 4 | j++ | |
+      | 1 | 2 | 5 < 8 | i++ | |
+      | 2 | 2 | 9 > 8 | j++ | |
+      | 2 | 3 | 9 = 9 | dono aage | **[4, 9]** |
+    viz: { tracer: intersectTrace }
+    code: ex1-intersect
+    complexity:
+      time: O(n log n + m log m)
+      space: "O(1) extra (sort aur output chhod ke)"
+      why: "Sort ka kharcha; walk O(n + m)."
+
+  - id: inversions
+    level: medium
+    title: Inversions gino — O(n log n) mein
+    source: { name: Inversion of Array, platform: GFG, url: "https://www.geeksforgeeks.org/problems/inversion-of-array-1587115620/1" }
+    problem: |
+      Kitne jode `(i, j)` hain jahan `i < j` aur `a[i] > a[j]`? n = 10⁵ tak.
+
+      Example: `[2, 4, 1, 3, 5]` → **3**
+    intuition: |
+      Simple Sorts mein bubble se O(n²) gina tha. Ab merge sort:
+
+      Total inversions = **left ke andar** + **right ke andar** + **cross** (ek left mein, ek right mein).
+
+      Pehle do recursion se. Cross merge ke waqt: jab right ka `a[j]` left ke `a[i]` se **chhota** nikla, to left sorted hai — `a[i..mid]` **saare** `a[j]` se bade hain! Ek baar mein `mid − i + 1` jodo.
+
+      > [!galti]
+      > Count `Int` mein rakha → n = 10⁵ par max n(n−1)/2 ≈ 5 × 10⁹ — overflow! `Long` lo.
+    dryRun: |
+      `[2, 4, 1, 3, 5]` → left `[2, 4]`, right `[1, 3, 5]` (recursion ke baad sorted)
+
+      | Compare | Kya hua | Cross count |
+      |---|---|---|
+      | 2 vs 1 | 1 chhota → left ke bache (2, 4) dono se → +2 | 2 |
+      | 2 vs 3 | 2 pehle | 2 |
+      | 4 vs 3 | 3 chhota → left ka bacha (4) → +1 | **3** |
+      | 4 vs 5 | 4 pehle | 3 |
+    viz: { tracer: invTrace }
+    code: ex2-inversions
+    complexity:
+      time: O(n log n)
+      space: O(n)
+      why: "Merge sort hi hai; ginti har step O(1)."
+
+  - id: reverse-pairs
+    level: tricky
+    title: Reverse pairs — a[i] > 2·a[j]
+    source: { name: Reverse Pairs, platform: LeetCode, url: "https://leetcode.com/problems/reverse-pairs/" }
+    problem: |
+      Kitne jode `(i, j)` hain jahan `i < j` aur `nums[i] > 2 × nums[j]`?
+
+      Example: `[2, 4, 3, 5, 1]` → **3** (4 > 2·1, 3 > 2·1, 5 > 2·1)
+    intuition: |
+      Inversions jaisa — par condition **merge ki condition se alag** hai (`x > 2y` vs `x > y`). To ek hi loop mein dono nahi ho sakta.
+
+      **Do alag pass:**
+      1. **Ginti:** dono halves sorted hain. Har left `a[i]` ke liye `j` ko aage badhao jab tak `a[i] > 2·a[j]`. Agla `a[i]` bada hai, to `j` **peeche nahi jaata** — two pointers, O(n).
+      2. **Merge:** normal merge.
+
+      > [!galti]
+      > `2 * a[j]` Int mein: `a[j] = 1073741824` → `2147483648` overflow → negative! `2L * a[j]` aur `a[i].toLong()` lo.
+
+      > [!tip]
+      > Pattern: "**i < j wale jode jinpe koi condition**" → merge sort ke andar ginti (ya Fenwick tree). Count of Smaller After Self, Count of Range Sum — sab isi family ke.
+    dryRun: |
+      Aakhri level: left `[2, 3, 4]`, right `[1, 5]` (sorted)
+
+      | Left x | j kahan ruka | Jode (x > 2y) |
+      |---|---|---|
+      | 2 | 2 > 2·1? nahi → j = 0 | +0 |
+      | 3 | 3 > 2 ✓, 3 > 10 ✗ → j = 1 | +1 |
+      | 4 | 4 > 2 ✓ (j wahin se) | +1 |
+
+      Halves ke andar se: left `[2, 4, 3]` → 0; right `[5, 1]` → 5 > 2·1 ✓ +1. Total = 0 + 1 + 2 = **3**.
+    viz: { tracer: reversePairsTrace }
+    code: ex3-reverse-pairs
+    complexity:
+      time: O(n log n)
+      space: O(n)
+      why: "Har level: ginti O(n) (j sirf aage) + merge O(n)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Guaranteed O(n log n) chahiye (worst case bhi)."
+    - "Stable sort chahiye (objects, multiple keys)."
+    - "Linked list sort karni hai."
+    - "i < j jodon ki ginti (inversions, reverse pairs, smaller after self)."
+    - "Data memory se bada hai (external sort) — tukde sort karo, phir merge."
+  avoid:
+    - "Memory bahut tight — O(n) extra; heap sort / quick sort in-place."
+    - "Chhota array — insertion sort tez."
+    - "Primitives ka sirf fast sort — Java Arrays.sort(int[]) dual-pivot quicksort hai."
+  signals:
+    - keyword: "count pairs i < j with a[i] > a[j] / > 2·a[j]"
+      think: "Merge sort ke andar cross ginti."
+    - keyword: "sort linked list in O(n log n)"
+      think: "Merge sort (beech dhoondho fast/slow se, phir merge)."
+    - keyword: "merge two / k sorted lists"
+      think: "Merge step; k lists → heap."
+    - keyword: "stable sort"
+      think: "Merge sort / TimSort."
+
+# 9. Real-world
+realWorld:
+  - where: "Java / Kotlin object sort"
+    how: "`Collections.sort`, `list.sortedBy {}` — TimSort (merge sort + insertion sort), stable."
+  - where: "Databases"
+    how: "Sort-merge join aur ORDER BY jab data RAM se bada ho — external merge sort, disk par tukde."
+  - where: "Git / diff tools"
+    how: "Do sorted file lists ko merge karke kya add/remove hua nikaalna."
+  - where: "Big data (Hadoop / Spark)"
+    how: "Har machine apna hissa sort karti hai, phir sorted outputs merge — 'shuffle and sort' step."
+  - where: "Music / video apps"
+    how: "Do sorted playlists (date wise) ko ek feed mein jodna — merge step."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Merge mein < likha (<= nahi)"
+    type: logic
+    wrong: |
+      `if (a[i] < a[j])` → barabar par right wala pehle → **stable nahi** raha.
+    right: |
+      `a[i] <= a[j]` — barabar par left pehle.
+  - title: "Bache items copy karna bhool gaye"
+    type: logic
+    wrong: |
+      Main while loop ke baad seedha copy back → ek half ke bache items gayab.
+    right: |
+      Do `while` aur: `while (i <= mid)` aur `while (j <= r)`.
+  - title: "mid ke saath galat range"
+    type: off-by-one
+    wrong: |
+      `mergeSort(l, mid - 1)` + `mergeSort(mid, r)` jab `mid = (l + r) / 2` → 2 items par infinite recursion.
+    right: |
+      `mergeSort(l, mid)` + `mergeSort(mid + 1, r)`.
+  - title: "Har merge mein naya array"
+    type: other
+    wrong: |
+      `val tmp = IntArray(r - l + 1)` har call mein → n log n allocations.
+    right: |
+      Ek `tmp` shuru mein, sab calls ko pass.
+  - title: "Ginti Int mein"
+    type: overflow
+    right: |
+      Inversions n²/2 tak ho sakte hain (n = 10⁵ → 5 × 10⁹) — `Long` lo.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Merge sort ki complexity aur kyun?"
+      a: |
+        O(n log n) har case: log n levels, har level O(n) merge. Space O(n) tmp + O(log n) stack.
+    - q: "Merge sort stable kyun hai?"
+      a: |
+        Merge mein barabar values par left half wala pehle jaata hai (<=). Left wale original mein pehle the.
+    - q: "Merge sort vs quick sort?"
+      followUp: true
+      a: |
+        Merge: guaranteed O(n log n), stable, O(n) extra. Quick: average O(n log n), worst O(n²), in-place, cache-friendly, practically tez. Linked list → merge; arrays of primitives → quick.
+    - q: "Linked list ko O(n log n) mein sort kaise?"
+      a: |
+        Fast/slow se beech dhoondho, list todo, dono recursively sort, phir do sorted lists merge (pointers badal ke). Extra array nahi.
+    - q: "Inversions O(n log n) mein kaise?"
+      a: |
+        Merge karte waqt right ka item chhota nikla to left ke bache sab (mid − i + 1) usse bade — ek saath jodo.
+    - q: "Merge sort in-place ho sakta hai?"
+      followUp: true
+      a: |
+        Possible hai par complex aur slow (block merge). Practically O(n) buffer lete hain.
+    - q: "External sort kya hai?"
+      a: |
+        10 GB data, 1 GB RAM: 1 GB ke tukde sort karke disk par likho, phir k-way merge (heap se) karke ek sorted file.
+    - q: "k sorted arrays merge kaise?"
+      a: |
+        Min-heap mein har array ka pehla item; nikaalo, us array ka agla daalo. O(N log k). Ya pair-wise merge (merge sort ki tarah) — bhi O(N log k).
+  mayAsk:
+    - "Sort List (linked list)."
+    - "Merge k Sorted Lists."
+    - "Count of Smaller Numbers After Self."
+    - "Merge two sorted arrays bina extra space (gap method)."
+
+# 12. Practice
+practice:
+  - name: Merge Sorted Array
+    platform: LeetCode
+    num: 88
+    url: "https://leetcode.com/problems/merge-sorted-array/"
+    level: easy
+    pattern: Merge step (peeche se)
+    hint: "Two Pointers (same) topic ka example — merge ka in-place roop."
+  - name: Merge Two Sorted Lists
+    platform: LeetCode
+    num: 21
+    url: "https://leetcode.com/problems/merge-two-sorted-lists/"
+    level: easy
+    pattern: Merge step on linked list
+    hint: "Dummy node lo; dono list ke aage wale mein chhota jodo. (Linked List chapter ke baad aur aasaan lagega.)"
+  - name: Intersection of Two Arrays II
+    platform: LeetCode
+    num: 350
+    url: "https://leetcode.com/problems/intersection-of-two-arrays-ii/"
+    level: easy
+    pattern: Sort + merge walk
+    hint: "Example 1."
+  - name: Sort an Array
+    platform: LeetCode
+    num: 912
+    url: "https://leetcode.com/problems/sort-an-array/"
+    level: medium
+    pattern: Merge sort
+    hint: "Built-in mat lo — merge sort khud likho. Simple sorts yahan TLE denge."
+  - name: Sort List
+    platform: LeetCode
+    num: 148
+    url: "https://leetcode.com/problems/sort-list/"
+    level: medium
+    pattern: Merge sort on linked list
+    hint: "Fast/slow se beech, todo, recurse, merge."
+  - name: Merge Without Extra Space
+    platform: GFG
+    url: "https://www.geeksforgeeks.org/problems/merge-two-sorted-arrays-1587115620/1"
+    level: medium
+    pattern: Merge two sorted arrays in O(1) space
+    hint: "a ke bade items aur b ke chhote items swap karo (a ke end se, b ke start se) jab tak a[i] > b[j]; phir dono ko alag sort."
+  - name: Reverse Pairs
+    platform: LeetCode
+    num: 493
+    url: "https://leetcode.com/problems/reverse-pairs/"
+    level: hard
+    pattern: Count during merge sort
+    hint: "Example 3 — Long ka dhyaan."
+  - name: Count of Smaller Numbers After Self
+    platform: LeetCode
+    num: 315
+    url: "https://leetcode.com/problems/count-of-smaller-numbers-after-self/"
+    level: hard
+    pattern: Merge sort on indexes
+    hint: "Values ki jagah indexes sort karo. Left ka item tmp mein jaaye tab tak right se jitne item pehle gaye — wo uske 'smaller after self'."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Todo (mid), dono halves sort (recursion), merge (two pointers)."
+    - "Hamesha O(n log n); space O(n); stable (merge mein <=)."
+    - "Merge: chhota aage wala lo; bache hue copy; tmp se wapas."
+    - "Merge ke waqt cross ginti: inversions (+ mid − i + 1), reverse pairs (alag pass)."
+    - "Linked list + stable + guarantee → merge sort."
+  cheatsheet: |
+    ```kotlin
+    fun sort(a: IntArray, l: Int, r: Int, t: IntArray) {
+        if (l >= r) return
+        val m = (l + r) / 2
+        sort(a, l, m, t); sort(a, m + 1, r, t)
+        var i = l; var j = m + 1; var k = l
+        while (i <= m && j <= r) t[k++] = if (a[i] <= a[j]) a[i++] else a[j++]
+        while (i <= m) t[k++] = a[i++]
+        while (j <= r) t[k++] = a[j++]
+        for (p in l..r) a[p] = t[p]
+    }
+    // inversions: else-branch mein count += m - i + 1
+    ```
+  quiz:
+    - q: "8 items par merge sort ke kitne levels (todne ke)?"
+      options: ["2", "3", "4", "8"]
+      answer: 1
+      explain: "8 → 4 → 2 → 1: log₂ 8 = 3."
+    - q: "Merge sort ki worst case time?"
+      options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"]
+      answer: 1
+      explain: "Har case same — tukde hamesha aadhe."
+    - q: "Merge mein a[i] < a[j] (strict) likha to kya bigdega?"
+      options: ["Galat sort", "Stability", "Complexity", "Kuch nahi"]
+      answer: 1
+      explain: "Barabar par right wala pehle chala jaata hai."
+    - q: "Left = [3, 7, 9], right = [5]. Merge mein 5 jaate waqt kitne inversions jude?"
+      options: ["1", "2", "3", "0"]
+      answer: 1
+      explain: "Left ke bache 7, 9 dono 5 se bade → +2."
+    - q: "Merge sort ki extra space (array version)?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
+      answer: 2
+      explain: "tmp array n ka (+ O(log n) stack)."
+
+# 14. Connections
+connections:
+  related:
+    - id: recursion-patterns
+      why: "Divide & conquer dhaancha."
+    - id: two-pointers-same
+      why: "Merge = do sorted sequences par saath-saath chalna."
+    - id: simple-sorts
+      why: "Inversions ki O(n²) ginti wahan."
+  usedLater:
+    - id: quick-sort
+      how: "Doosra D&C sort — kaam todne mein, jodne mein nahi."
+    - id: sorting-in-practice
+      how: "TimSort = merge + insertion."
+    - id: linked-list-techniques
+      how: "Merge two sorted lists, sort list."
+    - id: top-k
+      how: "k sorted lists ka merge heap se."

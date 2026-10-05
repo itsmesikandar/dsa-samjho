@@ -4,8 +4,8 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–4 done (22 topics).
-- Next action: chapter 5 → `simple-sorts` (code how/bubble/selection written; next ex1 height-checker (selection), ex2 count swaps = inversions (bubble, GFG), ex3 nearly-sorted (insertion, GFG); visual = bubble sort on `bars` panel).
+- Step: 3 (Content). Chapters 0–5 done (29 topics).
+- Next action: chapter 6 → `singly-linked-list` (use `list` panel: nodes with id/next, pointers by node id).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
 - Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
 - Note: low RAM on this machine (~1 GB free) makes `npm run build` slow (24 min once); run it once per chapter.
@@ -69,13 +69,13 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] recursion-patterns
 
 ### 5. Sorting & Searching
-- [ ] simple-sorts
-- [ ] merge-sort
-- [ ] quick-sort
-- [ ] sorting-in-practice
-- [ ] binary-search
-- [ ] binary-search-variations
-- [ ] binary-search-on-answer
+- [x] simple-sorts
+- [x] merge-sort
+- [x] quick-sort
+- [x] sorting-in-practice
+- [x] binary-search
+- [x] binary-search-variations
+- [x] binary-search-on-answer
 
 ### 6. Linked List
 - [ ] singly-linked-list

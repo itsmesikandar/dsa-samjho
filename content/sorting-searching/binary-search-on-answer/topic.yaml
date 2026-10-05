@@ -1,0 +1,446 @@
+meta:
+  id: binary-search-on-answer
+  chapter: sorting-searching
+  title: Binary Search on Answer
+  subtitle: Array nahi, answer ki range par binary search — "sabse kam kitna chalega?"
+  level: advanced
+  minutes: 45
+  prereqs: [binary-search-variations]
+  tags: [binary-search, binary-search-on-answer, monotonic, min-max, feasibility]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Kuch problems mein koi sorted array nahi hota, par **answer ek number** hai jo ek range mein hai — speed, capacity, din, doori.
+
+    Agar ek sawaal ho **"x chalega?"** (feasible) jo **monotonic** ho —
+    x chala to x + 1 bhi chalega (ya ulta) — to answer ki range par binary search:
+
+    ```
+    x:        1  2  3  4  5  6  7  …
+    chalega?  F  F  F  T  T  T  T
+                       ^ sabse chhota chalne wala = answer
+    ```
+
+    **Recipe (3 kadam):**
+    1. Answer ki range: `lo` = jo pakka kam hai / sabse chhota possible, `hi` = jo pakka chalega.
+    2. `feasible(x)` likho — aksar ek greedy O(n) pass.
+    3. First-true template (pichhla topic).
+
+    > [!yaad]
+    > Time = O(feasible ka kharcha × log(range)). Range 10⁹ ho to bhi sirf ~30 checks.
+  analogy: |
+    **Exam se pehle 12 chapters, 5 din.** Roz kitne chapter padhoge (kam se kam)?
+
+    Roz 1 → 12 din (nahi chalega). Roz 6 → 2 din (chalega, par zyada mehnat). Roz 3 → 4 din ✓, roz 2 → 6 din ✗. Har number try karne ki jagah beech wala try karo: "roz x padhun to 5 din mein ho jaayega?" — ye haan/naa sawaal monotonic hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    In problems ka direct formula nahi hota. "Sabse kam speed jisse h ghante mein kele khatam" — speed ke hisaab se seedha nikaal nahi sakte, par **di hui speed check** karna aasaan hai (O(n)).
+
+    Har possible answer check karo → O(n × range) — range 10⁹ → TLE. Binary search → O(n × log range) ≈ 30n.
+
+    **Pehchaan ke shabd:** "**minimum** speed / capacity / time such that…", "**maximize the minimum**…", "**minimize the maximum**…", "k-th smallest" (jab seedha sort mehenga ho).
+
+    > [!socho]
+    > Kaise pata ki feasible monotonic hai?
+    >
+    > Socho: x chala to x + 1 mein kya bigdega? Zyada speed → kam ghante (ya barabar). Zyada capacity → kam din. Agar "zyada = hamesha aasaan" hai to monotonic hai. Agar kabhi zyada se bura ho sakta hai → binary search galat.
+
+# 3. Visual intro
+visual:
+  body: |
+    Graph: speed (x-axis) vs lagne wale ghante. Laal line = h. Graph hamesha **neeche** jaata hai — monotonic.
+
+    Binary search sirf kuch speeds check karta hai (dashed line). Har check se aadhi range gayi.
+  viz: { tracer: answerChart }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Koko Eating Bananas:** kele ke dher `[3, 6, 7, 11]`, h = 8 ghante. Ek ghante mein ek dher se `k` kele (dher chhota ho to bhi poora ghanta). Sabse kam `k`?
+
+    1. **Range:** `lo = 1`, `hi = max(piles) = 11` (isse tez khaane ka koi fayda nahi — har dher 1 ghante mein).
+    2. **feasible(k):** total ghante = Σ ⌈p / k⌉ ≤ h?
+    3. First-true:
+
+    | lo | hi | mid | ghante | Chala? |
+    |---|---|---|---|---|
+    | 1 | 11 | 6 | 1+1+2+2 = 6 | ✓ hi = 6 |
+    | 1 | 6 | 3 | 1+2+3+4 = 10 | ✗ lo = 4 |
+    | 4 | 6 | 5 | 1+2+2+3 = 8 | ✓ hi = 5 |
+    | 4 | 5 | 4 | 1+2+2+3 = 8 | ✓ hi = 4 |
+    | 4 | 4 | | | **4** |
+
+    > [!tip]
+    > ⌈p / k⌉ ko `(p - 1) / k + 1` likho — double nahi, aur `(p + k - 1) / k` jaisa overflow bhi nahi (p, k dono 10⁹ tak ho sakte hain).
+  viz: { tracer: kokoTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Binary search on answer"
+    time: O(C · log R)
+    space: O(1)
+    why: "C = ek feasible check ka kharcha, R = answer range."
+  - op: "Koko / Ship / Split array"
+    time: O(n log(sum ya max))
+    space: O(1)
+    why: "Feasible = ek greedy pass O(n)."
+  - op: "Har answer linear try"
+    time: O(n · R)
+    space: O(1)
+    why: "R = 10⁹ → TLE."
+  - op: "Sqrt(x)"
+    time: O(log x)
+    space: O(1)
+    why: "Aakhri mid jiska mid² ≤ x."
+  - op: "k-th smallest pair distance"
+    time: O(n log n + n log R)
+    space: O(1)
+    why: "Sort + har d par two-pointer count."
+  - op: "Real number answer (precision)"
+    time: O(C · iterations)
+    space: O(1)
+    why: "lo < hi ki jagah ~60–100 fixed iterations (ya hi − lo > 1e-6)."
+
+# 6. Code
+code:
+  - title: Generic template — minFeasible(lo, hi) { … }
+    file: template
+    note: |
+      Har problem mein sirf `feasible` aur range badalti hai. Template ek baar likh lo:
+      - `hi` aisa rakho jo **pakka chale** — warna "koi nahi chala" ka case alag sambhaalna padega.
+      - "Sabse bada x jo chale" (maximize) chahiye to aakhri-true: mid upar round (`lo + (hi - lo + 1) / 2`), T par `lo = mid`, F par `hi = mid - 1` (Example 1).
+
+# 7. Examples
+examples:
+  - id: sqrt
+    level: easy
+    title: Square root (bina library)
+    source: { name: "Sqrt(x)", platform: LeetCode, url: "https://leetcode.com/problems/sqrtx/" }
+    problem: |
+      Non-negative `x` ka square root, **neeche round** karke (integer). `sqrt` / `pow` use nahi karna.
+
+      Example: `8` → **2** (√8 ≈ 2.83)
+    intuition: |
+      Answer `0..x` mein. Sawaal "`mid² ≤ x`?" → `T T T F F F` — is baar **aakhri T** chahiye (sabse bada jiska square fit ho).
+
+      **Aakhri-true template:**
+      - `mid = lo + (hi − lo + 1) / 2` — **upar** round.
+      - T → `lo = mid` (mid answer ho sakta hai), F → `hi = mid − 1`.
+
+      Neeche round kiya to `lo = 3, hi = 4` par mid = 3 → T → lo = 3 — atak gaye, infinite loop!
+
+      > [!galti]
+      > `mid * mid` Int mein: x ≈ 2³¹ par mid ≈ 46341 → mid² > Int max → negative → galat. `mid.toLong() * mid`.
+    dryRun: |
+      x = 8
+
+      | lo | hi | mid (upar) | mid² | Kya |
+      |---|---|---|---|---|
+      | 0 | 8 | 4 | 16 | > 8 → hi = 3 |
+      | 0 | 3 | 2 | 4 | ≤ 8 → lo = 2 |
+      | 2 | 3 | 3 | 9 | > 8 → hi = 2 |
+      | 2 | 2 | | | **2** |
+    viz: { tracer: sqrtTrace }
+    code: ex1-sqrt
+    complexity:
+      time: O(log x)
+      space: O(1)
+      why: "Range 0..x par binary search."
+
+  - id: ship
+    level: medium
+    title: D din mein packets bhejne ki sabse kam capacity
+    source: { name: Capacity To Ship Packages Within D Days, platform: LeetCode, url: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/" }
+    problem: |
+      Packets ka weight order mein diya hai (order badal nahi sakte). Roz ek ship jaati hai, capacity C. `days` din mein sab bhejne hain. Sabse kam C?
+
+      Example: `[3, 2, 2, 4, 1, 4]`, days = 3 → **6** (`3 2 | 2 4 | 1 4`)
+    intuition: |
+      **Range:** `lo = max(weights)` (sabse bhaari packet akela bhi jaana chahiye), `hi = sum` (ek din mein sab).
+
+      **feasible(C):** greedy — aaj jitne packets aa sakein bharo, jagah khatam to agla din. Din ≤ days?
+
+      Kyun greedy sahi? Aaj zyada bharne se kal ka kaam kabhi badhta nahi.
+
+      **Monotonic:** capacity badhao → din kam ya barabar.
+
+      > [!tip]
+      > Yahi problem alag kapdon mein: **Split Array Largest Sum** (array ko k tukdon mein, max tukde ka sum minimum), **Painter's Partition**, **Book Allocation** (GFG). Sab "minimize the maximum" + greedy check.
+    dryRun: |
+      lo = 4, hi = 16, days = 3
+
+      | lo | hi | mid | Greedy split | Din | Kya |
+      |---|---|---|---|---|---|
+      | 4 | 16 | 10 | 3 2 2 / 4 1 4 | 2 | ✓ hi = 10 |
+      | 4 | 10 | 7 | 3 2 2 / 4 1 / 4 | 3 | ✓ hi = 7 |
+      | 4 | 7 | 5 | 3 2 / 2 / 4 1 / 4 | 4 | ✗ lo = 6 |
+      | 6 | 7 | 6 | 3 2 / 2 4 / 1 4 | 3 | ✓ hi = 6 |
+      | 6 | 6 | | | | **6** |
+    viz: { tracer: shipTrace }
+    code: ex2-ship
+    complexity:
+      time: O(n log(sum))
+      space: O(1)
+      why: "Har check ek pass; log(sum − max) checks."
+
+  - id: pair-distance
+    level: tricky
+    title: k-th sabse chhoti jodi-doori
+    source: { name: Find K-th Smallest Pair Distance, platform: LeetCode, url: "https://leetcode.com/problems/find-k-th-smallest-pair-distance/" }
+    problem: |
+      Saare jode `(i < j)` lo, unki doori `|a[i] − a[j]|`. In sab dooriyon ko sort karo to **k-th sabse chhoti** kya hai?
+
+      Example: `[1, 3, 4, 8, 10]`, k = 4 → **3**
+    intuition: |
+      Seedha: saare n²/2 jode banao, sort → n = 10⁴ par 5 × 10⁷ jode — memory aur time dono zyada.
+
+      **Answer par binary search:** doori `d` ki range `0..max − min`.
+
+      **Sawaal:** "doori ≤ d wale jode **≥ k** hain?" — d badhao to jode badhte hain → monotonic. Pehla d jahan T = answer. (Wo d kisi asli jodi ki doori hi hogi — kyunki chhote d par count kam tha.)
+
+      **Count kaise O(n)?** Array sort karo. Har `r` ke liye sabse chhota `l` jahan `a[r] − a[l] ≤ d` — `l` sirf aage badhta hai (sliding window). `r` ke saath `r − l` jode.
+
+      > [!tip]
+      > "k-th smallest" + seedha list banana mehenga → "≤ x wale kitne?" gin sakte ho to answer par binary search. Multiplication table ka k-th (LC 668), sorted matrix ka k-th (LC 378) — sab isi trick se.
+    dryRun: |
+      Sorted `[1, 3, 4, 8, 10]`, k = 4, range 0..9
+
+      | lo | hi | mid | Doori ≤ mid wale jode | ≥ 4? |
+      |---|---|---|---|---|
+      | 0 | 9 | 4 | (1,3)(1,4)(3,4)(8,10)(4,8) = 5 | ✓ hi = 4 |
+      | 0 | 4 | 2 | (1,3)(3,4)(8,10) = 3 | ✗ lo = 3 |
+      | 3 | 4 | 3 | + (1,4) = 4 | ✓ hi = 3 |
+      | 3 | 3 | | | **3** |
+    viz: { tracer: pairDistTrace }
+    code: ex3-pair-distance
+    complexity:
+      time: O(n log n + n log R)
+      space: O(1)
+      why: "Sort ek baar; har mid par two-pointer count O(n); R = max − min."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "\"Minimum X such that …\" / \"maximum X such that …\" — aur X check karna aasaan."
+    - "\"Minimize the maximum\" / \"maximize the minimum\" (split, allocate, place)."
+    - "k-th smallest jab saare candidates banana mehenga, par '≤ x kitne' gin sakte ho."
+    - "Answer ki range bahut badi (10⁹) par check O(n)."
+  avoid:
+    - "feasible monotonic nahi — kabhi zyada se bura bhi ho sakta hai."
+    - "Direct formula / greedy seedha answer de deta hai."
+    - "Check khud bahut mehenga (exponential) — pehle check sasta karo."
+  signals:
+    - keyword: "minimum speed / capacity / time / days such that"
+      think: "lo..hi par first-true, feasible = greedy pass."
+    - keyword: "minimize the largest sum / maximum"
+      think: "Split Array / Ship packages pattern."
+    - keyword: "maximize the minimum distance (place k items)"
+      think: "Aakhri-true: 'kam se kam d doori rakh ke k rakh sakte?'"
+    - keyword: "kth smallest in matrix / pairs / table"
+      think: "Answer par binary search + count ≤ mid."
+
+# 9. Real-world
+realWorld:
+  - where: "Cloud / server sizing"
+    how: "Kam se kam kitne servers (ya kitni RAM) ki 1 ghante mein saari requests ho jaayein — simulation se check, binary search se minimum."
+  - where: "Delivery apps (Swiggy / Zomato)"
+    how: "Kitne delivery partners chahiye ki har order 30 min mein pahunche — 'n partners chalenge?' monotonic."
+  - where: "Video streaming"
+    how: "Sabse bada bitrate jo bina buffering chale — bandwidth check monotonic."
+  - where: "Manufacturing / factory"
+    how: "Machines ki minimum speed ki deadline tak order pura ho — Koko jaisa."
+  - where: "Network"
+    how: "Maximum packet size (MTU) jo bina toote jaaye — size try karke binary search."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Range galat — lo bahut chhota ya hi chhota"
+    type: off-by-one
+    wrong: |
+      Ship mein `lo = 1` — capacity < max weight par greedy infinite loop / galat din (packet kabhi fit nahi hota).
+    right: |
+      `lo = max(weights)`, `hi = sum` — hi pakka feasible ho.
+  - title: "Maximize mein neeche round"
+    type: logic
+    wrong: |
+      Aakhri-true mein `mid = lo + (hi - lo) / 2` aur T par `lo = mid` → infinite loop.
+    right: |
+      `mid = lo + (hi - lo + 1) / 2`.
+  - title: "Ceil division mein overflow / double"
+    type: overflow
+    wrong: |
+      `(p + k - 1) / k` (p, k ~10⁹ → overflow) ya `Math.ceil(p / k)` (Int division pehle hi ho gaya).
+    right: |
+      `(p - 1) / k + 1`, aur total ghante `Long` mein.
+  - title: "Feasible check monotonic nahi"
+    type: logic
+    wrong: |
+      Check mein bug — kabhi bade x par F aa gaya → binary search galat boundary par ruka.
+    right: |
+      Chhote inputs par saare x ke liye check print karke dekho: F…F T…T hai?
+  - title: "Total mein overflow"
+    type: overflow
+    right: |
+      Koko mein ghante (10⁴ dher × 10⁹) — `Long` lo. Sum of weights bhi bada ho sakta hai.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Binary search on answer kab lagta hai?"
+      a: |
+        Jab answer ek number ho jo range mein hai, aur 'x chalega?' check monotonic ho aur sasta (O(n)) ho. Minimum/maximum X such that…
+    - q: "Koko ki complexity?"
+      a: |
+        O(n log max) — har check O(n), range 1..max(piles).
+    - q: "Ship packages mein lo aur hi kya, kyun?"
+      a: |
+        lo = max weight (usse kam mein ek packet kabhi nahi jaayega), hi = sum (ek din). hi pakka feasible.
+    - q: "Minimize maximum vs maximize minimum?"
+      followUp: true
+      a: |
+        Minimize max (split array): sabse chhota X jahan 'har tukda ≤ X' se k tukde ban jaayein — first-true. Maximize min (aggressive cows / magnetic force): sabse bada d jahan 'kam se kam d doori' se k rakh sako — last-true.
+    - q: "Answer real number ho (jaise 2.5 ghante) to?"
+      a: |
+        lo, hi Double; while loop 100 iterations ya (hi − lo) > 1e-7; mid = (lo + hi)/2; T par hi = mid warna lo = mid.
+    - q: "k-th smallest pair distance ko binary search on answer se kyun?"
+      a: |
+        n²/2 jode banana mehenga. '≤ d wale kitne' two pointers se O(n). d par binary search → O(n log R).
+    - q: "Check greedy kyun sahi hota hai (ship)?"
+      followUp: true
+      a: |
+        Aaj jitna ho sake bharna kabhi nuksaan nahi karta — baaki packets kam bachte hain. Exchange argument: kisi optimal plan ko greedy jaisa banaya ja sakta hai bina din badhaye.
+    - q: "Split Array Largest Sum aur Ship Packages mein fark?"
+      a: |
+        Same problem: k tukde = k din, max tukde ka sum = capacity. Code wahi.
+  mayAsk:
+    - "Magnetic Force Between Two Balls (maximize min)."
+    - "Minimum Number of Days to Make m Bouquets."
+    - "Kth Smallest Element in a Sorted Matrix."
+    - "Book Allocation / Painter's Partition (GFG)."
+
+# 12. Practice
+practice:
+  - name: "Sqrt(x)"
+    platform: LeetCode
+    num: 69
+    url: "https://leetcode.com/problems/sqrtx/"
+    level: easy
+    pattern: Last-true on answer
+    hint: "Example 1 — mid upar round."
+  - name: Valid Perfect Square
+    platform: LeetCode
+    num: 367
+    url: "https://leetcode.com/problems/valid-perfect-square/"
+    level: easy
+    pattern: Binary search 1..num
+    hint: "mid × mid (Long) == num? Bada → hi = mid − 1, chhota → lo = mid + 1."
+  - name: Arranging Coins
+    platform: LeetCode
+    num: 441
+    url: "https://leetcode.com/problems/arranging-coins/"
+    level: easy
+    pattern: Last-true on rows
+    hint: "k rows ke liye k(k + 1)/2 coins (Long). Sabse bada k jo ≤ n."
+  - name: Koko Eating Bananas
+    platform: LeetCode
+    num: 875
+    url: "https://leetcode.com/problems/koko-eating-bananas/"
+    level: medium
+    pattern: Minimum feasible speed
+    hint: "'Kaise kaam karta hai' wala."
+  - name: Capacity To Ship Packages Within D Days
+    platform: LeetCode
+    num: 1011
+    url: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/"
+    level: medium
+    pattern: Minimize max + greedy check
+    hint: "Example 2."
+  - name: Minimum Number of Days to Make m Bouquets
+    platform: LeetCode
+    num: 1482
+    url: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/"
+    level: medium
+    pattern: Minimum day + adjacent-run check
+    hint: "Din d par khile phool (bloom ≤ d) ki lagatar runs gino; har k lagatar = ek bouquet. m bane? Range min(bloom)..max(bloom). m·k > n → −1."
+  - name: Split Array Largest Sum
+    platform: LeetCode
+    num: 410
+    url: "https://leetcode.com/problems/split-array-largest-sum/"
+    level: hard
+    pattern: Minimize max sum
+    hint: "Ship packages hi hai: k tukde = days."
+  - name: Find K-th Smallest Pair Distance
+    platform: LeetCode
+    num: 719
+    url: "https://leetcode.com/problems/find-k-th-smallest-pair-distance/"
+    level: hard
+    pattern: Answer search + two-pointer count
+    hint: "Example 3."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Answer ek number + 'x chalega?' monotonic → answer ki range par binary search."
+    - "Range: lo = pakka kam/sabse chhota possible, hi = pakka chalega."
+    - "Minimize → first-true (hi = mid). Maximize → last-true (mid upar round, lo = mid)."
+    - "Feasible aksar greedy O(n): Koko ghante, ship din, pairs count."
+    - "Time O(n log R); ceil = (p − 1)/k + 1; totals Long."
+  cheatsheet: |
+    ```kotlin
+    // minimize
+    var lo = LOW; var hi = HIGH            // HIGH pakka feasible
+    while (lo < hi) {
+        val m = lo + (hi - lo) / 2
+        if (feasible(m)) hi = m else lo = m + 1
+    }
+    // maximize
+    while (lo < hi) {
+        val m = lo + (hi - lo + 1) / 2
+        if (feasible(m)) lo = m else hi = m - 1
+    }
+    // ship check
+    var d = 1; var load = 0
+    for (x in w) { if (load + x > cap) { d++; load = 0 }; load += x }
+    ```
+  quiz:
+    - q: "Koko, piles [3, 6, 7, 11]: speed 4 par kitne ghante?"
+      options: ["6", "8", "10", "7"]
+      answer: 1
+      explain: "⌈3/4⌉ + ⌈6/4⌉ + ⌈7/4⌉ + ⌈11/4⌉ = 1 + 2 + 2 + 3 = 8."
+    - q: "Ship packages mein hi kya rakhte hain?"
+      options: ["max(weights)", "sum(weights)", "days", "n"]
+      answer: 1
+      explain: "Sab ek din mein — pakka feasible."
+    - q: "\"Maximize the minimum distance\" mein mid kaise?"
+      options: ["lo + (hi − lo) / 2", "lo + (hi − lo + 1) / 2", "(lo + hi) / 2 − 1", "hi − 1"]
+      answer: 1
+      explain: "Last-true: upar round, warna lo = mid par atak jaate."
+    - q: "Answer range 1..10⁹, check O(n). Total?"
+      options: ["O(n · 10⁹)", "O(n log 10⁹) ≈ 30n", "O(log n)", "O(n²)"]
+      answer: 1
+      explain: "~30 checks."
+    - q: "Binary search on answer ki zaroori shart?"
+      options: ["Input sorted ho", "feasible(x) monotonic ho", "Answer 0 ho sakta ho", "n chhota ho"]
+      answer: 1
+      explain: "F…F T…T pattern chahiye; input sorted hona zaroori nahi."
+
+# 14. Connections
+connections:
+  related:
+    - id: binary-search-variations
+      why: "First-true / last-true template yahin se."
+    - id: sliding-window-variable
+      why: "Pair count wala two-pointer window."
+    - id: prefix-sum
+      why: "Kuch feasible checks prefix sums se O(1) per query."
+  usedLater:
+    - id: greedy-basics
+      how: "Feasible check aksar greedy hota hai — kyun sahi hai, wahan proof."
+    - id: dijkstra
+      how: "'Minimum max edge path' jaise graph problems — answer par binary search + BFS."
+    - id: dp-1d
+      how: "Split array jaisa problem DP se bhi — binary search usse tez."
