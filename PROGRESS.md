@@ -5,7 +5,7 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 
 ## Current
 - Step: 3 (Content). Chapters 0–9 done (48 topics).
-- Next action: chapter 9 build + commit, then chapter 10 → `heap-basics`.
+- Next action: chapter 10 → `heap-basics` (chapter 9 committed bd364e2).
 - Tracers that can explode on random input: cap frames with a budget counter (see constraint-backtracking sudoku/word) — validate fuzz fails on FrameLimitError.
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
