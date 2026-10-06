@@ -1,0 +1,438 @@
+meta:
+  id: priority-queue
+  chapter: heap
+  title: PriorityQueue & Heap Sort
+  subtitle: Library wala heap — Comparator se koi bhi order; aur heap se in-place O(n log n) sort
+  level: intermediate
+  minutes: 40
+  prereqs: [heap-basics, queue, sorting-in-practice]
+  tags: [priority-queue, comparator, heap-sort, greedy]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **PriorityQueue** = aisi queue jisme item **priority ke order** mein nikalte hain, aane ke order mein nahi. Andar se ye heap-basics wala **binary heap** hi hai.
+
+    Kotlin ki apni PQ nahi — wahan bhi `java.util.PriorityQueue` hi use hoti hai.
+
+    | Kaam | Method | Time |
+    |---|---|---|
+    | Daalo | `add(x)` / `offer(x)` | O(log n) |
+    | Sabse aage wala dekho | `peek()` | O(1) |
+    | Nikaalo | `poll()` | O(log n) |
+    | Size / khaali? | `size`, `isEmpty()` | O(1) |
+    | Koi bhi item hatao / dhoondho | `remove(x)`, `contains(x)` | O(n) |
+
+    Default = **min-heap** (chhota pehle). Max chahiye → `Collections.reverseOrder()`. Objects ke liye → apna **Comparator**.
+
+    > [!yaad]
+    > `println(pq)` ya for-loop **sorted order nahi** deta — andar ka heap array deta hai. Order sirf `peek()` / `poll()` se.
+  analogy: |
+    **Airport boarding gate:**
+    Log kisi bhi order mein line mein aate hain. Par gate wala pehle **business class**, phir **priority members**, phir baaki ko bulata hai. Ek group ke andar jo pehle aaya, wo pehle.
+
+    "Kaun pehle" ka ye rule hi **Comparator** hai. Line wahi rehti hai — rule badlo to bulane ka order badal jaata hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Har baar apna heap likhna = bugs ka khatra. Library tested hai, generic hai (koi bhi type), aur Comparator se koi bhi order de deti hai.
+
+    Kahan aati hai: greedy ("abhi sabse sasta / bada"), Dijkstra, top-k, k-way merge, scheduling, simulation (events time ke order mein).
+
+    **Heap sort** bonus: heap se hi sorting — O(n log n) **guaranteed** (quick sort jaisa worst O(n²) nahi) aur **O(1) extra jagah** (merge sort jaisa O(n) nahi).
+
+    > [!socho]
+    > Sirf ek baar sorted output chahiye. Sab PQ mein daal ke poll karna, ya seedha `sort()` — kaunsa?
+    >
+    > `sort()` — same O(n log n), kam overhead. PQ tab jab items **beech beech mein aate rahein** aur har waqt sabse aage wala chahiye.
+
+# 3. Visual intro
+visual:
+  body: |
+    PQ mein kuch numbers `add` karo. Har add ke baad `peek()` sabse chhota deta hai. Par `println(pq)` jo dikhata hai wo andar ka **heap array** hai — sorted nahi. Sorted order sirf baar baar `poll()` se milta hai.
+  viz: { tracer: pqPrint }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    PQ ko bas ek sawaal ka jawab chahiye: **"x aur y mein kaun pehle?"** — yahi **Comparator** hai. `compare(x, y)`:
+    - negative → x pehle (upar)
+    - positive → y pehle
+    - 0 → barabar
+
+    Emergency ward: `[severity, aane ka number]` pairs. Rule: zyada severity pehle (ulta compare: `compare(y[0], x[0])`); barabar ho to jo pehle aaya.
+
+    Har `add` (sift up) aur `poll` (sift down) mein heap sirf comparator se poochhta hai. Tumhe heap ka koi code nahi likhna.
+
+    > [!galti]
+    > Comparator `(x, y) -> x[0] - y[0]` — numbers bade ya negative hon to minus **overflow** karta hai aur order ulta ho jaata hai. Hamesha `Integer.compare(x[0], y[0])` (Kotlin: `compareBy`).
+  viz: { tracer: triageTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "add / offer"
+    time: "O(log n)"
+    space: O(1)
+    why: "End par daalo + sift up."
+  - op: "peek"
+    time: O(1)
+    space: O(1)
+    why: "Root dekho; khaali par null."
+  - op: "poll"
+    time: "O(log n)"
+    space: O(1)
+    why: "Root nikaalo, aakhri ko upar, sift down; khaali par null."
+  - op: "remove(x) / contains(x)"
+    time: O(n)
+    space: O(1)
+    why: "Pehle linear search karna padta hai."
+  - op: "PriorityQueue(collection) — ek saath banao"
+    time: O(n)
+    space: O(n)
+    why: "Andar heapify (neeche se upar sift down). addAll = n baar add = O(n log n)."
+  - op: "Heap sort"
+    time: "O(n log n)"
+    space: O(1)
+    why: "Build O(n) + (n - 1) baar sift down; usi array mein."
+
+# 6. Code
+code:
+  - title: PriorityQueue — roz ka API
+    file: pq-api
+    note: |
+      - `peek()` / `poll()` khaali PQ par **null** dete hain; `element()` / `remove()` exception.
+      - Kotlin `compareBy { }.thenBy { }`, Java `Comparator.comparingInt(...).thenComparing(...)` — overflow ka darr nahi.
+      - Max-heap: `PriorityQueue(Collections.reverseOrder())` ya `compareByDescending { }`.
+      - Item PQ mein rehte hue uski priority badli → heap ko pata nahi chalta, order toot jaata hai. Purana `remove` karo, naya `add` — ya naya entry daalo aur poll par purana skip karo ("lazy delete").
+
+# 7. Examples
+examples:
+  - id: last-stone
+    level: easy
+    title: Do sabse bhaari patthar takraao
+    source: { name: Last Stone Weight, platform: LeetCode, url: "https://leetcode.com/problems/last-stone-weight/" }
+    problem: |
+      Pattharon ke wazan diye hain. Har round mein do sabse bhaari patthar (y ≥ x) uthao aur takraao:
+      - barabar → dono khatam
+      - warna → x khatam, y ka wazan `y - x` ho jaata hai
+
+      Aakhir mein ek bacha to uska wazan batao, warna 0.
+
+      Example: `[2, 7, 4, 1, 8, 1]` → **1**
+    intuition: |
+      Har round mein "do sabse bhaari" chahiye — aur bacha tukda wapas aata hai. Ek baar sort karke kaam nahi chalega: naya tukda kahin bhi fit ho sakta hai, sorted array mein insert O(n).
+
+      **Max-heap**: do baar `poll()`, tukda bacha to `add()`. Har round O(log n).
+
+      > [!galti]
+      > Java mein `Integer y = pq.poll(), x = pq.poll(); if (y != x)` — ye **reference** compare hai! -128..127 ke bahar barabar values bhi "alag" lagengi. `int` mein lo, ya `.equals()`.
+    dryRun: |
+      | Heap (bada pehle) | y, x | Bacha |
+      |---|---|---|
+      | 8 7 4 2 1 1 | 8, 7 | 1 wapas |
+      | 4 2 1 1 1 | 4, 2 | 2 wapas |
+      | 2 1 1 1 | 2, 1 | 1 wapas |
+      | 1 1 1 | 1, 1 | kuch nahi |
+      | 1 | — | jawab **1** |
+    viz: { tracer: lastStoneTrace }
+    code: ex1-last-stone
+    complexity:
+      time: "O(n log n)"
+      space: O(n)
+      why: "Har round mein kam se kam ek patthar khatam → n rounds, har round O(log n). Heap mein n items."
+
+  - id: heap-sort
+    level: medium
+    title: Heap sort — usi array mein sort
+    source: { name: Heap Sort, platform: GFG, url: "https://www.geeksforgeeks.org/heap-sort/" }
+    problem: |
+      Array ko badhte order mein sort karo — **heap** se, aur **extra array ke bina** (O(1) jagah).
+
+      Example: `[5, 2, 9, 1, 6, 3]` → **[1, 2, 3, 5, 6, 9]**
+    intuition: |
+      PQ mein daal ke poll karna O(n) extra jagah leta hai. Trick: array ko do hisson mein socho — **aage heap, peeche sorted**.
+
+      1. Poore array ko **max-heap** banao (build heap, O(n)).
+      2. Root = sabse bada → heap ke **aakhri** index se swap. Ab wo apni pakki jagah par; heap size ek kam.
+      3. Naye root ko sift down (sirf heap wale hisse mein). Repeat.
+
+      Max-heap kyun, min nahi? Sabse bada end par jaana chahiye — aur end hi wo jagah hai jo heap se chhoot rahi hai.
+
+      > [!galti]
+      > Swap ke baad sift down mein poore array ka size `n` diya. Peeche ke sorted items phir heap mein khinch aate hain → kachra. Size = `end`.
+    dryRun: |
+      | Step | Array (heap \| sorted) |
+      |---|---|
+      | max-heap | [9, 6, 5, 1, 2, 3] |
+      | 9 ↔ 3, sift | [6, 3, 5, 1, 2 \| 9] |
+      | 6 ↔ 2, sift | [5, 3, 2, 1 \| 6, 9] |
+      | 5 ↔ 1, sift | [3, 1, 2 \| 5, 6, 9] |
+      | 3 ↔ 2, sift | [2, 1 \| 3, 5, 6, 9] |
+      | 2 ↔ 1 | [1 \| 2, 3, 5, 6, 9] |
+    viz: { tracer: heapSortTrace }
+    code: ex2-heap-sort
+    complexity:
+      time: "O(n log n)"
+      space: O(1)
+      why: "Build O(n) + (n - 1) sift down × O(log n), har case mein. Iterative sift → recursion stack bhi nahi."
+
+  - id: ropes
+    level: tricky
+    title: Rassiyan jodne ka sabse kam kharcha
+    source: { name: Minimum Cost of Ropes, platform: GFG, url: "https://www.geeksforgeeks.org/problems/minimum-cost-of-ropes-1587115620/1" }
+    problem: |
+      Kuch rassiyon ki lambai di hai. Do rassiyan jodne ka kharcha = dono ki lambai ka jod. Sab ko jod kar ek rassi banani hai — kul kharcha kam se kam kitna?
+
+      Example: `[4, 3, 2, 6]` → **29**
+    intuition: |
+      Jo rassi jaldi judti hai, wo nayi rassi ka hissa ban kar **aage ke har jod mein phir se ginti hai**. Lambi rassi baar baar gini gayi to mehenga.
+
+      Greedy: har baar **do sabse chhoti** jodo, nayi rassi wapas daalo. "Har baar do sabse chhote, aur naya item wapas" = **min-heap**.
+
+      Ye Huffman coding wala hi idea hai — kam frequency wale sabse gehre.
+
+      > [!galti]
+      > Ek baar sort karke left se jodte gaye (jo bana usme agla jodo). `[2, 2, 3, 3]`: 4, 7, 10 → **21**. Heap se: 2+2 = 4, phir **3+3** = 6 (4 + 3 = 7 se sasta), phir 10 → **20**. Nayi rassi hamesha sabse chhoti nahi hoti — har baar heap se phir chuno. Aur kharcha `Long` mein.
+    dryRun: |
+      | Heap | Jodo | Kharcha |
+      |---|---|---|
+      | 2 3 4 6 | 2 + 3 = 5 | 5 |
+      | 4 5 6 | 4 + 5 = 9 | 14 |
+      | 6 9 | 6 + 9 = 15 | **29** |
+    viz: { tracer: ropesTrace }
+    code: ex3-ropes
+    complexity:
+      time: "O(n log n)"
+      space: O(n)
+      why: "n - 1 jod; har jod mein 2 poll + 1 add, har ek O(log n)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Items beech beech mein aate rahein aur har waqt 'sabse aage wala' chahiye."
+    - "Greedy jisme har step par sabse chhota / bada chunna ho (ropes, stones)."
+    - "Custom order — severity, deadline, distance — Comparator se."
+    - "Sort chahiye guaranteed O(n log n) aur O(1) jagah mein → heap sort."
+  avoid:
+    - "Sab items pehle se hain aur ek baar sorted chahiye → sort()."
+    - "Kisi bhi item ko baar baar dhoondhna / hatana → TreeSet / TreeMap (remove O(log n))."
+    - "Stable sort chahiye (barabar items ka order bana rahe) → heap sort nahi; library sort."
+  signals:
+    - keyword: "har baar sabse bada / chhota uthao, result wapas daalo"
+      think: "PQ simulation — poll, poll, add."
+    - keyword: "minimum cost to combine / merge"
+      think: "Min-heap greedy (Huffman jaisa)."
+    - keyword: "priority / severity / deadline ke order mein process"
+      think: "PQ + Comparator; tie-break bhi socho."
+    - keyword: "in-place sort, O(1) space, worst O(n log n)"
+      think: "Heap sort."
+
+# 9. Real-world
+realWorld:
+  - where: "Linux kernel ka sort()"
+    how: "Kernel ka generic sort heap sort hai — O(1) memory aur worst case bhi O(n log n)."
+  - where: "Event-driven simulation (games, network simulators)"
+    how: "Agla event = sabse kam time wala; naye events aate rehte hain → PQ."
+  - where: "Router packet scheduling"
+    how: "Voice / video call ke packets high priority — pehle bheje jaate hain (priority queueing)."
+  - where: "Huffman compression (zip, JPEG)"
+    how: "Ropes wala hi algorithm: do sabse kam frequency wale jodo, wapas daalo."
+  - where: "Delivery / cab apps"
+    how: "Paas ke candidates distance ke order mein — PQ + Comparator (distance)."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "println(pq) ko sorted samajh liya"
+    type: logic
+    wrong: |
+      `println(pq)` → `[1, 2, 8, 5, 3]` dekh ke confuse; ya `for (x in pq)` ko sorted order maan liya.
+    right: |
+      Sorted chahiye to `while (pq.isNotEmpty()) poll()`. Iteration = andar ka heap array.
+  - title: "Comparator mein minus se overflow"
+    type: overflow
+    wrong: |
+      `(a, b) -> a - b` — a = 2_000_000_000, b = -1_000_000_000 → minus overflow karke negative, order galat.
+    right: |
+      `Integer.compare(a, b)` / `compareBy { }` / `Comparator.comparingInt(...)`.
+  - title: "Java mein Integer ko != se compare"
+    type: logic
+    wrong: |
+      `Integer y = pq.poll(), x = pq.poll(); if (y != x)` → 128 aur 128 bhi "alag" (do alag objects).
+    right: |
+      `int y = pq.poll();` (unbox ho jaata hai), ya `y.equals(x)`.
+  - title: "Khaali PQ par poll"
+    type: "null"
+    wrong: |
+      Java `int x = pq.poll();` khaali PQ par → null unbox → NullPointerException. Kotlin mein bhi `pq.poll()` platform type hai — wahin crash.
+    right: |
+      Pehle `isEmpty()` / `size > 1` check — jaise examples ke while loops mein.
+  - title: "PQ ke andar item ki priority badal di"
+    type: logic
+    wrong: |
+      Object PQ mein hai aur uska `dist` field badal diya → heap ko pata nahi, galat order mein nikalega.
+    right: |
+      `remove(obj)` (O(n)) phir naya `add`. Ya naya entry daalo aur poll par purana (stale) entry skip karo — Dijkstra mein yahi.
+  - title: "Heap sort mein sift down ka size galat"
+    type: off-by-one
+    wrong: |
+      Swap ke baad `siftDown(a, 0, n)` → sorted hissa phir heap mein aa gaya.
+    right: |
+      `siftDown(a, 0, end)` — heap sirf `0 until end`.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "PriorityQueue andar se kya hai? Operations ki complexity?"
+      a: |
+        Binary heap (array). add / poll O(log n), peek O(1), remove(x) / contains O(n). Default min-heap.
+    - q: "Java / Kotlin mein max-heap kaise?"
+      a: |
+        `PriorityQueue(Collections.reverseOrder())`, ya `PriorityQueue<Int>(compareByDescending { it })`, ya Comparator `(a, b) -> Integer.compare(b, a)`.
+    - q: "Pair / object ko PQ mein kaise daaloge?"
+      a: |
+        Comparator do. Kotlin `compareBy { }.thenBy { }`; Java `Comparator.comparingInt(...).thenComparing(...)`. Tie-break sochna mat bhoolo.
+    - q: "Comparator mein a - b kyun nahi likhna chahiye?"
+      a: |
+        Bade / negative numbers par overflow → sign ulta → order galat. `Integer.compare` safe hai.
+    - q: "Heap sort ke steps aur complexity?"
+      a: |
+        Max-heap banao O(n); phir n - 1 baar root ko heap ke end se swap + sift down O(log n). Total O(n log n), O(1) space, stable nahi.
+    - q: "Heap sort vs quick sort vs merge sort?"
+      a: |
+        Heap: O(n log n) har case, O(1) space, par cache-unfriendly (index door door jumps) aur unstable. Quick: average tez, worst O(n²). Merge: stable, O(n) space. Practice mein library sort tez; heap sort tab jab worst-case guarantee + kam memory chahiye.
+    - q: "PQ mein bahut saare elements ek saath daalne ka fast tareeka?"
+      a: |
+        `PriorityQueue(collection)` — andar heapify, O(n). `addAll` = n baar add = O(n log n).
+    - q: "Iterator se PQ sorted milega?"
+      a: |
+        Nahi — iterator / toString heap array ka order dete hain. Sorted ke liye poll karte jao (ya copy karke sort).
+    - q: "Minimum cost of ropes mein greedy sahi kyun hai?"
+      followUp: true
+      a: |
+        Har rassi ki lambai utni baar ginti hai jitna gehra wo merge-tree mein hai. Do sabse chhoti ko sabse gehra rakhna optimal hai (Huffman ka exchange argument).
+    - q: "PQ mein kisi item ki priority badalni ho (decrease-key)?"
+      followUp: true
+      a: |
+        Java PQ mein decrease-key nahi. remove + add (O(n)), ya naya entry daal ke purana poll par skip (lazy deletion) — Dijkstra mein standard.
+  mayAsk:
+    - "Last Stone Weight."
+    - "Heap sort likho (in-place)."
+    - "Minimum cost to connect ropes / sticks."
+    - "Task Scheduler (CPU tasks with cooldown)."
+
+# 12. Practice
+practice:
+  - name: Last Stone Weight
+    platform: LeetCode
+    num: 1046
+    url: "https://leetcode.com/problems/last-stone-weight/"
+    level: easy
+    pattern: Max-heap simulation
+    hint: "Example 1."
+  - name: Relative Ranks
+    platform: LeetCode
+    num: 506
+    url: "https://leetcode.com/problems/relative-ranks/"
+    level: easy
+    pattern: Max-heap of index (score se)
+    hint: "PQ mein index daalo, Comparator score se (bada pehle). Poll order = rank 1, 2, 3…"
+  - name: Minimum Cost of Ropes
+    platform: GFG
+    url: "https://www.geeksforgeeks.org/problems/minimum-cost-of-ropes-1587115620/1"
+    level: easy
+    pattern: Min-heap greedy
+    hint: "Example 3. Long mein jodo."
+  - name: Sort an Array
+    platform: LeetCode
+    num: 912
+    url: "https://leetcode.com/problems/sort-an-array/"
+    level: medium
+    pattern: Heap sort
+    hint: "Example 2 wala in-place heap sort — O(n log n) har case mein."
+  - name: Sort Characters By Frequency
+    platform: LeetCode
+    num: 451
+    url: "https://leetcode.com/problems/sort-characters-by-frequency/"
+    level: medium
+    pattern: Frequency map + max-heap
+    hint: "Pehle HashMap mein count; phir chars ko count ke hisaab se max-heap mein; poll karke count jitni baar append."
+  - name: Single-Threaded CPU
+    platform: LeetCode
+    num: 1834
+    url: "https://leetcode.com/problems/single-threaded-cpu/"
+    level: medium
+    pattern: Time se sort + PQ (duration, index)
+    hint: "Tasks enqueueTime se sort. Jitne tasks aa chuke, PQ mein (processing time, phir index). PQ khaali ho to time ko agle task tak kood do. Time Long mein."
+  - name: Minimum Cost to Hire K Workers
+    platform: LeetCode
+    num: 857
+    url: "https://leetcode.com/problems/minimum-cost-to-hire-k-workers/"
+    level: hard
+    pattern: Ratio se sort + quality ka max-heap
+    hint: "wage / quality ratio se sort. Har worker ko 'sabse bada ratio' maano; ab tak ke k sabse kam quality chahiye → size k ka max-heap aur sum. Cost = ratio × sum."
+  - name: Course Schedule III
+    platform: LeetCode
+    num: 630
+    url: "https://leetcode.com/problems/course-schedule-iii/"
+    level: hard
+    pattern: Deadline se sort + max-heap
+    hint: "Deadline ke order mein courses lo, duration max-heap mein daalo, time jodo. Time deadline se zyada ho gaya → heap se sabse lamba course nikaalo (time ghatao)."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "PriorityQueue = binary heap. add / poll O(log n), peek O(1), remove(x) O(n). Default min."
+    - "Max: Collections.reverseOrder(). Objects: Comparator (compareBy / Integer.compare), minus nahi."
+    - "println / iterator = andar ka array, sorted nahi. Order sirf peek / poll se."
+    - "Pattern: poll, poll, jodo, add — stones, ropes (Huffman)."
+    - "Heap sort: max-heap, root ↔ end swap, size - 1, sift down. O(n log n), O(1) space, unstable."
+  cheatsheet: |
+    ```kotlin
+    val minPq = PriorityQueue<Int>()
+    val maxPq = PriorityQueue<Int>(Collections.reverseOrder())
+    val byPair = PriorityQueue<IntArray>(compareBy<IntArray>({ it[0] }, { it[1] }))
+    pq.add(x); pq.peek(); pq.poll()        // log n, 1, log n; khaali par null
+    // heap sort
+    for (i in n / 2 - 1 downTo 0) siftDown(a, i, n)                 // max-heap
+    for (end in n - 1 downTo 1) { swap(a, 0, end); siftDown(a, 0, end) }
+    ```
+  quiz:
+    - q: "PriorityQueue mein 5, 1, 8, 3, 2 add kiye. println(pq) kya dikhayega?"
+      options: ["[1, 2, 3, 5, 8]", "[1, 2, 8, 5, 3]", "[5, 1, 8, 3, 2]", "[8, 5, 3, 2, 1]"]
+      answer: 1
+      explain: "Andar ka heap array — level order, sorted nahi."
+    - q: "pq.remove(x) (koi bhi item) ki complexity?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
+      answer: 2
+      explain: "Pehle x ko dhoondhna linear hai; hatana phir O(log n)."
+    - q: "Comparator (a, b) -> a - b mein kya khatra hai?"
+      options: ["Slow hai", "Overflow se order ulta ho sakta hai", "Max-heap ban jaata hai", "Koi khatra nahi"]
+      answer: 1
+      explain: "Bade / negative values par minus overflow. Integer.compare use karo."
+    - q: "Heap sort ki extra space?"
+      options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
+      answer: 0
+      explain: "Usi array mein heap aur sorted hissa; iterative sift down."
+    - q: "Ropes [4, 3, 2, 6] ka minimum kharcha?"
+      options: ["15", "25", "29", "34"]
+      answer: 2
+      explain: "2+3 = 5, 4+5 = 9, 6+9 = 15 → 5 + 9 + 15 = 29."
+
+# 14. Connections
+connections:
+  related:
+    - id: heap-basics
+      why: "PQ andar se wahi heap — sift up / sift down."
+    - id: sorting-in-practice
+      why: "Comparator wahi jo sort mein; heap sort vs quick / merge."
+  usedLater:
+    - id: top-k
+      how: "Size k ka PQ — kth largest, k closest, k-way merge."
+    - id: two-heaps
+      how: "Max-PQ + min-PQ se running median."
+    - id: dijkstra
+      how: "PQ of (distance, node), stale entries skip."
+    - id: greedy-classics
+      how: "Har step par sabse sasta / jaldi khatam hone wala — PQ se."

@@ -1,4 +1,4 @@
-import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, ListPanel, RecursionPanel, Tone, TreePanel } from './types';
+import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, ListPanel, RecursionPanel, Tone, ToneMap, TreePanel } from './types';
 
 export const MAX_FRAMES = 400;
 
@@ -317,6 +317,74 @@ export function treeView(
       .filter((e): e is [string, string] => typeof e[1] === 'string')
       .map(([name, at]) => ({ name, at })),
     edgeTones: opts.edgeTones,
+  };
+}
+
+/** heap array → tree panel (i ke bachche 2i+1, 2i+2; badge = index). ids stable rakho to swap par node khisakta dikhta hai. */
+export function heapView(
+  values: readonly Cell[],
+  opts: { ids?: readonly string[]; label?: string; tones?: ToneMap; pointers?: Record<string, number | null | undefined> } = {},
+): TreePanel {
+  const n = values.length;
+  const id = (i: number) => opts.ids?.[i] ?? `h${i}`;
+  const kid = (i: number) => (i < n ? id(i) : null);
+  return {
+    kind: 'tree',
+    label: opts.label,
+    root: n ? id(0) : null,
+    nodes: values.map((value, i) => ({ id: id(i), value, left: kid(2 * i + 1), right: kid(2 * i + 2), tone: opts.tones?.[i], badge: String(i) })),
+    pointers: Object.entries(opts.pointers ?? {})
+      .filter((e): e is [string, number] => typeof e[1] === 'number' && e[1] >= 0 && e[1] < n)
+      .map(([name, i]) => ({ name, at: id(i) })),
+  };
+}
+
+/** java.util.PriorityQueue jaisa heap (same siftUp / siftDown) → andar ka array bhi Java jaisa. before(x, y) = x ko y se upar hona chahiye. */
+export function heapSim<T>(before: (x: T, y: T) => boolean) {
+  const a: T[] = [];
+  const up = (i: number) => {
+    for (; i > 0 && before(a[i], a[(i - 1) >> 1]); i = (i - 1) >> 1) swap(a, i, (i - 1) >> 1);
+  };
+  /** returns where the item finally stopped */
+  const down = (i: number): number => {
+    for (;;) {
+      const l = 2 * i + 1;
+      let m = i;
+      if (l < a.length && before(a[l], a[m])) m = l;
+      if (l + 1 < a.length && before(a[l + 1], a[m])) m = l + 1;
+      if (m === i) return i;
+      swap(a, i, m);
+      i = m;
+    }
+  };
+  return {
+    a,
+    add(x: T) {
+      a.push(x);
+      up(a.length - 1);
+    },
+    poll(): T | undefined {
+      if (!a.length) return undefined;
+      const top = a[0];
+      const last = a.pop()!;
+      if (a.length) {
+        a[0] = last;
+        down(0);
+      }
+      return top;
+    },
+    /** PriorityQueue.remove(o): array order mein pehla match hatao; aakhri item us jagah, siftDown, na hile to siftUp (Java removeAt jaisa) */
+    remove(match: (x: T) => boolean): T | undefined {
+      const i = a.findIndex(match);
+      if (i < 0) return undefined;
+      const x = a[i];
+      const last = a.pop()!;
+      if (i < a.length) {
+        a[i] = last;
+        if (down(i) === i) up(i);
+      }
+      return x;
+    },
   };
 }
 

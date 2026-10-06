@@ -4,11 +4,12 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–9 done (48 topics).
-- Next action: chapter 10 → `heap-basics` (chapter 9 committed bd364e2).
+- Step: 3 (Content). Chapters 0–10 done (52 topics).
+- Next action: chapter 11 (Graphs) → `graph-basics`.
 - Tracers that can explode on random input: cap frames with a budget counter (see constraint-backtracking sudoku/word) — validate fuzz fails on FrameLimitError.
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
+- Heap topics: `heapView(a, {ids, tones, pointers})` in tracer.ts (array → tree panel, index badges); pair with `array()` using same ids (see heap-basics `views`). `heapSim(before)` = Java-PriorityQueue-exact add/poll (same internal array) for op-level traces (see priority-queue). `heapSim.remove(match)` = Java `remove(Object)` (see two-heaps window median).
 - Tree topics: input spec `type: 'tree'` (level order, `#` = null, maxNodes/min/max/bst); helpers `buildTree`, `levelOrderOf`, `treeView` in tracer.ts. Code files copy the `TreeNode` + `build(vararg Int?)` pattern from `content/trees/level-order/code/how.kt` / `.java` (Java build uses `LinkedList` queue, ArrayDeque rejects null).
 - Screenshot check of chapter 9 tree pages (level-order, bst, lca) still pending.
 - Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
@@ -109,10 +110,10 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] lca
 
 ### 10. Heap / Priority Queue
-- [ ] heap-basics
-- [ ] priority-queue
-- [ ] top-k
-- [ ] two-heaps
+- [x] heap-basics
+- [x] priority-queue
+- [x] top-k
+- [x] two-heaps
 
 ### 11. Graphs
 - [ ] graph-basics

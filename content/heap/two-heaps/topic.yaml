@@ -1,0 +1,444 @@
+meta:
+  id: two-heaps
+  chapter: heap
+  title: Two Heaps
+  subtitle: Chhota aadha max-heap mein, bada aadha min-heap mein — median hamesha tops par
+  level: advanced
+  minutes: 45
+  prereqs: [priority-queue, top-k]
+  tags: [two-heaps, median, running-median, sliding-window-median, ipo, heap]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Ek heap sirf ek **sira** (sabse chhota ya sabse bada) turant deta hai. Par kabhi **beech** wala chahiye — jaise median. Tab **do heaps** saath lo:
+
+    - **Left = MAX-heap** → numbers ka chhota aadha. Top = chhoton mein sabse bada.
+    - **Right = MIN-heap** → numbers ka bada aadha. Top = badon mein sabse chhota.
+
+    Dono tops milkar **beech ki deewar** banate hain. Median wahin hai:
+    - Kul odd → left ka top (left mein ek zyada rakhte hain).
+    - Kul even → dono tops ka average.
+
+    Do niyam hamesha sach rakhne hain:
+    1. **Order:** left ka har number ≤ right ka har number.
+    2. **Size:** left.size = right.size, ya right.size + 1.
+
+    Pattern ka doosra roop: do heaps **alag cheezon** par — jaise "locked" projects capital par aur "ready" projects profit par (Example 2).
+
+    > [!yaad]
+    > Chhota aadha → **max**-heap, bada aadha → **min**-heap. Dono ka top beech ki taraf dekhta hai.
+  analogy: |
+    **School assembly, height ke hisaab se do lines:**
+    Chhote bachche left line mein, bade bachche right line mein. Left line ka sabse lamba bachcha aage khada hai; right line ka sabse chhota bachcha aage. Dono lines barabar (ya left mein ek zyada).
+
+    Naya bachcha aaya → left ke aage wale se chhota to left line, warna right. Line lambi ho gayi → aage wala bachcha dusri line mein. "Beech ki height" kaun? Bas dono lines ke **aage wale** dekho — poori assembly sort nahi karni.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Numbers ek ek aa rahe hain (stream), aur har baar median chahiye:
+
+    | Tareeka | add | median | Dikkat |
+    |---|---|---|---|
+    | Har baar sort | O(1) | O(n log n) | bahut slow |
+    | Sorted list mein insert | O(n) (shift) | O(1) | insert slow |
+    | Quickselect | O(1) | O(n) average | har query par poora kaam |
+    | **Do heaps** | **O(log n)** | **O(1)** | — |
+
+    1 lakh numbers, har ek ke baad median → sorted-insert mein ~ n²/4 ≈ 250 crore shifts. Do heaps mein ~ 1 lakh × (3 heap ops × 17) ≈ 50 lakh kadam.
+
+    > [!socho]
+    > Ek heap mein median kyun nahi mil sakta?
+    >
+    > Heap sirf top ka order pakka karta hai. Beech wala element array mein kahin bhi ho sakta hai — dhoondhna O(n). Do heaps beech wale ko **top** bana dete hain.
+
+# 3. Visual intro
+visual:
+  body: |
+    Upar wali line = sab numbers sorted (sirf dikhane ke liye). Neeche do heaps. Dhyan do: left ka top aur right ka top hamesha sorted line ke **beech** mein baithe hain — median wahin se aata hai.
+  viz: { tracer: halvesTrace }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    `add(x)`:
+    1. **Route:** left khaali ya `x ≤ left.peek()` → left mein. Warna right mein. (Niyam 1 bacha.)
+    2. **Balance:** left 2 se aage → left ka top right mein. Right aage → right ka top left mein. (Niyam 2 bacha.)
+
+    `median()`:
+    - left bada → `left.peek()`
+    - barabar → `(left.peek() + right.peek()) / 2.0`
+
+    Top hi kyun bhejte hain? Left ka top = left ka **sabse bada**. Wo right mein jaaye to bhi right ke sab numbers se chhota ya barabar → niyam 1 nahi toot-ta.
+
+    > [!galti]
+    > `(a + b) / 2` → do galtiyan: Int division (7 / 2 = 3) aur bade numbers par overflow. `(a.toLong() + b) / 2.0` likho.
+  viz: { tracer: medianTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "add (route + balance)"
+    time: "O(log n)"
+    space: O(1)
+    why: "Ek add + max ek poll/add jodi — har heap op log n."
+  - op: "median()"
+    time: O(1)
+    space: O(1)
+    why: "Sirf dono tops ka peek."
+  - op: "n numbers ka running median"
+    time: "O(n log n)"
+    space: O(n)
+    why: "n baar O(log n); saare numbers dono heaps mein."
+  - op: "Kisi bhi number ka remove (sliding window)"
+    time: "O(k)"
+    space: O(1)
+    why: "PriorityQueue.remove(x) pehle linear search karta hai, phir sift O(log k). TreeMap ya lazy deletion se O(log k)."
+  - op: "IPO (n projects, k rounds)"
+    time: "O(n log n + k log n)"
+    space: O(n)
+    why: "Har project ek baar locked heap se nikalta, ek baar ready heap se."
+
+# 6. Code
+code:
+  - title: Running percentile (p50, p90) — median ka bada bhai
+    file: percentile
+    note: |
+      Median = 50th percentile. Ab koi bhi p chahiye (jaise **p90 response time**): left mein hamesha `rank = ceil(p% × n)` sabse chhote rakho. Left ka top = jawab.
+
+      Route same. Balance ab "barabar" nahi, `rank` ke hisaab se: left bada → top right mein; chhota → right ka top left mein.
+
+      `ceil` integer math se: `(p * n + 99) / 100` — double ki precision ka jhanjhat nahi.
+
+# 7. Examples
+examples:
+  - id: median-finder
+    level: easy
+    title: Stream ka median (MedianFinder class)
+    source: { name: Find Median from Data Stream, platform: LeetCode, url: "https://leetcode.com/problems/find-median-from-data-stream/" }
+    problem: |
+      Ek class banao jisme do kaam hon:
+      - `addNum(num)` — stream se ek number lo.
+      - `findMedian()` — ab tak ke sab numbers ka median lautao (even count par beech ke do ka average).
+
+      Example: 6, 10, 2, 6, 5, 0 add karke findMedian → **5.5** (sorted 0 2 5 6 6 10). Phir 6 add → **6.0**.
+    intuition: |
+      How wala hi idea, par code aur chhota — **har number pehle left se guzarta hai**:
+      1. `left.add(num)`
+      2. `right.add(left.poll())` — left ka sabse bada right mein. Agar num bada tha to wahi gaya; warna purana bada gaya. Niyam 1 apne aap pakka.
+      3. `if (right.size > left.size) left.add(right.poll())` — size theek.
+
+      "num kis heap ka hai?" wala compare likhna hi nahi padta → galti ki jagah kam. Kimat: har add par 3-5 heap ops (phir bhi O(log n)).
+
+      > [!galti]
+      > Sirf sizes balance kiye, order nahi: num ko seedha chhote heap mein daal diya. Ab left ka top right ke top se bada ho sakta hai → median galat.
+    dryRun: |
+      | num | Kadam 1-2-3 | Left (max) | Right (min) |
+      |---|---|---|---|
+      | 6 | L←6, 6→R, 6→L | 6 | — |
+      | 10 | L←10, 10→R | 6 | 10 |
+      | 2 | L←2, 6→R, 6→L | 6, 2 | 10 |
+      | 6 | L←6, 6→R | 6, 2 | 6, 10 |
+      | 5 | L←5, 6→R, 6→L | 6, 5, 2 | 6, 10 |
+      | 0 | L←0, 6→R | 5, 2, 0 | 6, 6, 10 |
+      | find | even → (5 + 6) / 2 | | **5.5** |
+    viz: { tracer: finderTrace }
+    code: ex1-median-finder
+    complexity:
+      time: "addNum O(log n), findMedian O(1)"
+      space: O(n)
+      why: "Har add par gine-chune heap ops (har ek log n); median sirf do peek. Saare numbers heaps mein."
+
+  - id: ipo
+    level: medium
+    title: Paisa badhao — k projects chuno (IPO)
+    source: { name: IPO, platform: LeetCode, url: "https://leetcode.com/problems/ipo/" }
+    problem: |
+      Tumhare paas `w` paisa hai. n projects hain: project i shuru karne ke liye kam se kam `capital[i]` paisa chahiye, aur khatam hone par `profit[i]` milta hai (paisa kharch nahi hota, sirf badhta hai). Zyada se zyada k projects karke aakhir mein kitna paisa ho sakta hai?
+
+      Example: w = 1, k = 3, capital = [0, 2, 1, 6, 3], profit = [3, 5, 2, 7, 1] → **16**
+    intuition: |
+      Greedy: har round mein jo projects **afford** ho sakte hain, unme **sabse zyada profit** wala karo. Zyada paisa = aage zyada projects khulte hain, to chhota profit lene se kabhi fayda nahi.
+
+      Do sawaal har round:
+      - "Ab kaun kaun afford hai?" → **locked** projects ka **min-heap capital par**. Top ka capital ≤ paisa → nikaalo, ready mein daalo (`while`, kai ek saath khul sakte hain).
+      - "Afford walon mein best?" → **ready** ka **max-heap profit par**. Top lo.
+
+      Paisa kabhi ghatta nahi → ek baar khula project hamesha khula. Isliye har project ek hi baar dono heaps se guzarta hai.
+
+      > [!galti]
+      > Ready khaali hai aur phir bhi `poll()` → null (Kotlin mein NPE). Ready khaali = paisa ab nahi badhega → loop todo.
+    dryRun: |
+      | Round | Paisa | Khule (capital ≤ paisa) | Ready (profits) | Kiya |
+      |---|---|---|---|---|
+      | 1 | 1 | P0 (c0), P2 (c1) | 3, 2 | +3 → 4 |
+      | 2 | 4 | P1 (c2), P4 (c3) | 5, 2, 1 | +5 → 9 |
+      | 3 | 9 | P3 (c6) | 7, 2, 1 | +7 → **16** |
+    viz: { tracer: ipoTrace }
+    code: ex2-ipo
+    complexity:
+      time: "O(n log n + k log n)"
+      space: O(n)
+      why: "n projects locked heap mein (n log n); har project max ek baar ready mein; k baar poll."
+
+  - id: window-median
+    level: tricky
+    title: Har window ka median (sliding window median)
+    source: { name: Sliding Window Median, platform: LeetCode, url: "https://leetcode.com/problems/sliding-window-median/" }
+    problem: |
+      Array aur window size k diya hai. Window baayein se daayein ek ek khisakti hai. Har poori window ka median lautao.
+
+      Example: `[5, 2, 8, 1, 9, 3, 7]`, k = 3 → **[5.0, 2.0, 8.0, 3.0, 7.0]**
+    intuition: |
+      Running median + ek naya kaam: **purana number bahar** nikaalna. Har kadam:
+      1. Naya number route karke andar (how jaisa).
+      2. `i ≥ k` → `nums[i - k]` bahar. Kis heap mein hai? `old ≤ left.peek()` → left, warna right. `remove(old)`.
+      3. Balance (ek baar kaafi — add aur remove ne sizes max 2 se hilaye).
+      4. Window poori → median.
+
+      `PriorityQueue.remove(x)` heap mein x ko **dhoondhta** hai → O(k). Kul O(n·k). Interview mein bolo: TreeMap (multiset) ya **lazy deletion** (hash map mein "baad mein hatana hai" likho, top par aaye tab hatao) se O(n log k).
+
+      > [!galti]
+      > `(a + b) / 2.0` bina Long ke — `2147483647` jaise numbers par Int overflow, median negative aa jaata hai. LeetCode ka test isi ko pakadta hai.
+    dryRun: |
+      | i | Andar | Bahar | Left (max) | Right (min) | Median |
+      |---|---|---|---|---|---|
+      | 0 | 5 | — | 5 | — | |
+      | 1 | 2 | — | 2 | 5 | |
+      | 2 | 8 | — | 5, 2 | 8 | 5.0 |
+      | 3 | 1 | 5 | 2, 1 | 8 | 2.0 |
+      | 4 | 9 | 2 | 8, 1 | 9 | 8.0 |
+      | 5 | 3 | 8 | 3, 1 | 9 | 3.0 |
+      | 6 | 7 | 1 | 7, 3 | 9 | 7.0 |
+    viz: { tracer: windowMedianTrace }
+    code: ex3-window-median
+    complexity:
+      time: "O(n·k)"
+      space: O(k)
+      why: "Har kadam remove O(k) (linear search) + add/balance O(log k). Heaps mein sirf window ke k numbers."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Stream mein baar baar median (ya koi percentile) chahiye."
+    - "Data ko do hisson mein baantna hai aur dono ka 'seema wala' element turant chahiye."
+    - "Do alag priorities saath — 'kya allowed hai' (ek heap) aur 'allowed mein best' (doosra heap), jaise IPO, task scheduling."
+    - "Window ka median, jahan items aate bhi hain aur jaate bhi."
+  avoid:
+    - "Sirf ek baar median chahiye, poora array haath mein → quickselect O(n) ya sort."
+    - "Values ki range chhoti (jaise 0 se 100) → counting array, median O(100)."
+    - "Sirf min ya sirf max chahiye → ek heap kaafi."
+  signals:
+    - keyword: "median of stream / running median"
+      think: "Left max-heap + right min-heap, sizes balanced."
+    - keyword: "sliding window median"
+      think: "Two heaps + remove (ya lazy deletion / TreeMap)."
+    - keyword: "p90 / percentile in stream"
+      think: "Two heaps, left ka size = ceil(p% × n)."
+    - keyword: "capital / unlock hone ke baad best profit"
+      think: "Locked min-heap (requirement par) + ready max-heap (value par)."
+
+# 9. Real-world
+realWorld:
+  - where: "API monitoring dashboard (p50 / p90 latency)"
+    how: "Har request ka time aata hai; 'median aur p90 kitna?' — two heaps exact jawab deti hain. Bahut bade scale par t-digest jaise approximate sketches."
+  - where: "Sensor / audio noise hatana (median filter)"
+    how: "Har chhoti window ka median lo — achanak aaya spike median ko nahi hilaata. Ye sliding window median hi hai."
+  - where: "Stock trading app"
+    how: "Pichhle k trades ki median price — ek bada galat trade average bigaad deta hai, median nahi."
+  - where: "Game ka tech tree / upgrade shop"
+    how: "Coins badhte hain to naye upgrades unlock hote hain (locked heap); unlocked mein sabse faydemand pehle (ready heap) — IPO jaisa."
+  - where: "Ride-hailing fare estimate"
+    how: "Ek area ke haal ke rides ka median fare — kuch bahut lambe rides se estimate na bigde."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Heaps ulte le liye"
+    type: logic
+    wrong: |
+      Left (chhota aadha) min-heap bana diya. Ab left ka top = sabse chhota number, beech wala nahi.
+    right: |
+      Chhota aadha → max-heap (`Collections.reverseOrder()`), bada aadha → min-heap. Dono tops beech ki taraf.
+  - title: "Sirf size balance, order bhool gaye"
+    type: logic
+    wrong: |
+      `if (left.size <= right.size) left.add(x) else right.add(x)` — x ki value dekhi hi nahi.
+    right: |
+      Pehle value se route karo (`x ≤ left.peek()`), phir size theek karo. Ya Example 1 ka trick: hamesha left → right → (zaroorat ho to) left.
+  - title: "Average mein Int division / overflow"
+    type: overflow
+    wrong: |
+      `(left.peek() + right.peek()) / 2` → 7 / 2 = 3, aur 2147483647 + 1 negative.
+    right: |
+      `(left.peek().toLong() + right.peek()) / 2.0` (Java mein `(long)` cast).
+  - title: "Khaali par findMedian"
+    type: empty
+    wrong: |
+      Koi number add kiye bina `left.peek()` → null; Kotlin mein NPE.
+    right: |
+      Problem guarantee deta hai to theek; warna pehle `isEmpty` check karke error / default lautao.
+  - title: "Sliding window mein galat heap se remove"
+    type: logic
+    wrong: |
+      Purana number hamesha left se hataya, ya hatane ke baad balance karna bhool gaye.
+    right: |
+      `old ≤ left.peek()` → left, warna right. Remove ke baad bhi balance check.
+  - title: "IPO mein while ki jagah if"
+    type: logic
+    wrong: |
+      Har round sirf ek project unlock kiya (`if`), jabki kai ek saath afford ho sakte the.
+    right: |
+      `while (locked top ka capital ≤ paisa)` — jitne khul sakte hain sab ready mein.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Stream ka median — sorted list kyun nahi, do heaps kyun?"
+      a: |
+        Sorted list mein insert O(n) (shifting). Do heaps: add O(log n), median O(1). n numbers par O(n²) vs O(n log n).
+    - q: "Left max-heap aur right min-heap hi kyun?"
+      a: |
+        Median = chhote aadhe ka sabse bada / bade aadhe ka sabse chhota. Ye dono "seema wale" elements tops par tabhi aate hain jab chhota aadha max-heap aur bada aadha min-heap ho.
+    - q: "Kaunse invariants rakhte ho?"
+      a: |
+        (1) left ke sab ≤ right ke sab. (2) left.size − right.size ∈ {0, 1}. Dono sach → odd par median left top, even par dono tops ka average.
+    - q: "addNum aur findMedian ki complexity?"
+      a: |
+        addNum O(log n) (gine-chune heap ops), findMedian O(1), space O(n).
+    - q: "'Hamesha left se guzaro' wala trick sahi kyun hai?"
+      a: |
+        left.add(x) ke baad left ka sabse bada right mein jaata hai — to right ka naya item left ke sab se bada ya barabar → order pakka. Phir sirf size theek karna bachta hai.
+    - q: "Sliding window median mein remove kaise karoge? Complexity?"
+      a: |
+        Value se decide karo kis heap mein hai, `remove(x)` — O(k), kul O(n·k). Behtar: lazy deletion (hash map mein delayed count; top par aaye tab hatao, sizes ka hisaab alag rakho) ya TreeMap multiset → O(n log k).
+    - q: "IPO mein greedy kyun sahi hai?"
+      a: |
+        Profit kabhi negative nahi, paisa sirf badhta hai. Abhi ka sabse bada profit lene se paisa sabse zyada badhta hai → jo projects khulte, wo kisi aur choice se kam nahi. Exchange argument se koi behtar order nahi milta.
+    - q: "Agar saare numbers 0 se 100 ke beech hon?"
+      followUp: true
+      a: |
+        Heaps ki zaroorat nahi: `count[101]` array. add O(1); median ke liye count jodte jao jab tak n/2 paar na ho → O(101) = O(1).
+    - q: "Agar 99% numbers 0 se 100 mein hon?"
+      followUp: true
+      a: |
+        Same count array + do counters (100 se bade, 0 se chhote). Median almost hamesha range mein hi aayega. Bahar wale bahut kam, unke liye chhoti sorted list / heap.
+    - q: "Median ki jagah p90 chahiye to?"
+      followUp: true
+      a: |
+        Wahi do heaps, bas left ka target size = ceil(0.9 × n). Balance usi ke hisaab se. Left ka top = p90.
+  mayAsk:
+    - "Sliding Window Median (lazy deletion ke saath)."
+    - "Median of Two Sorted Arrays — ye heap nahi, binary search hai."
+    - "Meeting Rooms III / Process Tasks Using Servers — free + busy do heaps."
+    - "Kth smallest in a stream / running percentile."
+
+# 12. Practice
+practice:
+  - name: Running median — khud likho
+    platform: Custom
+    level: easy
+    pattern: Two heaps (route + balance)
+    hint: "How wala code bina dekhe likho. Test: [5, 15, 1, 3, 8] → 5, 10, 5, 4, 5. Phir saare barabar, negative, aur do element wale inputs."
+  - name: Lower aur upper median dono
+    platform: Custom
+    level: easy
+    pattern: Two heaps ke tops
+    hint: "Even count par dono beech wale lautao (left top, right top); odd par dono same (left top). Sirf findMedian badlega."
+  - name: Median jab numbers sirf 0 se 100 hon
+    platform: Custom
+    level: easy
+    pattern: Counting array
+    hint: "count[101] rakho. Median: chhote se count jodte jao jab tak n/2 (aur even par n/2 + 1) paar na ho. Heap se compare karo."
+  - name: Total Cost to Hire K Workers
+    platform: LeetCode
+    num: 2462
+    url: "https://leetcode.com/problems/total-cost-to-hire-k-workers/"
+    level: medium
+    pattern: Do min-heaps (aage + peeche)
+    hint: "Aage ke `candidates` aur peeche ke `candidates` workers do min-heaps mein (cost, index). Har round dono tops mein sasta (tie par chhota index); usi taraf ka agla worker heap mein — do pointers takraayen nahi."
+  - name: Number of Orders in the Backlog
+    platform: LeetCode
+    num: 1801
+    url: "https://leetcode.com/problems/number-of-orders-in-the-backlog/"
+    level: medium
+    pattern: Buy max-heap + sell min-heap
+    hint: "Naya buy: jab tak sell ka top price ≤ buy price, match (amount ghatao). Bacha → buy heap. Sell ulta. Aakhir mein amounts jodo, mod 1e9+7."
+  - name: The Number of the Smallest Unoccupied Chair
+    platform: LeetCode
+    num: 1942
+    url: "https://leetcode.com/problems/the-number-of-the-smallest-unoccupied-chair/"
+    level: medium
+    pattern: Free min-heap + occupied min-heap
+    hint: "Arrival order mein chalo. Occupied heap (leaveTime, chair): jinka leaveTime ≤ abhi, unki chair free heap mein. Free heap ka top = sabse chhoti khaali chair."
+  - name: Meeting Rooms III
+    platform: LeetCode
+    num: 2402
+    url: "https://leetcode.com/problems/meeting-rooms-iii/"
+    level: hard
+    pattern: Free rooms + busy rooms (do heaps)
+    hint: "Meetings start order mein. Busy heap (endTime, room): start se pehle khatam hue rooms free heap mein. Koi free nahi → busy top ka room lo, meeting deri se (end + duration). Time Long mein."
+  - name: Minimum Difference in Sums After Removal of Elements
+    platform: LeetCode
+    num: 2163
+    url: "https://leetcode.com/problems/minimum-difference-in-sums-after-removal-of-elements/"
+    level: hard
+    pattern: Dono taraf se size-n heaps
+    hint: "n = size / 3. Baayein se: har prefix tak n sabse chhoton ka sum (max-heap size n). Daayein se: n sabse badon ka sum (min-heap size n). Har split par leftSum − rightSum ka minimum."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Left = max-heap (chhota aadha), right = min-heap (bada aadha). Median = tops se."
+    - "Niyam: left ≤ right (order) aur left.size = right.size ya +1 (size)."
+    - "add: route (x ≤ left top → left), phir balance (top dusri taraf). O(log n). median O(1)."
+    - "Average: (a.toLong() + b) / 2.0 — Int division aur overflow dono se bacho."
+    - "Doosra roop: locked (requirement par min-heap) + ready (value par max-heap) — IPO."
+  cheatsheet: |
+    ```kotlin
+    val left = PriorityQueue<Int>(Collections.reverseOrder()) // chhota aadha
+    val right = PriorityQueue<Int>()                         // bada aadha
+    fun add(x: Int) {
+        left.add(x); right.add(left.poll())                   // order
+        if (right.size > left.size) left.add(right.poll())    // size
+    }
+    fun median() = if (left.size > right.size) left.peek().toDouble()
+                   else (left.peek().toLong() + right.peek()) / 2.0
+    // window: old <= left.peek() ? left.remove(old) : right.remove(old), phir balance
+    ```
+  quiz:
+    - q: "Running median mein chhota aadha kaunse heap mein?"
+      options: ["Min-heap", "Max-heap", "Koi bhi", "Sorted list"]
+      answer: 1
+      explain: "Chhote aadhe ka sabse bada (beech ke paas wala) top par chahiye → max-heap."
+    - q: "Left mein 4, right mein 3 numbers. Median kahan?"
+      options: ["Right ka top", "Left ka top", "Dono tops ka average", "Left ka last element"]
+      answer: 1
+      explain: "Kul 7 (odd), left mein ek zyada → beech wala left ka top."
+    - q: "addNum aur findMedian ki time complexity?"
+      options: ["O(1), O(log n)", "O(log n), O(1)", "O(n), O(1)", "O(log n), O(log n)"]
+      answer: 1
+      explain: "add mein gine-chune heap ops (log n), median sirf peek."
+    - q: "Tops 2147483647 aur 2147483647. `(a + b) / 2.0` Int mein kya dega?"
+      options: ["2.147483647E9", "Negative number", "Exception", "0.0"]
+      answer: 1
+      explain: "a + b Int mein overflow ho kar negative ban jaata hai. Long mein jodo."
+    - q: "IPO mein 'ab kaun afford hai' ke liye kaunsa heap?"
+      options: ["Profit par max-heap", "Capital par min-heap", "Profit par min-heap", "Capital par max-heap"]
+      answer: 1
+      explain: "Sabse sasta project sabse pehle khulta hai → capital par min-heap; khule hue ready max-heap (profit) mein."
+
+# 14. Connections
+connections:
+  related:
+    - id: top-k
+      why: "Wahan ek size-k heap ek seema (kth) rakhta tha; yahan do heaps beech ki seema (median) rakhte hain."
+    - id: sliding-window-fixed
+      why: "Window khiskane ka same dhaancha — andar wala add, bahar wala remove."
+    - id: quick-sort
+      why: "Ek baar ka median quickselect se O(n) average; stream mein two heaps."
+  usedLater:
+    - id: intervals
+      how: "Meeting rooms: end times ka min-heap; Meeting Rooms III mein free + busy do heaps."
+    - id: greedy-basics
+      how: "IPO jaisa: har kadam par abhi ka best heap se uthana = greedy choice."
