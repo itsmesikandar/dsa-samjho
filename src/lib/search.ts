@@ -1,6 +1,6 @@
 // Site search: index is built at build time (scripts/gen.ts), matching runs in the browser. No library.
 
-export type DocKind = 'chapter' | 'topic' | 'example' | 'problem';
+export type DocKind = 'page' | 'chapter' | 'topic' | 'example' | 'problem';
 
 /** one search result as stored in src/generated/search-index.json (short keys keep the file small) */
 export interface SearchDoc {
@@ -15,8 +15,8 @@ export interface SearchDoc {
   w: string;
 }
 
-export const KIND_LABEL: Record<DocKind, string> = { chapter: 'Chapter', topic: 'Topic', example: 'Example', problem: 'Practice' };
-const KIND_BONUS: Record<DocKind, number> = { topic: 3, chapter: 2, example: 1, problem: 0 };
+export const KIND_LABEL: Record<DocKind, string> = { page: 'Page', chapter: 'Chapter', topic: 'Topic', example: 'Example', problem: 'Practice' };
+const KIND_BONUS: Record<DocKind, number> = { page: 3, topic: 3, chapter: 2, example: 1, problem: 0 };
 
 /** lowercase, only a-z 0-9, single spaces ("Kadane's — O(n)" → "kadane s o n") */
 export const norm = (s: string) =>

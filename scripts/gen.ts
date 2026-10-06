@@ -36,7 +36,11 @@ ${entries.map(([k, p]) => `  '${k}': () => import('${p}'),`).join('\n')}
 );
 
 // ---------- search index ----------
-const docs: SearchDoc[] = [];
+const docs: SearchDoc[] = [
+  { k: 'page', t: 'Patterns pehchano', s: 'Question mein ye keyword dikhe → ye pattern socho', h: '/patterns/', w: 'signals keywords interview kab use karein' },
+  { k: 'page', t: 'Bookmarks', s: 'Tumhare save kiye topics', h: '/bookmarks/', w: 'saved star' },
+  { k: 'page', t: 'Visualizer playground', s: 'Har animation panel ka demo', h: '/playground/', w: 'animation demo viz' },
+];
 const sameName = (a: string, b: string) => a.toLowerCase().replace(/[^a-z0-9]/g, '') === b.toLowerCase().replace(/[^a-z0-9]/g, '');
 for (const ch of getNav()) {
   docs.push({ k: 'chapter', t: ch.title, s: `Chapter ${ch.index} · ${plain(ch.subtitle)}`, h: ch.href, w: ch.topics.map((x) => x.id).join(' ') });

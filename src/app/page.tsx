@@ -36,6 +36,9 @@ export default function Home() {
           <Link href="/playground/" className="rounded-lg border border-line px-5 py-3 font-semibold hover:border-accent">
             Animations dekho
           </Link>
+          <Link href="/patterns/" className="rounded-lg border border-line px-5 py-3 font-semibold hover:border-accent">
+            Patterns pehchano
+          </Link>
         </div>
         <div className="mt-6 max-w-md">
           <ContinueCard titles={titles} />
