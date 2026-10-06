@@ -4,8 +4,8 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–12 done (61 topics).
-- Next action: chapter 13 (DP) → `dp-intro`.
+- Step: 3 (Content). Chapters 0–13 done (68 topics).
+- Next action: chapter 13 build + commit, then chapter 14 → `trie`.
 - Tracers that can explode on random input: cap frames with a budget counter (see constraint-backtracking sudoku/word) — validate fuzz fails on FrameLimitError.
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
@@ -132,13 +132,13 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] greedy-classics
 
 ### 13. Dynamic Programming
-- [ ] dp-intro
-- [ ] dp-1d
-- [ ] dp-grid
-- [ ] knapsack-01
-- [ ] unbounded-knapsack
-- [ ] dp-strings
-- [ ] lis
+- [x] dp-intro
+- [x] dp-1d
+- [x] dp-grid
+- [x] knapsack-01
+- [x] unbounded-knapsack
+- [x] dp-strings
+- [x] lis
 
 ### 14. Trie & Bits
 - [ ] trie

@@ -1,0 +1,439 @@
+meta:
+  id: dp-intro
+  chapter: dp
+  title: DP introduction
+  subtitle: Recursion + yaaddasht = DP — memo se table tak, table se do variables tak
+  level: intermediate
+  minutes: 45
+  prereqs: [recursion-patterns, big-o-time]
+  tags: [dp, memoization, tabulation, fibonacci, climbing-stairs, space-optimization]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Dynamic Programming (DP)** = bade sawaal ko chhote sawaalon se banao, aur **har chhota sawaal sirf ek baar** solve karo — jawab yaad rakh ke.
+
+    DP tab lagta hai jab do cheezein hon:
+    1. **Overlapping subproblems** — wahi chhota sawaal baar baar aata hai (fib(3) kai baar).
+    2. **Optimal substructure** — bade ka jawab chhoton ke jawab se banta hai (fib(n) = fib(n-1) + fib(n-2)).
+
+    Chaar kadam ka safar (har DP sawaal mein yahi):
+    1. **Recursion** — sahi par slow (exponential).
+    2. **Memoization (top-down)** — recursion + memo array. O(states).
+    3. **Tabulation (bottom-up)** — chhote se bade tak table bharo, recursion nahi.
+    4. **Space optimise** — sirf utni pichhli values rakho jitni chahiye.
+
+    > [!yaad]
+    > DP ka asli kaam = **state** aur **transition** dhoondhna: "dp[i] ka matlab kya hai?" aur "dp[i] pichhlon se kaise banta hai?" Code uske baad 5 line ka hai.
+  analogy: |
+    **Maths ki copy mein pichhla jawab:**
+    Teacher poochhti hai 17 × 23. Tumne kal yahi solve kiya tha — copy mein dekh ke bata diya, dobara multiply nahi kiya. DP wahi copy hai.
+
+    Ya **seedhiyan chadhna:** 10vi seedhi tak kitne tareeke? Pehle 1, 2, 3… tak ke tareeke ek kaagaz par likhte jao — har agla pichhle do se ban jaata hai. Upar se neeche har baar ginna nahi padta.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Seedhi recursion wahi kaam baar baar karti hai:
+
+    | n | fib(n) seedhi recursion calls | DP kaam |
+    |---|---|---|
+    | 10 | 177 | 10 |
+    | 30 | ~27 lakh | 30 |
+    | 50 | ~4 × 10¹⁰ (ghanto) | 50 |
+
+    Exponential → linear. Interview ke sabse common "hard" sawaal (knapsack, LCS, edit distance, coin change) sab DP hain.
+
+    Pehchaan ke signals: "kitne tareeke", "minimum / maximum cost", "kya possible hai", aur choices jinka asar aage tak jaata hai (greedy fail).
+
+    > [!socho]
+    > Memo (top-down) aur tabulation (bottom-up) mein kaunsa behtar?
+    >
+    > Dono O(states). Memo likhna aasaan (recursion se seedha), sirf zaroori states banata hai, par recursion stack lagta hai. Tabulation tez (no calls), space optimise karna aasaan, par order khud sochna padta hai.
+
+# 3. Visual intro
+visual:
+  body: |
+    fib(n) ki seedhi recursion ka ped. **Laal** calls wo hain jinka jawab pehle hi nikal chuka tha — phir bhi poora kaam dobara. n badha ke dekho ped kitni tezi se badhta hai.
+  viz: { tracer: fibTreeTrace }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Memoization:** recursion jaisa ka taisa, bas teen line jodo:
+    1. Base case (fib(0), fib(1)).
+    2. `memo[n]` bhara hai → seedha lautao.
+    3. Nahi to nikaalo, `memo[n]` mein likho, lautao.
+
+    Har `n` ek hi baar "nikaala" jaata hai → calls ~2n, kaam O(n).
+
+    Memo ki "khaali" value soch ke chuno: yahan fib(n) > 0 (n ≥ 1), to `0` = abhi nahi pata chal jaata hai. Jahan 0 bhi valid jawab ho, `-1` ya `Long?` / boolean array lo.
+
+    > [!galti]
+    > memo ko har call mein naya bana diya (`fib(n - 1, LongArray(n))`) — yaaddasht hi khatam, wapas exponential. Ek hi memo saari calls mein share karo.
+  viz: { tracer: memoTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Seedhi recursion (fib)"
+    time: "O(2ⁿ)"
+    space: O(n)
+    why: "Har call do calls; recursion stack gehraai n."
+  - op: "Memoization (top-down)"
+    time: O(n)
+    space: O(n)
+    why: "Har state ek baar nikla; memo + recursion stack."
+  - op: "Tabulation (bottom-up)"
+    time: O(n)
+    space: O(n)
+    why: "Ek loop, dp array; recursion nahi."
+  - op: "Space optimised (rolling variables)"
+    time: O(n)
+    space: O(1)
+    why: "dp[i] ko sirf pichhle k chahiye → k variables."
+  - op: "General DP"
+    time: "O(states × transitions)"
+    space: "O(states)"
+    why: "Har state ek baar, har state par jitne choices utna kaam."
+
+# 6. Code
+code:
+  - title: Climbing stairs ka general roop — koi bhi allowed kadam
+    file: k-steps
+    note: |
+      Kadam {1, 2} ki jagah koi bhi set: `dp[i] = Σ dp[i − s]` (har allowed s ≤ i). `dp[0] = 1` — khaali rasta ek tareeka hai (yahi base case sabse zyada galat hota hai).
+
+      Dhyaan do: yahan **order matter karta hai** — 1 + 2 aur 2 + 1 alag tareeke hain. Coin Change II (unbounded knapsack topic) mein order matter nahi karta, aur loops ulte ho jaate hain. Wahan ye farak phir aayega.
+
+# 7. Examples
+examples:
+  - id: fib-four-ways
+    level: easy
+    title: Fibonacci chaar tareeke se
+    problem: |
+      fib(0) = 0, fib(1) = 1, fib(n) = fib(n − 1) + fib(n − 2). fib(n) nikaalo — chaaron tareeke se (recursion, memo, tabulation, do variables) aur unka farak dekho.
+
+      Example: n = 10 → **55** (seedhi recursion 177 calls karti hai)
+    intuition: |
+      1. **Recursion:** definition seedhi code mein — sahi, par O(2ⁿ).
+      2. **Memo:** recursion + `memo[]` — O(n).
+      3. **Tabulation:** `dp[0] = 0, dp[1] = 1`, phir `i = 2..n`: `dp[i] = dp[i-1] + dp[i-2]`. Recursion hi nahi — order khud tay kiya (chhote se bade).
+      4. **Do variables:** dp[i] ko sirf pichhle do chahiye → `a, b` aur khidki khiskao. O(1) memory.
+
+      Har DP sawaal mein yahi seedhi chadho: pehle recursion socho (sahi kya hai), phir memo, phir table, phir memory bachao.
+
+      > [!tip]
+      > Interview mein seedha 4th version mat likho. Pehle recurrence bolo (dp ka matlab + transition), phir optimise — interviewer ko soch dikhni chahiye.
+    dryRun: |
+      | i | dp[i-2] | dp[i-1] | dp[i] |
+      |---|---|---|---|
+      | 2 | 0 | 1 | 1 |
+      | 3 | 1 | 1 | 2 |
+      | 4 | 1 | 2 | 3 |
+      | 5 | 2 | 3 | 5 |
+      | … | | | |
+      | 10 | 21 | 34 | **55** |
+    viz: { tracer: tabTrace }
+    code: ex1-fib-four-ways
+    complexity:
+      time: O(n)
+      space: O(1)
+      why: "Do-variable version: ek loop, do numbers. (Tabulation O(n) memory, memo O(n) + stack.)"
+
+  - id: climbing-stairs
+    level: medium
+    title: Seedhiyan chadhne ke tareeke (Climbing Stairs)
+    source: { name: Climbing Stairs, platform: LeetCode, url: "https://leetcode.com/problems/climbing-stairs/" }
+    problem: |
+      n seedhiyan. Ek baar mein 1 ya 2 seedhi chadh sakte ho. Upar tak pahunchne ke kitne alag tareeke?
+
+      Example: n = 5 → **8**
+    intuition: |
+      **State:** `dp[i]` = seedhi i tak pahunchne ke tareeke.
+
+      **Transition:** i par pahunchne ka **aakhri kadam** ya to 1 seedhi ka tha (i − 1 se) ya 2 ka (i − 2 se). Ye dono alag tareekon ke group hain, overlap nahi → `dp[i] = dp[i − 1] + dp[i − 2]`.
+
+      **Base:** `dp[0] = 1` (zameen par — ek tareeka: kuch na karo), `dp[1] = 1`.
+
+      Ye Fibonacci hi nikla! "Aakhri kadam kya tha?" — ye sawaal lagbhag har counting DP ka darwaza hai.
+
+      > [!galti]
+      > `dp[0] = 0` rakh diya → dp[2] = 1 aata hai (sahi 2). Base case ka matlab socho: "0 seedhi tak 1 tareeka" — khade raho.
+    dryRun: |
+      | i | dp[i-1] | dp[i-2] | dp[i] |
+      |---|---|---|---|
+      | 0, 1 | | | 1, 1 |
+      | 2 | 1 | 1 | 2 |
+      | 3 | 2 | 1 | 3 |
+      | 4 | 3 | 2 | 5 |
+      | 5 | 5 | 3 | **8** |
+    viz: { tracer: stairsTrace }
+    code: ex2-climbing-stairs
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Ek loop. Do variables se O(1) memory bhi."
+
+  - id: min-cost-stairs
+    level: tricky
+    title: Kam se kam kharche mein upar (Min Cost Climbing Stairs)
+    source: { name: Min Cost Climbing Stairs, platform: LeetCode, url: "https://leetcode.com/problems/min-cost-climbing-stairs/" }
+    problem: |
+      `cost[i]` = seedhi i par pair rakh ke aage badhne ka kharcha (1 ya 2 seedhi). Shuruaat seedhi 0 ya 1 se kar sakte ho. Top = aakhri seedhi ke **paar** (index n). Kam se kam kharcha?
+
+      Example: `[3, 8, 2, 7, 1, 5]` → **6**
+    intuition: |
+      Counting ki jagah ab **minimum** — par dhaancha same.
+
+      **State:** `dp[i]` = seedhi i par **khade** hone tak ka kam se kam kharcha.
+
+      **Transition:** i par ya to i − 1 se aaye (`dp[i−1] + cost[i−1]`) ya i − 2 se (`dp[i−2] + cost[i−2]`). Chhota lo.
+
+      **Base:** `dp[0] = dp[1] = 0` (wahan se shuru — muft). **Jawab:** `dp[n]` (top).
+
+      Tricky hissa = state ka **matlab** pakka karna. "i par khade hone tak" vs "i se nikalne tak" — dono chalte hain par formula alag. Ek chuno, aur base + jawab usi hisaab se.
+
+      > [!galti]
+      > Jawab `dp[n - 1]` le liya — wo aakhri seedhi par khade hone ka kharcha hai, top ka nahi. Top index n hai.
+    dryRun: |
+      | i | i-1 se | i-2 se | dp[i] |
+      |---|---|---|---|
+      | 0, 1 | | | 0, 0 |
+      | 2 | 0 + 8 | 0 + 3 | 3 |
+      | 3 | 3 + 2 | 0 + 8 | 5 |
+      | 4 | 5 + 7 | 3 + 2 | 5 |
+      | 5 | 5 + 1 | 5 + 7 | 6 |
+      | 6 (top) | 6 + 5 | 5 + 1 | **6** |
+    viz: { tracer: minCostTrace }
+    code: ex3-min-cost-stairs
+    complexity:
+      time: O(n)
+      space: O(n)
+      why: "Ek loop, do choices. Pichhle do se O(1) memory bhi."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "'Kitne tareeke', 'minimum / maximum', 'possible hai ya nahi' — aur choices ka asar aage tak."
+    - "Recursion likhi aur same arguments baar baar aa rahe (overlapping subproblems)."
+    - "Greedy ka counterexample mil gaya (coin change)."
+    - "Constraints ~10³–10⁴ aur O(n²) / O(n × W) chal sakta hai."
+  avoid:
+    - "Subproblems overlap nahi karte (merge sort) — divide & conquer kaafi, memo bekaar."
+    - "Saare actual combinations print karne hain — DP ginti deta hai, list nahi (backtracking)."
+    - "Greedy saabit ho chuka — DP slow aur zyada memory."
+    - "State bahut badi (2ⁿ × kuch) aur n bada — DP bhi nahi bachayega."
+  signals:
+    - keyword: "number of ways / kitne tareeke"
+      think: "Counting DP: dp[i] = Σ (aakhri choice ke hisaab se)."
+    - keyword: "minimum cost / maximum profit with choices"
+      think: "Optimisation DP: dp[i] = min / max (choices)."
+    - keyword: "recursion TLE / same calls repeat"
+      think: "Memo lagao — phir tabulation."
+    - keyword: "sirf pichhle 1-2 states chahiye"
+      think: "Rolling variables — O(1) memory."
+
+# 9. Real-world
+realWorld:
+  - where: "Google Maps / routing (shortest path)"
+    how: "Bellman-Ford / Floyd-Warshall DP hain — chhote raston se bade raste."
+  - where: "Spell check / git diff"
+    how: "Edit distance aur LCS — strings par DP (aage ka topic)."
+  - where: "Stock trading strategies"
+    how: "Fee / cooldown wale buy-sell faisle — state machine DP."
+  - where: "Compilers / parsers"
+    how: "Code ko grammar ke hisaab se todna (CYK parsing) — interval DP."
+  - where: "Speech recognition / DNA alignment"
+    how: "Viterbi aur sequence alignment — DP tables."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "State ka matlab saaf nahi"
+    type: logic
+    wrong: |
+      "dp[i] kuch toh hai" — base case aur jawab ka index galat (dp[n] vs dp[n-1]).
+    right: |
+      Pehle ek line likho: "dp[i] = …". Base aur jawab usi se nikaalo.
+  - title: "Galat base case"
+    type: off-by-one
+    wrong: |
+      Climbing stairs mein dp[0] = 0.
+    right: |
+      Base ka matlab socho: 0 seedhi tak 1 tareeka (kuch na karna).
+  - title: "Memo ka 'khaali' value valid jawab bhi"
+    type: logic
+    wrong: |
+      memo 0 se bhara, par 0 ek valid jawab bhi hai → har baar dobara nikalta (ya galat 'pehle se pata').
+    right: |
+      -1 se bharo, ya `Array<Long?>` / alag `done[]` boolean.
+  - title: "Overflow"
+    type: overflow
+    wrong: |
+      fib(50) / tareeke Int mein — 2³¹ se upar, negative.
+    right: |
+      Long, ya sawaal kahe to `% (10⁹ + 7)` har jod par.
+  - title: "Tabulation ka galat order"
+    type: logic
+    wrong: |
+      dp[i] bharte waqt dp[i + 1] chahiye tha, par loop chhote se bade chal raha — wo abhi bhara hi nahi.
+    right: |
+      Dependency dekho: jin par dp[i] depend karta hai wo pehle bharne chahiye. Zaroorat ho to loop ulta.
+  - title: "n = 0 / n = 1 par array index"
+    type: empty
+    wrong: |
+      `dp[1] = 1` jab array size 1 (n = 0) → out of bounds.
+    right: |
+      Chhote n pehle return karo, ya size max(n + 1, 2) lo.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "DP kya hai? Kab lagate ho?"
+      a: |
+        Chhote subproblems ke jawab yaad rakh ke bada sawaal solve karna. Jab overlapping subproblems aur optimal substructure ho.
+    - q: "Memoization vs tabulation?"
+      a: |
+        Memo: top-down recursion + cache, likhna aasaan, sirf zaroori states. Tabulation: bottom-up loop, recursion stack nahi, space optimise aasaan. Complexity same.
+    - q: "DP vs divide and conquer?"
+      a: |
+        Dono chhote hisson mein todte hain. D&C ke hisse alag (merge sort) — kuch yaad rakhna bekaar. DP ke hisse overlap karte hain — yaad rakhna hi fayda.
+    - q: "DP vs greedy?"
+      a: |
+        Greedy ek choice lock karta hai; DP saari choices ke best sub-results compare karta hai. Greedy fail (counterexample) → DP.
+    - q: "Climbing stairs ka recurrence kaise socha?"
+      a: |
+        Aakhri kadam: 1 ya 2. Dono groups alag → dp[n] = dp[n-1] + dp[n-2]. Base dp[0] = dp[1] = 1.
+    - q: "Space kaise bachaoge?"
+      a: |
+        Dekho dp[i] kitne pichhle states par depend karta hai. Do par → do variables. Grid mein pichhli row → ek 1D array.
+    - q: "Fib ki seedhi recursion ki exact complexity?"
+      a: |
+        Calls = 2·fib(n+1) − 1 ≈ φⁿ (φ ≈ 1.618) — O(2ⁿ) ka tight roop O(1.618ⁿ).
+    - q: "Fibonacci O(log n) mein?"
+      followUp: true
+      a: |
+        Matrix exponentiation: [[1,1],[1,0]]ⁿ — fast power se log n multiplications.
+    - q: "Memo recursion mein StackOverflow ho to?"
+      followUp: true
+      a: |
+        Gehraai n — bade n (10⁵) par stack bhar sakta hai. Tabulation par switch karo (loop, stack nahi).
+  mayAsk:
+    - "N-th Tribonacci Number."
+    - "House Robber (agla topic)."
+    - "Decode Ways."
+    - "Min Cost Climbing Stairs (top-down aur bottom-up dono)."
+
+# 12. Practice
+practice:
+  - name: Fibonacci Number
+    platform: LeetCode
+    num: 509
+    url: "https://leetcode.com/problems/fibonacci-number/"
+    level: easy
+    pattern: Chaaron tareeke
+    hint: "Recursion, memo, table, do variables — chaaron likho aur n = 30 par time dekho."
+  - name: N-th Tribonacci Number
+    platform: LeetCode
+    num: 1137
+    url: "https://leetcode.com/problems/n-th-tribonacci-number/"
+    level: easy
+    pattern: Teen rolling variables
+    hint: "T(n) = T(n-1) + T(n-2) + T(n-3). Teen variables khiskao."
+  - name: Pascal's Triangle
+    platform: LeetCode
+    num: 118
+    url: "https://leetcode.com/problems/pascals-triangle/"
+    level: easy
+    pattern: Pichhli row se agli
+    hint: "row[j] = prev[j-1] + prev[j]; dono kinare 1. Tabulation ka pehla 2D feel."
+  - name: Count Ways To Build Good Strings
+    platform: LeetCode
+    num: 2466
+    url: "https://leetcode.com/problems/count-ways-to-build-good-strings/"
+    level: medium
+    pattern: Climbing stairs (zero / one kadam)
+    hint: "dp[len] = dp[len - zero] + dp[len - one]. low..high ke dp jodo, mod 1e9+7."
+  - name: Domino and Tromino Tiling
+    platform: LeetCode
+    num: 790
+    url: "https://leetcode.com/problems/domino-and-tromino-tiling/"
+    level: medium
+    pattern: Recurrence dhoondhna
+    hint: "Chhote n haath se banao (1, 2, 5, 11…). dp[n] = 2·dp[n-1] + dp[n-3]. Mod lagao."
+  - name: Integer Break
+    platform: LeetCode
+    num: 343
+    url: "https://leetcode.com/problems/integer-break/"
+    level: medium
+    pattern: Max product DP
+    hint: "dp[i] = max over j (max(j, dp[j]) × max(i-j, dp[i-j])). Ya maths: zyada se zyada 3 ke tukde."
+  - name: Count Vowels Permutation
+    platform: LeetCode
+    num: 1220
+    url: "https://leetcode.com/problems/count-vowels-permutation/"
+    level: hard
+    pattern: State = aakhri letter
+    hint: "5 counters (a, e, i, o, u se khatam). Har length par niyam se naye counters. O(n), mod."
+  - name: Student Attendance Record II
+    platform: LeetCode
+    num: 552
+    url: "https://leetcode.com/problems/student-attendance-record-ii/"
+    level: hard
+    pattern: State = (kitne A, aakhir mein kitne L)
+    hint: "dp[a][l]: a ∈ {0,1} absents, l ∈ {0,1,2} lagaataar late. Har din P / A / L se transitions. Rolling 6 states."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "DP = overlapping subproblems + optimal substructure; har state ek baar."
+    - "Safar: recursion → memo → tabulation → space optimise."
+    - "Pehle likho: dp[i] ka matlab, transition, base, jawab ka index."
+    - "Counting: 'aakhri kadam kya tha?' se transitions jodo. Optimisation: min / max."
+    - "dp[i] sirf pichhle k par depend → k variables, O(1) memory."
+  cheatsheet: |
+    ```kotlin
+    // memo
+    fun f(n: Int): Long { if (n <= 1) return n.toLong(); if (memo[n] != -1L) return memo[n]
+        memo[n] = f(n - 1) + f(n - 2); return memo[n] }
+    // table
+    val dp = LongArray(n + 1); dp[1] = 1; for (i in 2..n) dp[i] = dp[i - 1] + dp[i - 2]
+    // rolling
+    var a = 0L; var b = 1L; repeat(n) { val c = a + b; a = b; b = c }  // a = fib(n)
+    ```
+  quiz:
+    - q: "DP lagne ke liye kaunsi do cheezein chahiye?"
+      options: ["Sorted input aur heap", "Overlapping subproblems aur optimal substructure", "Graph aur queue", "Recursion aur stack"]
+      answer: 1
+      explain: "Sub-sawaal baar baar aayein, aur bada jawab chhoton se bane."
+    - q: "fib(n) memo ke saath — time?"
+      options: ["O(2ⁿ)", "O(n²)", "O(n)", "O(log n)"]
+      answer: 2
+      explain: "Har k ek baar nikla, baaki memo se."
+    - q: "Climbing stairs (1 ya 2 kadam), dp[0] = ?"
+      options: ["0", "1", "2", "Undefined"]
+      answer: 1
+      explain: "Zameen par khade rehne ka ek tareeka — isi se dp[2] = 2 sahi aata hai."
+    - q: "Min Cost Climbing Stairs mein jawab kis index par?"
+      options: ["dp[n - 1]", "dp[n]", "dp[0]", "min(dp[n-1], dp[n-2])"]
+      answer: 1
+      explain: "Top = aakhri seedhi ke paar = index n (state 'i par khade')."
+    - q: "dp[i] sirf dp[i-1] aur dp[i-2] par depend. Memory kitni kaafi?"
+      options: ["O(n)", "O(n²)", "O(1)", "O(log n)"]
+      answer: 2
+      explain: "Do variables, khidki khiskao."
+
+# 14. Connections
+connections:
+  related:
+    - id: recursion-patterns
+      why: "DP ki shuruaat sahi recursion se — memo usi par lagta hai."
+    - id: greedy-basics
+      why: "Greedy fail (coin change) → DP. Dono 'optimal substructure' par chalte hain."
+    - id: backtracking-basics
+      why: "Backtracking saare raste banata hai; DP sirf ginti / best yaad rakhta hai."
+  usedLater:
+    - id: dp-1d
+      how: "House Robber, Decode Ways — 1D state ke aur pattern."
+    - id: knapsack-01
+      how: "Do-dimensional state (item, capacity) — wahi recursion → table safar."
