@@ -4,8 +4,9 @@ Source of truth. Update after every topic.
 Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code passed).
 
 ## Current
-- Step: 3 (Content). Chapters 0–13 done (68 topics).
-- Next action: chapter 13 build + commit, then chapter 14 → `trie`.
+- Step: 3 (Content) DONE — all 15 chapters, 71 topics (chapter 14 committed 2026-10-06).
+- Next action: Step 4 (Polish) → Search (build-time index + Ctrl+K dialog).
+- Bit grids: GridViz cells are fixed ~42px, so ~5 columns fit at 390px (less inside example cards). Size bit rows to needed bits (`fitW` in bit-basics viz.ts) and keep row labels short.
 - Tracers that can explode on random input: cap frames with a budget counter (see constraint-backtracking sudoku/word) — validate fuzz fails on FrameLimitError.
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
 - Recursion panels: use `callTree()` from tracer.ts (push/done/depth/panel).
@@ -14,6 +15,7 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - Timelines: grid panel `dense: true` (narrow cells, fits 390px); see intervals `timeline()`. Charts: ChartPanel series per segment (see greedy-classics).
 - Code files: ASCII only, no arrows or >= symbols in comments (check:code does not catch it). Check: `grep -rlP '[^\x00-\x7F]' content/*/*/code`.
 - Tree topics: input spec `type: 'tree'` (level order, `#` = null, maxNodes/min/max/bst); helpers `buildTree`, `levelOrderOf`, `treeView` in tracer.ts. Code files copy the `TreeNode` + `build(vararg Int?)` pattern from `content/trees/level-order/code/how.kt` / `.java` (Java build uses `LinkedList` queue, ArrayDeque rejects null).
+- Trie panels: `trieView()` in trie viz.ts = graph panel with authored tree layout (`found` tone draws ★, so trie paths use `compare`).
 - Screenshot check of chapter 9 tree pages (level-order, bst, lca) still pending.
 - Visual check without dev server: `npm run build`, then scratchpad `serve.mjs out 4321` + `step.mjs <playerIdx> <steps>` + `shot.mjs <url> <png> 390 light 1300 @step.js`.
 - Note: low RAM on this machine (~1 GB free) makes `npm run build` slow (24 min once); run it once per chapter.
@@ -141,9 +143,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] lis
 
 ### 14. Trie & Bits
-- [ ] trie
-- [ ] bit-basics
-- [ ] bit-tricks
+- [x] trie
+- [x] bit-basics
+- [x] bit-tricks
 
 ## Step 4 — Polish
 - [ ] Search (build-time index + Ctrl+K dialog)

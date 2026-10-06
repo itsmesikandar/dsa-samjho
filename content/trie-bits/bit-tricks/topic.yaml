@@ -1,0 +1,456 @@
+meta:
+  id: bit-tricks
+  chapter: trie-bits
+  title: XOR tricks & Bitmasks
+  subtitle: x ^ x = 0 se jode katao, ek number mein poora set — subsets bina recursion
+  level: intermediate
+  minutes: 45
+  prereqs: [bit-basics, permutations-combinations]
+  tags: [bits, xor, bitmask, subsets, single-number]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    Bits ke do bade hathiyar:
+
+    **1. XOR ke niyam**
+
+    | Niyam | Matlab |
+    |---|---|
+    | `x ^ x = 0` | same cheez do baar → kat gayi |
+    | `x ^ 0 = x` | 0 se kuch nahi badalta |
+    | `a ^ b = b ^ a`, `(a ^ b) ^ c = a ^ (b ^ c)` | order se farak nahi |
+    | `a ^ b ^ b = a` | XOR khud apna undo hai |
+
+    → Jodon wali list ka XOR = sirf **akele** numbers bachte hain.
+
+    **2. Bitmask = set**
+
+    `n` items (n ≤ ~20) → ek `Int` ke `n` bits. Bit `i` on = item `i` set mein.
+
+    | Set ka kaam | Bits se (Kotlin) |
+    |---|---|
+    | add i | `mask or (1 shl i)` |
+    | remove i | `mask and (1 shl i).inv()` |
+    | contains i | `((mask shr i) and 1) == 1` |
+    | union / common | `a or b` / `a and b` |
+    | size | `Integer.bitCount(mask)` |
+    | saare subsets | `mask` = 0 se 2ⁿ − 1 |
+
+    > [!yaad]
+    > XOR = **toggle switch** — do baar dabao, wapas wahi haalat. Isliye jo do baar aaya, uska asar khatam.
+  analogy: |
+    **Seedhi ki light ka switch:**
+    Ek bulb, log aate jaate switch dabaate hain. Jisne do baar dabaya uska asar khatam. Aakhir mein bulb on hai ya off — sirf un logon par depend karta hai jo **odd** baar aaye. Yahi XOR hai.
+
+    **Pizza ke toppings:** 4 toppings (cheese, onion, paneer, corn) — har order ek 4-bit number. `1011` = cheese + onion + corn. 0 se 15 tak gin lo = saare 16 possible orders. Yahi bitmask hai.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    | Kaam | Normal tareeka | XOR / mask se |
+    |---|---|---|
+    | Akela number dhoondho | HashMap — O(n) memory | XOR — O(1) memory |
+    | 0..n mein gayab number | sum formula (overflow ka dar) | XOR — overflow nahi |
+    | Saare subsets | recursion (lo / chhodo) | ek loop: `mask` 0 se 2ⁿ − 1 |
+    | "Kaun kaun ho gaye" state | BooleanArray copy | ek Int — DP / HashMap key |
+
+    Interview mein "O(1) extra memory" sunte hi XOR socho. Aur `n ≤ 20` dikhe to bitmask.
+
+    > [!socho]
+    > Delivery boy ko 15 ghar jaana hai, kisi bhi order mein — sabse chhota raasta? "Kaun kaun se ghar ho gaye" ko DP state kaise banaoge?
+    >
+    > 15-bit mask! State = (mask, abhi kahan hai). 2¹⁵ × 15 ≈ 5 lakh states. Ye **bitmask DP** (TSP) hai — mask ke bina state rakhna mushkil.
+
+# 3. Visual intro
+visual:
+  body: |
+    4 toppings, ek number. `mask` badal ke dekho — har bit ek topping on / off karta hai. Phir dekho set ke kaam (jodo, hatao) kaise ek bit operation ban jaate hain.
+  viz: { tracer: maskSetTrace }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Saare subsets bitmask se:**
+    - `for (mask in 0 until (1 shl n))` — har number ek subset.
+    - Andar `for (i in 0 until n)`: `((mask shr i) and 1) == 1` → `nums[i]` lo.
+    - `mask = 0` = khaali set, `mask = 2ⁿ − 1` = sab items.
+
+    Recursion (lo / chhodo) bhi 2ⁿ subsets banata hai. Bitmask ka fayda: seedha loop, koi stack nahi, aur `mask` khud subset ki **id** hai — DP index ya HashMap key ban sakta hai.
+
+    Limit: n ≤ ~20 (2²⁰ ≈ 10 lakh). `Int` mein 31 bits, `Long` mein 63.
+
+    > [!galti]
+    > `(mask shr i) and 1 == 1` bina bahar ke brackets — Kotlin ise `(mask shr i) and (1 == 1)` padhta hai → compile error. Hamesha `((mask shr i) and 1) == 1`.
+  viz: { tracer: subsetsTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Sabka XOR (single number)"
+    time: "O(n)"
+    space: "O(1)"
+    why: "Ek pass; jode kat jaate."
+  - op: "Missing number (XOR)"
+    time: "O(n)"
+    space: "O(1)"
+    why: "Index aur value dono XOR — sirf gayab bachta."
+  - op: "Do akele (Single Number III)"
+    time: "O(n)"
+    space: "O(1)"
+    why: "Do pass: ek XOR ke liye, ek groups ke liye."
+  - op: "Saare subsets (mask loop)"
+    time: "O(2ⁿ · n)"
+    space: "O(2ⁿ · n) output"
+    why: "2ⁿ masks, har mask par n bits check."
+  - op: "Set kaam (add / remove / contains / union)"
+    time: "O(1)"
+    space: "O(1)"
+    why: "Ek-ek bit operation."
+  - op: "Ek mask ke saare sub-masks"
+    time: "O(2ᵏ)"
+    space: "O(1)"
+    why: "k = mask mein 1 bits; sub = (sub − 1) and mask."
+
+# 6. Code
+code:
+  - title: Mask ko set ki tarah — union, common, sub-masks
+    file: mask-set
+    note: |
+      Chhota set (elements 0..31) = ek `Int`:
+      - union = `or`, common = `and`, `a − b` = `a and b.inv()`, size = `bitCount`.
+
+      **Sub-masks:** `sub = (sub − 1) and mask` — mask ke saare subsets bade se chhote tak (khaali chhod ke). `sub − 1` sabse neeche ka 1 hatata aur neeche ke bits on karta; `and mask` sirf mask wale bits rakhta. Bitmask DP mein bahut kaam aata (saare masks ke sub-masks milake O(3ⁿ)).
+
+# 7. Examples
+examples:
+  - id: single-number
+    level: easy
+    title: Akela number (Single Number)
+    source: { name: Single Number, platform: LeetCode, url: "https://leetcode.com/problems/single-number/" }
+    problem: |
+      Array mein har number **do baar** hai, sirf ek number **ek baar**. Wo dhoondo — O(n) time, O(1) extra memory.
+
+      Example: `[7, 3, 5, 3, 7]` → **5**
+    intuition: |
+      - HashMap / Set: O(n) memory — mana hai.
+      - Sort karke padosi dekho: O(n log n).
+      - **XOR:** sabka XOR karo. Order matter nahi karta, to har joda aapas mein kat jaata (`x ^ x = 0`), aur `0 ^ akela = akela`.
+
+      `r = 0` se shuru — 0 XOR ka "khaali" hai, jaise jod mein 0.
+
+      > [!galti]
+      > `r = 1` se shuru kiya → jawab ek bit ulta. Aur agar numbers **teen-teen** baar hon (Single Number II), seedha XOR kaam nahi karta — har bit ki ginti `% 3` chahiye.
+    dryRun: |
+      | x | r = r ^ x | r (binary) |
+      |---|---|---|
+      | 7 | 7 | 111 |
+      | 3 | 4 | 100 |
+      | 5 | 1 | 001 |
+      | 3 | 2 | 010 |
+      | 7 | **5** | 101 |
+    viz: { tracer: singleTrace }
+    code: ex1-single-number
+    complexity:
+      time: "O(n)"
+      space: "O(1)"
+      why: "Ek pass, ek variable."
+
+  - id: missing-number
+    level: medium
+    title: Gayab number (Missing Number)
+    source: { name: Missing Number, platform: LeetCode, url: "https://leetcode.com/problems/missing-number/" }
+    problem: |
+      `0` se `n` tak ke numbers mein se `n` numbers array mein hain (sab alag). Ek gayab hai — kaunsa?
+
+      Example: `[4, 0, 1, 3]` → **2**
+    intuition: |
+      **Sum:** `n(n + 1)/2 − sum` — chalta hai, par bade `n` par `Int` overflow ka dar.
+
+      **XOR:** saare **index** (0..n) aur saari **values** XOR karo. Jo number array mein hai, wo index ke roop mein bhi aaya aur value ke roop mein bhi → do baar → kat gaya. Gayab number sirf index ke roop mein aaya → bacha.
+
+      Index `n` loop mein nahi aata (indices 0..n−1) — isliye `x = n` se shuru.
+
+      Aur tareeke: sort + scan O(n log n); HashSet O(n) memory; cyclic sort.
+
+      > [!galti]
+      > `x = 0` se shuru kiya, `n` bhool gaye → jab `n` khud gayab ho (`[0, 1, 2]` → 3) to galat jawab.
+    dryRun: |
+      | i | nums[i] | x = x ^ i ^ nums[i] |
+      |---|---|---|
+      | shuru | — | 4 |
+      | 0 | 4 | 4 ^ 0 ^ 4 = 0 |
+      | 1 | 0 | 0 ^ 1 ^ 0 = 1 |
+      | 2 | 1 | 1 ^ 2 ^ 1 = 2 |
+      | 3 | 3 | 2 ^ 3 ^ 3 = **2** |
+    viz: { tracer: missingTrace }
+    code: ex2-missing-number
+    complexity:
+      time: "O(n)"
+      space: "O(1)"
+      why: "Ek pass; XOR mein overflow ka sawaal hi nahi."
+
+  - id: single-number-iii
+    level: tricky
+    title: Do akele numbers (Single Number III)
+    source: { name: Single Number III, platform: LeetCode, url: "https://leetcode.com/problems/single-number-iii/" }
+    problem: |
+      Array mein **do** numbers ek-ek baar hain, baaki sab do-do baar. Dono akele dhoondo — O(n) time, O(1) extra memory.
+
+      Example: `[6, 4, 9, 6, 4, 2]` → **[2, 9]**
+    intuition: |
+      Sabka XOR = `a ^ b` (jode kat gaye). Par isse `a` aur `b` alag kaise nikalein?
+
+      `a ≠ b` → `a ^ b` mein kam se kam ek bit 1 hai — **us bit par `a` aur `b` alag hain** (ek ka 1, doosre ka 0). Sabse daayein wala lo: `diff = all and −all`.
+
+      Ab saare numbers ko do groups mein baanto:
+      - `diff` bit 1 wale → group A
+      - `diff` bit 0 wale → group B
+
+      `a` aur `b` alag groups mein. Har joda **ek hi** group mein (same number, same bit) → group ke andar kat jaata. Har group ka XOR = ek akela.
+
+      > [!galti]
+      > Kotlin `if (x and diff != 0)` → `x and (diff != 0)` — compile error. `if ((x and diff) != 0)`.
+    dryRun: |
+      | Step | Value |
+      |---|---|
+      | all = a ^ b | 6^4^9^6^4^2 = 11 (1011) |
+      | diff = all and −all | 1 (bit 0) |
+      | Group A (bit 0 = 1) | 9 → XOR = 9 |
+      | Group B (bit 0 = 0) | 6, 4, 6, 4, 2 → XOR = 2 |
+      | Jawab | **[2, 9]** |
+    viz: { tracer: single3Trace }
+    code: ex3-single-number-iii
+    complexity:
+      time: "O(n)"
+      space: "O(1)"
+      why: "Do pass; sirf 4 variables (all, diff, a, b)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Har element do baar (ya even baar), ek / do akele → XOR."
+    - "0..n mein gayab / extra number, O(1) memory → XOR (ya sum)."
+    - "n ≤ 20 items ke saare subsets / combinations → bitmask loop."
+    - "DP ka state 'kaun kaun ho gaye' (TSP, task assignment) → mask as state."
+    - "Chhote set ko HashMap key ya visited state banana → ek Int."
+  avoid:
+    - "Har element teen baar, ek akela → seedha XOR nahi; har bit ki ginti % 3."
+    - "n > ~25 → 2ⁿ masks bahut zyada; pruning ya alag DP socho."
+    - "Set ke elements 64 se bade (ya bahut saare) → mask nahi, HashSet / BitSet."
+    - "Readability zaroori aur speed ka farak nahi → normal Set / recursion."
+  signals:
+    - keyword: "every element appears twice except one"
+      think: "Sabka XOR."
+    - keyword: "missing number in 0..n"
+      think: "Index + value XOR, x = n se shuru (ya sum formula)."
+    - keyword: "exactly two elements appear once"
+      think: "all = a ^ b, diff = all and −all, do groups."
+    - keyword: "all subsets / power set, n ≤ 20"
+      think: "for (mask in 0 until (1 shl n))."
+    - keyword: "visit all nodes / assign n ≤ 20 tasks"
+      think: "Bitmask DP / BFS with state (node, mask)."
+
+# 9. Real-world
+realWorld:
+  - where: "RAID 5 storage"
+    how: "Parity disk = baaki disks ka XOR. Ek disk mare to bachi disks ka XOR = uska poora data wapas."
+  - where: "Encryption (XOR cipher, one-time pad)"
+    how: "data ^ key = cipher, cipher ^ key = data — XOR khud apna undo."
+  - where: "Network parity / checksum"
+    how: "Bits ka XOR = parity bit — ek bit ulta ho gaya to pakad mein."
+  - where: "Roles & permissions"
+    how: "Har permission ek bit; user ke roles ka OR = saari permissions; check = AND."
+  - where: "Route planning (kam stops)"
+    how: "Delivery / pickup ke 10-15 stops — bitmask DP se sabse chhota order."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Mask check bina brackets"
+    type: logic
+    wrong: |
+      `if ((mask shr i) and 1 == 1)` — Kotlin compile error (Java `& 1 == 1` bhi).
+    right: |
+      `if (((mask shr i) and 1) == 1)`.
+  - title: "XOR ka start 1 se"
+    type: logic
+    wrong: |
+      `var r = 1` — jawab ek bit ulta.
+    right: |
+      `var r = 0` — 0 XOR ka khaali value hai.
+  - title: "Missing number mein n bhool gaye"
+    type: off-by-one
+    wrong: |
+      `x = 0` se shuru — index n kabhi XOR nahi hua.
+    right: |
+      `x = n` se shuru (ya loop 0..n chalao).
+  - title: "1 shl n bada n par"
+    type: overflow
+    wrong: |
+      n = 31 par `1 shl 31` negative → loop chala hi nahi; n ≥ 32 par shift wrap.
+    right: |
+      `1L shl n` (Long) — par itne bade n par 2ⁿ masks waise bhi impossible; approach badlo.
+  - title: "Teen baar wale par XOR"
+    type: logic
+    wrong: |
+      Single Number II (baaki teen-teen baar) mein bhi sabka XOR.
+    right: |
+      Har bit position par 1s gino, `% 3` — bacha bit akele ka.
+  - title: "Khaali array ke subsets"
+    type: empty
+    wrong: |
+      Khaali `nums` par `[]` (koi subset nahi) lauta diya.
+    right: |
+      `[[]]` — khaali set bhi subset hai. `0 until (1 shl 0)` = sirf mask 0, loop khud sahi.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "XOR ke kaunse niyam tricks mein kaam aate hain?"
+      a: |
+        x ^ x = 0, x ^ 0 = x, commutative + associative. Isliye jodon wali list ka XOR = akele ka XOR, order se farak nahi.
+    - q: "Single Number O(1) memory mein?"
+      a: |
+        Sabka XOR — jode kat jaate. HashMap O(n) memory leta, sort O(n log n).
+    - q: "Missing number — XOR ya sum?"
+      a: |
+        Dono O(n), O(1). Sum mein n(n+1)/2 bade n par Int overflow kar sakta; XOR mein overflow nahi.
+    - q: "Single Number II (baaki teen baar)?"
+      a: |
+        Har bit (0..31) par 1s gino, % 3 → wo bit akele ka. O(32 n). Ya ones/twos do variables wali state machine.
+    - q: "Single Number III ka diff bit kyun?"
+      a: |
+        a ^ b ka koi 1 bit = a aur b wahan alag. Us bit se do groups: a, b alag groups mein, har joda ek group mein. Har group ka XOR.
+    - q: "Subsets — bitmask vs recursion?"
+      a: |
+        Dono O(2ⁿ · n). Bitmask iterative, stack nahi, mask = subset ki id (DP / hash key). Recursion mein pruning (backtracking) aasaan.
+    - q: "Ek mask ke saare sub-masks kaise?"
+      a: |
+        sub = mask; jab tak sub > 0: process; sub = (sub − 1) & mask. Saare masks ke saare sub-masks milake O(3ⁿ).
+    - q: "Bitmask DP ka example?"
+      a: |
+        TSP: dp[mask][i] = mask wale shehar ghoom ke i par khatam hone ka min kharcha. Transition: naya shehar j (mask mein nahi). O(2ⁿ · n²).
+    - q: "Ek number duplicate aur ek gayab (Set Mismatch)?"
+      followUp: true
+      a: |
+        Index 1..n aur values ka XOR = dup ^ missing. diff bit se do groups (Single Number III jaisa), phir array mein dekh ke kaun dup hai.
+    - q: "Gray code kaise banta hai?"
+      followUp: true
+      a: |
+        g(i) = i ^ (i >> 1). Lagaataar codes mein sirf ek bit badalta. Ulta: prefix XOR of shifts.
+  mayAsk:
+    - "Single Number II."
+    - "Set Mismatch."
+    - "Gray Code."
+    - "Shortest Path Visiting All Nodes."
+
+# 12. Practice
+practice:
+  - name: Find the Difference
+    platform: LeetCode
+    num: 389
+    url: "https://leetcode.com/problems/find-the-difference/"
+    level: easy
+    pattern: XOR se extra akshar
+    hint: "Dono strings ke saare chars XOR karo — jo jode mein hain kat jaate, extra bachta."
+  - name: Decode XORed Array
+    platform: LeetCode
+    num: 1720
+    url: "https://leetcode.com/problems/decode-xored-array/"
+    level: easy
+    pattern: XOR undo
+    hint: "encoded[i] = arr[i] ^ arr[i+1] → arr[i+1] = encoded[i] ^ arr[i]."
+  - name: Subsets
+    platform: LeetCode
+    num: 78
+    url: "https://leetcode.com/problems/subsets/"
+    level: easy
+    pattern: Mask loop
+    hint: "How wala — 0 se 2ⁿ − 1 tak masks. Recursion se bhi likh ke compare karo. (LeetCode par medium.)"
+  - name: Single Number II
+    platform: LeetCode
+    num: 137
+    url: "https://leetcode.com/problems/single-number-ii/"
+    level: medium
+    pattern: Har bit ki ginti % 3
+    hint: "32 bits par loop; har bit par kitne numbers mein 1 — % 3 bacha to wo bit akele ka. Negative ke liye bit 31 bhi."
+  - name: Gray Code
+    platform: LeetCode
+    num: 89
+    url: "https://leetcode.com/problems/gray-code/"
+    level: medium
+    pattern: i xor (i shr 1)
+    hint: "0 se 2ⁿ − 1 tak har i ka Gray = i xor (i shr 1). Padosi codes mein ek hi bit ka farak."
+  - name: Minimum Flips to Make a OR b Equal to c
+    platform: LeetCode
+    num: 1318
+    url: "https://leetcode.com/problems/minimum-flips-to-make-a-or-b-equal-to-c/"
+    level: medium
+    pattern: Bit by bit
+    hint: "Har bit: c ka bit 1 aur a, b dono 0 → 1 flip. c ka 0 → a ke 1 + b ke 1 jitne flips."
+  - name: Shortest Path Visiting All Nodes
+    platform: LeetCode
+    num: 847
+    url: "https://leetcode.com/problems/shortest-path-visiting-all-nodes/"
+    level: hard
+    pattern: BFS state (node, mask)
+    hint: "Har node se shuru, state = (node, visited mask). Pehli baar mask = sab on → jawab. States n · 2ⁿ."
+  - name: Smallest Sufficient Team
+    platform: LeetCode
+    num: 1125
+    url: "https://leetcode.com/problems/smallest-sufficient-team/"
+    level: hard
+    pattern: Bitmask DP on skills
+    hint: "Skills ≤ 16 → har banda ek skill-mask. dp[mask] = sabse chhoti team jo mask cover kare; har bande se dp[mask or uska] update."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "XOR: x ^ x = 0, x ^ 0 = x, order free → jode kat jaate."
+    - "Single: sabka XOR. Missing: index + value XOR, n se shuru."
+    - "Do akele: all = a ^ b, diff = all and −all, us bit se do groups."
+    - "Bitmask = set: bit i = item i; 0..2ⁿ − 1 = saare subsets (n ≤ 20)."
+    - "Mask check hamesha brackets mein: ((mask shr i) and 1) == 1."
+  cheatsheet: |
+    ```kotlin
+    var r = 0; for (x in nums) r = r xor x                        // akela
+    var m = n; for (i in nums.indices) m = m xor i xor nums[i]     // gayab
+    val diff = all and -all                                        // a, b ko alag karne wala bit
+    for (mask in 0 until (1 shl n))                                // saare subsets
+        for (i in 0 until n) if (((mask shr i) and 1) == 1) { /* nums[i] */ }
+    var sub = mask; while (sub > 0) { /* ... */; sub = (sub - 1) and mask }   // sub-masks
+    ```
+  quiz:
+    - q: "5 ^ 3 ^ 5 = ?"
+      options: ["5", "3", "0", "6"]
+      answer: 1
+      explain: "5 do baar → kat gaya, 3 bacha."
+    - q: "[2, 9, 2, 4, 4] mein akela?"
+      options: ["2", "4", "9", "0"]
+      answer: 2
+      explain: "Sabka XOR — 2 aur 4 ke jode kate, 9 bacha."
+    - q: "n = 3 items. Kitne masks / subsets?"
+      options: ["3", "6", "8", "9"]
+      answer: 2
+      explain: "2³ = 8 — mask 0 (khaali) se 7 (sab) tak."
+    - q: "Items [a, b, c] (bit 0 = a). mask = 6 kaunsa subset?"
+      options: ["{a, b}", "{b, c}", "{a, c}", "{c}"]
+      answer: 1
+      explain: "6 = 110 → bit 1 (b) aur bit 2 (c) on."
+    - q: "Single Number III mein diff = all and −all kyun?"
+      options: ["Sabse bada number", "Wo ek bit jahan a aur b alag hain", "Sum nikalne ke liye", "Overflow rokne ke liye"]
+      answer: 1
+      explain: "a ^ b ka koi bhi 1 bit a aur b ko alag karta — usi se do groups."
+
+# 14. Connections
+connections:
+  related:
+    - id: bit-basics
+      why: "XOR, shifts, x and −x — sab wahin se."
+    - id: permutations-combinations
+      why: "Subsets recursion (lo / chhodo) — bitmask uska iterative roop."
+    - id: hashset
+      why: "Single / missing number ka O(n) memory wala tareeka; mask chhota set."
+  usedLater:
+    - id: dp-intro
+      how: "Bitmask DP: state = mask ('kaun kaun ho gaye') — TSP, assignment. DP ki soch + mask."
