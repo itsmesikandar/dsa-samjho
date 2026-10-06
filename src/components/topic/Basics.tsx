@@ -13,7 +13,7 @@ export function Inline({ src }: { src: string }) {
 export function Section({ id, children }: { id: SectionId; children: ReactNode }) {
   const s = SECTIONS.find((x) => x.id === id)!;
   return (
-    <section id={id} aria-labelledby={`${id}-h`} className="scroll-mt-28 border-t border-line pt-8 pb-4 first:border-t-0">
+    <section id={id} aria-labelledby={`${id}-h`} className="border-t border-line pt-8 pb-4 first:border-t-0">
       <h2 id={`${id}-h`} className="mb-4 flex items-baseline gap-2.5 text-xl font-bold tracking-tight sm:text-2xl">
         <span className="font-mono text-sm font-semibold text-accent">{String(s.n).padStart(2, '0')}</span>
         <a href={`#${id}`} className="hover:underline">

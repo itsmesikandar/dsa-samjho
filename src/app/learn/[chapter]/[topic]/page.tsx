@@ -8,7 +8,7 @@ import { VizPlayer } from '@/components/viz/engine/VizPlayer';
 import { CodePane } from '@/components/code/CodePane';
 import { Inline, LevelBadge, Md, Section } from '@/components/topic/Basics';
 import { ExampleCard, Interview, Mistakes, OpsTable, Practice, RealWorld, TopicLink, WhenToUse } from '@/components/topic/Blocks';
-import { Quiz, SectionJump, Toc, TopicActions, TrackVisit } from '@/components/topic/client';
+import { HashScroll, Quiz, SectionJump, Toc, TopicActions, TrackVisit } from '@/components/topic/client';
 
 type Params = { params: Promise<{ chapter: string; topic: string }> };
 
@@ -206,6 +206,7 @@ export default async function TopicPage({ params }: Params) {
           <TopicActions id={t.meta.id} big />
         </div>
         <TrackVisit href={`/learn/${chapter}/${topic}/`} />
+        <HashScroll />
       </article>
       <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 shrink-0 overflow-y-auto py-8 pr-4 xl:block">
         <Toc />

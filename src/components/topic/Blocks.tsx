@@ -58,7 +58,7 @@ export function OpsTable({ ops }: { ops: Topic['operations'] }) {
 
 export function ExampleCard({ ex, n, topicKey, code }: { ex: Example; n: number; topicKey: string; code: CodeViews }) {
   return (
-    <article id={`ex-${ex.id}`} className="scroll-mt-28 rounded-xl border border-line p-4 sm:p-5">
+    <article id={`ex-${ex.id}`} className="rounded-xl border border-line p-4 sm:p-5">
       <header className="mb-3 flex flex-wrap items-center gap-2">
         <span className="font-mono text-xs text-muted">Example {n}</span>
         <LevelBadge level={ex.level} />

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { LazyMotion, MotionConfig } from 'motion/react';
 import type { NavChapter } from '@/lib/content';
 import { Sidebar } from './Sidebar';
+import { Search } from './Search';
 import { LangToggle, ThemeToggle } from './Toggles';
 
 const loadFeatures = () => import('@/components/viz/engine/motion-features').then((r) => r.default);
@@ -28,7 +29,7 @@ export function AppShell({ nav, children }: { nav: NavChapter[]; children: React
     <LazyMotion features={loadFeatures}>
       <MotionConfig reducedMotion="user" transition={{ duration: 0.35, ease: 'easeInOut' }}>
         <header className="sticky top-0 z-30 h-14 border-b border-line bg-bg/90 backdrop-blur">
-          <div className="mx-auto flex h-full max-w-[96rem] items-center gap-2 px-3 sm:px-4">
+          <div className="mx-auto flex h-full max-w-[96rem] items-center gap-1.5 px-2.5 sm:gap-2 sm:px-4">
             <button
               onClick={() => setOpen(true)}
               className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-card lg:hidden"
@@ -38,13 +39,14 @@ export function AppShell({ nav, children }: { nav: NavChapter[]; children: React
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <Link href="/" className="flex items-center gap-2 font-bold tracking-tight">
+            <Link href="/" className="flex items-center gap-2 font-bold tracking-tight whitespace-nowrap">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent font-mono text-sm text-accent-fg">{'{}'}</span>
               <span>
                 DSA <span className="text-accent">Samjho</span>
               </span>
             </Link>
-            <div className="ml-auto flex items-center gap-1.5">
+            <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
+              <Search />
               <LangToggle />
               <ThemeToggle />
             </div>

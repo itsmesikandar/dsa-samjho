@@ -5,7 +5,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 
 ## Current
 - Step: 3 (Content) DONE — all 15 chapters, 71 topics (chapter 14 committed 2026-10-06).
-- Next action: Step 4 (Polish) → Search (build-time index + Ctrl+K dialog).
+- Step 4: Search done (2026-10-06). Next action: Patterns page (auto from `when.signals`).
+- Search: `scripts/gen.ts` writes `src/generated/search-index.json` (chapters, topics, examples, practice; ~35 KB gz, lazy chunk). Matching in `src/lib/search.ts` (no lib). UI `src/components/layout/Search.tsx` (Ctrl/⌘ K, `/`), portalled to body (header backdrop-blur traps `fixed`). LeetCode numbers only searchable for practice entries (examples have no `num`).
+- Anchors: `html { scroll-padding-top: 7rem }` is the only offset (no `scroll-mt-*` on sections). `HashScroll` (topic client.tsx) keeps #anchor aligned while players render. Use `focus({ preventScroll: true })` for focus inside sticky/fixed UI.
 - Bit grids: GridViz cells are fixed ~42px, so ~5 columns fit at 390px (less inside example cards). Size bit rows to needed bits (`fitW` in bit-basics viz.ts) and keep row labels short.
 - Tracers that can explode on random input: cap frames with a budget counter (see constraint-backtracking sudoku/word) — validate fuzz fails on FrameLimitError.
 - List panels: use `listView(nodes, head, {extra, pointers, tones, doubly})` from tracer.ts (cycle-safe; `extra` keeps removed nodes / fixed order).
@@ -148,7 +150,7 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 - [x] bit-tricks
 
 ## Step 4 — Polish
-- [ ] Search (build-time index + Ctrl+K dialog)
+- [x] Search (build-time index + Ctrl+K dialog)
 - [ ] Patterns page (auto from `when.signals`)
 - [ ] Cheatsheets page
 - [ ] Glossary page

@@ -14,7 +14,7 @@ export function LangToggle() {
           role="radio"
           aria-checked={l === lang}
           onClick={() => setLang(l)}
-          className={`rounded-md px-2.5 py-1.5 ${l === lang ? 'bg-accent text-accent-fg' : 'text-muted hover:text-fg'}`}
+          className={`rounded-md px-2 py-1.5 sm:px-2.5 ${l === lang ? 'bg-accent text-accent-fg' : 'text-muted hover:text-fg'}`}
         >
           {LANG_LABEL[l]}
         </button>

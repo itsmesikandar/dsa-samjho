@@ -47,6 +47,36 @@ export function TrackVisit({ href }: { href: string }) {
   return null;
 }
 
+/** #anchor wale link se aaye: browser pehle hi scroll kar deta hai, phir players bante hain aur upar ka
+ *  content lamba ho jaata hai. Layout settle hone tak (max 3s) target ko upar hi rakho — user khud scroll kare to ruk jao. */
+export function HashScroll() {
+  useEffect(() => {
+    let stopped = false;
+    let ro: ResizeObserver | undefined;
+    const stop = () => {
+      stopped = true;
+      ro?.disconnect();
+    };
+    const userEvents = ['wheel', 'touchstart', 'keydown', 'mousedown'] as const;
+    // client navigation mein URL (hash) is effect ke baad update hota hai — ek frame ruko
+    const raf = requestAnimationFrame(() => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      if (!id || stopped) return;
+      ro = new ResizeObserver(() => !stopped && document.getElementById(id)?.scrollIntoView({ block: 'start' }));
+      ro.observe(document.body);
+      userEvents.forEach((e) => window.addEventListener(e, stop, { passive: true, once: true }));
+    });
+    const t = setTimeout(stop, 3000);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+      stop();
+      userEvents.forEach((e) => window.removeEventListener(e, stop));
+    };
+  }, []);
+  return null;
+}
+
 function useActiveSection(): string {
   const [active, setActive] = useState<string>(SECTIONS[0].id);
   useEffect(() => {
