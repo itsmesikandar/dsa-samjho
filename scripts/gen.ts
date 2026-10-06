@@ -3,7 +3,7 @@
 //   search-index.json  chapters, topics, examples, practice problems (loaded only when search opens)
 import fs from 'node:fs';
 import path from 'node:path';
-import { getNav, getTopic } from '../src/lib/content';
+import { getGlossary, getNav, getTopic, termSlug } from '../src/lib/content';
 import { plain, type SearchDoc } from '../src/lib/search';
 
 const root = process.cwd();
@@ -39,6 +39,8 @@ ${entries.map(([k, p]) => `  '${k}': () => import('${p}'),`).join('\n')}
 const docs: SearchDoc[] = [
   { k: 'page', t: 'Patterns pehchano', s: 'Question mein ye keyword dikhe → ye pattern socho', h: '/patterns/', w: 'signals keywords interview kab use karein' },
   { k: 'page', t: 'Bookmarks', s: 'Tumhare save kiye topics', h: '/bookmarks/', w: 'saved star' },
+  { k: 'page', t: 'Cheatsheets', s: 'Big-O, constraints, sorting, Kotlin vs Java — aur har topic ki cheat-sheet', h: '/cheatsheets/', w: 'revision complexity table collections' },
+  { k: 'page', t: 'Glossary', s: 'English shabd, simple Hinglish matlab', h: '/glossary/', w: 'words meaning terms dictionary' },
   { k: 'page', t: 'Visualizer playground', s: 'Har animation panel ka demo', h: '/playground/', w: 'animation demo viz' },
 ];
 const sameName = (a: string, b: string) => a.toLowerCase().replace(/[^a-z0-9]/g, '') === b.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -71,6 +73,10 @@ for (const ch of getNav()) {
       docs.push({ k: 'problem', t: p.name, s: `${p.platform}${num} · ${where}`, h: `${nt.href}#practice`, w: `${plain(p.pattern)} ${p.level}${lc}` });
     }
   }
+}
+for (const g of getGlossary()) {
+  const m = plain(g.meaning);
+  docs.push({ k: 'term', t: g.term, s: m.length > 90 ? `${m.slice(0, 88)}…` : m, h: `/glossary/#${termSlug(g.term)}`, w: (g.aka ?? []).join(' ') });
 }
 const json = JSON.stringify(docs);
 write('search-index.json', json);

@@ -1,6 +1,6 @@
 // Site search: index is built at build time (scripts/gen.ts), matching runs in the browser. No library.
 
-export type DocKind = 'page' | 'chapter' | 'topic' | 'example' | 'problem';
+export type DocKind = 'page' | 'chapter' | 'topic' | 'example' | 'problem' | 'term';
 
 /** one search result as stored in src/generated/search-index.json (short keys keep the file small) */
 export interface SearchDoc {
@@ -15,8 +15,8 @@ export interface SearchDoc {
   w: string;
 }
 
-export const KIND_LABEL: Record<DocKind, string> = { page: 'Page', chapter: 'Chapter', topic: 'Topic', example: 'Example', problem: 'Practice' };
-const KIND_BONUS: Record<DocKind, number> = { page: 3, topic: 3, chapter: 2, example: 1, problem: 0 };
+export const KIND_LABEL: Record<DocKind, string> = { page: 'Page', term: 'Glossary', chapter: 'Chapter', topic: 'Topic', example: 'Example', problem: 'Practice' };
+const KIND_BONUS: Record<DocKind, number> = { page: 3, term: 1, topic: 3, chapter: 2, example: 1, problem: 0 };
 
 /** lowercase, only a-z 0-9, single spaces ("Kadane's — O(n)" → "kadane s o n") */
 export const norm = (s: string) =>
@@ -82,3 +82,6 @@ export function search(index: Prepared[], query: string, limit = 30): SearchDoc[
   hits.sort((a, b) => b.score - a.score || a.p.doc.t.length - b.p.doc.t.length);
   return hits.slice(0, limit).map((h) => h.p.doc);
 }
+
+/** har query word kisi word ki shuruaat ho ("sub" → subarray) — patterns / glossary filter */
+export const prefixMatch = (query: string[], words: string[]) => query.every((q) => words.some((w) => w.startsWith(q)));

@@ -311,6 +311,10 @@ pre,
 :not(pre) > code {
   overflow-wrap: anywhere;
 }
+/* table khud side mein scroll hoti hai — wahan code ko beech se mat todo, sirf spaces par */
+.table-wrap code {
+  overflow-wrap: normal;
+}
 .code-box {
   font-family: var(--font-mono);
   font-size: 0.82rem;

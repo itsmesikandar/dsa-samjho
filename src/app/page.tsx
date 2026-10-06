@@ -40,6 +40,16 @@ export default function Home() {
             Patterns pehchano
           </Link>
         </div>
+        <p className="mt-4 text-sm text-muted">
+          Revision ke liye:{" "}
+          <Link href="/cheatsheets/" className="text-accent hover:underline">
+            Cheatsheets
+          </Link>{" "}
+          ·{" "}
+          <Link href="/glossary/" className="text-accent hover:underline">
+            Glossary
+          </Link>
+        </p>
         <div className="mt-6 max-w-md">
           <ContinueCard titles={titles} />
         </div>

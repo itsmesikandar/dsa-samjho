@@ -140,3 +140,26 @@ export const TopicSchema = z
 export type Chapter = z.infer<typeof ChaptersSchema>[number];
 export type Topic = z.infer<typeof TopicSchema>;
 export type Example = Topic['examples'][number];
+
+// content/glossary.yaml — English term → simple Hinglish meaning
+export const GlossarySchema = z
+  .array(
+    z.strictObject({
+      term: line,
+      /** doosre naam / short form (search mein bhi milte hain) */
+      aka: z.array(line).optional(),
+      meaning: z.string().trim().min(10, 'meaning thoda aur likho'),
+      example: line.optional(),
+      /** is word ko samajhne ke liye best topic */
+      topic: id.optional(),
+    }),
+  )
+  .min(20);
+
+// content/cheatsheets.yaml — /cheatsheets page ke upar wale tables
+export const CheatsheetsSchema = z
+  .array(z.strictObject({ id, title: line, intro: line.optional(), body: md }))
+  .min(1);
+
+export type GlossaryEntry = z.infer<typeof GlossarySchema>[number];
+export type Cheatsheet = z.infer<typeof CheatsheetsSchema>[number];

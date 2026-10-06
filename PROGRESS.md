@@ -5,8 +5,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 
 ## Current
 - Step: 3 (Content) DONE — all 15 chapters, 71 topics (chapter 14 committed 2026-10-06).
-- Step 4: Search, Patterns done (2026-10-06). Next action: Cheatsheets page.
+- Step 4: Search, Patterns, Cheatsheets, Glossary done (2026-10-06). Next action: "Aaj revise karo" on home.
 - Patterns: `src/app/patterns/page.tsx` (server, renders all signals) + `src/components/patterns/client.tsx` (word-prefix filter, chapter chips). Linked from sidebar, home, search (`page` docs in gen.ts).
+- Cheatsheets: `content/cheatsheets.yaml` (Big-O, constraints, DS ops, sorting, recurrences, Kotlin vs Java) + every topic's revision summary/cheatsheet in per-chapter <details>. Glossary: `content/glossary.yaml` (120 terms, `topic` link checked by validate), anchors `termSlug()` = g-<slug>, terms in search (kind `term`). Shared filter UI: `src/components/layout/StickyFilter.tsx`.
 - Search: `scripts/gen.ts` writes `src/generated/search-index.json` (chapters, topics, examples, practice; ~35 KB gz, lazy chunk). Matching in `src/lib/search.ts` (no lib). UI `src/components/layout/Search.tsx` (Ctrl/⌘ K, `/`), portalled to body (header backdrop-blur traps `fixed`). LeetCode numbers only searchable for practice entries (examples have no `num`).
 - Anchors: `html { scroll-padding-top: 7rem }` is the only offset (no `scroll-mt-*` on sections). `HashScroll` (topic client.tsx) keeps #anchor aligned while players render. Use `focus({ preventScroll: true })` for focus inside sticky/fixed UI.
 - Bit grids: GridViz cells are fixed ~42px, so ~5 columns fit at 390px (less inside example cards). Size bit rows to needed bits (`fitW` in bit-basics viz.ts) and keep row labels short.
@@ -153,8 +154,8 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 ## Step 4 — Polish
 - [x] Search (build-time index + Ctrl+K dialog)
 - [x] Patterns page (auto from `when.signals`)
-- [ ] Cheatsheets page
-- [ ] Glossary page
+- [x] Cheatsheets page
+- [x] Glossary page
 - [ ] "Aaj revise karo" on home (1/3/7-day reminders)
 - [ ] Dark mode + mobile pass on every page
 - [ ] Accessibility pass (keyboard, aria-live, reduced motion, contrast)

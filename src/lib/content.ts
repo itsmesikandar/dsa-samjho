@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parseDocument } from 'yaml';
 import { z } from 'zod';
-import { ChaptersSchema, TopicSchema, type Chapter, type Topic } from './schema';
+import { ChaptersSchema, CheatsheetsSchema, GlossarySchema, TopicSchema, type Chapter, type Cheatsheet, type GlossaryEntry, type Topic } from './schema';
 import { parseCode, LANG_EXT, type Lang, type ParsedCode } from './codefile';
 
 export const CONTENT_DIR = path.join(process.cwd(), 'content');
@@ -97,3 +97,14 @@ export function neighbours(topicId: string): { prev?: NavTopic; next?: NavTopic 
   const i = list.findIndex((t) => t.id === topicId);
   return { prev: list[i - 1], next: list[i + 1] };
 }
+
+function loadList<T>(file: string, schema: z.ZodType<T>): T {
+  const r = schema.safeParse(readYaml(path.join(CONTENT_DIR, file)));
+  if (!r.success) throw new Error(`content/${file} galat hai:\n${z.prettifyError(r.error)}`);
+  return r.data;
+}
+export const getGlossary = (): GlossaryEntry[] => loadList('glossary.yaml', GlossarySchema);
+export const getCheatsheets = (): Cheatsheet[] => loadList('cheatsheets.yaml', CheatsheetsSchema);
+
+/** glossary anchor: "Big-O" → "g-big-o" */
+export const termSlug = (term: string) => 'g-' + term.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

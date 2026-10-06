@@ -104,6 +104,12 @@ export function Sidebar({ nav, onNavigate }: { nav: NavChapter[]; onNavigate?: (
         <Link href="/patterns/" onClick={onNavigate} className="block rounded-md px-2 py-1.5 text-muted hover:bg-card hover:text-fg">
           Patterns pehchano
         </Link>
+        <Link href="/cheatsheets/" onClick={onNavigate} className="block rounded-md px-2 py-1.5 text-muted hover:bg-card hover:text-fg">
+          Cheatsheets
+        </Link>
+        <Link href="/glossary/" onClick={onNavigate} className="block rounded-md px-2 py-1.5 text-muted hover:bg-card hover:text-fg">
+          Glossary (English → Hinglish)
+        </Link>
         <Link href="/playground/" onClick={onNavigate} className="block rounded-md px-2 py-1.5 text-muted hover:bg-card hover:text-fg">
           Visualizer playground
         </Link>

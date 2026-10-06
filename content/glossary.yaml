@@ -1,0 +1,397 @@
+# English term → simple Hinglish meaning. /glossary page aur search isse bante hain.
+# term: jaisa interview / docs mein likha hota hai. topic: is word ko samajhne ka best topic (id).
+
+- term: Adjacency list
+  meaning: "Graph rakhne ka tareeka — har node ke saamne uske padosiyon ki list. Kam edges wale graph mein memory bachata hai."
+  example: "0: [1, 2], 1: [2], 2: []"
+  topic: graph-basics
+- term: Adjacency matrix
+  meaning: "n × n table: `m[u][v] = 1` agar u se v tak edge hai. Edge check O(1), par memory O(n²)."
+  topic: graph-basics
+- term: Algorithm
+  meaning: "Kisi kaam ko karne ke saaf, step-by-step niyam — jaise chai banane ki recipe."
+  topic: problem-solving
+- term: Amortized
+  meaning: "Kabhi-kabhi ek operation mehenga hota hai, par lambe samay mein average sasta rehta hai."
+  example: "ArrayList ka add: kabhi poora array copy (O(n)), par average O(1)."
+  topic: dynamic-array
+- term: Ancestor
+  meaning: "Tree mein kisi node ke upar ke saare nodes — parent, parent ka parent… root tak."
+  topic: lca
+- term: Array
+  meaning: "Ek hi type ke items, memory mein lagaataar (side by side). Index se seedha O(1) mein pahuncho."
+  topic: array
+- term: Ascending
+  meaning: "Chhote se bade ki taraf — 1, 2, 3… Ulta hai descending."
+  topic: sorting-in-practice
+- term: Auxiliary space
+  meaning: "Input ke alawa jo extra memory tumhara code leta hai — temp array, map, recursion stack."
+  topic: space-complexity
+- term: Average case
+  meaning: "Aam (random) input par kitna time lagta hai — best case aur worst case ke beech."
+  topic: big-o-time
+- term: Backtracking
+  meaning: "Ek choice lo, aage badho; raasta galat nikla to wapas aao aur doosri choice try karo. Maze mein deewar mili to peeche mud jaana."
+  topic: backtracking-basics
+- term: Balanced tree
+  meaning: "Jiske left aur right hisson ki height mein zyada farak na ho — height O(log n) rehti hai, isliye search tez."
+  topic: bst
+- term: Base case
+  meaning: "Recursion ka rukne ka point — sabse chhota sawaal jiska jawab seedha pata hai. Iske bina recursion kabhi nahi rukegi."
+  topic: recursion-basics
+- term: Best case
+  meaning: "Sabse achhe input par kitna time — jaise already sorted array par insertion sort O(n)."
+  topic: big-o-time
+- term: BFS
+  aka: [Breadth-first search]
+  meaning: "Graph / tree ko level by level ghoomna — pehle saare paas wale, phir unke padosi. Queue se chalta hai."
+  topic: bfs
+- term: Big-O
+  aka: [Big O notation, Asymptotic]
+  meaning: "Input badhne par time / memory kitni tezi se badhti hai, uski upper limit. Constants aur chhote terms chhod dete hain."
+  example: "3n² + 5n + 2 → O(n²)"
+  topic: big-o-time
+- term: Binary search
+  meaning: "Sorted data mein beech wala element dekho, galat aadha hissa phek do. Har kadam range aadhi → O(log n)."
+  topic: binary-search
+- term: Binary tree
+  meaning: "Tree jisme har node ke zyada se zyada do bachche hon — left aur right."
+  topic: binary-tree-basics
+- term: Bit
+  meaning: "Memory ki sabse chhoti unit — 0 ya 1. 8 bits = 1 byte, Int = 32 bits."
+  topic: bit-basics
+- term: Bitmask
+  meaning: "Ek number ke bits ko on/off switches ki tarah use karna — bit i on matlab item i liya."
+  example: "mask 101 = item 0 aur item 2"
+  topic: bit-tricks
+- term: Brute force
+  meaning: "Saare possible options try karna. Jawab sahi par aksar slow — pehle idea ke roop mein theek hai."
+  topic: problem-solving
+- term: BST
+  aka: [Binary search tree]
+  meaning: "Binary tree jisme har node ke left mein sab chhote, right mein sab bade. Search binary search jaisa chalta hai."
+  topic: bst
+- term: Cache
+  meaning: "Baar-baar chahiye wali cheez paas rakhna taaki dobara mehnat na karni pade. DP ka memo bhi ek cache hai."
+  topic: dp-intro
+- term: Call stack
+  meaning: "Function calls ki stack — har call apna frame (local variables) push karti hai, return par pop. Bahut gehri recursion se StackOverflowError."
+  topic: recursion-basics
+- term: Collision
+  aka: [Hash collision]
+  meaning: "Hashing mein do alag keys ka ek hi bucket mein aana. Chaining (list) ya probing se sambhalte hain."
+  topic: hashing-internals
+- term: Combination
+  meaning: "Items chunna jahan order matter nahi karta — {a, b} aur {b, a} ek hi hain. n mein se k: C(n, k)."
+  topic: permutations-combinations
+- term: Comparator
+  meaning: "Do cheezon ko compare karne ka rule — sort ya PriorityQueue ko batata hai kaun pehle aaye."
+  example: "compareBy { it.age }"
+  topic: sorting-in-practice
+- term: Complete binary tree
+  meaning: "Har level poora bhara, sirf aakhri level baayein se bharta hai. Heap aisa hi tree hai — isliye array mein fit ho jaata hai."
+  topic: heap-basics
+- term: Connected component
+  meaning: "Graph ka aisa hissa jiske andar har node baaki tak pahunch sake, aur bahar se juda na ho — jaise alag-alag tapu (islands)."
+  topic: dfs
+- term: Constraints
+  meaning: "Question mein di gayi limits (jaise n ≤ 10⁵). Inse pata chalta hai kaunsi complexity chalegi."
+  topic: problem-solving
+- term: Contiguous
+  meaning: "Lagaataar, bina gap ke. Subarray contiguous hota hai; subsequence nahi."
+  topic: kadane
+- term: Cycle
+  meaning: "Graph mein aisa raasta jo ghoom ke wapas usi node par aa jaaye."
+  topic: dfs
+- term: DAG
+  aka: [Directed acyclic graph]
+  meaning: "Directed graph jisme koi cycle nahi. Isi par topological sort hota hai — jaise subjects ke prerequisites."
+  topic: topological-sort
+- term: Degree
+  meaning: "Node se jude edges ki ginti. Directed graph mein in-degree (aane wale) aur out-degree (jaane wale) alag."
+  topic: graph-basics
+- term: Depth
+  meaning: "Root se kisi node tak kitne kadam (edges). Root ki depth 0."
+  topic: binary-tree-basics
+- term: Deque
+  aka: [Double-ended queue]
+  meaning: "Queue jisme dono kinaron se O(1) mein daal bhi sakte ho aur nikaal bhi."
+  topic: deque
+- term: Descending
+  meaning: "Bade se chhote ki taraf — 9, 7, 3…"
+  topic: sorting-in-practice
+- term: DFS
+  aka: [Depth-first search]
+  meaning: "Ek raaste par jitna gehra ja sako jao, phir peeche aao (backtrack). Recursion ya stack se chalta hai."
+  topic: dfs
+- term: Directed graph
+  meaning: "Edges ki disha hoti hai — u → v ka matlab v → u nahi. Jaise Instagram follow."
+  topic: graph-basics
+- term: Divide and conquer
+  meaning: "Bade sawaal ko chhote tukdon mein todo, har tukda alag hal karo, phir jodo."
+  example: "Merge sort: aadha-aadha sort karo, phir merge."
+  topic: merge-sort
+- term: DP
+  aka: [Dynamic programming]
+  meaning: "Recursion + yaaddasht — jo chhote sawaal baar-baar aate hain unke jawab save karo, dobara mat nikaalo."
+  topic: dp-intro
+- term: DSU
+  aka: [Union-Find, Disjoint set union]
+  meaning: "Groups ka hisaab: do items ek group mein hain? (find) — do groups milao (union). Lagbhag O(1) har operation."
+  topic: union-find
+- term: Dummy node
+  aka: [Sentinel node]
+  meaning: "Linked list ke aage ek nakli node — head ke liye alag `if` likhne ki zaroorat khatam."
+  topic: linked-list-techniques
+- term: Edge
+  meaning: "Graph mein do nodes ko jodne wali line (rishta). Weighted ho to uska kharcha / doori bhi."
+  topic: graph-basics
+- term: Edge case
+  meaning: "Kinaare wala ya khaas input jahan code aksar toot-ta hai — khaali array, ek item, sab same, negative, bahut bada number."
+  topic: problem-solving
+- term: Enqueue / Dequeue
+  meaning: "Queue mein peeche daalna (enqueue) aur aage se nikaalna (dequeue)."
+  topic: queue
+- term: Exponential
+  meaning: "Har kadam par kaam dugna — O(2ⁿ). n = 30 par bhi ~10⁹ steps, bahut slow."
+  topic: big-o-time
+- term: Fast and slow pointers
+  aka: [Tortoise and hare, Floyd cycle detection]
+  meaning: "Ek pointer ek kadam, doosra do kadam chalta hai — cycle aur list ka beech dhoondhne ke liye."
+  topic: fast-slow-pointers
+- term: FIFO
+  aka: [First in first out]
+  meaning: "Jo pehle aaya wo pehle jaayega — ticket ki line. Queue isi par chalti hai."
+  topic: queue
+- term: Frequency
+  meaning: "Koi cheez kitni baar aayi — HashMap ya array mein gin ke rakhte hain."
+  topic: frequency-count
+- term: Greedy
+  meaning: "Har kadam par abhi ka sabse accha choice lo, peeche mud ke mat dekho. Kabhi sahi, kabhi nahi — proof chahiye."
+  topic: greedy-basics
+- term: Hash function
+  meaning: "Key ko ek number (bucket index) mein badalne wala formula. Same key par hamesha same number."
+  topic: hashing-internals
+- term: HashMap
+  aka: [Hash table, Dictionary]
+  meaning: "Key → value store — average O(1) mein daalo, dhoondo, hatao. Order ki koi guarantee nahi."
+  topic: hashmap
+- term: HashSet
+  meaning: "Sirf keys ka HashMap — 'ye pehle dekha hai?' O(1) mein. Duplicate nahi rakhta."
+  topic: hashset
+- term: Heap
+  aka: [Min-heap, Max-heap]
+  meaning: "Complete binary tree jisme parent hamesha bachchon se chhota (min-heap) ya bada (max-heap). Top par min/max — O(1)."
+  topic: heap-basics
+- term: Height
+  meaning: "Node se neeche sabse door leaf tak kitne kadam. Tree ki height = root ki height."
+  topic: tree-recursion
+- term: Immutable
+  meaning: "Banne ke baad badal nahi sakte. String immutable hai — har badlaav naya string banata hai."
+  topic: strings
+- term: In-degree
+  meaning: "Directed graph mein kisi node par aane wale edges ki ginti. Kahn's algorithm in-degree 0 wale nodes se shuru hota hai."
+  topic: topological-sort
+- term: In-place
+  meaning: "Naya bada array banaye bina usi array mein kaam karna — O(1) extra memory."
+  topic: two-pointers-same
+- term: Index
+  meaning: "Array mein item ki position — 0 se shuru. `a[0]` pehla item."
+  topic: array
+- term: Inorder
+  meaning: "Tree traversal: left, node, right. BST par inorder = sorted order."
+  topic: tree-traversals
+- term: Invariant
+  meaning: "Aisi baat jo loop ke har step par sach rehti hai — code sahi hone ka saboot."
+  example: "Binary search: jawab hamesha [lo, hi] ke andar hai."
+  topic: binary-search-variations
+- term: Iterative
+  meaning: "Loop se kaam karna, recursion ke bina."
+  topic: recursion-basics
+- term: Kadane's algorithm
+  meaning: "Sabse bada subarray sum ek pass mein — har jagah socho 'pichhla jod rakhun ya yahin se naya shuru karun?'"
+  topic: kadane
+- term: Leaf
+  meaning: "Tree ka aisa node jiska koi bachcha nahi."
+  topic: binary-tree-basics
+- term: LIFO
+  aka: [Last in first out]
+  meaning: "Jo aakhri aaya wo pehle niklega — plates ka dher. Stack isi par chalta hai."
+  topic: stack
+- term: Linear
+  meaning: "Input ke barabar kaam — O(n). Input dugna, time dugna."
+  topic: big-o-time
+- term: Linked list
+  meaning: "Nodes ki chain — har node mein value aur agle node ka pointer. Beech mein jodna sasta, index se pahunchna mehenga."
+  topic: singly-linked-list
+- term: Load factor
+  meaning: "HashMap mein items ÷ buckets. Zyada bhar jaaye (Java mein 0.75 se upar) to table dugna karke rehash."
+  topic: hashing-internals
+- term: Logarithmic
+  meaning: "Har kadam par problem aadhi — O(log n). 10⁹ items bhi ~30 kadam mein."
+  topic: big-o-time
+- term: Lower bound
+  meaning: "Sorted array mein pehla index jahan value ≥ target."
+  topic: binary-search-variations
+- term: Matrix
+  meaning: "2D array — rows aur columns ki grid. `grid[r][c]`."
+  topic: matrix
+- term: Memoization
+  meaning: "Recursion ke jawab map / array mein yaad rakhna — same input dobara aaye to seedha lauta do (top-down DP)."
+  topic: dp-intro
+- term: Monotonic
+  meaning: "Hamesha ek hi disha mein — sirf badhta ya sirf ghatta. Monotonic stack / deque isi order ko bana ke rakhte hain."
+  topic: monotonic-stack
+- term: Mutable
+  meaning: "Baad mein badal sakte ho. `IntArray`, `MutableList`, `StringBuilder` mutable hain."
+  topic: kotlin-java-toolkit
+- term: Node
+  meaning: "Linked list / tree / graph ki ek ikai (dabba) — value aur doosron ke links rakhta hai."
+  topic: singly-linked-list
+- term: "Null"
+  aka: [NullPointerException]
+  meaning: "Kuch nahi / khaali reference. Linked list ka aakhri next null hota hai; null par `.val` padha to crash."
+  topic: singly-linked-list
+- term: Optimal substructure
+  meaning: "Bade sawaal ka best jawab chhote sawaalon ke best jawabon se banta hai. DP aur greedy dono ki shart."
+  topic: dp-intro
+- term: Overflow
+  aka: [Integer overflow]
+  meaning: "Number apne type ki limit se bada ho gaya — Int ki limit ~2.1 × 10⁹. Chupchaap galat (negative) ho jaata hai; Long lo."
+  topic: kotlin-java-toolkit
+- term: Overlapping subproblems
+  meaning: "Same chhota sawaal baar-baar aana — DP lagne ki pakki nishaani. Jawab yaad rakho."
+  topic: dp-intro
+- term: Palindrome
+  meaning: "Aage aur peeche se same padha jaaye — 'naman', 'madam', 121."
+  topic: strings
+- term: Partition
+  meaning: "Array ko kisi rule se do hisson mein baantna — quick sort mein pivot se chhote ek taraf, bade doosri taraf."
+  topic: quick-sort
+- term: Permutation
+  meaning: "Items ka koi order — yahan order matter karta hai. n items ke n! permutations."
+  topic: permutations-combinations
+- term: Pivot
+  meaning: "Quick sort mein chuna gaya element jiske aas-paas array baanta jaata hai."
+  topic: quick-sort
+- term: Pointer
+  meaning: "Kisi item ki jagah batane wala variable — array ka index (two pointers) ya node ka reference."
+  topic: two-pointers-opposite
+- term: Postorder
+  meaning: "Tree traversal: left, right, phir node. Bachchon ka kaam pehle, parent ka baad mein."
+  topic: tree-traversals
+- term: Prefix
+  meaning: "Shuru ka hissa — 'app' 'apple' ka prefix hai. Prefix sum = shuru se ab tak ka jod."
+  topic: prefix-sum
+- term: Preorder
+  meaning: "Tree traversal: node, left, right. Tree ki copy banane ya save karne mein kaam aata hai."
+  topic: tree-traversals
+- term: Priority queue
+  meaning: "Queue jisme hamesha sabse chhota (ya bada) pehle niklega, aane ka order nahi. Andar heap hota hai."
+  topic: priority-queue
+- term: Pruning
+  meaning: "Backtracking mein jo raasta pakka bekaar hai use aage explore hi mat karo — bahut kaam bachta hai."
+  topic: constraint-backtracking
+- term: Pseudo-polynomial
+  meaning: "Complexity jo number ki value par depend kare, uske digits par nahi — jaise knapsack O(n · W). W bahut bada ho to slow."
+  topic: knapsack-01
+- term: Queue
+  meaning: "FIFO line — peeche se aao, aage se jao."
+  topic: queue
+- term: Recurrence
+  aka: [Recurrence relation]
+  meaning: "Formula jo bade sawaal ko chhote sawaalon se likhe."
+  example: "f(n) = f(n − 1) + f(n − 2)"
+  topic: recursion-patterns
+- term: Recursion
+  meaning: "Function jo apne aap ko chhote input ke saath bulaata hai, jab tak base case na aa jaaye."
+  topic: recursion-basics
+- term: Recursion tree
+  meaning: "Har recursive call ek node — dikhata hai kitni calls bani aur kaunsi dobara aayi."
+  topic: recursion-patterns
+- term: Root
+  meaning: "Tree ka sabse upar wala node — iska koi parent nahi."
+  topic: binary-tree-basics
+- term: Shortest path
+  meaning: "Do jagahon ke beech sabse chhota / sasta raasta. Bina weight BFS, weight ho to Dijkstra."
+  topic: dijkstra
+- term: Sliding window
+  meaning: "Array par ek khidki (range) jo aage khiskti hai — har baar sab dobara nahi ginna, bas ek aaya ek gaya."
+  topic: sliding-window-fixed
+- term: Space complexity
+  meaning: "Input badhne par kitni extra memory lagti hai."
+  topic: space-complexity
+- term: Stable sort
+  meaning: "Barabar wale items apna purana order rakhte hain. Merge sort stable hai, quick sort nahi."
+  topic: sorting-in-practice
+- term: Stack
+  meaning: "LIFO dher — upar daalo (push), upar se nikaalo (pop)."
+  topic: stack
+- term: Stack overflow
+  aka: [StackOverflowError]
+  meaning: "Recursion bahut gehri ho gayi aur call stack ki memory khatam."
+  topic: recursion-basics
+- term: State
+  meaning: "DP mein wo cheezein jo ek sawaal ko poori tarah batati hain — jaise `dp[i][w]` = (item i, bachi jagah w)."
+  topic: dp-intro
+- term: Subarray
+  meaning: "Array ka lagaataar hissa. n items ke n(n + 1)/2 subarrays."
+  example: "[2, 3, 4] in [1, 2, 3, 4, 5]"
+  topic: kadane
+- term: Subsequence
+  meaning: "Kuch items hata ke bacha hua — order wahi, beech mein gap chalega. n items ke 2ⁿ subsequences."
+  example: "[1, 3, 5] in [1, 2, 3, 4, 5]"
+  topic: dp-strings
+- term: Subset
+  meaning: "Items ka koi bhi group, order ka matlab nahi. n items ke 2ⁿ subsets."
+  topic: backtracking-basics
+- term: Substring
+  meaning: "String ka lagaataar hissa."
+  example: "'ana' in 'banana'"
+  topic: strings
+- term: Tabulation
+  meaning: "Bottom-up DP — chhote sawaalon se shuru karke table bharo, recursion ke bina."
+  topic: dp-intro
+- term: Time complexity
+  meaning: "Input badhne par steps kitne badhte hain — Big-O mein likhte hain."
+  topic: big-o-time
+- term: TLE
+  aka: [Time limit exceeded]
+  meaning: "Code sahi par bahut slow — judge ne time limit ke baad rok diya. Rough rule — ~10⁸ simple steps ≈ 1 second."
+  topic: problem-solving
+- term: Topological sort
+  meaning: "DAG ke nodes ko aisi line mein lagana ki har edge u → v mein u pehle aaye — kaamon ka sahi order."
+  topic: topological-sort
+- term: Traverse
+  aka: [Traversal]
+  meaning: "Har item ko ek-ek karke visit karna — array par loop, tree / graph par DFS ya BFS."
+  topic: tree-traversals
+- term: Trie
+  aka: [Prefix tree]
+  meaning: "Strings ka tree, har node ek prefix. Prefix search word ki length jitne time mein."
+  topic: trie
+- term: Two pointers
+  meaning: "Do index ek saath chalana (dono kinaron se, ya ek tez ek dheema) — nested loop ki jagah O(n)."
+  topic: two-pointers-opposite
+- term: Two's complement
+  meaning: "Negative numbers ko bits mein rakhne ka tareeka — −x = ~x + 1. Sabse upar ka bit sign batata hai."
+  topic: bit-basics
+- term: Undirected graph
+  meaning: "Edges dono taraf chalti hain — u–v matlab v–u bhi. Jaise Facebook friendship."
+  topic: graph-basics
+- term: Upper bound
+  meaning: "Sorted array mein pehla index jahan value > target."
+  topic: binary-search-variations
+- term: Vertex
+  aka: [Vertices]
+  meaning: "Graph ka node (bindu). Plural — vertices."
+  topic: graph-basics
+- term: Weighted graph
+  meaning: "Har edge par ek number — doori, kharcha ya time. Sabse sasta raasta Dijkstra se."
+  topic: dijkstra
+- term: Worst case
+  meaning: "Sabse bure input par kitna time — interview mein aksar yahi bolte hain."
+  topic: big-o-time
+- term: XOR
+  meaning: "Bitwise operator — dono bits alag hon to 1. x ^ x = 0, isliye jode kat jaate hain."
+  topic: bit-tricks

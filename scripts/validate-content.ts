@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { CONTENT_DIR, getChapters, getTopic, hasTopic, readCodeFile } from '../src/lib/content';
+import { CONTENT_DIR, getChapters, getCheatsheets, getGlossary, getTopic, hasTopic, readCodeFile, termSlug } from '../src/lib/content';
 import { LANGS, type ParsedCode } from '../src/lib/codefile';
 import type { Topic } from '../src/lib/schema';
 import {
@@ -183,6 +183,27 @@ async function main() {
       const ids = [...t.meta.prereqs, ...t.connections.related.map((r) => r.id), ...t.connections.usedLater.map((r) => r.id)];
       for (const id of ids) if (!allIds.has(id)) err(key, `topic id "${id}" chapters.yaml mein nahi hai`);
     }
+  }
+
+  // glossary + cheatsheets (pages /glossary, /cheatsheets)
+  try {
+    const slugs = new Set<string>();
+    for (const g of getGlossary()) {
+      const slug = termSlug(g.term);
+      if (slugs.has(slug)) err('glossary.yaml', `"${g.term}" do baar hai`);
+      slugs.add(slug);
+      const ch = g.topic && allIds.get(g.topic);
+      if (g.topic && !ch) err('glossary.yaml', `"${g.term}": topic "${g.topic}" chapters.yaml mein nahi hai`);
+      else if (g.topic && ch && !hasTopic(ch, g.topic)) err('glossary.yaml', `"${g.term}": topic "${g.topic}" abhi likha nahi gaya`);
+    }
+  } catch (e) {
+    err('glossary.yaml', (e as Error).message);
+  }
+  try {
+    const ids = getCheatsheets().map((c) => c.id);
+    if (new Set(ids).size !== ids.length) err('cheatsheets.yaml', 'id do baar hai');
+  } catch (e) {
+    err('cheatsheets.yaml', (e as Error).message);
   }
 
   const demo = await loadViz(path.join(process.cwd(), 'src/components/viz/demo.ts'), 'playground');

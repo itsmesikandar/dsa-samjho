@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { norm } from '@/lib/search';
+import { norm, prefixMatch } from '@/lib/search';
+import { JumpChips, StickyFilter } from '@/components/layout/StickyFilter';
 
 export interface PatternItem {
   /** keyword / think — inline markdown se bana HTML (build time) */
@@ -20,47 +21,28 @@ export interface PatternGroup {
   items: PatternItem[];
 }
 
-/** filter: har typed word kisi word ki shuruaat ho ("sub" → subarray, subsequence) */
+/** signals list + filter (har typed word kisi word ki shuruaat ho) */
 export function PatternList({ groups }: { groups: PatternGroup[] }) {
   const [q, setQ] = useState('');
   const prepared = useMemo(() => groups.map((g) => ({ ...g, items: g.items.map((it) => ({ it, words: it.text.split(' ') })) })), [groups]);
   const words = norm(q).split(' ').filter(Boolean);
   const shown = prepared
-    .map((g) => ({ ...g, items: words.length ? g.items.filter(({ words: ws }) => words.every((w) => ws.some((x) => x.startsWith(w)))) : g.items }))
+    .map((g) => ({ ...g, items: words.length ? g.items.filter((x) => prefixMatch(words, x.words)) : g.items }))
     .filter((g) => g.items.length);
   const total = prepared.reduce((s, g) => s + g.items.length, 0);
   const count = shown.reduce((s, g) => s + g.items.length, 0);
 
   return (
     <>
-      <div className="sticky top-14 z-10 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-        <label htmlFor="pattern-filter" className="sr-only">
-          Keyword se filter karo
-        </label>
-        <input
-          id="pattern-filter"
-          type="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Keyword likho (jaise subarray, sorted)"
-          autoComplete="off"
-          spellCheck={false}
-          className="h-11 w-full rounded-lg border border-line bg-bg px-3 text-base outline-none placeholder:text-muted focus:border-accent"
-        />
-        <p aria-live="polite" className="mt-1.5 text-xs text-muted">
-          {words.length ? `${count} / ${total} signals mile` : `${total} signals, ${groups.length} chapters`}
-        </p>
-      </div>
-
-      {shown.length > 1 && (
-        <nav aria-label="Chapters" className="mt-4 flex flex-wrap gap-1.5">
-          {shown.map((g) => (
-            <a key={g.id} href={`#ch-${g.id}`} className="rounded-full border border-line px-2.5 py-1 font-mono text-xs text-muted hover:border-accent hover:text-accent">
-              {g.index}. {g.title}
-            </a>
-          ))}
-        </nav>
-      )}
+      <StickyFilter
+        id="pattern-filter"
+        value={q}
+        onChange={setQ}
+        label="Keyword se filter karo"
+        placeholder="Keyword likho (jaise subarray, sorted)"
+        status={words.length ? `${count} / ${total} signals mile` : `${total} signals, ${groups.length} chapters`}
+      />
+      <JumpChips label="Chapters" items={shown.map((g) => ({ href: `#ch-${g.id}`, text: `${g.index}. ${g.title}` }))} />
 
       {shown.length === 0 && (
         <p className="mt-10 text-center text-muted">

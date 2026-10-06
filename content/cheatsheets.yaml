@@ -1,0 +1,113 @@
+# /cheatsheets page ke upar wale tables. Har topic ka apna cheatsheet (revision.cheatsheet) neeche apne aap aata hai.
+
+- id: big-o
+  title: Big-O — kaun kitna tez
+  intro: Rough rule — ~10⁸ simple steps ≈ 1 second.
+  body: |
+    | Complexity | Naam | Example | n = 10⁵ par steps |
+    |---|---|---|---|
+    | O(1) | Constant | Array index, HashMap get | 1 |
+    | O(log n) | Logarithmic | Binary search, heap push / pop | ~17 |
+    | O(n) | Linear | Ek loop, linear search | 10⁵ |
+    | O(n log n) | Linearithmic | Merge sort, library `sort()` | ~1.7 × 10⁶ |
+    | O(n²) | Quadratic | Do nested loops, bubble sort | 10¹⁰ ✗ TLE |
+    | O(2ⁿ) | Exponential | Saare subsets | ✗ — sirf n ≤ ~20 |
+    | O(n!) | Factorial | Saare permutations | ✗ — sirf n ≤ ~10 |
+
+    > [!yaad]
+    > Constants chhod do (O(2n) = O(n)), sabse bada term rakho (O(n² + n) = O(n²)). Do alag inputs ho to dono likho: O(n + m), O(n · m).
+
+- id: constraints
+  title: Constraints dekh ke complexity chuno
+  intro: Question ki limit padhte hi pata chal jaata hai kaunsa approach chalega.
+  body: |
+    | n kitna | Ye chalega | Aksar kya lagta hai |
+    |---|---|---|
+    | n ≤ 10 | O(n!) | Permutations, backtracking |
+    | n ≤ 20 | O(2ⁿ · n) | Subsets, bitmask, bitmask DP |
+    | n ≤ 500 | O(n³) | Teen loops, interval DP |
+    | n ≤ 5,000 | O(n²) | Do loops, 2D DP |
+    | n ≤ 10⁵ – 10⁶ | O(n log n) ya O(n) | Sort, heap, binary search, two pointers, sliding window, HashMap |
+    | n ≤ 10⁹ | O(√n) ya O(log n) | Maths, binary search on answer |
+    | n ≤ 10¹⁸ | O(log n) ya O(1) | Fast power, formula |
+
+    > [!tip]
+    > Values (n nahi) bahut badi hon to `Long` ka socho — `Int` ~2.1 × 10⁹ par overflow.
+
+- id: data-structures
+  title: Data structures — har operation ki cost
+  intro: Sahi structure chuno, aadha kaam wahin ho jaata hai.
+  body: |
+    | Structure | Index se | Search | Insert | Delete | Yaad rakho |
+    |---|---|---|---|---|---|
+    | Array (`IntArray`) | O(1) | O(n) | O(n) | O(n) | Size fixed |
+    | Dynamic array (`ArrayList`) | O(1) | O(n) | End: O(1)*, beech: O(n) | End: O(1), beech: O(n) | * amortized |
+    | Linked list | O(n) | O(n) | O(1) — node pata ho | O(1) — node pata ho | Pahunchna mehenga |
+    | Stack / Queue / Deque (`ArrayDeque`) | — | O(n) | O(1) | O(1) | Sirf kinaron par |
+    | HashMap / HashSet | — | O(1) avg | O(1) avg | O(1) avg | Worst O(n), order nahi |
+    | TreeMap / TreeSet | — | O(log n) | O(log n) | O(log n) | Sorted, floor / ceiling |
+    | Heap (`PriorityQueue`) | min / max: O(1) | O(n) | O(log n) | poll: O(log n), remove(x): O(n) | Sirf top tez |
+    | BST (balanced) | — | O(log n) | O(log n) | O(log n) | Unbalanced: O(n) |
+    | Trie | — | O(L) | O(L) | O(L) | L = word ki length |
+    | Union-Find | — | find: ~O(1) | union: ~O(1) | — | Path compression + rank |
+
+- id: sorting
+  title: Sorting algorithms
+  intro: Interview mein naam, complexity aur stable hai ya nahi — teeno pooche jaate hain.
+  body: |
+    | Algorithm | Best | Average | Worst | Extra space | Stable? |
+    |---|---|---|---|---|---|
+    | Bubble | O(n) | O(n²) | O(n²) | O(1) | Haan |
+    | Selection | O(n²) | O(n²) | O(n²) | O(1) | Nahi |
+    | Insertion | O(n) | O(n²) | O(n²) | O(1) | Haan |
+    | Merge | O(n log n) | O(n log n) | O(n log n) | O(n) | Haan |
+    | Quick | O(n log n) | O(n log n) | O(n²) | O(log n) | Nahi |
+    | Heap sort | O(n log n) | O(n log n) | O(n log n) | O(1) | Nahi |
+    | Counting | O(n + k) | O(n + k) | O(n + k) | O(k) | Haan |
+
+    Library: Java `Arrays.sort(int[])` (aur Kotlin `IntArray.sort()`) dual-pivot quick sort — O(n log n). Objects / lists ka sort (TimSort) **stable** hai.
+
+- id: recurrences
+  title: Recursion ka time — common recurrences
+  intro: Recursive code ka formula pehchano, complexity seedha likho.
+  body: |
+    | Recurrence | Kahan dikhta hai | Time |
+    |---|---|---|
+    | T(n) = T(n/2) + O(1) | Binary search | O(log n) |
+    | T(n) = T(n − 1) + O(1) | Factorial, list ko ek-ek karke | O(n) |
+    | T(n) = 2T(n/2) + O(1) | Tree traversal | O(n) |
+    | T(n) = 2T(n/2) + O(n) | Merge sort | O(n log n) |
+    | T(n) = T(n − 1) + O(n) | Quick sort worst, selection sort | O(n²) |
+    | T(n) = 2T(n − 1) + O(1) | Tower of Hanoi | O(2ⁿ) |
+    | T(n) = T(n − 1) + T(n − 2) + O(1) | Naive Fibonacci | O(2ⁿ) (asal mein ~1.6ⁿ) |
+
+    Space = recursion ki gehraai (stack depth) + extra memory. Binary search recursion O(log n), linked list par recursion O(n).
+
+- id: kotlin-java
+  title: Kotlin vs Java — DSA collections
+  intro: Dono JVM par same collections use karte hain — complexity same, bas likhne ka tareeka alag.
+  body: |
+    | Kaam | Kotlin | Java |
+    |---|---|---|
+    | Fixed int array | `IntArray(n)` | `new int[n]` |
+    | 2D array | `Array(m) { IntArray(n) }` | `new int[m][n]` |
+    | Dynamic list | `mutableListOf<Int>()` | `new ArrayList<Integer>()` |
+    | Stack | `ArrayDeque<Int>()` — `addLast`, `removeLast`, `last()` | `ArrayDeque<Integer>` — `push`, `pop`, `peek` |
+    | Queue | `ArrayDeque<Int>()` — `addLast`, `removeFirst`, `first()` | `ArrayDeque<Integer>` — `offer`, `poll`, `peek` |
+    | HashMap | `HashMap<K, V>()` ya `mutableMapOf()` (LinkedHashMap) | `new HashMap<>()` |
+    | Ginti karna | `m[x] = (m[x] ?: 0) + 1` | `m.merge(x, 1, Integer::sum)` |
+    | Default value | `m.getOrDefault(k, 0)` ya `m[k] ?: 0` | `m.getOrDefault(k, 0)` |
+    | HashSet | `HashSet<Int>()` ya `mutableSetOf()` | `new HashSet<>()` |
+    | Sorted map | `TreeMap<K, V>()` | `new TreeMap<>()` |
+    | Min-heap | `PriorityQueue<Int>()` | `new PriorityQueue<>()` |
+    | Max-heap | `PriorityQueue<Int>(compareByDescending { it })` | `new PriorityQueue<>(Collections.reverseOrder())` |
+    | String jodna | `StringBuilder()` — `append`, `toString()` | `new StringBuilder()` — same |
+    | Array sort | `a.sort()` | `Arrays.sort(a)` |
+    | Custom sort | `list.sortWith(compareBy({ it.x }, { it.y }))` | `list.sort((p, q) -> Integer.compare(p.x, q.x))` |
+    | Binary search | `a.binarySearch(x)` | `Arrays.binarySearch(a, x)` |
+    | Array print | `a.contentToString()` | `Arrays.toString(a)` |
+    | Bada number | `Long`, `1L`, `x.toLong()` | `long`, `1L`, `(long) x` |
+    | Akshar → index | `c - 'a'` | `c - 'a'` |
+
+    > [!galti]
+    > Comparator mein `a - b` mat likho — bade / negative numbers par overflow. `Integer.compare(a, b)` ya `compareBy` lo.
