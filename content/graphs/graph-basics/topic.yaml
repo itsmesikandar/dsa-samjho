@@ -1,0 +1,441 @@
+meta:
+  id: graph-basics
+  chapter: graphs
+  title: Graph basics
+  subtitle: Nodes aur unke beech rishte — adjacency list mein store karo
+  level: intermediate
+  minutes: 40
+  prereqs: [dynamic-array, hashmap, binary-tree-basics]
+  tags: [graph, adjacency-list, adjacency-matrix, directed, undirected, weighted, degree]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Graph** = kuch **nodes** (vertices, V) + unke beech **edges** (E). Edge batati hai "ye do cheezein judi hain".
+
+    Tree bhi graph hai, par graph mein koi pabandi nahi: koi root nahi, koi parent-child nahi, ghoom kar wapas aa sakte ho (cycle), aur kuch hisse bilkul alag bhi ho sakte hain.
+
+    | Type | Matlab | Example |
+    |---|---|---|
+    | **Undirected** | edge dono taraf (a — b) | Facebook friends |
+    | **Directed** | edge ek taraf (a → b) | Instagram follow |
+    | **Weighted** | edge par number (doori, kharcha) | Google Maps ki sadak (km) |
+    | **Unweighted** | sab edges barabar | "seedha jude hain ya nahi" |
+
+    Zaroori shabd:
+    - **Padosi (neighbour):** edge se seedha juda node.
+    - **Degree:** kitni edges judi. Directed mein **in-degree** (aane wali) aur **out-degree** (jaane wali).
+    - **Path:** edges ke sahare node se node tak ka rasta. **Cycle:** path jo wahin lauta.
+    - **Connected component:** aisa hissa jiske andar sab ek dusre tak pahunch sakte hain.
+
+    > [!yaad]
+    > Graph problem ka pehla kadam lagbhag hamesha same: **edge list → adjacency list** banao.
+  analogy: |
+    **Mumbai local / metro ka map:**
+    Stations = nodes, patriyan = edges. Kisi station se kitni lines nikalti hain = degree (Dadar ki degree badi, aakhri station ki 1). Andheri se Churchgate jaane ka rasta = path. Ek line jo ghoom kar wapas aaye = cycle. Mumbai aur Delhi metro ke beech koi patri nahi = do alag components.
+
+    Har station par lagi board "yahan se kahan kahan ja sakte ho" = **adjacency list**.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Array line mein rakhta hai, tree upar-neeche. Par asli duniya mein rishte **kisi se bhi kisi tak** hote hain:
+    - Shehar aur sadkein (Maps, delivery route)
+    - Log aur dosti (friend suggestions)
+    - Courses aur prerequisites (kya pehle padhna hai)
+    - Web pages aur links (Google ka crawler)
+
+    Aise data ko graph ki tarah store karoge tabhi BFS, DFS, shortest path jaise ready-made algorithms laga paoge. Bahut se "alag dikhne wale" sawaal — grid, word ladder, dependencies — andar se graph hi hain.
+
+    Store karne ke do tareeke, aur sahi chunav zaroori:
+
+    | | Adjacency list | Adjacency matrix |
+    |---|---|---|
+    | Memory | O(V + E) | O(V²) |
+    | Saare padosi | O(degree) | O(V) |
+    | "u-v edge hai?" | O(degree) | **O(1)** |
+    | Kab | zyada tar (sparse graph) | chhota V ya dense graph |
+
+    > [!socho]
+    > 1 lakh users, har ek ke ~100 dost. Matrix kitni badi hogi?
+    >
+    > 10⁵ × 10⁵ = 10¹⁰ cells — ~10 GB (boolean). List mein sirf 10⁵ + 2 × 50 lakh entries. Sparse graph = list.
+
+# 3. Visual intro
+visual:
+  body: |
+    Ek chhota graph, aur graph ki poori bhasha ek ek karke: padosi, degree, path, cycle, components. Apni edges daal ke dekho — cycle hatao to kya hota hai, ek edge jodo to components kaise milte hain.
+  viz: { tracer: termsTrace }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    Input mostly **edge list** hoti hai: `[[0, 1], [0, 2], ...]`. Usse adjacency list:
+    1. `n` khaali lists banao — har node ke liye ek.
+    2. Har edge `(u, v)`: `adj[u].add(v)`.
+    3. Undirected hai to `adj[v].add(u)` bhi. Directed mein nahi.
+    4. Weighted hai to `(v, w)` jodi rakho.
+
+    Ab "u ke padosi" = `adj[u]`, degree = `adj[u].size`.
+
+    > [!galti]
+    > Undirected graph mein sirf `adj[u].add(v)` likha. Ab v se u nahi ja sakte — BFS/DFS aadha graph dekhega aur galat jawab dega.
+  viz: { tracer: adjListTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Adjacency list banana"
+    time: "O(V + E)"
+    space: "O(V + E)"
+    why: "V lists + har edge ki 1 (directed) ya 2 (undirected) entries."
+  - op: "u ke saare padosi"
+    time: "O(degree(u))"
+    space: O(1)
+    why: "List mein sirf asli padosi; matrix mein poori row O(V) padhni padti."
+  - op: "Edge u-v hai? (list)"
+    time: "O(degree(u))"
+    space: O(1)
+    why: "adj[u] mein v dhoondhna. HashSet ki list rakho to O(1) average."
+  - op: "Edge u-v hai? (matrix)"
+    time: O(1)
+    space: "O(V²)"
+    why: "Seedha mat[u][v]. Par memory V² — bade graph par nahi chalega."
+  - op: "Saari degrees"
+    time: "O(V + E)"
+    space: O(V)
+    why: "Edges par ek loop, har edge do nodes ki degree badhati hai (directed: out aur in)."
+
+# 6. Code
+code:
+  - title: Ek graph, do roop — matrix aur weighted list
+    file: representations
+    note: |
+      Weighted directed graph: matrix mein `mat[u][v] = weight` (0 = edge nahi; agar weight 0 bhi ho sakta hai to "nahi" ke liye `-1` ya `Int.MAX_VALUE` lo). List mein `(padosi, weight)` jodi.
+
+      Dhyan do: `1 → 0` edge nahi hai, sirf `0 → 1` — directed mein ulti disha apne aap nahi milti.
+
+      Node numbers nahi, naam hon (shehar, words) → `HashMap<String, MutableList<String>>` lo.
+
+# 7. Examples
+examples:
+  - id: star-center
+    level: easy
+    title: Star graph ka center dhoondho
+    source: { name: Find Center of Star Graph, platform: LeetCode, url: "https://leetcode.com/problems/find-center-of-star-graph/" }
+    problem: |
+      n nodes (1 se n) ka ek **star graph** hai: ek center node, aur baaki har node sirf center se juda. n - 1 edges di hain. Center batao.
+
+      Example: `[[1, 2], [2, 3], [4, 2]]` → **2**
+    intuition: |
+      Seedha tareeka: degree gino. Center ki degree n - 1, baaki sab ki 1. Ye har graph par chalta hai — O(n).
+
+      Star ki khaasiyat: center **har** edge mein hai, leaf sirf **ek** mein. To pehli do edges ka **common** node hi center. Sirf 2 edges dekho → O(1).
+
+      > [!tip]
+      > Interview mein pehle general tareeka (degree) bolo, phir "is graph ki shape ka fayda" uthao. Ye soch — "input ki khaasiyat kya hai?" — har jagah kaam aati hai.
+    dryRun: |
+      | Kadam | Dekha | Nateeja |
+      |---|---|---|
+      | Degree | 1:1, 2:3, 3:1, 4:1 | deg 3 = n - 1 → **2** |
+      | Shortcut | edges[0] = [1, 2], edges[1] = [2, 3] | 1 doosri mein nahi → **2** |
+    viz: { tracer: starTrace }
+    code: ex1-star-center
+    complexity:
+      time: "O(1) shortcut (degree tareeka O(n))"
+      space: O(1)
+      why: "Sirf pehli do edges padhi. Degree tareeke mein n + 1 ka array aur saari edges."
+
+  - id: town-judge
+    level: medium
+    title: Gaon ka judge (in-degree / out-degree)
+    source: { name: Find the Town Judge, platform: LeetCode, url: "https://leetcode.com/problems/find-the-town-judge/" }
+    problem: |
+      Gaon mein n log (1 se n). `trust[i] = [a, b]` matlab a ko b par bharosa hai. **Judge** wo hai jo kisi par bharosa nahi karta, aur baaki **sab** us par karte hain. Aisa ek hi insaan ho sakta hai. Judge batao, warna -1.
+
+      Example: n = 4, trust = `[[1, 3], [2, 3], [4, 3]]` → **3**
+    intuition: |
+      Trust = **directed** edge a → b. Judge ki pehchaan graph ki bhasha mein:
+      - out-degree = 0 (kisi par trust nahi)
+      - in-degree = n - 1 (baaki sab ka trust)
+
+      Do arrays ki jagah ek: `score = in - out`. Score n - 1 tabhi ho sakta hai jab in = n - 1 aur out = 0 (in max n - 1 hai, out kam se kam 0). Adjacency list banane ki zaroorat hi nahi — sirf degrees chahiye.
+
+      > [!galti]
+      > Sirf in-degree dekha: "jis par sab trust karte" — par wo khud kisi par trust karta ho to judge nahi. Out-degree bhi check karo (score mein apne aap ho jaata hai).
+    dryRun: |
+      | trust | score[1] | score[2] | score[3] | score[4] |
+      |---|---|---|---|---|
+      | 1 → 3 | -1 | 0 | 1 | 0 |
+      | 2 → 3 | -1 | -1 | 2 | 0 |
+      | 4 → 3 | -1 | -1 | **3** | -1 |
+      | check | | | 3 = n - 1 → **judge 3** | |
+    viz: { tracer: judgeTrace }
+    code: ex2-town-judge
+    complexity:
+      time: "O(n + m)"
+      space: O(n)
+      why: "m trust edges par ek loop, phir n logon par ek. Sirf ek score array."
+
+  - id: network-rank
+    level: tricky
+    title: Do shehron ka sabse bada network rank
+    source: { name: Maximal Network Rank, platform: LeetCode, url: "https://leetcode.com/problems/maximal-network-rank/" }
+    problem: |
+      n shehar (0 se n - 1) aur unke beech do-taraf sadkein di hain (do shehron ke beech max ek sadak). Do alag shehron ka **network rank** = un dono mein se kisi se bhi judi sadkon ki ginti — dono ko jodne wali sadak (agar hai) sirf **ek baar** gini jaati hai. Sabse bada network rank batao.
+
+      Example: n = 6, roads = `[[0, 1], [0, 2], [0, 3], [1, 2], [1, 4], [3, 5]]` → **5**
+    intuition: |
+      Rank(a, b) = deg[a] + deg[b], aur agar a-b seedhi sadak hai to **- 1** (wo dono ki degree mein gini gayi).
+
+      Har pair try karo: n² / 2 pairs. Har pair par "a-b sadak hai?" ka jawab O(1) chahiye → **adjacency matrix** (`connected[a][b]`). Yahi wo jagah hai jahan matrix list se behtar hai.
+
+      > [!galti]
+      > "Sabse badi degree wale do shehar le lo" — galat. Agar wo do aapas mein jude hain to -1 lagta hai, aur koi aur pair (jo jude nahi) barabar ya bada nikal sakta hai. Example mein (0, 1) aur (1, 3) dono 5 dete hain.
+    dryRun: |
+      | Pair | deg + deg | Seedhi sadak? | Rank |
+      |---|---|---|---|
+      | (0, 1) | 3 + 3 | haan → - 1 | **5** |
+      | (0, 2) | 3 + 2 | haan → - 1 | 4 |
+      | (0, 4) | 3 + 1 | nahi | 4 |
+      | (1, 3) | 3 + 2 | nahi | **5** |
+      | (2, 3) | 2 + 2 | nahi | 4 |
+      | … | | | max = **5** |
+    viz: { tracer: networkRankTrace }
+    code: ex3-network-rank
+    complexity:
+      time: "O(n² + m)"
+      space: "O(n²)"
+      why: "Degrees + matrix banana O(m) (matrix init O(n²)); har pair O(1). Matrix n × n."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Cheezon ke beech rishte / connections hain: shehar-sadak, log-dosti, task-dependency."
+    - "Sawaal mein 'rasta', 'pahunch sakte ho?', 'jude hue', 'network', 'dependency' jaise shabd."
+    - "Grid / board jahan har cell padosi cells se juda hai (implicit graph)."
+    - "Adjacency list: zyada tar problems. Matrix: chhota n (≤ ~1000) aur baar baar 'edge hai?' poochhna."
+  avoid:
+    - "Data line mein hai, rishta sirf 'agla / pichhla' → array / linked list kaafi."
+    - "Har node ka ek hi parent, koi cycle nahi → tree ki tarah socho (simple recursion)."
+    - "Bade sparse graph par matrix — memory V² phat jaayegi."
+  signals:
+    - keyword: "edges = [[u, v], ...] diya hai"
+      think: "Pehle adjacency list banao (undirected → dono taraf)."
+    - keyword: "in-degree / out-degree / 'sab us par…'"
+      think: "Adjacency list nahi, sirf degree arrays."
+    - keyword: "'kya u aur v seedhe jude hain?' baar baar"
+      think: "Adjacency matrix (ya HashSet) — O(1) check."
+    - keyword: "nodes ke naam strings hain"
+      think: "HashMap<String, List<String>> adjacency."
+
+# 9. Real-world
+realWorld:
+  - where: "Google Maps / Ola-Uber routing"
+    how: "Chauraahe = nodes, sadkein = weighted directed edges (one-way bhi). Shortest path graph par chalta hai."
+  - where: "Facebook / LinkedIn 'People you may know'"
+    how: "Users = nodes, dosti = undirected edges. Dost ke dost = 2 kadam door ke nodes."
+  - where: "npm / Gradle dependencies"
+    how: "Package → jis par depend karta hai = directed edge. Install order = topological sort."
+  - where: "Indian Railways ka route network"
+    how: "Stations nodes, trains/patriyan edges. 'Seedhi train hai?' = edge check; 'kahan kahan badalna padega' = path."
+  - where: "Web crawler"
+    how: "Pages = nodes, links = directed edges. Crawler graph ko BFS ki tarah ghoomta hai."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Undirected mein sirf ek taraf add"
+    type: logic
+    wrong: |
+      `adj[u].add(v)` likha, `adj[v].add(u)` bhool gaye.
+    right: |
+      Undirected → dono line. Directed → sirf `adj[u].add(v)`. Problem statement mein "bidirectional / undirected" dhyaan se padho.
+  - title: "Nodes 1 se n, array n ka"
+    type: off-by-one
+    wrong: |
+      `IntArray(n)` banaya aur `deg[n]` chhua → ArrayIndexOutOfBounds.
+    right: |
+      Nodes 1..n ho to size `n + 1` lo (index 0 khaali), ya har node se 1 ghatao.
+  - title: "Akele (isolated) nodes bhool gaye"
+    type: empty
+    wrong: |
+      Sirf edges mein aaye nodes ki list banayi. Jis node ki koi edge nahi wo gayab — components / answer galat.
+    right: |
+      `n` hamesha alag se diya hota hai — `List(n)` se saare nodes ki list banao, edges ho ya na ho.
+  - title: "Bade graph par matrix"
+    type: other
+    wrong: |
+      n = 10⁵ par `Array(n) { IntArray(n) }` → Memory Limit Exceeded.
+    right: |
+      Sparse graph (E ≪ V²) → adjacency list. Matrix sirf chhote n par.
+  - title: "Duplicate edges / self-loop maan liye nahi"
+    type: logic
+    wrong: |
+      Input mein `[1, 2]` do baar → degree do baar badhi, ya `[3, 3]` jaisa self-loop aaya.
+    right: |
+      Constraints padho ("no repeated edges"?). Zaroorat ho to `HashSet` se duplicates hatao.
+  - title: "Directed mein degree ek hi gini"
+    type: logic
+    wrong: |
+      Trust/follow wale sawaal mein sirf ek `deg` array — in aur out mila diya.
+    right: |
+      Directed → `in[]` aur `out[]` alag (ya `in - out` jaisa ek soch-samajh ke).
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Adjacency list vs matrix — kab kya?"
+      a: |
+        List: O(V + E) memory, padosi O(degree) — sparse graphs (zyada tar). Matrix: O(V²) memory, "edge hai?" O(1) — chhote ya dense graph, ya jab baar baar edge check ho.
+    - q: "Undirected graph mein degrees ka jod kitna?"
+      a: |
+        2E — har edge do nodes ki degree 1-1 badhati hai (handshake lemma). Isliye odd degree wale nodes hamesha even ginti mein hote hain.
+    - q: "Tree aur graph mein farak?"
+      a: |
+        Tree = connected graph bina cycle; V nodes par exactly V - 1 edges. Graph mein cycle, alag components, directed edges sab ho sakte hain — isliye traversal mein visited chahiye.
+    - q: "Simple undirected graph mein max kitni edges?"
+      a: |
+        V(V - 1) / 2 (har pair ek baar). Directed mein V(V - 1). Isliye E = O(V²).
+    - q: "Sparse aur dense graph?"
+      a: |
+        Sparse: E lagbhag V jitna (sadak network, social graph). Dense: E lagbhag V². Sparse par list, dense par matrix theek.
+    - q: "Weighted graph ki list kaise rakhoge?"
+      a: |
+        `List<MutableList<Pair<Int, Int>>>` (padosi, weight) — Java mein `List<int[]>`. Ya ek chhoti `Edge(to, w)` class.
+    - q: "Nodes strings hon (shehar ke naam) to?"
+      a: |
+        `HashMap<String, MutableList<String>>`. Ya pehle har naam ko 0..n-1 id do (HashMap se), phir normal list/array.
+    - q: "Town judge mein adjacency list kyun nahi banayi?"
+      a: |
+        Sawaal sirf in/out degree ka hai — degrees edges par ek loop se mil jaati hain. Jo chahiye bas wahi banao: O(n) memory.
+    - q: "Implicit graph kya hai?"
+      followUp: true
+      a: |
+        Jahan edges likhi nahi hoti, rule se nikalti hain — jaise grid mein har cell ke 4 padosi, ya word ladder mein ek letter badal ke bane words. List banaye bina, zaroorat par padosi generate karo.
+    - q: "Edge list hi kyun nahi use karte?"
+      followUp: true
+      a: |
+        Edge list mein "u ke padosi" ke liye saari E edges padhni padti hain. Kruskal (edges ko weight se sort) jaise kuch algorithms mein edge list hi best hai.
+  mayAsk:
+    - "Find if Path Exists in Graph (BFS / DFS / union-find)."
+    - "Clone Graph — adjacency list ki deep copy."
+    - "Count connected components."
+    - "Find Champion (in-degree 0 wala unique node)."
+
+# 12. Practice
+practice:
+  - name: Destination City
+    platform: LeetCode
+    num: 1436
+    url: "https://leetcode.com/problems/destination-city/"
+    level: easy
+    pattern: Out-degree 0
+    hint: "Har path [a, b] mein a ki out-degree badhti hai. Jis shehar ki out-degree 0 — wahi destination. HashSet mein saare 'a' daalo."
+  - name: Find Champion I
+    platform: LeetCode
+    num: 2923
+    url: "https://leetcode.com/problems/find-champion-i/"
+    level: easy
+    pattern: Adjacency matrix padhna
+    hint: "grid[i][j] = 1 matlab i, j se strong (edge i → j). Champion = jiski row mein baaki sab 1 (ya jiske column mein koi 1 nahi)."
+  - name: Edge list, matrix, list — teeno banao
+    platform: Custom
+    level: easy
+    pattern: Representations
+    hint: "Ek edge list lo, usse matrix aur adjacency list banao, phir dono se wapas edge list. Directed aur undirected dono ke liye. Degrees teeno se gin ke milao."
+  - name: Minimum Number of Vertices to Reach All Nodes
+    platform: LeetCode
+    num: 1557
+    url: "https://leetcode.com/problems/minimum-number-of-vertices-to-reach-all-nodes/"
+    level: medium
+    pattern: In-degree 0
+    hint: "DAG mein jiski in-degree 0 hai, use koi nahi pahuncha sakta — wo set mein hona hi chahiye. Aur wahi kaafi hain."
+  - name: Maximum Total Importance of Roads
+    platform: LeetCode
+    num: 2285
+    url: "https://leetcode.com/problems/maximum-total-importance-of-roads/"
+    level: medium
+    pattern: Degree + greedy
+    hint: "Har shehar ki value uski degree baar gini jaati hai. Degrees sort karo; sabse badi degree ko n, phir n - 1… Jawab Long."
+  - name: Find Champion II
+    platform: LeetCode
+    num: 2924
+    url: "https://leetcode.com/problems/find-champion-ii/"
+    level: medium
+    pattern: Unique in-degree 0
+    hint: "In-degree gino. In-degree 0 wala ek hi node ho to wahi champion; ek se zyada → -1."
+  - name: Minimum Degree of a Connected Trio in a Graph
+    platform: LeetCode
+    num: 1761
+    url: "https://leetcode.com/problems/minimum-degree-of-a-connected-trio-in-a-graph/"
+    level: hard
+    pattern: Matrix + degree
+    hint: "Matrix se O(1) 'edge hai?'. Har edge (u, v) ke liye har w check: u-w aur v-w dono hon to trio. Degree = deg[u] + deg[v] + deg[w] - 6."
+  - name: Add Edges to Make Degrees of All Nodes Even
+    platform: LeetCode
+    num: 2508
+    url: "https://leetcode.com/problems/add-edges-to-make-degrees-of-all-nodes-even/"
+    level: hard
+    pattern: Odd degree nodes + case analysis
+    hint: "Odd degree wale nodes gino — max 2 edges jod sakte ho, to jawab tabhi possible jab ye 0, 2 ya 4 hon. 2 hon: seedha jodo, ya koi teesra node dhoondho jo dono se juda na ho. 4: teen tarah ki jodi try karo. Edge check ke liye HashSet."
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Graph = nodes + edges. Directed / undirected, weighted / unweighted."
+    - "Padosi, degree (in / out), path, cycle, connected component — bhasha yaad rakho."
+    - "Edge list → adjacency list: undirected mein dono taraf add. O(V + E)."
+    - "List: sparse graph, padosi tez. Matrix: chhota / dense graph, 'edge hai?' O(1), memory V²."
+    - "Degrees ka jod = 2E. Tree = connected + no cycle = V - 1 edges."
+  cheatsheet: |
+    ```kotlin
+    // undirected, nodes 0..n-1
+    val adj = List(n) { mutableListOf<Int>() }
+    for ((u, v) in edges) { adj[u].add(v); adj[v].add(u) }
+    // weighted: List(n) { mutableListOf<Pair<Int, Int>>() }; adj[u].add(v to w)
+    // matrix: val mat = Array(n) { BooleanArray(n) }; mat[u][v] = true
+    // degrees (directed): inDeg[v]++, outDeg[u]++
+    // nodes 1..n → size n + 1
+    ```
+  quiz:
+    - q: "Undirected graph mein 5 edges hain. Saari degrees ka jod?"
+      options: ["5", "10", "25", "Pata nahi chal sakta"]
+      answer: 1
+      explain: "Har edge do nodes ki degree badhati hai → 2 × 5."
+    - q: "1 lakh nodes, har node ke ~10 padosi. Kaunsa representation?"
+      options: ["Adjacency matrix", "Adjacency list", "Dono barabar", "Sirf edge list"]
+      answer: 1
+      explain: "Sparse graph: list O(V + E) ≈ 11 lakh entries; matrix 10¹⁰ cells."
+    - q: "Directed edge a → b se kya badhta hai?"
+      options: ["a ki in-degree", "b ki out-degree", "a ki out-degree aur b ki in-degree", "Dono ki degree 2"]
+      answer: 2
+      explain: "Edge a se nikalti hai (out), b mein aati hai (in)."
+    - q: "'u aur v seedhe jude hain?' O(1) mein chahiye. Kya rakhoge?"
+      options: ["Adjacency list", "Adjacency matrix", "Edge list", "Degree array"]
+      answer: 1
+      explain: "mat[u][v] seedha. List mein O(degree) dhoondhna padta hai."
+    - q: "6 nodes ka connected graph, koi cycle nahi. Kitni edges?"
+      options: ["6", "5", "7", "15"]
+      answer: 1
+      explain: "Connected + no cycle = tree → V - 1 = 5 edges."
+
+# 14. Connections
+connections:
+  related:
+    - id: binary-tree-basics
+      why: "Tree ek khaas graph hai — connected, bina cycle. Graph mein ye pabandiyan hat jaati hain."
+    - id: matrix
+      why: "Adjacency matrix ek 2D array hi hai; grid problems bhi andar se graph (har cell ke padosi)."
+    - id: hashmap
+      why: "Naam wale nodes ke liye HashMap adjacency; 'edge hai?' ke liye HashSet."
+  usedLater:
+    - id: bfs
+      how: "Adjacency list par level by level ghoomna — unweighted shortest path."
+    - id: dfs
+      how: "Adjacency list par gehraai mein jaana — components, cycle."
+    - id: topological-sort
+      how: "Directed graph ki in-degrees se Kahn's algorithm."
+    - id: dijkstra
+      how: "Weighted adjacency list (padosi, weight) par shortest path."
+    - id: union-find
+      how: "Edge list seedhe — components aur Kruskal MST."

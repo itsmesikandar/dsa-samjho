@@ -1,4 +1,4 @@
-import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, ListPanel, RecursionPanel, Tone, ToneMap, TreePanel } from './types';
+import type { ArrayPanel, ArrPointer, CallNode, Cell, Frame, GraphPanel, ListPanel, RecursionPanel, Tone, ToneMap, TreePanel } from './types';
 
 export const MAX_FRAMES = 400;
 
@@ -50,8 +50,10 @@ export interface EdgesSpec extends SpecBase {
   type: 'edges';
   /** [u, v] or [u, v, w] */
   default: number[][];
-  /** node ids are 0..nodes-1 */
+  /** node ids are base..base+nodes-1 */
   nodes: number;
+  /** pehla node id (default 0; LeetCode jaise 1..n ke liye 1) */
+  base?: number;
   maxEdges: number;
   weighted?: boolean;
   minW?: number;
@@ -320,6 +322,45 @@ export function treeView(
   };
 }
 
+/**
+ * Edge list → graph panel. Nodes base..base+n-1 (id = number string).
+ * pos: node → [x, y] (0..100) — sirf authored layout ke liye (default input); warna circle layout.
+ * edgeTones key "u-v" (undirected mein "v-u" bhi chalega). weighted → e[2] edge par dikhta hai.
+ */
+export function graphView(
+  n: number,
+  edges: readonly (readonly number[])[],
+  opts: {
+    base?: number;
+    directed?: boolean;
+    weighted?: boolean;
+    label?: string;
+    pos?: Record<number, readonly [number, number]>;
+    tones?: Record<number, Tone | undefined>;
+    badges?: Record<number, string | undefined>;
+    edgeTones?: Record<string, Tone | undefined>;
+  } = {},
+): GraphPanel {
+  const lo = opts.base ?? 0;
+  const et = opts.edgeTones ?? {};
+  return {
+    kind: 'graph',
+    label: opts.label,
+    directed: opts.directed,
+    nodes: Array.from({ length: n }, (_, i) => {
+      const u = lo + i;
+      const p = opts.pos?.[u];
+      return { id: String(u), ...(p ? { x: p[0], y: p[1] } : {}), tone: opts.tones?.[u], badge: opts.badges?.[u] };
+    }),
+    edges: edges.map(([u, v, w]) => ({
+      from: String(u),
+      to: String(v),
+      ...(opts.weighted ? { w } : {}),
+      tone: et[`${u}-${v}`] ?? (opts.directed ? undefined : et[`${v}-${u}`]),
+    })),
+  };
+}
+
 /** heap array → tree panel (i ke bachche 2i+1, 2i+2; badge = index). ids stable rakho to swap par node khisakta dikhta hai. */
 export function heapView(
   values: readonly Cell[],
@@ -448,7 +489,9 @@ function parseOne(spec: InputSpec, raw: string): Parsed {
         const m = /^(\d+)\s*-\s*(\d+)(?:\s*:\s*(-?\d+))?$/.exec(it);
         if (!m) return fail(`"${it}" samajh nahi aaya. Format: 0-1${spec.weighted ? ':5' : ''}`);
         const [a, b] = [Number(m[1]), Number(m[2])];
-        if (a >= spec.nodes || b >= spec.nodes) return fail(`Node number 0 se ${spec.nodes - 1} tak hi.`);
+        const lo = spec.base ?? 0;
+        const hi = lo + spec.nodes - 1;
+        if (a < lo || b < lo || a > hi || b > hi) return fail(`Node number ${lo} se ${hi} tak hi.`);
         if (a === b) return fail('Self-loop (0-0) allowed nahi hai.');
         if (spec.weighted) {
           if (m[3] === undefined) return fail(`"${it}" mein weight do, jaise ${a}-${b}:4`);
@@ -541,8 +584,9 @@ function randomOne(spec: InputSpec, rnd: () => number): unknown {
     case 'edges': {
       const m = randInt(rnd, 0, spec.maxEdges);
       return Array.from({ length: m }, () => {
-        const a = randInt(rnd, 0, spec.nodes - 1);
-        let b = randInt(rnd, 0, spec.nodes - 2);
+        const lo = spec.base ?? 0;
+        const a = randInt(rnd, lo, lo + spec.nodes - 1);
+        let b = randInt(rnd, lo, lo + spec.nodes - 2);
         if (b >= a) b++;
         return spec.weighted ? [a, b, randInt(rnd, spec.minW ?? 1, spec.maxW ?? 99)] : [a, b];
       });

@@ -1,0 +1,442 @@
+meta:
+  id: union-find
+  chapter: graphs
+  title: Union-Find (DSU)
+  subtitle: Groups jodo aur poochho "ek hi group?" — lagbhag O(1); Kruskal MST bhi
+  level: advanced
+  minutes: 50
+  prereqs: [graph-basics, dfs, recursion-basics]
+  tags: [union-find, dsu, disjoint-set, path-compression, kruskal, mst]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Union-Find / DSU (Disjoint Set Union)** cheezon ko alag alag **groups** mein rakhta hai, do kaam bahut tez:
+    - `find(x)` — x ke group ka **leader** (root) kaun?
+    - `union(a, b)` — a aur b ke groups ko **ek** kar do.
+
+    Store kaise? Ek hi array `parent[]`. Har group ek ulta ped hai: har node apne parent ki taraf ishaara karta hai, leader khud ki taraf (`parent[r] = r`).
+
+    Do tricks jo ise lagbhag O(1) banati hain:
+    1. **Path compression:** find karte waqt raste ke sab nodes ko seedha leader se jod do.
+    2. **Union by size (ya rank):** chhote ped ka leader bade ped ke leader ke neeche — ped gehra nahi hota.
+
+    > [!yaad]
+    > "a aur b connected hain?" = `find(a) == find(b)`. Edges ek ek aa rahi hon aur ye sawaal baar baar ho — DSU sabse aasaan aur tez.
+  analogy: |
+    **School ke houses / college ke clubs merge hona:**
+    Har club ka ek president. "Rahul aur Priya ek club mein?" → dono ke president poochho; same to haan.
+
+    Do clubs merge: chhote club ka president bade club ke president ko report karne lagta hai — bas ek line badli, chhote club ke 50 members ko kuch nahi karna. Aur jab koi member "mera asli president kaun?" poochh ke upar tak jaata hai, wapas aate hue sabko seedha asli president ka number de deta hai (path compression).
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Graph mein edges ek ek karke aa rahi hain, aur har baar poochhna hai "kya ye do node jude hue hain?":
+
+    | Tareeka | Har edge / query |
+    |---|---|
+    | Har baar BFS / DFS | O(V + E) |
+    | Har node ka group-number, merge par sab badlo | O(V) |
+    | **DSU (compression + size)** | **≈ O(1)** (α(n) ≤ 4) |
+
+    Jahan kaam aata hai:
+    - Connected components ginna (online — edges aate rahein)
+    - Undirected graph mein cycle (edge ke dono sire pehle se ek group)
+    - **Kruskal's MST** — sabse sasti tarah sab nodes jodna
+    - "Equivalence" sawaal: same accounts, barabar letters, same equations
+
+    > [!socho]
+    > Path compression ke bina, union(0,1), union(1,2), … union(n-2, n-1) agar hamesha naye ko leader banaye — ped kaisa banega?
+    >
+    > Ek lambi line (linked list) — find O(n). Union by size isse rokta hai: chhota hamesha bade ke neeche, to gehraai max log n. Compression ke saath lagbhag 1.
+
+# 3. Visual intro
+visual:
+  body: |
+    Upar: diye gaye dosti ke jode (asli graph). Neeche: DSU ka "jungle" — har group ek ped, upar leader. Rang = group. Dekho: do groups milte hain to sirf ek leader doosre ke neeche aata hai, poora group saath chalta hai.
+  viz: { tracer: leadersTrace }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    ```text
+    find(x):  agar parent[x] != x:  parent[x] = find(parent[x])   // compression
+              return parent[x]
+    union(a, b):
+        ra = find(a), rb = find(b)
+        agar ra == rb: return false          // pehle se ek group
+        size[ra] < size[rb] ho to swap        // bada leader rahe
+        parent[rb] = ra; size[ra] += size[rb]
+        return true
+    ```
+
+    `union` ka Boolean bahut kaam ka: **false = ye edge cycle banati** (dono sire pehle se jude).
+
+    Groups ginne: shuru mein `n`, har **safal** union par `-1`.
+
+    > [!galti]
+    > `parent[b] = a` likh diya (nodes jode, leaders nahi). b ke purane group ke baaki members purane leader ke neeche reh gaye — group toot gaya. Hamesha **leaders** jodo: `parent[find(b)] = find(a)`.
+  viz: { tracer: dsuTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "find (compression + size)"
+    time: "O(α(n)) ≈ O(1)"
+    space: O(1)
+    why: "α = inverse Ackermann, kisi bhi practical n ke liye ≤ 4. (Recursive find ka stack — ped chhote, to chhota.)"
+  - op: "union"
+    time: "O(α(n)) ≈ O(1)"
+    space: O(1)
+    why: "Do find + ek parent badalna."
+  - op: "Sirf compression (bina size)"
+    time: "O(log n) amortized"
+    space: O(1)
+    why: "Kaafi tez, aur code chhota — interview mein aksar yahi chalta hai."
+  - op: "Na compression, na size"
+    time: "O(n) worst"
+    space: O(1)
+    why: "Ped linked list ban sakta hai."
+  - op: "Kruskal MST (E edges)"
+    time: "O(E log E)"
+    space: "O(V + E)"
+    why: "Edges sort karna sabse mehnga; har edge par union ≈ O(1)."
+
+# 6. Code
+code:
+  - title: Sabse chhota barabar string — leader = group ka sabse chhota letter
+    file: smallest-equivalent
+    note: |
+      `s1[i]` aur `s2[i]` barabar maane jaate hain (aur barabari transitive hai: a = c, c = e → a = e). base string ke har letter ko uske group ke **sabse chhote** letter se badlo.
+
+      Trick: union karte waqt **chhota letter hi leader** bane (`if (a < b) parent[b] = a`). Ab `find` seedha jawab deta hai. Size wali trick ki jagah apna niyam — DSU flexible hai.
+
+      26 letters = 26 nodes. Strings / naam ho to pehle `HashMap<String, Int>` se id do.
+
+# 7. Examples
+examples:
+  - id: provinces
+    level: easy
+    title: Kitne provinces? (Number of Provinces)
+    source: { name: Number of Provinces, platform: LeetCode, url: "https://leetcode.com/problems/number-of-provinces/" }
+    problem: |
+      n shehar. `isConnected[i][j] = 1` matlab i aur j ke beech seedhi sadak. Seedhe ya ghuma-phira ke jude shehar ek **province**. Kitne provinces?
+
+      Example: 6 shehar, sadkein 0-1, 1-2, 3-4 → **3** ({0,1,2}, {3,4}, {5})
+    intuition: |
+      Connected components hi hain (DFS se bhi hota). DSU mein aur seedha:
+      - `provinces = n` (sab akele).
+      - Har `isConnected[i][j] == 1` (i < j): `find(i) != find(j)` → jodo, `provinces--`.
+
+      Pehle se ek group (kisi aur raste se jude) → kuch nahi ghatta. Isliye sirf **safal** union gino.
+
+      Matrix symmetric hai → `j` ko `i + 1` se shuru karo, aadha kaam bachta hai.
+
+      > [!tip]
+      > Interview mein dono bolo: "DFS O(n²) bhi; DSU tab achha jab connections ek ek aate rahein (online)."
+    dryRun: |
+      | (i, j) | Leaders | Kya hua | provinces |
+      |---|---|---|---|
+      | shuru | | | 6 |
+      | (0, 1) | 0, 1 | jode | 5 |
+      | (1, 2) | 0, 2 | jode | 4 |
+      | (3, 4) | 3, 4 | jode | **3** |
+    viz: { tracer: provincesTrace }
+    code: ex1-provinces
+    complexity:
+      time: "O(n² · α(n))"
+      space: O(n)
+      why: "Matrix ke n²/2 cells; har 1 par do find ≈ O(1). Sirf parent array."
+
+  - id: redundant
+    level: medium
+    title: Faltu edge dhoondho (Redundant Connection)
+    source: { name: Redundant Connection, platform: LeetCode, url: "https://leetcode.com/problems/redundant-connection/" }
+    problem: |
+      n nodes (1 se n) ka ek tree tha, usme **ek extra edge** jod di gayi — ab ek cycle hai. Edges list di hai. Wo edge batao jise hatane se phir tree ban jaaye (kai hon to input mein jo **sabse baad** aati hai).
+
+      Example: `[[1,2],[1,3],[2,4],[3,4],[4,5]]` → **[3, 4]**
+    intuition: |
+      Edges order mein jodte jao. Jis edge ke dono sire **pehle se ek group** mein hain (`find(a) == find(b)`), wo cycle **poori** karti hai — wahi faltu.
+
+      "Sabse baad wali" kyun yahi? Cycle ki baaki edges is se pehle aa chuki thi; pehli edge jo cycle band karti hai wo cycle ki **aakhri** edge hai input order mein.
+
+      DFS se bhi hoga (har edge se pehle check karo a se b rasta hai?) — par wo O(n²). DSU O(n · α).
+
+      > [!galti]
+      > Directed version (Redundant Connection II) mein ye seedha nahi chalta — wahan kisi node ke do parent bhi ho sakte hain. Alag case analysis.
+    dryRun: |
+      | Edge | find(a), find(b) | Kya hua |
+      |---|---|---|
+      | 1-2 | 1, 2 | jode |
+      | 1-3 | 1, 3 | jode |
+      | 2-4 | 1, 4 | jode |
+      | 3-4 | 1, 1 | **same → [3, 4]** |
+    viz: { tracer: redundantTrace }
+    code: ex2-redundant
+    complexity:
+      time: "O(n · α(n))"
+      space: O(n)
+      why: "Har edge par do find + shayad ek union."
+
+  - id: kruskal
+    level: tricky
+    title: Saare points sabse saste mein jodo (Kruskal MST)
+    source: { name: Min Cost to Connect All Points, platform: LeetCode, url: "https://leetcode.com/problems/min-cost-to-connect-all-points/" }
+    problem: |
+      2D points diye hain. Do points jodne ka kharcha = Manhattan doori `|x1 - x2| + |y1 - y2|`. Saare points aapas mein jude hon (seedha ya ghuma ke), kam se kam kharcha kitna?
+
+      Example: `[[0,0],[1,3],[4,1],[6,4],[2,6]]` → **18**
+    intuition: |
+      Sab jode, kam kharcha, cycle bekaar (cycle ki ek edge hata do to bhi sab jude, kharcha kam) → jawab ek **tree** hai: **Minimum Spanning Tree (MST)**, n - 1 edges.
+
+      **Kruskal (greedy):**
+      1. Har jodi ki edge banao (n²/2), kharche se sort.
+      2. Sasti se mehngi: edge do **alag** groups jodti hai → lo (union). Same group → chhodo (cycle).
+      3. n - 1 edges ho gayi → ruko.
+
+      Greedy sahi kyun? Kisi bhi "cut" (points ke do hisse) ko paar karne wali sabse sasti edge kisi MST mein zaroor hoti hai — Kruskal hamesha wahi uthata hai.
+
+      Dense graph (har jodi edge) par **Prim** (Dijkstra jaisa heap, ya O(n²) array) bhi achha.
+
+      > [!galti]
+      > Sasti edges le li bina cycle check ke → n - 1 edges ho gayi par kuch points juda hi nahi (ek group mein cycle, doosra akela). Union ka false = skip.
+    dryRun: |
+      | Edge (cost) | Groups alag? | Kul |
+      |---|---|---|
+      | 0-1 (4) | haan → lo | 4 |
+      | 1-4 (4) | haan → lo | 8 |
+      | 0-2 (5) | haan → lo | 13 |
+      | 1-2 (5) | nahi (0,1,2 ek) → chhodo | 13 |
+      | 2-3 (5) | haan → lo, 4 edges = n - 1 | **18** |
+    viz: { tracer: kruskalTrace }
+    code: ex3-kruskal
+    complexity:
+      time: "O(n² log n)"
+      space: "O(n²)"
+      why: "n²/2 edges banana aur sort karna (log n² = 2 log n). Union-find har edge par ≈ O(1)."
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Connections ek ek aa rahe hain aur baar baar 'ye do jude hain?' poochhna hai."
+    - "Undirected graph mein cycle / faltu edge."
+    - "Kruskal MST — sabse sasta network (sadak, cable, pipeline)."
+    - "Equivalence / grouping: same accounts, barabar variables, similar strings."
+  avoid:
+    - "Shortest path / doori chahiye → BFS / Dijkstra (DSU sirf 'jude ya nahi' batata hai)."
+    - "Directed graph ki reachability / cycle → DFS / topological sort."
+    - "Edges hatani (delete) bhi hain → plain DSU split nahi kar sakta (ulta process karo ya doosra structure)."
+  signals:
+    - keyword: "number of connected components / provinces / groups"
+      think: "DSU: count = n, har safal union par --."
+    - keyword: "redundant edge / cycle banane wali edge"
+      think: "union false → wahi edge."
+    - keyword: "minimum cost to connect all"
+      think: "MST: Kruskal (sort + DSU) ya Prim (heap)."
+    - keyword: "equivalent / same group / merge accounts"
+      think: "DSU (strings → HashMap se id)."
+
+# 9. Real-world
+realWorld:
+  - where: "Network / cable / pipeline design"
+    how: "Saare shehar sabse kam taar mein jodo — MST (Kruskal / Prim)."
+  - where: "Image processing (connected regions)"
+    how: "Same rang ke pixels ke groups — labeling mein union-find."
+  - where: "Social network / accounts merge"
+    how: "Same email / phone wale accounts ek insaan ke — union karke groups."
+  - where: "Compilers (type inference)"
+    how: "'a ka type = b ka type' jaisi barabariyan union-find se ek group mein."
+  - where: "Clustering (single-linkage)"
+    how: "Sabse paas wale points pehle jodte jao (Kruskal) jab tak k clusters na bachein."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Nodes jode, leaders nahi"
+    type: logic
+    wrong: |
+      `parent[b] = a` — b ke group ke baaki members purane leader ke saath reh gaye.
+    right: |
+      `parent[find(b)] = find(a)`. Hamesha roots jodo.
+  - title: "find ke bina parent padha"
+    type: logic
+    wrong: |
+      `if (parent[a] == parent[b])` se same group check — parent sirf ek kadam upar hai, leader nahi.
+    right: |
+      `find(a) == find(b)`.
+  - title: "Bina compression / size — linked list ped"
+    type: other
+    wrong: |
+      Naya node hamesha leader → 10⁵ unions ke baad find O(n) → TLE.
+    right: |
+      Kam se kam path compression. Bade input par size / rank bhi.
+  - title: "1-based nodes, size n"
+    type: off-by-one
+    wrong: |
+      Nodes 1..n aur `IntArray(n) { it }` → node n par crash.
+    right: |
+      `IntArray(n + 1) { it }`; index 0 bas khaali pada rahe.
+  - title: "Groups count mein har union ghataya"
+    type: logic
+    wrong: |
+      Har jodi par `count--`, chahe dono pehle se ek group mein hon.
+    right: |
+      Sirf jab `find(a) != find(b)` (union ne true lautaya).
+  - title: "Kruskal mein n - 1 par ruke bina / disconnected graph"
+    type: empty
+    wrong: |
+      Graph disconnected ho to n - 1 edges kabhi nahi milti — maan liya MST ban gaya.
+    right: |
+      Aakhir mein `used == n - 1` check; warna "sab nahi jud sakte" (-1).
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Union-Find kya hai? Kaunse operations?"
+      a: |
+        Disjoint groups ka structure. find(x) = leader, union(a, b) = groups jodo. Ek parent array se implement.
+    - q: "Path compression aur union by size/rank kya karte hain?"
+      a: |
+        Compression: find ke raste ke nodes seedha root se jod do. Size/rank: chhota ped bade ke neeche. Dono saath → har operation O(α(n)) amortized, practically constant.
+    - q: "Rank aur size mein farak?"
+      a: |
+        Size = group mein kitne nodes; rank = ped ki gehraai ka upper bound. Dono se same guarantee. Size zyada kaam ka (group size bhi mil jaata hai).
+    - q: "DSU se undirected cycle kaise?"
+      a: |
+        Har edge (a, b) par: find(a) == find(b) → cycle. Warna union.
+    - q: "Components ke liye DFS ya DSU?"
+      a: |
+        Static graph → dono O(V + E). Edges dheere dheere aayein aur beech mein queries ho (online) → DSU. 'Kitne components har edge ke baad?' → DSU.
+    - q: "Kruskal vs Prim?"
+      a: |
+        Kruskal: edges sort + DSU, O(E log E) — sparse graph ke liye accha. Prim: node se heap ke saath badhao, O(E log V); dense graph par O(V²) array version.
+    - q: "MST unique kab hota hai?"
+      a: |
+        Saare edge weights alag hon to MST unique. Barabar weights ho to kai MST, kharcha same.
+    - q: "Edges delete karni ho to?"
+      followUp: true
+      a: |
+        DSU split nahi karta. Saari queries pehle se pata hon to ulta chalo: aakhri state se shuru karke deletions ko additions maano (offline reverse).
+    - q: "Weighted DSU kya hai? (Evaluate Division)"
+      followUp: true
+      a: |
+        Har node apne parent ke saath ek ratio / offset bhi rakhta hai. find mein compress karte waqt ratios guna karte jao. a/b = weight(a) / weight(b) agar same root.
+  mayAsk:
+    - "Accounts Merge (emails ko id do, union)."
+    - "Number of Islands II (online islands)."
+    - "Satisfiability of Equality Equations."
+    - "Evaluate Division (weighted DSU)."
+
+# 12. Practice
+practice:
+  - name: Find if Path Exists in Graph
+    platform: LeetCode
+    num: 1971
+    url: "https://leetcode.com/problems/find-if-path-exists-in-graph/"
+    level: easy
+    pattern: DSU connectivity
+    hint: "Saari edges union karo, phir find(source) == find(destination)."
+  - name: Connected components ginna (DSU se)
+    platform: Custom
+    level: easy
+    pattern: DSU count
+    hint: "n nodes, edge list. count = n, har safal union par --. DFS wale jawab se milao."
+  - name: Lexicographically Smallest Equivalent String
+    platform: LeetCode
+    num: 1061
+    url: "https://leetcode.com/problems/lexicographically-smallest-equivalent-string/"
+    level: easy
+    pattern: Chhota letter = leader
+    hint: "Code section wala. (LeetCode par medium.)"
+  - name: Satisfiability of Equality Equations
+    platform: LeetCode
+    num: 990
+    url: "https://leetcode.com/problems/satisfiability-of-equality-equations/"
+    level: medium
+    pattern: Do pass — pehle ==, phir !=
+    hint: "Pehle saare 'a==b' union. Phir har 'a!=b' check: same group → false."
+  - name: Accounts Merge
+    platform: LeetCode
+    num: 721
+    url: "https://leetcode.com/problems/accounts-merge/"
+    level: medium
+    pattern: Strings → id + DSU
+    hint: "Har email ko pehle mile account ka index do (HashMap). Ek account ke saare emails union. Phir root ke hisaab se emails group, sort, naam aage."
+  - name: Number of Operations to Make Network Connected
+    platform: LeetCode
+    num: 1319
+    url: "https://leetcode.com/problems/number-of-operations-to-make-network-connected/"
+    level: medium
+    pattern: Components - 1 + faltu cables
+    hint: "Cables < n - 1 → -1. Warna jawab = components - 1 (faltu cables utni hi kaafi hain)."
+  - name: Number of Islands II
+    platform: LeetCode
+    num: 305
+    url: "https://leetcode.com/problems/number-of-islands-ii/"
+    level: hard
+    pattern: Online DSU on grid
+    hint: "Har nayi zameen: count++, phir 4 padosi zameen se union (safal par count--). Duplicate position par count wahi. (Premium — GFG par 'Number of Islands' online version.)"
+  - name: Remove Max Number of Edges to Keep Graph Fully Traversable
+    platform: LeetCode
+    num: 1579
+    url: "https://leetcode.com/problems/remove-max-number-of-edges-to-keep-graph-fully-traversable/"
+    level: hard
+    pattern: Do DSU + type 3 pehle
+    hint: "Alice aur Bob ke do DSU. Pehle type 3 edges dono mein (greedy — dono ke kaam aati hai). Phir type 1 Alice mein, type 2 Bob mein. Faltu = jo union false. Aakhir mein dono connected?"
+
+# 13. Quick revision
+revision:
+  summary:
+    - "parent[] se groups; find = leader, union = leaders jodo."
+    - "Path compression + union by size → har op ≈ O(1) (α(n))."
+    - "union false = pehle se jude = undirected cycle / faltu edge."
+    - "Components: n se shuru, har safal union par -1."
+    - "Kruskal MST: edges sort, alag groups jodne wali lo, n - 1 par ruko."
+  cheatsheet: |
+    ```kotlin
+    val parent = IntArray(n) { it }; val size = IntArray(n) { 1 }
+    fun find(x: Int): Int { if (parent[x] != x) parent[x] = find(parent[x]); return parent[x] }
+    fun union(a: Int, b: Int): Boolean {
+        var ra = find(a); var rb = find(b); if (ra == rb) return false
+        if (size[ra] < size[rb]) { val t = ra; ra = rb; rb = t }
+        parent[rb] = ra; size[ra] += size[rb]; return true
+    }
+    // Kruskal: edges.sortBy { it[0] }; for (e in edges) if (union(e[1], e[2])) { cost += e[0]; if (++used == n - 1) break }
+    ```
+  quiz:
+    - q: "a aur b same group mein hain — kaise check?"
+      options: ["parent[a] == parent[b]", "find(a) == find(b)", "a == b", "size[a] == size[b]"]
+      answer: 1
+      explain: "Leader (root) compare karo; parent sirf ek kadam upar hai."
+    - q: "union(a, b) ne false lautaya. Graph ke liye matlab?"
+      options: ["Error", "a-b edge cycle banati hai", "a aur b alag components", "Graph directed hai"]
+      answer: 1
+      explain: "Dono pehle se jude the — ye edge ek aur rasta = cycle."
+    - q: "Path compression + union by size ke saath ek operation?"
+      options: ["O(n)", "O(log n) worst", "O(α(n)) ≈ O(1) amortized", "O(n log n)"]
+      answer: 2
+      explain: "Inverse Ackermann — kisi bhi practical n ke liye ≤ 4."
+    - q: "5 nodes, 3 safal unions (aur 2 bekaar). Kitne groups?"
+      options: ["0", "2", "3", "5"]
+      answer: 1
+      explain: "5 - 3 = 2. Bekaar unions kuch nahi ghatate."
+    - q: "Kruskal mein edge (u, v) kab chhodte hain?"
+      options: ["Jab weight bada ho", "Jab u aur v pehle se ek group mein", "Jab u == 0", "Kabhi nahi"]
+      answer: 1
+      explain: "Same group = cycle banegi; MST mein cycle nahi."
+
+# 14. Connections
+connections:
+  related:
+    - id: dfs
+      why: "Components / cycle ka doosra tareeka; static graph par dono O(V + E)."
+    - id: graph-basics
+      why: "Edge list hi kaafi — adjacency list banane ki zaroorat nahi."
+    - id: sorting-in-practice
+      why: "Kruskal ka sabse mehnga hissa edges sort karna hai."
+  usedLater:
+    - id: greedy-basics
+      how: "Kruskal greedy ka classic — 'sabse sasta pehle', aur kyun ye sahi hai (cut property)."
+    - id: intervals
+      how: "Overlapping cheezon ko group karna — kuch interval sawaal DSU se bhi bante hain."
