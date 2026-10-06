@@ -3,7 +3,7 @@ fun topoSort(n: Int, edges: Array<IntArray>): List<Int> {
     val adj = List(n) { mutableListOf<Int>() }
     val indeg = IntArray(n)
     for ((u, v) in edges) {
-        adj[u].add(v) // u → v: pehle u, phir v //@build
+        adj[u].add(v) // u -> v: pehle u, phir v //@build
         indeg[v]++ // v ko ek aur cheez ka intezaar
     }
     val queue = ArrayDeque<Int>()

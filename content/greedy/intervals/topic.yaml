@@ -1,0 +1,438 @@
+meta:
+  id: intervals
+  chapter: greedy
+  title: Intervals
+  subtitle: Time ke tukde — sort karo, ek pass mein sweep karo
+  level: intermediate
+  minutes: 45
+  prereqs: [greedy-basics, sorting-in-practice]
+  tags: [intervals, merge-intervals, sweep, activity-selection, meeting-rooms, greedy]
+
+# 1. Ye kya hai?
+what:
+  body: |
+    **Interval** = ek shuruaat aur ek ant: `[start, end]` — meeting ka time, train ka station par rehna, booking ki dates.
+
+    Intervals ke sawaal mostly teen type ke:
+    1. **Jodo** — takraane wale milao (merge, insert).
+    2. **Chuno** — zyada se zyada bina takraav wale rakho / kam se kam hatao.
+    3. **Gino** — ek saath kitne chal rahe (rooms, platforms).
+
+    Mantra: **sort karo, phir ek pass (sweep)**. Kis cheez se sort — yahi asli sawaal hai:
+    - Jodna → **start** se.
+    - Zyada se zyada chunna → **end** se (jo jaldi khatam ho).
+    - Ek saath kitne → start aur end **alag alag** sort (ghatnaayein).
+
+    Do intervals `[a, b]` aur `[c, d]` takraate hain jab `a ≤ d` **aur** `c ≤ b`. (End par chhoona takraav hai ya nahi — sawaal padh ke tay karo.)
+
+    > [!yaad]
+    > Sort ke baad naya interval sirf **pichhle / aakhri rakhe** se takra sakta hai. Isliye n² jodiyon ki jagah ek pass.
+  analogy: |
+    **Shaadi ka hall booking register:**
+    Bookings ulti-seedhi likhi hain. "Kya do bookings takraati hain?" — har jodi milaane se behtar: tareekh ke order mein lagao, phir upar se neeche padho. Takraav sirf agal-bagal wali bookings mein dikhega.
+
+    "Kitne hall chahiye?" — har din dekho kitni shaadiyan ek saath chal rahi hain; sabse zyada wala din = halls.
+
+# 2. Kyun chahiye?
+why:
+  body: |
+    Calendar apps, room booking, train time-table, CPU scheduling — sab intervals.
+
+    | Tareeka | Time |
+    |---|---|
+    | Har jodi milao | O(n²) |
+    | **Sort + sweep** | **O(n log n)** |
+
+    n = 10⁵ meetings par: n² = 10¹⁰ (minutes), sort + sweep = ~17 lakh kadam (millisecond).
+
+    > [!socho]
+    > "Zyada se zyada meetings attend karo (ek waqt ek)" — start se sort karke pehli wali uthao to kya galat ho sakta hai?
+    >
+    > Sabse pehle shuru hone wali [0, 100] ho sakti hai — wo akeli saara din kha jaati hai. Jaldi KHATAM hone wali uthao: wo sabse kam time gherti hai, baaki ke liye sabse zyada jagah. Isliye end se sort.
+
+# 3. Visual intro
+visual:
+  body: |
+    Har row ek interval, rangeen cells = wo time. Pehle bikhre hue, phir start se sort — dekho takraane wale ab agal-bagal hain. Phir har group ek rang, aur aakhir mein merged intervals.
+  viz: { tracer: overlapTrace }
+
+# 4. Kaise kaam karta hai
+how:
+  body: |
+    **Merge intervals:**
+    1. Start se sort.
+    2. Output ka **aakhri** interval `last` dekho:
+       - `cur.start > last.end` → takraav nahi → `cur` naya interval.
+       - Warna takraaya → `last.end = max(last.end, cur.end)`.
+
+    `max` kyun? `cur` poora `last` ke andar bhi ho sakta hai (`[1, 10]` aur `[2, 3]`) — tab end nahi ghatna chahiye.
+
+    > [!galti]
+    > `last.end = cur.end` likh diya (max nahi). `[1, 10], [2, 3]` → `[1, 3]` — interval chhota ho gaya, galat.
+  viz: { tracer: mergeTrace }
+  code: how
+
+# 5. Operations table
+operations:
+  - op: "Merge intervals"
+    time: "O(n log n)"
+    space: O(n)
+    why: "Sort + ek pass; output list."
+  - op: "Overlap check (sorted, padosi)"
+    time: "O(n log n)"
+    space: O(1)
+    why: "Sort ke baad sirf i aur i - 1 compare."
+  - op: "Max non-overlapping (activity selection)"
+    time: "O(n log n)"
+    space: O(1)
+    why: "End se sort, ek pass mein greedy."
+  - op: "Ek saath kitne (rooms / platforms)"
+    time: "O(n log n)"
+    space: O(n)
+    why: "Starts aur ends alag sort + do pointers; ya min-heap of end times."
+  - op: "Insert interval (pehle se sorted)"
+    time: O(n)
+    space: O(n)
+    why: "Teen hisse ek pass mein — sort ki zaroorat nahi."
+
+# 6. Code
+code:
+  - title: Insert interval — sorted list mein naya interval
+    file: insert-interval
+    note: |
+      List pehle se sorted aur bina takraav. Naya `[s, e]` daalna hai. Sort dobara nahi — teen hisse:
+      1. Jo naye se **pehle khatam** (`end < s`) → jaise hain.
+      2. Jo **takraate** (`start ≤ e`) → sab ko naye mein milao (`s = min`, `e = max`).
+      3. Baaki → jaise hain.
+
+      O(n). LeetCode 57.
+
+# 7. Examples
+examples:
+  - id: meetings
+    level: easy
+    title: Saari meetings attend kar sakte ho?
+    problem: |
+      Meetings ke `[start, end]` diye hain. Ek insaan ek waqt mein ek hi meeting mein ho sakta hai. Saari attend kar sakta hai? (Ek meeting 10 baje khatam aur doosri 10 baje shuru — chalega.)
+
+      Example: `[[13,15],[9,10],[10,12]]` → **true**; `[[9,11],[14,15],[10,12]]` → **false**
+    intuition: |
+      Start se sort. Ab takraav hoga to kisi meeting aur uske **thik baad wali** mein hi (beech mein koi aur hoti to wo pehle takraati).
+
+      Bas har padosi jodi: `agli.start < pichhli.end` → false.
+
+      Yahan end par chhoona (`10` aur `10`) takraav **nahi** — isliye `<`, `≤` nahi.
+
+      > [!tip]
+      > LeetCode par ye "Meeting Rooms" (252) premium hai; GFG / interviews mein seedha aata hai. Agla level: "kitne rooms chahiye?" — Example 3 jaisa.
+    dryRun: |
+      | Sorted | Pichhli ka end | Agli ka start | Theek? |
+      |---|---|---|---|
+      | [9,10] | — | — | |
+      | [10,12] | 10 | 10 | 10 ≥ 10 ✓ |
+      | [13,15] | 12 | 13 | ✓ → **true** |
+    viz: { tracer: meetingsTrace }
+    code: ex1-meetings
+    complexity:
+      time: "O(n log n)"
+      space: O(1)
+      why: "Sort; phir n - 1 padosi jodiyan."
+
+  - id: non-overlapping
+    level: medium
+    title: Kam se kam kitne hatao (Non-overlapping Intervals)
+    source: { name: Non-overlapping Intervals, platform: LeetCode, url: "https://leetcode.com/problems/non-overlapping-intervals/" }
+    problem: |
+      Intervals ki list. Kam se kam kitne intervals hatao ki baaki aapas mein na takraayein? (`[1,2]` aur `[2,3]` nahi takraate.)
+
+      Example: `[[1,4],[2,3],[3,6],[5,7],[6,8]]` → **2**
+    intuition: |
+      Kam se kam hatana = **zyada se zyada rakhna** (activity selection).
+
+      Greedy: rakhe hue mein sabse **jaldi khatam** hone wala chuno — wo aage ke liye sabse zyada jagah chhodta hai. To **end se sort**:
+      - `start ≥ end_of_last_kept` → rakho, `end` update.
+      - Warna hatao (`removed++`). Hatana isi ko hai kyunki iska end pichhle rakhe hue se bada ya barabar hai — ye "zyada kharab" choice hai.
+
+      Saboot (exchange): kisi optimal set ka pehla interval greedy wale se badlo — greedy wala pehle khatam hota hai, baaki sab ab bhi fit.
+
+      > [!galti]
+      > Start se sort kiya → `[1,4]` pehle rakh liya, phir `[2,3]` aur `[3,6]` dono hatane pade → 3. End se sort → 2.
+    dryRun: |
+      | End se sorted | start ≥ end? | Faisla | end | removed |
+      |---|---|---|---|---|
+      | [2,3] | 2 ≥ −∞ | rakho | 3 | 0 |
+      | [1,4] | 1 < 3 | hatao | 3 | 1 |
+      | [3,6] | 3 ≥ 3 | rakho | 6 | 1 |
+      | [5,7] | 5 < 6 | hatao | 6 | 2 |
+      | [6,8] | 6 ≥ 6 | rakho | 8 | **2** |
+    viz: { tracer: nonOverlapTrace }
+    code: ex2-non-overlapping
+    complexity:
+      time: "O(n log n)"
+      space: O(1)
+      why: "Sort + ek pass. Sort in-place."
+
+  - id: platforms
+    level: tricky
+    title: Station par kitne platform chahiye?
+    source: { name: Minimum Platforms, platform: GFG, url: "https://www.geeksforgeeks.org/problems/minimum-platforms-1587115620/1" }
+    problem: |
+      Har train ka aane aur jaane ka time diya hai. Kam se kam kitne platform chahiye ki koi train intezaar na kare? (Ek train ke jaane ke **saath** hi doosri aaye to bhi alag platform chahiye — jaane wali abhi khadi hai.)
+
+      Example: trains (9-10, 9-12, 11-13, 12-14, 15-16, 10-11) → **3**
+    intuition: |
+      Platforms = kisi bhi pal ek saath kitni trains station par — **max overlap**.
+
+      Trick: kaunsi train kaunsi hai, farak nahi padta. Sirf ghatnaayein: "koi aayi" (+1), "koi gayi" (-1). To **aana aur jaana alag alag sort** karo aur time ke order mein padho (do sorted arrays ka merge):
+      - `arr[i] ≤ dep[j]` → pehle aana: `now++`, `i++`.
+      - Warna pehle jaana: `now--`, `j++`.
+      - `best = max(best, now)`.
+
+      Barabar time par pehle **aana** ginna — sawaal kehta hai jaane wali train abhi platform gher rahi hai.
+
+      Doosra tareeka: trains start se sort, ek **min-heap** mein end times; nayi train aaye to heap se pehle khatam ho chuki nikaalo — heap ka size = platforms.
+
+      > [!galti]
+      > Pairs (arr, dep) ko saath rakh ke sirf arr se sort kiya aur dep ka order bigad gaya — sweep galat. Ghatnaayein alag alag sort karo; pairing ki zaroorat hi nahi.
+    dryRun: |
+      | Ghatna | now | best |
+      |---|---|---|
+      | 9 aana, 9 aana, 10 aana | 3 | 3 |
+      | 10 jaana | 2 | 3 |
+      | 11 aana | 3 | 3 |
+      | 11 jaana | 2 | 3 |
+      | 12 aana | 3 | 3 |
+      | 12, 13, 14 jaana | 0 | 3 |
+      | 15 aana | 1 | **3** |
+    viz: { tracer: platformsTrace }
+    code: ex3-platforms
+    complexity:
+      time: "O(n log n)"
+      space: O(1)
+      why: "Do sort + ek pass. (Copies na banao to extra memory nahi.)"
+
+# 8. Kab use karein / kab NAHI
+when:
+  use:
+    - "Input mein [start, end] jodiyan — meetings, bookings, ranges, trains."
+    - "'Merge / jodo / overlapping hata do' → start se sort + sweep."
+    - "'Zyada se zyada bina takraav' / 'kam se kam hatao' / 'kam se kam arrows' → end se sort."
+    - "'Ek saath kitne' / rooms / platforms → events sweep ya min-heap."
+  avoid:
+    - "Har interval ka alag value / weight aur max value chahiye (weighted scheduling) → DP + binary search, sirf greedy nahi."
+    - "Ranges par baar baar update + query (online) → segment tree / difference array."
+    - "Points ka sawaal (interval nahi) — seedha sort ya hashing."
+  signals:
+    - keyword: "merge overlapping intervals"
+      think: "Start se sort, last.end = max."
+    - keyword: "minimum removals / maximum non-overlapping / arrows"
+      think: "End se sort, greedy activity selection."
+    - keyword: "meeting rooms / platforms / ek saath kitne"
+      think: "Starts aur ends alag sort, do pointers; ya end times ka min-heap."
+    - keyword: "insert into sorted intervals"
+      think: "Teen hisse: pehle, takraane wale (milao), baad."
+
+# 9. Real-world
+realWorld:
+  - where: "Google Calendar 'free slot dhoondho'"
+    how: "Sabki busy meetings merge karo; beech ke khaali gaps = free slots."
+  - where: "Railway / airport planning"
+    how: "Ek saath kitne trains / flights — platforms / gates kitne chahiye (Example 3)."
+  - where: "Hotel / hall booking"
+    how: "Nayi booking purani se takraati hai? Sorted list mein insert / overlap check."
+  - where: "CPU / job scheduling"
+    how: "Zyada se zyada jobs ek machine par — jaldi khatam hone wala pehle (activity selection)."
+  - where: "Log analysis"
+    how: "User sessions [login, logout] merge karke total online time; max concurrent users."
+
+# 10. Common galtiyan & edge cases
+mistakes:
+  - title: "Galat key se sort"
+    type: logic
+    wrong: |
+      Max non-overlapping ke liye start se sort.
+    right: |
+      Chunna → end se. Jodna → start se. Socho: greedy kaunsi cheez bachana chahta hai?
+  - title: "End par chhoona — takraav ya nahi?"
+    type: off-by-one
+    wrong: |
+      Har jagah `<` (ya har jagah `≤`) likh diya bina sawaal padhe.
+    right: |
+      Merge (LC 56): `[1,4]`, `[4,5]` milte hain → `>` par hi naya. Meetings / LC 435: `[1,2]`, `[2,3]` theek. Platforms: barabar par bhi naya platform.
+  - title: "Merge mein max bhool gaye"
+    type: logic
+    wrong: |
+      `last.end = cur.end` — andar wala interval end ghata deta hai.
+    right: |
+      `last.end = maxOf(last.end, cur.end)`.
+  - title: "Khaali input"
+    type: empty
+    wrong: |
+      `intervals[0]` padha bina check — khaali list par crash.
+    right: |
+      Khaali → khaali output / true / 0. Loop 1 se shuru ho to n = 0, 1 dono ka dhyaan.
+  - title: "Comparator mein overflow"
+    type: overflow
+    wrong: |
+      `(a, b) -> a[0] - b[0]` — bade negative / positive values par overflow, galat order.
+    right: |
+      `Comparator.comparingInt(...)` / `Integer.compare` / Kotlin `sortBy { it[0] }`.
+  - title: "Output mein input ka array hi daal diya"
+    type: other
+    wrong: |
+      `out.add(cur)` aur phir `last[1] = …` — input ka interval bhi badal gaya (same array object).
+    right: |
+      Naya array banao (`intArrayOf(cur[0], cur[1])`) agar input baad mein chahiye.
+
+# 11. Interview corner
+interview:
+  questions:
+    - q: "Merge Intervals kaise? Complexity?"
+      a: |
+        Start se sort; output ke aakhri se compare: takraaya to end = max, warna naya. O(n log n) time, O(n) output.
+    - q: "Do intervals takraate hain — condition?"
+      a: |
+        [a, b] aur [c, d]: a ≤ d aur c ≤ b (closed). Ulta socho: nahi takraate jab b < c ya d < a.
+    - q: "Activity selection mein end se sort kyun?"
+      a: |
+        Jaldi khatam hone wala sabse kam time gherta hai — exchange argument: kisi optimal ka pehla interval isse badlo, baaki fit rehte hain.
+    - q: "Meeting Rooms II (kitne rooms) ke do tareeke?"
+      a: |
+        (1) Starts aur ends alag sort, do pointers — max ek saath. (2) Start se sort, min-heap of end times; nayi meeting par heap top ≤ start to poll; heap size = rooms.
+    - q: "Insert Interval ko sort ke bina kaise?"
+      a: |
+        List pehle se sorted: pehle khatam wale copy, takraane wale merge (min start, max end), baaki copy. O(n).
+    - q: "Minimum Arrows to Burst Balloons?"
+      a: |
+        End se sort; arrow pehle balloon ke end par; jo balloon us arrow se shuru hone se pehle hai (start ≤ arrow) wo phoot gaya; warna naya arrow uske end par.
+    - q: "Interval List Intersections (do sorted lists)?"
+      a: |
+        Do pointers: intersection = [max(starts), min(ends)] agar valid. Jiska end chhota, uska pointer aage. O(m + n).
+    - q: "Har pal kitne intervals — bahut saare queries?"
+      followUp: true
+      a: |
+        Difference array: start par +1, end + 1 par -1, prefix sum. Time range chhoti ho to O(range + n).
+    - q: "Weighted interval scheduling?"
+      followUp: true
+      a: |
+        Har interval ki value alag → greedy fail. End se sort, dp[i] = max(dp[i-1], value[i] + dp[pichhla na takraane wala]) — binary search se pichhla dhoondho. O(n log n).
+  mayAsk:
+    - "Meeting Rooms II."
+    - "Minimum Number of Arrows to Burst Balloons."
+    - "Interval List Intersections."
+    - "Employee Free Time."
+
+# 12. Practice
+practice:
+  - name: Summary Ranges
+    platform: LeetCode
+    num: 228
+    url: "https://leetcode.com/problems/summary-ranges/"
+    level: easy
+    pattern: Sorted numbers → ranges
+    hint: "Lagaataar numbers ka tukda ek range. Jab agla number +1 nahi, range band karo ('a->b' ya 'a')."
+  - name: Merge Intervals
+    platform: LeetCode
+    num: 56
+    url: "https://leetcode.com/problems/merge-intervals/"
+    level: easy
+    pattern: Start sort + sweep
+    hint: "How wala — bina dekhe likho. (LeetCode par medium.)"
+  - name: Insert Interval
+    platform: LeetCode
+    num: 57
+    url: "https://leetcode.com/problems/insert-interval/"
+    level: easy
+    pattern: Teen hisse
+    hint: "Code section wala. Edge: khaali list, naya sabse pehle, sabse baad. (LeetCode par medium.)"
+  - name: Minimum Number of Arrows to Burst Balloons
+    platform: LeetCode
+    num: 452
+    url: "https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/"
+    level: medium
+    pattern: End sort greedy
+    hint: "End se sort. arrow = pehle ka end. Agla balloon start > arrow → naya arrow = uska end. Comparator mein overflow se bacho (values ±2³¹)."
+  - name: Interval List Intersections
+    platform: LeetCode
+    num: 986
+    url: "https://leetcode.com/problems/interval-list-intersections/"
+    level: medium
+    pattern: Do pointers
+    hint: "lo = max(starts), hi = min(ends); lo ≤ hi to jodo. Jiska end chhota, wo pointer aage."
+  - name: Car Pooling
+    platform: LeetCode
+    num: 1094
+    url: "https://leetcode.com/problems/car-pooling/"
+    level: medium
+    pattern: Events sweep / difference array
+    hint: "from par +passengers, to par -passengers (difference array, locations ≤ 1000). Prefix sum kabhi capacity se zyada → false."
+  - name: Meeting Rooms III
+    platform: LeetCode
+    num: 2402
+    url: "https://leetcode.com/problems/meeting-rooms-iii/"
+    level: hard
+    pattern: Do heaps (free rooms, busy rooms)
+    hint: "Start se sort. Free rooms min-heap (number), busy min-heap (end, room). Koi free nahi to sabse pehle khaali hone wala room, meeting deri se. Long time."
+  - name: Employee Free Time
+    platform: LeetCode
+    num: 759
+    url: "https://leetcode.com/problems/employee-free-time/"
+    level: hard
+    pattern: Sab merge + gaps
+    hint: "Sab employees ke intervals ek list, start se sort, merge. Merged ke beech ke gaps = free time. (Premium — GFG par similar.)"
+
+# 13. Quick revision
+revision:
+  summary:
+    - "Intervals = sort + sweep. n² jodiyon ki jagah O(n log n)."
+    - "Merge: start se sort, last.end = max(last.end, cur.end)."
+    - "Max non-overlapping / min removals: END se sort (activity selection)."
+    - "Ek saath kitne: starts aur ends alag sort, do pointers (ya end times ka min-heap)."
+    - "End par chhoona takraav hai ya nahi — sawaal se tay karo (< vs ≤)."
+  cheatsheet: |
+    ```kotlin
+    // merge
+    iv.sortBy { it[0] }
+    for (c in iv) if (out.isEmpty() || c[0] > out.last()[1]) out.add(intArrayOf(c[0], c[1]))
+                  else out.last()[1] = maxOf(out.last()[1], c[1])
+    // activity selection
+    iv.sortBy { it[1] }; var end = Int.MIN_VALUE
+    for (c in iv) if (c[0] >= end) { keep++; end = c[1] }
+    // rooms / platforms: arr.sort(); dep.sort(); i/j pointers, now++ / now--
+    ```
+  quiz:
+    - q: "Merge Intervals se pehle kis key par sort?"
+      options: ["End", "Start", "Length", "Sort nahi chahiye"]
+      answer: 1
+      explain: "Start se — takraane wale agal-bagal aate hain."
+    - q: "Zyada se zyada non-overlapping intervals chunne ke liye sort?"
+      options: ["Start se", "End se", "Length se", "Random"]
+      answer: 1
+      explain: "Jaldi khatam hone wala pehle — aage ke liye sabse zyada jagah."
+    - q: "[1, 10] aur [2, 3] merge. last.end = ?"
+      options: ["3", "10", "2", "13"]
+      answer: 1
+      explain: "max(10, 3) = 10 — andar wala interval end nahi ghatata."
+    - q: "Trains: aana [9, 9, 10], jaana [10, 11, 12] (barabar = naya platform). Platforms?"
+      options: ["1", "2", "3", "4"]
+      answer: 2
+      explain: "9, 9 aaye (2); 10 aana ≤ 10 jaana → pehle aana → 3."
+    - q: "Insert Interval (list pehle se sorted) ki time complexity?"
+      options: ["O(log n)", "O(n)", "O(n log n)", "O(n²)"]
+      answer: 1
+      explain: "Ek pass — teen hisse, sort dobara nahi."
+
+# 14. Connections
+connections:
+  related:
+    - id: greedy-basics
+      why: "Activity selection = exchange argument wala classic greedy."
+    - id: sorting-in-practice
+      why: "Har interval sawaal sahi comparator se shuru hota hai."
+    - id: two-heaps
+      why: "Meeting Rooms III / platforms — end times ke heaps."
+  usedLater:
+    - id: greedy-classics
+      how: "Partition Labels — har letter ka [pehla, aakhri] interval, merge ka hi roop."
+    - id: dp-1d
+      how: "Weighted interval scheduling — jab greedy kaafi nahi, DP + binary search."

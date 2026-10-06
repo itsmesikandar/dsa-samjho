@@ -9,7 +9,7 @@ class Main {
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
         int[] indeg = new int[n];
         for (int[] e : edges) {
-            adj.get(e[0]).add(e[1]); // u → v: pehle u, phir v //@build
+            adj.get(e[0]).add(e[1]); // u -> v: pehle u, phir v //@build
             indeg[e[1]]++; // v ko ek aur cheez ka intezaar
         }
         ArrayDeque<Integer> queue = new ArrayDeque<>();

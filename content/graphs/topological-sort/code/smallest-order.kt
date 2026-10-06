@@ -1,6 +1,6 @@
 import java.util.PriorityQueue
 
-// Kahn + min-heap: free nodes mein hamesha sabse chhota pehle → sabse chhota (lexicographic) topological order
+// Kahn + min-heap: free nodes mein hamesha sabse chhota pehle -> sabse chhota (lexicographic) topological order
 fun smallestTopo(n: Int, edges: Array<IntArray>): List<Int> {
     val adj = List(n) { mutableListOf<Int>() }
     val indeg = IntArray(n)

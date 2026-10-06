@@ -9,7 +9,7 @@ class Main {
     static String cheapestPath(int n, int[][] edges, int src, int dst) {
         List<List<int[]>> adj = new ArrayList<>();
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
-        for (int[] e : edges) adj.get(e[0]).add(new int[] {e[1], e[2]}); // sirf u → v
+        for (int[] e : edges) adj.get(e[0]).add(new int[] {e[1], e[2]}); // sirf u -> v
         int[] dist = new int[n];
         int[] parent = new int[n]; // kis node se sabse sasta aaya
         Arrays.fill(dist, Integer.MAX_VALUE);

@@ -57,6 +57,8 @@ export interface GridPanel {
   rowLabels?: string[];
   colLabels?: string[];
   corner?: string;
+  /** patle, chhote cells (timeline jaise lambe grids ke liye; text nahi dikhna chahiye) */
+  dense?: boolean;
 }
 
 export interface BarsPanel {

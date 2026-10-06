@@ -3,7 +3,7 @@ import java.util.PriorityQueue
 // Directed weighted graph: src se dst ka sabse sasta rasta - kharcha aur rasta dono
 fun cheapestPath(n: Int, edges: Array<IntArray>, src: Int, dst: Int): String {
     val adj = List(n) { mutableListOf<IntArray>() }
-    for ((u, v, w) in edges) adj[u].add(intArrayOf(v, w)) // sirf u → v
+    for ((u, v, w) in edges) adj[u].add(intArrayOf(v, w)) // sirf u -> v
     val dist = IntArray(n) { Int.MAX_VALUE }
     val parent = IntArray(n) { -1 } // kis node se sabse sasta aaya
     val pq = PriorityQueue<IntArray>(compareBy { it[1] })

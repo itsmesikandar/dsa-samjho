@@ -3,13 +3,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // [course, pre] = pehle pre, phir course → edge pre → course. Sab course free ho paaye? (cycle nahi?)
+    // [course, pre] = pehle pre, phir course -> edge pre -> course. Sab course free ho paaye? (cycle nahi?)
     static boolean canFinish(int numCourses, int[][] prerequisites) {
         List<List<Integer>> adj = new ArrayList<>();
         for (int i = 0; i < numCourses; i++) adj.add(new ArrayList<>());
         int[] indeg = new int[numCourses];
         for (int[] p : prerequisites) {
-            adj.get(p[1]).add(p[0]); // dhyaan: pre → course, ulta nahi //@build
+            adj.get(p[1]).add(p[0]); // dhyaan: pre -> course, ulta nahi //@build
             indeg[p[0]]++;
         }
         ArrayDeque<Integer> queue = new ArrayDeque<>();

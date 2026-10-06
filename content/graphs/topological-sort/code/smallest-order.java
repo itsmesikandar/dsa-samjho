@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 class Main {
-    // Kahn + min-heap: free nodes mein hamesha sabse chhota pehle → sabse chhota (lexicographic) topological order
+    // Kahn + min-heap: free nodes mein hamesha sabse chhota pehle -> sabse chhota (lexicographic) topological order
     static List<Integer> smallestTopo(int n, int[][] edges) {
         List<List<Integer>> adj = new ArrayList<>();
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());

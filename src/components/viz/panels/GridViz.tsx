@@ -14,8 +14,8 @@ export function GridViz({ p }: { p: GridPanel }) {
   return (
     <div className="w-full overflow-x-auto pb-1">
       <div
-        className="mx-auto grid w-max gap-1"
-        style={{ gridTemplateColumns: `${hasRow ? 'auto ' : ''}repeat(${cols}, minmax(2rem, 2.6rem))` }}
+        className={`mx-auto grid gap-1 ${p.dense ? 'w-full justify-center' : 'w-max'}`}
+        style={{ gridTemplateColumns: `${hasRow ? 'auto ' : ''}repeat(${cols}, ${p.dense ? 'minmax(1.1rem, 2rem)' : 'minmax(2rem, 2.6rem)'})` }}
       >
         {hasCol && (
           <>
@@ -36,10 +36,10 @@ export function GridViz({ p }: { p: GridPanel }) {
               return (
                 <div
                   key={c}
-                  className={`tone ${tone(t)} relative flex h-9 items-center justify-center rounded border-2 font-mono font-semibold ${text}`}
+                  className={`tone ${tone(t)} relative flex ${p.dense ? 'h-6' : 'h-9'} items-center justify-center rounded border-2 font-mono font-semibold ${text}`}
                 >
                   {v === null || v === undefined ? '' : String(v)}
-                  <Mark t={t} />
+                  {!p.dense && <Mark t={t} />}
                 </div>
               );
             })}

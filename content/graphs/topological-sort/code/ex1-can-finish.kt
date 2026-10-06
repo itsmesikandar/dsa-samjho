@@ -1,9 +1,9 @@
-// [course, pre] = pehle pre, phir course → edge pre → course. Sab course free ho paaye? (cycle nahi?)
+// [course, pre] = pehle pre, phir course -> edge pre -> course. Sab course free ho paaye? (cycle nahi?)
 fun canFinish(numCourses: Int, prerequisites: Array<IntArray>): Boolean {
     val adj = List(numCourses) { mutableListOf<Int>() }
     val indeg = IntArray(numCourses)
     for ((course, pre) in prerequisites) {
-        adj[pre].add(course) // dhyaan: pre → course, ulta nahi //@build
+        adj[pre].add(course) // dhyaan: pre -> course, ulta nahi //@build
         indeg[course]++
     }
     val queue = ArrayDeque<Int>()
