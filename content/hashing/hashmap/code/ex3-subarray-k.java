@@ -9,7 +9,7 @@ class Main {
         for (int x : nums) {
             pre += x; // ab tak ka total //@pre
             ans += count.getOrDefault(pre - k, 0); // pehle kitni baar prefix = pre - k tha? //@lookup
-            count.merge(pre, 1, Integer::sum); // apna prefix bhi gino //@store
+            count.merge(pre, 1, Integer::sum); // apna prefix bhi count karo //@store
         }
         return ans; //@done
     }

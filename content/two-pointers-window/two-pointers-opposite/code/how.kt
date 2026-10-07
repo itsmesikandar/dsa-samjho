@@ -6,8 +6,8 @@ fun sortedSquares(nums: IntArray): IntArray {
     val res = IntArray(n)
     var l = 0 //@init
     var r = n - 1
-    for (k in n - 1 downTo 0) { // sabse bada square kisi ek KINARE par hoga -> res ko peeche se bharo
-        if (abs(nums[l]) > abs(nums[r])) { // kaunse kinare ka square bada? //@compare
+    for (k in n - 1 downTo 0) { // sabse bada square kisi ek EDGE par hoga -> res ko peeche se bharo
+        if (abs(nums[l]) > abs(nums[r])) { // kaunse edge ka square bada? //@compare
             res[k] = nums[l] * nums[l] //@left
             l++
         } else {

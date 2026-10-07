@@ -5,7 +5,7 @@ const kCheck = (n: number, k: number) => (k <= n ? null : `k (${k}) array ki len
 const sumOf = (a: number[], from: number, to: number) => a.slice(from, to + 1).reduce((x, y) => x + y, 0);
 const SLIDE_LEGEND = { error: 'bahar gaya', new: 'andar aaya' };
 
-// ---------- 3. Visual intro: har baar poora jodna vs khiskana ----------
+// ---------- 3. Visual intro: har baar poora jodna vs shift karna ----------
 export const slideVsBrute = tracer<{ arr: number[]; k: number }>({
   inputs: [
     { name: 'arr', type: 'intArray', label: 'arr', default: [4, 2, 7, 1, 8, 3, 5, 6], minLen: 2, maxLen: 10, min: 0, max: 9 },
@@ -34,8 +34,8 @@ export const slideVsBrute = tracer<{ arr: number[]; k: number }>({
         : `Brute: ${arr.slice(s, e + 1).join(' + ')} = ${sum}  (${k} jod)\nSlide: ${prev} − ${arr[s - 1]} + ${arr[e]} = ${sum}  (sirf 2 kaam)`;
       t.frame({
         caption: s === 0
-          ? `Window = lagatar ${k} items ki khidki. Pehli window ka sum = ${sum}. Ab khidki ek-ek kadam aage khiskegi.`
-          : `Khidki aage khiski: ${arr[s - 1]} bahar gaya, ${arr[e]} andar aaya. Beech ke ${k - 1} items wahi hain — unhe dobara kyun jodna?`,
+          ? `Window = continuous ${k} items ki window. Pehli window ka sum = ${sum}. Ab window ek-ek step aage shift hogi.`
+          : `Window aage shift hui: ${arr[s - 1]} bahar gaya, ${arr[e]} andar aaya. Beech ke ${k - 1} items wahi hain — unhe dobara kyun jodna?`,
         vars: { 'brute kaam': brute, 'slide kaam': slide },
         legend: SLIDE_LEGEND,
         panels: [array(arr, { tones, ranges: [{ from: s, to: e, label: `sum = ${sum}`, tone: 'active' }] }), { kind: 'text', label: 'Kaam ka hisaab', text }],
@@ -142,7 +142,7 @@ export const anagramTrace = tracer<{ s: string; p: string }>({
     });
     const legend = { ...SLIDE_LEGEND, done: 'count barabar', compare: 'count alag' };
     const found: ToneMap = {};
-    t.frame({ line: 'init', caption: `p = "${p}" ke letters gine (need). Window ki ginti (have) abhi 0. Jab saare columns barabar → anagram!`, legend, panels: [array(c), table()] });
+    t.frame({ line: 'init', caption: `p = "${p}" ke letters count kiye (need). Window ki count (have) abhi 0. Jab saare columns barabar → anagram!`, legend, panels: [array(c), table()] });
     for (let r = 0; r < c.length; r++) {
       have[c[r]]++;
       const lo = Math.max(0, r - k + 1);
@@ -167,7 +167,7 @@ export const anagramTrace = tracer<{ s: string; p: string }>({
         });
       }
     }
-    t.frame({ line: 'check', caption: `Answer: ${listStr(res)}. Har kadam par sirf 2 counts badle; compare 26 letters ka (constant) → O(n).`, panels: [array(c, { tones: found }), table()] });
+    t.frame({ line: 'check', caption: `Answer: ${listStr(res)}. Har step par sirf 2 counts badle; compare 26 letters ka (constant) → O(n).`, panels: [array(c, { tones: found }), table()] });
     return listStr(res);
   },
 });
@@ -195,7 +195,7 @@ export const cardsTrace = tracer<{ cards: number[]; k: number }>({
       line: 'first',
       caption: w === 0
         ? `k = n — saare cards uthao. Answer = total = ${total}.`
-        : `Ulta socho: k uthaye to ${w} BACHENGE — aur wo hamesha beech ka lagatar hissa hain. Uthaya = total (${total}) − bacha. To bacha hua hissa (size ${w}) MINIMUM chahiye. Pehla: sum = ${sum}.`,
+        : `Ulta socho: k uthaye to ${w} BACHENGE — aur wo hamesha beech ka continuous hissa hain. Uthaya = total (${total}) − bacha. To bacha hua hissa (size ${w}) MINIMUM chahiye. Pehla: sum = ${sum}.`,
       vars: { total, w, sum },
       legend,
       panels: view(0),
@@ -211,7 +211,7 @@ export const cardsTrace = tracer<{ cards: number[]; k: number }>({
       }
       t.frame({ line: 'best', caption: better ? `${sum} sabse kam bacha → uthaya = ${total} − ${sum} = ${total - sum} (naya best).` : `${sum} ≥ ${minSum} — best wahi.`, vars: { r, sum, minSum }, legend, panels: view(lo, better ? 'compare' : 'muted') });
     }
-    t.frame({ line: 'best', caption: `Answer: ${total} − ${minSum} = ${total - minSum}. Left se ${bestLo}, right se ${k - bestLo} cards. "Kinaron se uthao" = "beech ka chhota hissa chhodo".`, vars: { answer: total - minSum }, legend, panels: view(bestLo, 'compare') });
+    t.frame({ line: 'best', caption: `Answer: ${total} − ${minSum} = ${total - minSum}. Left se ${bestLo}, right se ${k - bestLo} cards. "Edges se uthao" = "beech ka chhota hissa chhodo".`, vars: { answer: total - minSum }, legend, panels: view(bestLo, 'compare') });
     return String(total - minSum);
   },
 });

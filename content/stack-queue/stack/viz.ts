@@ -12,7 +12,7 @@ export const plates = tracer<{ values: number[]; pops: number }>({
   check: ({ values, pops }) => (pops <= values.length ? null : `Pop ${values.length} se zyada nahi — khaali stack se kya nikaaloge?`),
   run({ values, pops }, t) {
     const st: number[] = [];
-    t.frame({ caption: 'Stack = plates ka dher. Sirf UPAR se rakh sakte ho (push) aur upar se hi utha sakte ho (pop). Last In, First Out (LIFO).', panels: [stackPanel(st)] });
+    t.frame({ caption: 'Stack = plates ka pile. Sirf UPAR se rakh sakte ho (push) aur upar se hi utha sakte ho (pop). Last In, First Out (LIFO).', panels: [stackPanel(st)] });
     for (const v of values) {
       st.push(v);
       t.frame({ caption: `push(${v}) → sabse upar. O(1).`, vars: { size: st.length }, panels: [stackPanel(st, 'Stack', 'new')] });
@@ -39,7 +39,7 @@ export const parenTrace = tracer<{ s: string }>({
       const ch = c[i];
       if (!(ch in pair)) {
         st.push(ch);
-        t.frame({ line: 'push', caption: `'${ch}' khula → stack par. Ye tab tak intezaar karega jab tak iska band wala na aaye.`, vars: { i }, panels: [array(c, { pointers: { i }, tones: { [i]: 'new' } }), stackPanel(st, 'Khule (stack)', 'new')] });
+        t.frame({ line: 'push', caption: `'${ch}' khula → stack par. Ye tab tak wait karega jab tak iska band wala na aaye.`, vars: { i }, panels: [array(c, { pointers: { i }, tones: { [i]: 'new' } }), stackPanel(st, 'Khule (stack)', 'new')] });
         continue;
       }
       if (!st.length) {
@@ -48,13 +48,13 @@ export const parenTrace = tracer<{ s: string }>({
       }
       const top = st.pop()!;
       if (top !== pair[ch]) {
-        t.frame({ line: 'match', caption: `'${ch}' aaya, par sabse taaza khula '${top}' hai — jodi nahi bani → galat. (Pehle andar wala band hona chahiye.)`, vars: { i }, legend: { error: 'galat' }, panels: [array(c, { pointers: { i }, tones: { [i]: 'error' } }), stackPanel([...st, top], 'Khule (stack)', 'error')] });
+        t.frame({ line: 'match', caption: `'${ch}' aaya, par sabse fresh khula '${top}' hai — pair nahi bani → galat. (Pehle andar wala band hona chahiye.)`, vars: { i }, legend: { error: 'galat' }, panels: [array(c, { pointers: { i }, tones: { [i]: 'error' } }), stackPanel([...st, top], 'Khule (stack)', 'error')] });
         return 'false';
       }
-      t.frame({ line: 'match', caption: `'${ch}' ne sabse taaza khule '${top}' ko band kiya ✓ → pop.`, vars: { i }, legend: { found: 'jodi bani' }, panels: [array(c, { pointers: { i }, tones: { [i]: 'found' } }), stackPanel(st, 'Khule (stack)')] });
+      t.frame({ line: 'match', caption: `'${ch}' ne sabse fresh khule '${top}' ko band kiya ✓ → pop.`, vars: { i }, legend: { found: 'pair bani' }, panels: [array(c, { pointers: { i }, tones: { [i]: 'found' } }), stackPanel(st, 'Khule (stack)')] });
     }
     const ok = st.length === 0;
-    t.frame({ line: 'end', caption: ok ? 'String khatam, stack khaali → sab jodiyan bani → sahi! O(n).' : `String khatam par ${st.length} khule reh gaye (${st.join('')}) → galat.`, legend: { error: 'band nahi hue' }, panels: [array(c), stackPanel(st, 'Khule (stack)', ok ? undefined : 'error')] });
+    t.frame({ line: 'end', caption: ok ? 'String khatam, stack khaali → sab pairs bani → sahi! O(n).' : `String khatam par ${st.length} khule reh gaye (${st.join('')}) → galat.`, legend: { error: 'band nahi hue' }, panels: [array(c), stackPanel(st, 'Khule (stack)', ok ? undefined : 'error')] });
     return String(ok);
   },
 });
@@ -67,7 +67,7 @@ export const adjTrace = tracer<{ s: string }>({
     const st: string[] = [];
     for (let i = 0; i < c.length; i++) {
       if (st.length && st[st.length - 1] === c[i]) {
-        t.frame({ line: 'pop', caption: `'${c[i]}' == top '${st[st.length - 1]}' → dono jodi ban ke gayab (pop). Ab jo neeche tha wo top — shayad wo agle se jodi banaye.`, vars: { i }, legend: { error: 'hata' }, panels: [array(c, { pointers: { i }, tones: { [i]: 'error' } }), stackPanel(st, 'Stack (abhi ka result)', 'error')] });
+        t.frame({ line: 'pop', caption: `'${c[i]}' == top '${st[st.length - 1]}' → dono pair ban ke gayab (pop). Ab jo neeche tha wo top — shayad wo agle se pair banaye.`, vars: { i }, legend: { error: 'hata' }, panels: [array(c, { pointers: { i }, tones: { [i]: 'error' } }), stackPanel(st, 'Stack (abhi ka result)', 'error')] });
         st.pop();
       } else {
         st.push(c[i]);
@@ -88,7 +88,7 @@ const rpnCheck = (expr: string): string | null => {
   const st: number[] = [];
   for (const tk of toks) {
     if (OPS.includes(tk)) {
-      if (st.length < 2) return `"${tk}" se pehle do numbers chahiye.`;
+      if (st.length < 2) return `"${tk}" se pehle 2 numbers chahiye.`;
       const b = st.pop()!;
       const a = st.pop()!;
       if (tk === '/' && b === 0) return 'Zero se divide nahi.';
@@ -115,7 +115,7 @@ export const rpnTrace = tracer<{ expr: string }>({
         t.frame({ line: 'op', caption: `"${tk}": do pop — b = ${b} (pehle nikla), a = ${a}. a ${tk} b = ${r} → push. (Order ulta kiya to ${a} ${tk} ${b} ki jagah ${b} ${tk} ${a} ho jaata!)`, vars: { i }, panels: [array(toks, { pointers: { i }, tones: { [i]: 'active' } }), stackPanel(st, 'Stack', 'new')] });
       } else {
         st.push(Number(tk));
-        t.frame({ line: 'num', caption: `${tk} number → push. Operator aane tak intezaar.`, vars: { i }, panels: [array(toks, { pointers: { i }, tones: { [i]: 'compare' } }), stackPanel(st, 'Stack', 'new')] });
+        t.frame({ line: 'num', caption: `${tk} number → push. Operator aane tak wait.`, vars: { i }, panels: [array(toks, { pointers: { i }, tones: { [i]: 'compare' } }), stackPanel(st, 'Stack', 'new')] });
       }
     }
     t.frame({ line: 'result', caption: `Tokens khatam → stack mein bacha akela number = answer ${st[0]}. Brackets ki zaroorat hi nahi — calculators andar isi tarah chalte hain.`, panels: [stackPanel(st, 'Stack', 'found')] });
@@ -187,7 +187,7 @@ export const decodeTrace = tracer<{ s: string }>({
         t.frame({ line: 'char', caption: `Letter → cur = "${cur}".`, vars: { k }, panels: view(i, 'active') });
       }
     }
-    t.frame({ line: 'close', caption: `Answer "${cur}". Do stacks (counts, outs) ne nesting yaad rakhi — recursion jaisa, bina recursion.`, panels: [{ kind: 'text', label: 'Answer', text: cur }] });
+    t.frame({ line: 'close', caption: `Answer "${cur}". 2 stacks (counts, outs) ne nesting yaad rakhi — recursion jaisa, bina recursion.`, panels: [{ kind: 'text', label: 'Answer', text: cur }] });
     return cur;
   },
 });

@@ -1,4 +1,4 @@
-// Saari meetings attend kar sakte ho? Start se sort - takraav hoga to sirf PADOSI meetings mein
+// Saari meetings attend kar sakte ho? Start se sort - collision hoga to sirf NEIGHBOR meetings mein
 fun canAttendAll(intervals: Array<IntArray>): Boolean {
     intervals.sortBy { it[0] } //@sort
     for (i in 1 until intervals.size) {

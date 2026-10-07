@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.Deque;
 
 class Main {
-    // Size k ki har window (lagatar k items) ka maximum - O(n) mein
+    // Size k ki har window (continuous k items) ka maximum - O(n) mein
     static int[] maxSlidingWindow(int[] nums, int k) {
         Deque<Integer> dq = new ArrayDeque<>(); // INDEXES; inki values aage se peeche GHATTI hui (decreasing)
         int[] res = new int[nums.length - k + 1];

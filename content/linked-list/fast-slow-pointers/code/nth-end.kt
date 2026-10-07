@@ -1,10 +1,10 @@
 class ListNode(var value: Int, var next: ListNode? = null)
 
-// Aakhir se n-th node hatao - ek hi pass mein (length gine bina)
+// Aakhir se n-th node hatao - ek hi pass mein (length count kiye bina)
 fun removeNthFromEnd(head: ListNode?, n: Int): ListNode? {
     val dummy = ListNode(0, head) // head hi hatana pade to bhi same code
     var fast: ListNode? = dummy
-    for (i in 0..n) fast = fast?.next // fast ko n + 1 kadam aage: dono ke beech faasla fix
+    for (i in 0..n) fast = fast?.next // fast ko n + 1 step aage: dono ke beech distance fix
     var slow: ListNode? = dummy
     while (fast != null) { // ab dono saath chalo; fast null par = slow hatane wale ke PICHHLE par
         fast = fast.next

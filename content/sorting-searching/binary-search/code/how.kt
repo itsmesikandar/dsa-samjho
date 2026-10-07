@@ -6,7 +6,7 @@ fun binarySearch(a: IntArray, target: Int): Int {
         val mid = lo + (hi - lo) / 2 // (lo + hi) / 2 bade index par overflow kar sakta hai //@mid
         when {
             a[mid] == target -> return mid //@found
-            a[mid] < target -> lo = mid + 1 // target right mein: mid samet left aadha bekaar //@right
+            a[mid] < target -> lo = mid + 1 // target right mein: mid including left aadha bekaar //@right
             else -> hi = mid - 1 // target left mein //@left
         }
     }

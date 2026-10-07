@@ -17,7 +17,7 @@ export const buildTrace = tracer<{ levels: (number | null)[] }>({
     ];
     nodes.set('t0', { id: 't0', value: levels[0] as number, left: null, right: null });
     const q = ['t0'];
-    t.frame({ caption: `Tree ko line mein likhne ka LeetCode tareeka: level by level, upar se neeche, baayein se daayein. # = khaali jagah. Pehla = root (${levels[0]}).`, panels: show({ t0: 'new' }, q) });
+    t.frame({ caption: `Tree ko line mein likhne ka LeetCode tareeka: level by level, upar se neeche, left se right. # = khaali jagah. Pehla = root (${levels[0]}).`, panels: show({ t0: 'new' }, q) });
     let i = 1;
     while (q.length && i < levels.length) {
       const pid = q.shift()!;
@@ -114,7 +114,7 @@ export const goodTrace = tracer<{ levels: (number | null)[] }>({
       dfs(n.right, m);
     };
     dfs(tr.root, -Infinity);
-    t.frame({ line: 'recurse', caption: `${total} good nodes. Upar ki jaankari (max) parameter se NEECHE bheji — top-down recursion. O(n).`, vars: { good: total }, legend: { found: 'good', error: 'good nahi' }, panels: [treeView(tr.nodes, tr.root, { tones })] });
+    t.frame({ line: 'recurse', caption: `${total} good nodes. Upar ki information (max) parameter se NEECHE bheji — top-down recursion. O(n).`, vars: { good: total }, legend: { found: 'good', error: 'good nahi' }, panels: [treeView(tr.nodes, tr.root, { tones })] });
     return String(total);
   },
 });
@@ -143,15 +143,15 @@ export const completeTrace = tracer<{ n: number }>({
           mark(tr.nodes.get(x)!.right);
         };
         mark(id);
-        t.frame({ line: 'perfect', caption: `${v}: baayein raasta ${lh}, daayein raasta ${rh} — barabar → ye subtree PERFECT hai: 2^${lh} − 1 = ${sub} nodes, formula se! Andar jaane ki zaroorat nahi.`, vars: { calls }, legend: { found: 'formula se gina', compare: 'abhi', active: 'split' }, panels: [treeView(tr.nodes, tr.root, { tones: { ...tones } })] });
+        t.frame({ line: 'perfect', caption: `${v}: left raasta ${lh}, right raasta ${rh} — barabar → ye subtree PERFECT hai: 2^${lh} − 1 = ${sub} nodes, formula se! Andar jaane ki zaroorat nahi.`, vars: { calls }, legend: { found: 'formula se gina', compare: 'abhi', active: 'split' }, panels: [treeView(tr.nodes, tr.root, { tones: { ...tones } })] });
         return sub;
       }
       tones[id] = 'active';
-      t.frame({ line: 'split', caption: `${v}: baayein ${lh} ≠ daayein ${rh} → perfect nahi. 1 + left + right. (Inmein se ek subtree pakka perfect hoga — wo turant formula se.)`, vars: { calls }, legend: { found: 'formula se gina', compare: 'abhi', active: 'split' }, panels: [treeView(tr.nodes, tr.root, { tones: { ...tones, [id]: 'compare' } })] });
+      t.frame({ line: 'split', caption: `${v}: left ${lh} ≠ right ${rh} → perfect nahi. 1 + left + right. (Inmein se ek subtree pakka perfect hoga — wo turant formula se.)`, vars: { calls }, legend: { found: 'formula se gina', compare: 'abhi', active: 'split' }, panels: [treeView(tr.nodes, tr.root, { tones: { ...tones, [id]: 'compare' } })] });
       return 1 + count(tr.nodes.get(id)!.left) + count(tr.nodes.get(id)!.right);
     };
     const ans = count(tr.root);
-    t.frame({ line: 'split', caption: `${ans} nodes, sirf ${calls} calls. Har level par ek hi taraf neeche jaate hain, aur raasta naapna O(log n) → O(log² n).`, vars: { calls }, panels: [treeView(tr.nodes, tr.root, { tones })] });
+    t.frame({ line: 'split', caption: `${ans} nodes, sirf ${calls} calls. Har level par ek hi taraf neeche jaate hain, aur raasta measure karna O(log n) → O(log² n).`, vars: { calls }, panels: [treeView(tr.nodes, tr.root, { tones })] });
     return String(ans);
   },
 });

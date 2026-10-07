@@ -3,18 +3,18 @@ class TreeNode(var value: Int) {
     var right: TreeNode? = null
 }
 
-// Complete tree (har level bhara, aakhri level left se bhara) ke nodes O(n) se tez gino
+// Complete tree (har level bhara, aakhri level left se bhara) ke nodes O(n) se tez count karo
 fun countNodes(root: TreeNode?): Int {
     if (root == null) return 0 //@base
     var lh = 0
     var n: TreeNode? = root
-    while (n != null) { // sabse baayein raasta ki lambai
+    while (n != null) { // sabse left raasta ki length
         lh++
         n = n.left
     }
     var rh = 0
     n = root
-    while (n != null) { // sabse daayein raasta ki lambai
+    while (n != null) { // sabse right raasta ki length
         rh++
         n = n.right
     }

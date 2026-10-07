@@ -1,11 +1,11 @@
-// 0/1 array. Zyada se zyada k zeros ko 1 bana sakte ho. Sabse lambi lagatar 1s ki line kitni?
+// 0/1 array. Zyada se zyada k zeros ko 1 bana sakte ho. Sabse lambi continuous 1s ki line kitni?
 fun longestOnes(nums: IntArray, k: Int): Int {
     var l = 0
     var zeros = 0 // window mein kitne 0 (jinhe flip karna padega)
     var best = 0
     for (r in nums.indices) {
         if (nums[r] == 0) zeros++ //@expand
-        while (zeros > k) { // flips kam pad gaye: l se sikodo //@shrink
+        while (zeros > k) { // flips kam pad gaye: l se shrink karo //@shrink
             if (nums[l] == 0) zeros--
             l++
         }

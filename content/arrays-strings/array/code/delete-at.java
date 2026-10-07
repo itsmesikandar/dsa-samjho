@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // index wala item hatao; uske baad ke saare items ek kadam left khisakenge
+    // index wala item hatao; uske baad ke saare items ek step left shift honge
     static int deleteAt(int[] arr, int size, int index) {
         if (index < 0 || index >= size) throw new IndexOutOfBoundsException("Galat index");
         for (int i = index; i < size - 1; i++) {

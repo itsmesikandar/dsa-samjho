@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // Two Sum II: sorted array, answer 1-indexed. Template: dono kinaron se, sum dekh ke pointer hilao
+    // Two Sum II: sorted array, answer 1-indexed. Template: dono edges se, sum dekh ke pointer move karo
     static int[] twoSumSorted(int[] numbers, int target) {
         int l = 0, r = numbers.length - 1;
         while (l < r) {

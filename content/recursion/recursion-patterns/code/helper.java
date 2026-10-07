@@ -7,7 +7,7 @@ class Main {
 
     static boolean isPal(String s, int l, int r) {
         if (l >= r) return true; // 0 ya 1 char: palindrome hi hai
-        if (s.charAt(l) != s.charAt(r)) return false; // kinare alag: wahin khatam
+        if (s.charAt(l) != s.charAt(r)) return false; // edge alag: wahin khatam
         return isPal(s, l + 1, r - 1); // andar wala hissa
     }
 

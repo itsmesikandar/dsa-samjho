@@ -3,8 +3,8 @@ fun findAnagrams(s: String, p: String): List<Int> {
     val res = mutableListOf<Int>()
     val k = p.length
     if (k > s.length) return res
-    val need = IntArray(26) // p ke har letter ki ginti
-    val have = IntArray(26) // window ke har letter ki ginti
+    val need = IntArray(26) // p ke har letter ki count
+    val have = IntArray(26) // window ke har letter ki count
     for (c in p) need[c - 'a']++ //@init
     for (r in s.indices) {
         have[s[r] - 'a']++ // naya char window mein //@add

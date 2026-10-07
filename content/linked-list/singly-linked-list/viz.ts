@@ -29,7 +29,7 @@ export const scatteredNodes = tracer<{ values: number[] }>({
         return { value: values[k], tag: `next ${nextAddr}`, tone: (k === hot ? 'new' : 'active') as Tone };
       });
     const arrows = (upto: number) => Array.from({ length: Math.max(0, Math.min(upto, values.length - 1)) }, (_, k) => ({ from: spots[k], to: spots[k + 1] }));
-    t.frame({ caption: 'Array mein items memory mein lagatar baithte hain. Linked list ke NODES kahin bhi ban sakte hain — har node apne saath agle ka address (next) rakhta hai.', panels: [{ kind: 'memory', label: 'RAM', start, cells: mem(-1) }] });
+    t.frame({ caption: 'Array mein items memory mein continuous baithte hain. Linked list ke NODES kahin bhi ban sakte hain — har node apne saath agle ka address (next) rakhta hai.', panels: [{ kind: 'memory', label: 'RAM', start, cells: mem(-1) }] });
     for (let k = 0; k < values.length; k++) {
       const id = `n${k}`;
       nodes.set(id, { id, value: values[k], next: null });
@@ -43,10 +43,10 @@ export const scatteredNodes = tracer<{ values: number[] }>({
     const target = Math.min(2, values.length - 1);
     let cur: string | null = head;
     for (let s = 0; s <= target; s++) {
-      t.frame({ caption: s === 0 ? `Index ${target} ka value chahiye? Array mein seedha address nikal jaata (O(1)). Yahan head se shuru karke next-next chalna padega.` : `${s} kadam chale. cur ab ${nodes.get(cur!)!.value} par.`, vars: { kadam: s }, panels: [listView(nodes, head, { pointers: { head, cur }, tones: { [cur!]: 'compare' } })] });
+      t.frame({ caption: s === 0 ? `Index ${target} ka value chahiye? Array mein seedha address nikal jaata (O(1)). Yahan head se shuru karke next-next chalna padega.` : `${s} step chale. cur ab ${nodes.get(cur!)!.value} par.`, vars: { kadam: s }, panels: [listView(nodes, head, { pointers: { head, cur }, tones: { [cur!]: 'compare' } })] });
       if (s < target) cur = nodes.get(cur!)!.next;
     }
-    t.frame({ caption: `get(${target}) = ${nodes.get(cur!)!.value} — ${target} kadam lage → O(n). Par aage node jodna/hatana sirf ek-do next badalne ka kaam → O(1).`, panels: [listView(nodes, head, { pointers: { head }, tones: { [cur!]: 'found' } })] });
+    t.frame({ caption: `get(${target}) = ${nodes.get(cur!)!.value} — ${target} step lage → O(n). Par aage node jodna/hatana sirf ek-do next badalne ka kaam → O(1).`, panels: [listView(nodes, head, { pointers: { head }, tones: { [cur!]: 'found' } })] });
     return showList(nodes, head);
   },
 });
@@ -66,7 +66,7 @@ export const insertTrace = tracer<{ values: number[]; pos: number; value: number
     nodes.set(nid, { id: nid, value, next: null });
     if (pos === 0) {
       nodes.get(nid)!.next = head;
-      t.frame({ line: 'head', caption: `Position 0: naya node (${value}) ka next = purana head. Ab naya node hi head. Kisi ko khiskana nahi pada → O(1).`, panels: [listView(nodes, nid, { pointers: { head: nid }, tones: { [nid]: 'new' } })] });
+      t.frame({ line: 'head', caption: `Position 0: naya node (${value}) ka next = purana head. Ab naya node hi head. Kisi ko shift karna nahi pada → O(1).`, panels: [listView(nodes, nid, { pointers: { head: nid }, tones: { [nid]: 'new' } })] });
       head = nid;
       return showList(nodes, head);
     }
@@ -80,7 +80,7 @@ export const insertTrace = tracer<{ values: number[]; pos: number; value: number
     nodes.get(nid)!.next = after;
     t.frame({ line: 'link1', caption: `Pehle: naya.next = prev.next (${after ? nodes.get(after)!.value : 'null'}). Ab naya node aage ki list ko pakde hue hai — kuch khoya nahi.`, panels: [listView(nodes, head, { pointers: { prev }, tones: { [prev]: 'compare', [nid]: 'new' }, extra: [nid] })] });
     nodes.get(prev)!.next = nid;
-    t.frame({ line: 'link2', caption: `Phir: prev.next = naya. Bas do arrows badle — koi item khiskaana nahi pada (array mein O(n) shift hota).`, panels: [listView(nodes, head, { tones: { [nid]: 'found' } })] });
+    t.frame({ line: 'link2', caption: `Phir: prev.next = naya. Bas 2 arrows badle — koi item shift karna nahi pada (array mein O(n) shift hota).`, panels: [listView(nodes, head, { tones: { [nid]: 'found' } })] });
     return showList(nodes, head);
   },
 });
@@ -97,7 +97,7 @@ export const removeTrace = tracer<{ values: number[]; x: number }>({
     while (head && nodes.get(head)!.value === x) {
       const old = head;
       head = nodes.get(head)!.next;
-      t.frame({ line: 'head', caption: `Head khud ${x} hai → head = head.next. (Head ka koi "pichhla" nahi, isliye alag se sambhaala.)`, panels: [listView(nodes, head, { pointers: { head }, extra: [old], tones: { [old]: 'error' } })] });
+      t.frame({ line: 'head', caption: `Head khud ${x} hai → head = head.next. (Head ka koi "pichhla" nahi, isliye alag se handle kiya.)`, panels: [listView(nodes, head, { pointers: { head }, extra: [old], tones: { [old]: 'error' } })] });
     }
     let cur = head;
     if (cur) t.frame({ line: 'move', caption: `Head ab ${x} nahi. cur = head. Har baar cur.next dekhenge — hatane ke liye PICHHLA node chahiye.`, panels: [listView(nodes, head, { pointers: { cur }, tones: { [cur]: 'compare' } })] });
@@ -165,11 +165,11 @@ export const intersectTrace = tracer<{ aOnly: number[]; bOnly: number[]; shared:
   inputs: [
     { name: 'aOnly', type: 'intArray', label: 'Sirf A ke nodes', default: [4, 1], minLen: 0, maxLen: 4, min: 0, max: 9 },
     { name: 'bOnly', type: 'intArray', label: 'Sirf B ke nodes', default: [5, 6, 1], minLen: 0, maxLen: 4, min: 0, max: 9 },
-    { name: 'shared', type: 'intArray', label: 'Saanjhe nodes (milne ke baad)', default: [8, 4, 5], minLen: 0, maxLen: 3, min: 0, max: 9 },
+    { name: 'shared', type: 'intArray', label: 'Common nodes (milne ke baad)', default: [8, 4, 5], minLen: 0, maxLen: 3, min: 0, max: 9 },
   ],
   check: ({ aOnly, bOnly, shared }) => (aOnly.length + shared.length > 0 && bOnly.length + shared.length > 0 ? null : 'Dono lists mein kam se kam ek node chahiye.'),
   run({ aOnly, bOnly, shared }, t) {
-    // asli nodes: a0.., b0.., s0.. — panels mein A aur B alag dikhte hain, saanjhe nodes dono mein
+    // asli nodes: a0.., b0.., s0.. — panels mein A aur B alag dikhte hain, common nodes dono mein
     const real = new Map<string, LNode>();
     const add = (pre: string, vals: number[], tail: string | null) => {
       for (let i = vals.length - 1; i >= 0; i--) {
@@ -200,7 +200,7 @@ export const intersectTrace = tracer<{ aOnly: number[]; bOnly: number[]; shared:
       (qIn === 'A' ? ptrA : ptrB).q = q ? `${qIn}:${q}` : null;
       return [listView(PA, aHead ? `A:${aHead}` : null, { label: 'List A', pointers: ptrA, tones: sharedTones('A') }), listView(PB, bHead ? `B:${bHead}` : null, { label: 'List B', pointers: ptrB, tones: sharedTones('B') })];
     };
-    t.frame({ line: 'step', caption: `Neeli nodes dono lists mein SAME nodes hain (Y shape). Lambaiyan alag hain, isliye seedha saath chalne se nahi milenge. Trick: list khatam ho to doosri ke head par kood jao.`, legend: { active: 'saanjha node' }, panels: view() });
+    t.frame({ line: 'step', caption: `Blue nodes dono lists mein SAME nodes hain (Y shape). Lengths alag hain, isliye seedha saath chalne se nahi milenge. Trick: list khatam ho to doosri ke head par jump kar jao.`, legend: { active: 'common node' }, panels: view() });
     let steps = 0;
     while (p !== q) {
       const pv = p;
@@ -215,10 +215,10 @@ export const intersectTrace = tracer<{ aOnly: number[]; bOnly: number[]; shared:
       } else q = real.get(q)!.next;
       steps++;
       const jumped = pv === null || qv === null;
-      t.frame({ line: jumped ? 'switch' : 'step', caption: jumped ? `${pv === null ? 'p ne A khatam ki → B ke head par.' : ''} ${qv === null ? 'q ne B khatam ki → A ke head par.' : ''} Ab dono ne barabar (A + B) chalna hai.`.trim() : `Dono ek kadam aage. Abhi same node nahi.`, vars: { steps }, legend: { active: 'saanjha node' }, panels: view() });
+      t.frame({ line: jumped ? 'switch' : 'step', caption: jumped ? `${pv === null ? 'p ne A khatam ki → B ke head par.' : ''} ${qv === null ? 'q ne B khatam ki → A ke head par.' : ''} Ab dono ne barabar (A + B) chalna hai.`.trim() : `Dono ek step aage. Abhi same node nahi.`, vars: { steps }, legend: { active: 'common node' }, panels: view() });
     }
     const ans = p ? String(real.get(p)!.value) : 'null';
-    t.frame({ line: 'meet', caption: p ? `p aur q same node par mile → ${ans}. Dono ne (sirf A) + (saanjha) + (sirf B) jitna chala — isliye ek saath pahunche. O(m + n), O(1).` : `Dono null par mile → koi saanjha node nahi.`, vars: { steps }, legend: { active: 'saanjha node' }, panels: view() });
+    t.frame({ line: 'meet', caption: p ? `p aur q same node par mile → ${ans}. Dono ne (sirf A) + (common) + (sirf B) jitna chala — isliye ek saath pahunche. O(m + n), O(1).` : `Dono null par mile → koi common node nahi.`, vars: { steps }, legend: { active: 'common node' }, panels: view() });
     return ans;
   },
 });

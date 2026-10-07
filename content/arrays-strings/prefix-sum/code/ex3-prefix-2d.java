@@ -14,7 +14,7 @@ class Main {
             }
         }
 
-        // (r1, c1) se (r2, c2) tak ka rectangle (dono kone shamil)
+        // (r1, c1) se (r2, c2) tak ka rectangle (dono kone include)
         long sum(int r1, int c1, int r2, int c2) {
             return pre[r2 + 1][c2 + 1] - pre[r1][c2 + 1] - pre[r2 + 1][c1] + pre[r1][c1]; //@query
         }

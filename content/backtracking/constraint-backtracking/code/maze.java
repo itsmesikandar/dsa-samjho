@@ -6,7 +6,7 @@ class Main {
     static final int[] DC = {0, -1, 1, 0};
     static final String DIR = "DLRU";
 
-    // Rat (0,0) se (n-1,n-1) jaana chahta hai. 1 = khula, 0 = deewar. Chaal: D, L, R, U. Saare raaste.
+    // Rat (0,0) se (n-1,n-1) jaana chahta hai. 1 = khula, 0 = wall. Move: D, L, R, U. Saare raaste.
     static List<String> findPaths(int[][] m) {
         int n = m.length;
         List<String> res = new ArrayList<>();
@@ -30,7 +30,7 @@ class Main {
                 path.deleteCharAt(path.length() - 1);
             }
         }
-        seen[r][c] = false; // wapas jaate waqt cell phir khula - doosre raaste isse guzar sakein
+        seen[r][c] = false; // wapas jaate time cell phir khula - doosre raaste isse guzar sakein
     }
 
     public static void main(String[] args) {

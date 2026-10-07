@@ -1,11 +1,11 @@
 class Main {
-    // Roz ke bit kaam - sab O(1). i = bit number (0 = sabse daayein)
+    // Roz ke bit kaam - sab O(1). i = bit number (0 = sabse right)
     static boolean isOdd(int x) { return (x & 1) == 1; } // aakhri bit 1 = odd (negative par bhi sahi, x % 2 nahi)
     static int getBit(int x, int i) { return (x >> i) & 1; } // bit i: 0 ya 1
     static int setBit(int x, int i) { return x | (1 << i); } // bit i ko 1 karo
     static int clearBit(int x, int i) { return x & ~(1 << i); } // bit i ko 0 karo
     static int toggleBit(int x, int i) { return x ^ (1 << i); } // bit i ulta karo
-    static int lowestSetBit(int x) { return x & -x; } // sirf sabse daayein wala 1 bacha, baaki 0
+    static int lowestSetBit(int x) { return x & -x; } // sirf sabse right wala 1 bacha, baaki 0
 
     public static void main(String[] args) {
         int x = 13; // 1101

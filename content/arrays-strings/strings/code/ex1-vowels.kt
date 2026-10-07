@@ -1,6 +1,6 @@
 fun countVowels(s: String): Int {
     var count = 0
-    for (c in s.lowercase()) { // 'A' aur 'a' dono gine jaayein
+    for (c in s.lowercase()) { // 'A' aur 'a' dono count kiye jaayein
         if (c in "aeiou") count++ // vowel hai? //@check
     }
     return count //@done

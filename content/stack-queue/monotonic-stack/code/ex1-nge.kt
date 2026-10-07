@@ -1,4 +1,4 @@
-// nums1 ke har number ke liye: nums2 mein usi number ke DAAYEIN pehla bada (na ho to -1). nums1 subset of nums2, sab distinct.
+// nums1 ke har number ke liye: nums2 mein usi number ke RIGHT pehla bada (na ho to -1). nums1 subset of nums2, sab distinct.
 fun nextGreaterElement(nums1: IntArray, nums2: IntArray): IntArray {
     val next = HashMap<Int, Int>() // value -> uska next greater (nums2 mein)
     val st = ArrayDeque<Int>() // values jinka next greater abhi nahi mila

@@ -9,11 +9,11 @@ class Main {
         }
     }
 
-    // Do lists kahin jaakar ek ho jaati hain (Y shape). Milne wala pehla NODE do (na mile to null).
+    // 2 lists kahin jaakar ek ho jaati hain (Y shape). Milne wala pehla NODE do (na mile to null).
     static ListNode getIntersectionNode(ListNode a, ListNode b) {
         ListNode p = a, q = b;
         while (p != q) { // same NODE (same object) - sirf same value nahi //@step
-            p = (p == null) ? b : p.next; // apni list khatam: doosri list ke head par kood jao //@switch
+            p = (p == null) ? b : p.next; // apni list khatam: doosri list ke head par jump kar jao //@switch
             q = (q == null) ? a : q.next;
         }
         return p; // dono ne barabar raasta chala: milne ki jagah, ya dono null //@meet

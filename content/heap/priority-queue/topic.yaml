@@ -36,7 +36,7 @@ what:
 # 2. Kyun chahiye?
 why:
   body: |
-    Har baar apna heap likhna = bugs ka khatra. Library tested hai, generic hai (koi bhi type), aur Comparator se koi bhi order de deti hai.
+    Har baar apna heap likhna = bugs ka risk. Library tested hai, generic hai (koi bhi type), aur Comparator se koi bhi order de deti hai.
 
     Kahan aati hai: greedy ("abhi sabse sasta / bada"), Dijkstra, top-k, k-way merge, scheduling, simulation (events time ke order mein).
 
@@ -45,7 +45,7 @@ why:
     > [!socho]
     > Sirf ek baar sorted output chahiye. Sab PQ mein daal ke poll karna, ya seedha `sort()` — kaunsa?
     >
-    > `sort()` — same O(n log n), kam overhead. PQ tab jab items **beech beech mein aate rahein** aur har waqt sabse aage wala chahiye.
+    > `sort()` — same O(n log n), kam overhead. PQ tab jab items **beech beech mein aate rahein** aur har time sabse aage wala chahiye.
 
 # 3. Visual intro
 visual:
@@ -111,20 +111,20 @@ code:
 examples:
   - id: last-stone
     level: easy
-    title: Do sabse bhaari patthar takraao
+    title: 2 sabse bhaari stone collision
     source: { name: Last Stone Weight, platform: LeetCode, url: "https://leetcode.com/problems/last-stone-weight/" }
     problem: |
-      Pattharon ke wazan diye hain. Har round mein do sabse bhaari patthar (y ≥ x) uthao aur takraao:
+      Stones ke weight diye hain. Har round mein 2 sabse bhaari stone (y ≥ x) uthao aur collision:
       - barabar → dono khatam
-      - warna → x khatam, y ka wazan `y - x` ho jaata hai
+      - warna → x khatam, y ka weight `y - x` ho jaata hai
 
-      Aakhir mein ek bacha to uska wazan batao, warna 0.
+      Aakhir mein ek bacha to uska weight batao, warna 0.
 
       Example: `[2, 7, 4, 1, 8, 1]` → **1**
     intuition: |
-      Har round mein "do sabse bhaari" chahiye — aur bacha tukda wapas aata hai. Ek baar sort karke kaam nahi chalega: naya tukda kahin bhi fit ho sakta hai, sorted array mein insert O(n).
+      Har round mein "2 sabse bhaari" chahiye — aur bacha piece wapas aata hai. Ek baar sort karke kaam nahi chalega: naya piece kahin bhi fit ho sakta hai, sorted array mein insert O(n).
 
-      **Max-heap**: do baar `poll()`, tukda bacha to `add()`. Har round O(log n).
+      **Max-heap**: 2 baar `poll()`, piece bacha to `add()`. Har round O(log n).
 
       > [!galti]
       > Java mein `Integer y = pq.poll(), x = pq.poll(); if (y != x)` — ye **reference** compare hai! -128..127 ke bahar barabar values bhi "alag" lagengi. `int` mein lo, ya `.equals()`.
@@ -141,7 +141,7 @@ examples:
     complexity:
       time: "O(n log n)"
       space: O(n)
-      why: "Har round mein kam se kam ek patthar khatam → n rounds, har round O(log n). Heap mein n items."
+      why: "Har round mein kam se kam ek stone khatam → n rounds, har round O(log n). Heap mein n items."
 
   - id: heap-sort
     level: medium
@@ -152,7 +152,7 @@ examples:
 
       Example: `[5, 2, 9, 1, 6, 3]` → **[1, 2, 3, 5, 6, 9]**
     intuition: |
-      PQ mein daal ke poll karna O(n) extra jagah leta hai. Trick: array ko do hisson mein socho — **aage heap, peeche sorted**.
+      PQ mein daal ke poll karna O(n) extra jagah leta hai. Trick: array ko 2 hisson mein socho — **aage heap, peeche sorted**.
 
       1. Poore array ko **max-heap** banao (build heap, O(n)).
       2. Root = sabse bada → heap ke **aakhri** index se swap. Ab wo apni pakki jagah par; heap size ek kam.
@@ -180,23 +180,23 @@ examples:
 
   - id: ropes
     level: tricky
-    title: Rassiyan jodne ka sabse kam kharcha
+    title: Ropes jodne ka sabse kam cost
     source: { name: Minimum Cost of Ropes, platform: GFG, url: "https://www.geeksforgeeks.org/problems/minimum-cost-of-ropes-1587115620/1" }
     problem: |
-      Kuch rassiyon ki lambai di hai. Do rassiyan jodne ka kharcha = dono ki lambai ka jod. Sab ko jod kar ek rassi banani hai — kul kharcha kam se kam kitna?
+      Kuch ropes ki length di hai. Do ropes jodne ka cost = dono ki length ka jod. Sab ko jod kar ek rope banani hai — total cost kam se kam kitna?
 
       Example: `[4, 3, 2, 6]` → **29**
     intuition: |
-      Jo rassi jaldi judti hai, wo nayi rassi ka hissa ban kar **aage ke har jod mein phir se ginti hai**. Lambi rassi baar baar gini gayi to mehenga.
+      Jo rope jaldi judti hai, wo nayi rope ka hissa ban kar **aage ke har jod mein phir se count hai**. Lambi rope baar baar count ki gayi to mehenga.
 
-      Greedy: har baar **do sabse chhoti** jodo, nayi rassi wapas daalo. "Har baar do sabse chhote, aur naya item wapas" = **min-heap**.
+      Greedy: har baar **2 sabse chhoti** jodo, nayi rope wapas daalo. "Har baar 2 sabse chhote, aur naya item wapas" = **min-heap**.
 
-      Ye Huffman coding wala hi idea hai — kam frequency wale sabse gehre.
+      Ye Huffman coding wala hi idea hai — kam frequency wale sabse deep.
 
       > [!galti]
-      > Ek baar sort karke left se jodte gaye (jo bana usme agla jodo). `[2, 2, 3, 3]`: 4, 7, 10 → **21**. Heap se: 2+2 = 4, phir **3+3** = 6 (4 + 3 = 7 se sasta), phir 10 → **20**. Nayi rassi hamesha sabse chhoti nahi hoti — har baar heap se phir chuno. Aur kharcha `Long` mein.
+      > Ek baar sort karke left se jodte gaye (jo bana usme agla jodo). `[2, 2, 3, 3]`: 4, 7, 10 → **21**. Heap se: 2+2 = 4, phir **3+3** = 6 (4 + 3 = 7 se sasta), phir 10 → **20**. Nayi rope hamesha sabse chhoti nahi hoti — har baar heap se phir choose karo. Aur cost `Long` mein.
     dryRun: |
-      | Heap | Jodo | Kharcha |
+      | Heap | Jodo | Cost |
       |---|---|---|
       | 2 3 4 6 | 2 + 3 = 5 | 5 |
       | 4 5 6 | 4 + 5 = 9 | 14 |
@@ -211,8 +211,8 @@ examples:
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Items beech beech mein aate rahein aur har waqt 'sabse aage wala' chahiye."
-    - "Greedy jisme har step par sabse chhota / bada chunna ho (ropes, stones)."
+    - "Items beech beech mein aate rahein aur har time 'sabse aage wala' chahiye."
+    - "Greedy jisme har step par sabse chhota / bada choose karna ho (ropes, stones)."
     - "Custom order — severity, deadline, distance — Comparator se."
     - "Sort chahiye guaranteed O(n log n) aur O(1) jagah mein → heap sort."
   avoid:
@@ -238,7 +238,7 @@ realWorld:
   - where: "Router packet scheduling"
     how: "Voice / video call ke packets high priority — pehle bheje jaate hain (priority queueing)."
   - where: "Huffman compression (zip, JPEG)"
-    how: "Ropes wala hi algorithm: do sabse kam frequency wale jodo, wapas daalo."
+    how: "Ropes wala hi algorithm: 2 sabse kam frequency wale jodo, wapas daalo."
   - where: "Delivery / cab apps"
     how: "Paas ke candidates distance ke order mein — PQ + Comparator (distance)."
 
@@ -259,7 +259,7 @@ mistakes:
   - title: "Java mein Integer ko != se compare"
     type: logic
     wrong: |
-      `Integer y = pq.poll(), x = pq.poll(); if (y != x)` → 128 aur 128 bhi "alag" (do alag objects).
+      `Integer y = pq.poll(), x = pq.poll(); if (y != x)` → 128 aur 128 bhi "alag" (2 alag objects).
     right: |
       `int y = pq.poll();` (unbox ho jaata hai), ya `y.equals(x)`.
   - title: "Khaali PQ par poll"
@@ -311,7 +311,7 @@ interview:
     - q: "Minimum cost of ropes mein greedy sahi kyun hai?"
       followUp: true
       a: |
-        Har rassi ki lambai utni baar ginti hai jitna gehra wo merge-tree mein hai. Do sabse chhoti ko sabse gehra rakhna optimal hai (Huffman ka exchange argument).
+        Har rope ki length utni baar count hai jitna deep wo merge-tree mein hai. 2 sabse chhoti ko sabse deep rakhna optimal hai (Huffman ka exchange argument).
     - q: "PQ mein kisi item ki priority badalni ho (decrease-key)?"
       followUp: true
       a: |
@@ -364,7 +364,7 @@ practice:
     url: "https://leetcode.com/problems/single-threaded-cpu/"
     level: medium
     pattern: Time se sort + PQ (duration, index)
-    hint: "Tasks enqueueTime se sort. Jitne tasks aa chuke, PQ mein (processing time, phir index). PQ khaali ho to time ko agle task tak kood do. Time Long mein."
+    hint: "Tasks enqueueTime se sort. Jitne tasks aa chuke, PQ mein (processing time, phir index). PQ khaali ho to time ko agle task tak jump kar do. Time Long mein."
   - name: Minimum Cost to Hire K Workers
     platform: LeetCode
     num: 857
@@ -407,15 +407,15 @@ revision:
       options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
       answer: 2
       explain: "Pehle x ko dhoondhna linear hai; hatana phir O(log n)."
-    - q: "Comparator (a, b) -> a - b mein kya khatra hai?"
-      options: ["Slow hai", "Overflow se order ulta ho sakta hai", "Max-heap ban jaata hai", "Koi khatra nahi"]
+    - q: "Comparator (a, b) -> a - b mein kya risk hai?"
+      options: ["Slow hai", "Overflow se order ulta ho sakta hai", "Max-heap ban jaata hai", "Koi risk nahi"]
       answer: 1
       explain: "Bade / negative values par minus overflow. Integer.compare use karo."
     - q: "Heap sort ki extra space?"
       options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
       answer: 0
       explain: "Usi array mein heap aur sorted hissa; iterative sift down."
-    - q: "Ropes [4, 3, 2, 6] ka minimum kharcha?"
+    - q: "Ropes [4, 3, 2, 6] ka minimum cost?"
       options: ["15", "25", "29", "34"]
       answer: 2
       explain: "2+3 = 5, 4+5 = 9, 6+9 = 15 → 5 + 9 + 15 = 29."

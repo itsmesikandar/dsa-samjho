@@ -1,4 +1,4 @@
-// DSU: har group ka ek leader (root). find = leader kaun? union = do groups jodo
+// DSU: har group ka ek leader (root). find = leader kaun? union = 2 groups jodo
 class DSU(n: Int) {
     val parent = IntArray(n) { it } // shuru mein har koi khud apna leader
     val size = IntArray(n) { 1 }
@@ -12,7 +12,7 @@ class DSU(n: Int) {
         var ra = find(a) //@roots
         var rb = find(b)
         if (ra == rb) return false // pehle se ek hi group //@same
-        if (size[ra] < size[rb]) { // bada group leader rahe - ped chhota (kam gehra) rehta hai
+        if (size[ra] < size[rb]) { // bada group leader rahe - tree chhota (kam deep) rehta hai
             val t = ra
             ra = rb
             rb = t

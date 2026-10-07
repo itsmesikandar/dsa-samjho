@@ -1,4 +1,4 @@
-// Undirected cycle: DFS mein koi visited padosi mila jo parent NAHI hai - matlab doosre raste se pahunch gaye
+// Undirected cycle: DFS mein koi visited neighbor mila jo parent NAHI hai - matlab doosre raste se pahunch gaye
 fun hasCycleFrom(u: Int, parent: Int, adj: List<List<Int>>, visited: BooleanArray): Boolean {
     visited[u] = true //@enter
     for (v in adj[u]) {

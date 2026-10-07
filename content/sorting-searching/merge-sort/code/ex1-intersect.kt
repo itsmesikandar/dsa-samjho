@@ -1,4 +1,4 @@
-// Do arrays ka common hissa - jo number dono mein jitni baar (kam se kam) aaye, utni baar
+// 2 arrays ka common hissa - jo number dono mein jitni baar (kam se kam) aaye, utni baar
 fun intersect(a: IntArray, b: IntArray): IntArray {
     a.sort() // dono sort -> ab merge ki tarah saath-saath chal sakte hain //@sort
     b.sort()

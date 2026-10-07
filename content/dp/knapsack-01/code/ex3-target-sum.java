@@ -1,6 +1,6 @@
 class Main {
     // Har number ke aage + ya -. P = plus walon ka jod, N = minus walon ka. P - N = target, P + N = total
-    // => P = (total + target) / 2. Ab sawaal: kitne subsets ka jod P? (0/1 knapsack - ginti)
+    // => P = (total + target) / 2. Ab sawaal: kitne subsets ka jod P? (0/1 knapsack - count)
     static int findTargetSumWays(int[] nums, int target) {
         int total = 0;
         for (int x : nums) total += x;

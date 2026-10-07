@@ -20,7 +20,7 @@ function buildAdj(edges: number[][]): number[][] {
 }
 const posFor = (edges: number[][]) => (same(edges, G_DEFAULT) ? G_POS : undefined);
 
-// ---------- 3. Visual intro: paani mein lehrein — level by level ----------
+// ---------- 3. Visual intro: paani mein waves — level by level ----------
 const LEVEL_TONES: Tone[] = ['active', 'new', 'compare', 'found', 'swap', 'done', 'error'];
 
 export const rippleTrace = tracer<{ edges: number[][]; start: number }>({
@@ -47,16 +47,16 @@ export const rippleTrace = tracer<{ edges: number[][]; start: number }>({
         badges[v] = `d=${d}`;
         if (par[v] >= 0) et[`${par[v]}-${v}`] = tones[v];
       });
-      return [graphView(N, edges, { pos, tones, badges, edgeTones: et, label: `BFS lehrein, start = ${start}` })];
+      return [graphView(N, edges, { pos, tones, badges, edgeTones: et, label: `BFS waves, start = ${start}` })];
     };
     const legendUpTo = (k: number) => Object.fromEntries(Array.from({ length: Math.min(k + 1, LEVEL_TONES.length) }, (_, d) => [LEVEL_TONES[d], `level ${d}`]));
-    t.frame({ caption: `Shaant taalaab mein pathar phenko: lehrein pehle paas, phir door phailti hain. BFS bhi aise hi — start ${start} se pehle 1 kadam door wale, phir 2 kadam door wale…`, legend: legendUpTo(0), panels: view(0) });
+    t.frame({ caption: `Shaant pond mein stone phenko: waves pehle paas, phir door spread hoti hain. BFS bhi aise hi — start ${start} se pehle 1 step door wale, phir 2 step door wale…`, legend: legendUpTo(0), panels: view(0) });
     for (let k = 1; k <= maxD; k++) {
       const layer = dist.map((d, v) => (d === k ? v : -1)).filter((v) => v >= 0);
-      t.frame({ caption: `Level ${k}: ${layer.join(', ')} — level ${k - 1} ke wo padosi jo pehle nahi dikhe. Inki distance = ${k} (pehli baar jis level mein mile, wahi sabse chhota rasta).`, legend: legendUpTo(k), panels: view(k) });
+      t.frame({ caption: `Level ${k}: ${layer.join(', ')} — level ${k - 1} ke wo neighbor jo pehle nahi dikhe. Inki distance = ${k} (pehli baar jis level mein mile, wahi sabse chhota rasta).`, legend: legendUpTo(k), panels: view(k) });
     }
     const lost = dist.map((d, v) => (d < 0 ? v : -1)).filter((v) => v >= 0);
-    t.frame({ caption: `${maxD + 1} levels. Rangeen edges = har node tak pehla (sabse chhota) rasta — ye BFS tree hai.${lost.length ? ` ${lost.join(', ')} tak koi rasta nahi — lehar wahan kabhi nahi pahunchi.` : ' Sab nodes tak pahunch gaye.'}`, legend: legendUpTo(maxD), panels: view(maxD) });
+    t.frame({ caption: `${maxD + 1} levels. Colored edges = har node tak pehla (sabse chhota) rasta — ye BFS tree hai.${lost.length ? ` ${lost.join(', ')} tak koi rasta nahi — lehar wahan kabhi nahi pahunchi.` : ' Sab nodes tak pahunch gaye.'}`, legend: legendUpTo(maxD), panels: view(maxD) });
     return String(maxD);
   },
 });
@@ -70,7 +70,7 @@ export const bfsTrace = tracer<{ edges: number[][]; start: number }>({
     const visited: boolean[] = Array(N).fill(false);
     const order: number[] = [];
     const queue: number[] = [];
-    const legend = { active: 'abhi nikala (u)', compare: 'padosi check', new: 'queue mein', done: 'ho gaya' };
+    const legend = { active: 'abhi nikala (u)', compare: 'neighbor check', new: 'queue mein', done: 'ho gaya' };
     const view = (u?: number, v?: number): Panel[] => {
       const tones: Tones = {};
       for (let x = 0; x < N; x++) if (visited[x]) tones[x] = queue.includes(x) ? 'new' : 'done';
@@ -89,19 +89,19 @@ export const bfsTrace = tracer<{ edges: number[][]; start: number }>({
     while (queue.length) {
       const u = queue.shift()!;
       order.push(u);
-      t.frame({ line: 'pop', caption: `Queue ke aage se ${u} nikala → order mein. Ab ${u} ke padosi: ${listStr(adj[u])}.`, vars: { u }, legend, panels: view(u) });
+      t.frame({ line: 'pop', caption: `Queue ke aage se ${u} nikala → order mein. Ab ${u} ke neighbor: ${listStr(adj[u])}.`, vars: { u }, legend, panels: view(u) });
       for (const v of adj[u]) {
         if (!visited[v]) {
           visited[v] = true;
           queue.push(v);
-          t.frame({ line: 'mark', caption: `${v} pehli baar dikha → visited = true, queue ke peeche. Mark ABHI kiya, nikalte waqt nahi — warna ${v} queue mein do baar aa sakta.`, vars: { u, v }, legend, panels: view(u, v) });
+          t.frame({ line: 'mark', caption: `${v} pehli baar dikha → visited = true, queue ke peeche. Mark ABHI kiya, nikalte time nahi — warna ${v} queue mein 2 baar aa sakta.`, vars: { u, v }, legend, panels: view(u, v) });
         } else {
           t.frame({ line: 'check', caption: `${v} pehle se visited (${queue.includes(v) ? 'queue mein baitha hai' : 'ho chuka'}) → skip. Yahi check cycle mein ghoomne se bachata hai.`, vars: { u, v }, legend, panels: view(u, v) });
         }
       }
     }
     const lost = visited.map((x, i) => (x ? -1 : i)).filter((i) => i >= 0);
-    t.frame({ line: 'done', caption: `Queue khaali. BFS order = ${listStr(order)}.${lost.length ? ` ${lost.join(', ')} tak rasta nahi — kabhi queue mein nahi aaye.` : ''} Har node ek baar queue mein, har edge do baar check → O(V + E).`, legend, panels: view() });
+    t.frame({ line: 'done', caption: `Queue khaali. BFS order = ${listStr(order)}.${lost.length ? ` ${lost.join(', ')} tak rasta nahi — kabhi queue mein nahi aaye.` : ''} Har node ek baar queue mein, har edge 2 baar check → O(V + E).`, legend, panels: view() });
     return listStr(order);
   },
 });
@@ -111,7 +111,7 @@ export const shortestPathTrace = tracer<{ edges: number[][]; s: number; t: numbe
   inputs: [
     edgesSpec,
     { name: 's', type: 'int', label: 's (shuru)', default: 0, min: 0, max: N - 1 },
-    { name: 't', type: 'int', label: 't (manzil)', default: 6, min: 0, max: N - 1 },
+    { name: 't', type: 'int', label: 't (destination)', default: 6, min: 0, max: N - 1 },
   ],
   run({ edges, s, t: target }, t) {
     const adj = buildAdj(edges);
@@ -119,7 +119,7 @@ export const shortestPathTrace = tracer<{ edges: number[][]; s: number; t: numbe
     const dist: number[] = Array(N).fill(-1);
     const parent: number[] = Array(N).fill(-1);
     const queue: number[] = [];
-    const legend = { active: 'abhi nikala', new: 'queue mein', done: 'ho gaya', found: 'rasta', compare: 'manzil t' };
+    const legend = { active: 'abhi nikala', new: 'queue mein', done: 'ho gaya', found: 'rasta', compare: 'destination t' };
     const view = (u?: number, hot: number[] = [], path: number[] = []): Panel[] => {
       const tones: Tones = {};
       const badges: Record<number, string> = {};
@@ -145,7 +145,7 @@ export const shortestPathTrace = tracer<{ edges: number[][]; s: number; t: numbe
     while (queue.length) {
       const u = queue.shift()!;
       if (u === target) {
-        t.frame({ line: 'found', caption: `${target} queue se nikla → dist[${target}] = ${dist[u]} pakki. BFS mein jo pehle nikla wo kam kadam door — isse chhota rasta ho hi nahi sakta. Ruko.`, vars: { u, dist: dist[u] }, legend, panels: view(u) });
+        t.frame({ line: 'found', caption: `${target} queue se nikla → dist[${target}] = ${dist[u]} pakki. BFS mein jo pehle nikla wo kam step door — isse chhota rasta ho hi nahi sakta. Ruko.`, vars: { u, dist: dist[u] }, legend, panels: view(u) });
         break;
       }
       const hot: number[] = [];
@@ -157,7 +157,7 @@ export const shortestPathTrace = tracer<{ edges: number[][]; s: number; t: numbe
           hot.push(v);
         }
       }
-      t.frame({ line: hot.length ? 'relax' : 'pop', caption: hot.length ? `${u} nikala (d=${dist[u]}). Naye padosi ${hot.join(', ')}: dist = ${dist[u] + 1}, parent = ${u}, queue mein.` : `${u} nikala (d=${dist[u]}). Koi naya padosi nahi.`, vars: { u, dist: dist[u] }, legend, panels: view(u, hot) });
+      t.frame({ line: hot.length ? 'relax' : 'pop', caption: hot.length ? `${u} nikala (d=${dist[u]}). Naye neighbor ${hot.join(', ')}: dist = ${dist[u] + 1}, parent = ${u}, queue mein.` : `${u} nikala (d=${dist[u]}). Koi naya neighbor nahi.`, vars: { u, dist: dist[u] }, legend, panels: view(u, hot) });
     }
     if (dist[target] === -1) {
       t.frame({ line: 'none', caption: `Queue khaali, ${target} kabhi nahi mila → koi rasta nahi, khaali list.`, legend, panels: view() });
@@ -200,13 +200,13 @@ export const matrixTrace = tracer<{ grid: number[][] }>({
     }
     dist[0][0] = 1;
     queue.push([0, 0]);
-    t.frame({ line: 'start', caption: `Grid = graph: har khula cell ek node, uske 8 padosi (seedhe + tirchhe) edges. (0,0) se BFS; length cells mein ginte hain to dist = 1. Manzil (${r - 1},${c - 1}).`, legend, panels: view() });
+    t.frame({ line: 'start', caption: `Grid = graph: har khula cell ek node, uske 8 neighbor (seedhe + diagonal) edges. (0,0) se BFS; length cells mein count karte hain to dist = 1. Destination (${r - 1},${c - 1}).`, legend, panels: view() });
     while (queue.length) {
       const [x, y] = queue.shift()!;
       if (x === r - 1 && y === c - 1) {
         const path: string[] = [];
         for (let k: string | undefined = `${x},${y}`; k; k = par.get(k)) path.push(k);
-        t.frame({ line: 'found', caption: `(${x},${y}) manzil hai, pehli baar nikli → sabse chhota rasta = ${dist[x][y]} cells. (Rasta parent se dikhaya: ${path.reverse().map((k) => `(${k})`).join(' → ')}.)`, vars: { cells: dist[x][y] }, legend, panels: view([x, y], path) });
+        t.frame({ line: 'found', caption: `(${x},${y}) destination hai, pehli baar nikli → sabse chhota rasta = ${dist[x][y]} cells. (Rasta parent se dikhaya: ${path.reverse().map((k) => `(${k})`).join(' → ')}.)`, vars: { cells: dist[x][y] }, legend, panels: view([x, y], path) });
         return String(dist[x][y]);
       }
       const pushed: string[] = [];
@@ -222,37 +222,37 @@ export const matrixTrace = tracer<{ grid: number[][] }>({
           }
         }
       }
-      t.frame({ line: pushed.length ? 'push' : 'pop', caption: pushed.length ? `(${x},${y}) nikala, dist ${dist[x][y]}. 8 padosiyon mein khule + naye: ${pushed.join(' ')} → dist ${dist[x][y] + 1}, queue mein.` : `(${x},${y}) nikala, dist ${dist[x][y]}. Koi naya khula padosi nahi.`, vars: { cell: `${x},${y}`, dist: dist[x][y] }, legend, panels: view([x, y]) });
+      t.frame({ line: pushed.length ? 'push' : 'pop', caption: pushed.length ? `(${x},${y}) nikala, dist ${dist[x][y]}. 8 neighbors mein khule + naye: ${pushed.join(' ')} → dist ${dist[x][y] + 1}, queue mein.` : `(${x},${y}) nikala, dist ${dist[x][y]}. Koi naya khula neighbor nahi.`, vars: { cell: `${x},${y}`, dist: dist[x][y] }, legend, panels: view([x, y]) });
     }
-    t.frame({ line: 'none', caption: `Queue khaali, manzil tak nahi pahunche → -1. Har cell max ek baar queue mein → O(r × c × 8).`, legend, panels: view() });
+    t.frame({ line: 'none', caption: `Queue khaali, destination tak nahi pahunche → -1. Har cell max ek baar queue mein → O(r × c × 8).`, legend, panels: view() });
     return '-1';
   },
 });
 
 // ---------- Example 3: Rotting oranges (multi-source BFS) ----------
 export const rottingTrace = tracer<{ grid: number[][] }>({
-  inputs: [{ name: 'grid', type: 'intGrid', label: 'Grid (0 khaali, 1 taaza, 2 sada)', default: [[2, 1, 0, 2], [1, 1, 0, 1], [0, 1, 1, 1]], maxRows: 5, maxCols: 5, min: 0, max: 2 }],
+  inputs: [{ name: 'grid', type: 'intGrid', label: 'Grid (0 khaali, 1 fresh, 2 sada)', default: [[2, 1, 0, 2], [1, 1, 0, 1], [0, 1, 1, 1]], maxRows: 5, maxCols: 5, min: 0, max: 2 }],
   run({ grid: input }, t) {
     const grid = input.map((row) => [...row]);
     const r = grid.length;
     const c = grid[0].length;
-    const legend = { error: 'sada (2)', found: 'taaza (1)', muted: 'khaali (0)', active: 'is minute phailane wale', new: 'abhi sade' };
+    const legend = { error: 'sada (2)', found: 'fresh (1)', muted: 'khaali (0)', active: 'is minute spread karne wale', new: 'abhi rotten' };
     const view = (front: number[][] = [], fresh: number[][] = []): Panel[] => {
       const tones: Record<string, Tone> = {};
       grid.forEach((row, i) => row.forEach((x, j) => (tones[`${i},${j}`] = x === 2 ? 'error' : x === 1 ? 'found' : 'muted')));
       front.forEach(([i, j]) => (tones[`${i},${j}`] = 'active'));
       fresh.forEach(([i, j]) => (tones[`${i},${j}`] = 'new'));
-      return [{ kind: 'grid', label: 'Santre', values: grid.map((row) => [...row]), tones, rowLabels: grid.map((_, i) => String(i)), colLabels: grid[0].map((_, j) => String(j)) }];
+      return [{ kind: 'grid', label: 'Oranges', values: grid.map((row) => [...row]), tones, rowLabels: grid.map((_, i) => String(i)), colLabels: grid[0].map((_, j) => String(j)) }];
     };
     let queue: number[][] = [];
     let fresh = 0;
     grid.forEach((row, i) => row.forEach((x, j) => (x === 2 ? queue.push([i, j]) : x === 1 && fresh++)));
-    t.frame({ line: 'sources', caption: `${queue.length} sade santre — SAB ek saath queue mein (multi-source). ${fresh} taaze. Ek ek source se alag BFS chalate to har baar poora grid; ek saath chalane par sab lehrein saath phailti hain.`, vars: { minutes: 0, fresh }, legend, panels: view(queue) });
+    t.frame({ line: 'sources', caption: `${queue.length} rotten oranges — SAB ek saath queue mein (multi-source). ${fresh} fresh. Ek ek source se alag BFS chalate to har baar poora grid; ek saath chalane par sab waves saath spread hoti hain.`, vars: { minutes: 0, fresh }, legend, panels: view(queue) });
     const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
     let minutes = 0;
     while (queue.length && fresh > 0) {
       minutes++;
-      t.frame({ line: 'minute', caption: `Minute ${minutes}: queue mein abhi ${queue.length} sade santre — sirf yahi is minute phailayenge (queue.size pehle hi note kar liya).`, vars: { minutes, fresh }, legend, panels: view(queue) });
+      t.frame({ line: 'minute', caption: `Minute ${minutes}: queue mein abhi ${queue.length} rotten oranges — sirf yahi is minute spread karenge (queue.size pehle hi note kar liya).`, vars: { minutes, fresh }, legend, panels: view(queue) });
       const next: number[][] = [];
       for (const [x, y] of queue) {
         for (const [dx, dy] of dirs) {
@@ -265,11 +265,11 @@ export const rottingTrace = tracer<{ grid: number[][] }>({
           }
         }
       }
-      t.frame({ line: 'rot', caption: next.length ? `${next.map(([i, j]) => `(${i},${j})`).join(' ')} sad gaye — ye agle minute ke source. Taaze bache: ${fresh}.` : `Is minute koi naya nahi sada. Taaze bache: ${fresh}.`, vars: { minutes, fresh }, legend, panels: view([], next) });
+      t.frame({ line: 'rot', caption: next.length ? `${next.map(([i, j]) => `(${i},${j})`).join(' ')} sad gaye — ye agle minute ke source. Fresh bache: ${fresh}.` : `Is minute koi naya nahi sada. Fresh bache: ${fresh}.`, vars: { minutes, fresh }, legend, panels: view([], next) });
       queue = next;
     }
     const ans = fresh === 0 ? minutes : -1;
-    t.frame({ line: 'done', caption: fresh === 0 ? `Koi taaza nahi bacha → ${minutes} minute. Har cell ek baar queue mein → O(r × c).` : `Queue khaali par ${fresh} taaze bache — unke paas tak koi sada santra pahunch nahi sakta (khaali cells ki deewar) → -1.`, vars: { minutes, fresh }, legend, panels: view() });
+    t.frame({ line: 'done', caption: fresh === 0 ? `Koi fresh nahi bacha → ${minutes} minute. Har cell ek baar queue mein → O(r × c).` : `Queue khaali par ${fresh} fresh bache — unke paas tak koi sada orange pahunch nahi sakta (khaali cells ki wall) → -1.`, vars: { minutes, fresh }, legend, panels: view() });
     return String(ans);
   },
 });

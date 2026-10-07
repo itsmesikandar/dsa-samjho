@@ -1,5 +1,5 @@
 class Main {
-    // Jitni baar chaho khareedo-becho: har chadhaai (aaj > kal) ka munafa jodo
+    // Jitni baar chaho khareedo-becho: har chadhaai (aaj > kal) ka profit jodo
     static int maxProfit2(int[] prices) {
         int profit = 0;
         for (int i = 1; i < prices.length; i++) { //@day

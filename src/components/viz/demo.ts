@@ -6,7 +6,7 @@ export const arrayDemo = tracer<{ arr: number[] }>({
   run({ arr }, t) {
     const a = [...arr];
     const id = ids(a.length);
-    t.frame({ caption: 'Ek bubble-sort pass chalayenge: padosi pairs compare karke bade number ko aage bhejenge.', panels: [array(a, { ids: id })] });
+    t.frame({ caption: 'Ek bubble-sort pass chalayenge: neighbor pairs compare karke bade number ko aage bhejenge.', panels: [array(a, { ids: id })] });
     for (let i = 0; i + 1 < a.length; i++) {
       t.frame({
         caption: `a[${i}] = ${a[i]} aur a[${i + 1}] = ${a[i + 1]} ko compare karo — kaun bada hai?`,
@@ -122,7 +122,7 @@ export const listDemo = tracer<{ arr: number[] }>({
       show('curr ka arrow ab prev ki taraf mod diya.', [{ name: 'next', at: nxt }]);
       prev = curr;
       curr = nxt;
-      show('prev aur curr dono ek kadam aage badhe.');
+      show('prev aur curr dono ek step aage badhe.');
     }
     show('curr null ho gaya — prev hi naya head hai. List ulti ho gayi!', [{ name: 'head', at: prev }]);
     const out: string[] = [];
@@ -337,7 +337,7 @@ export const graphDemo = tracer<{ edges: number[][] }>({
     show('Node 0 se BFS shuru. Queue mein 0 daala, uski distance 0.');
     while (queue.length) {
       const u = queue.shift()!;
-      show(`Queue ke front se ${u} nikaala. Ab iske padosi dekhenge.`, u);
+      show(`Queue ke front se ${u} nikaala. Ab iske neighbors dekhenge.`, u);
       for (const v of adj[u]) {
         if (dist[v] === null) {
           dist[v] = dist[u]! + 1;
@@ -398,7 +398,7 @@ export const chartDemo = tracer<Record<string, never>>({
     ].map((s) => ({ label: s.label, points: xs.map((x) => [x, +s.f(x).toFixed(1)] as [number, number]) }));
     for (const n of [1, 4, 7, 10]) {
       t.frame({
-        caption: `n = ${n}: dekho n² kitni tezi se upar jaata hai jabki log n lagbhag flat rehta hai.`,
+        caption: `n = ${n}: dekho n² kitni tezi se upar jaata hai jabki log n approx flat rehta hai.`,
         vars: { n },
         panels: [{ kind: 'chart', series, marker: n, xLabel: 'n (input size)', yLabel: 'steps', yMax: 100 }],
       });

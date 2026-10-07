@@ -9,7 +9,7 @@ class Main {
         int now = 0; // abhi station par kitni trains
         int best = 0;
         while (i < arr.length) {
-            if (arr[i] <= dep[j]) { // agli ghatna ek train ka AANA (barabar time: pehle aayi maano - platform chahiye)
+            if (arr[i] <= dep[j]) { // agli event ek train ka AANA (barabar time: pehle aayi maano - platform chahiye)
                 now++; //@arrive
                 i++;
             } else { // pehle koi train JAAYEGI - platform khaali

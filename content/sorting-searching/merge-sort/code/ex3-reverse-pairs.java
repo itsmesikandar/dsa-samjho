@@ -8,7 +8,7 @@ class Main {
         if (l >= r) return 0; //@base
         int mid = (l + r) / 2;
         int count = sortCount(a, l, mid, tmp) + sortCount(a, mid + 1, r, tmp); //@halves
-        // MERGE SE PEHLE alag ginti: dono halves sorted hain, to j kabhi peeche nahi jaata
+        // MERGE SE PEHLE alag count: dono halves sorted hain, to j kabhi peeche nahi jaata
         int j = mid + 1;
         for (int i = l; i <= mid; i++) {
             while (j <= r && (long) a[i] > 2L * a[j]) j++; // long: 2 * a[j] int mein overflow ho sakta hai //@count

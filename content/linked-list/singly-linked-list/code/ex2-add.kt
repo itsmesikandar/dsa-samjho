@@ -1,6 +1,6 @@
 class ListNode(var value: Int, var next: ListNode? = null)
 
-// Do numbers ULTE digits mein (2 -> 4 -> 3 matlab 342). Jod ke usi format mein do.
+// 2 numbers ULTE digits mein (2 -> 4 -> 3 matlab 342). Jod ke usi format mein do.
 fun addTwoNumbers(a: ListNode?, b: ListNode?): ListNode? {
     var p = a
     var q = b

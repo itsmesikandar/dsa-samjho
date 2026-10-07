@@ -1,15 +1,15 @@
 class Main {
-    // Unique paths, par kuch cells mein patthar (1). Patthar par dp = 0 - wahan se koi rasta aage nahi jaata
+    // Unique paths, par kuch cells mein stone (1). Stone par dp = 0 - wahan se koi rasta aage nahi jaata
     static int uniquePathsWithObstacles(int[][] grid) {
         int m = grid.length, n = grid[0].length;
         int[][] dp = new int[m][n];
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                if (grid[i][j] == 1) { // patthar //@rock
+                if (grid[i][j] == 1) { // stone //@rock
                     dp[i][j] = 0;
                     continue;
                 }
-                if (i == 0 && j == 0) { // shuruaat (patthar nahi) - 1 rasta //@start
+                if (i == 0 && j == 0) { // shuruaat (stone nahi) - 1 rasta //@start
                     dp[i][j] = 1;
                     continue;
                 }

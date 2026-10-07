@@ -8,7 +8,7 @@ export const deqDemo = tracer<{ values: number[] }>({
   inputs: [{ name: 'values', type: 'intArray', label: 'Values (baari-baari peeche / aage)', default: [1, 2, 3, 4, 5], minLen: 1, maxLen: 6, min: 0, max: 99 }],
   run({ values }, t) {
     const d: number[] = [];
-    t.frame({ caption: 'Deque = Double-Ended Queue. Dono kinaron par jodo bhi, nikaalo bhi — sab O(1). Stack + queue dono ek mein.', panels: [dequePanel(d)] });
+    t.frame({ caption: 'Deque = Double-Ended Queue. Dono edges par jodo bhi, nikaalo bhi — sab O(1). Stack + queue dono ek mein.', panels: [dequePanel(d)] });
     values.forEach((v, i) => {
       if (i % 2 === 0) {
         d.push(v);
@@ -75,13 +75,13 @@ export const keyboardTrace = tracer<{ s: string }>({
     for (let i = 0; i < c.length; i++) {
       if (c[i] === 'i') {
         flipped = !flipped;
-        t.frame({ line: 'flip', caption: `'i' → text ulta. Sach mein ulta karte to O(n) har baar. Bas flag palto: flipped = ${flipped}.`, vars: { flipped }, panels: view(i) });
+        t.frame({ line: 'flip', caption: `'i' → text ulta. Sach mein ulta karte to O(n) har baar. Bas flag flip karo: flipped = ${flipped}.`, vars: { flipped }, panels: view(i) });
       } else if (flipped) {
         dq.unshift(c[i]);
-        t.frame({ line: 'front', caption: `Ulti halat: screen par '${c[i]}' end mein dikhta hai, par asal (seedhe) order mein wo AAGE hai → addFirst.`, vars: { flipped }, panels: view(i, { 0: 'new' }) });
+        t.frame({ line: 'front', caption: `Ulti state: screen par '${c[i]}' end mein dikhta hai, par asal (seedhe) order mein wo AAGE hai → addFirst.`, vars: { flipped }, panels: view(i, { 0: 'new' }) });
       } else {
         dq.push(c[i]);
-        t.frame({ line: 'back', caption: `Seedhi halat → addLast('${c[i]}').`, vars: { flipped }, panels: view(i, { [dq.length - 1]: 'new' }) });
+        t.frame({ line: 'back', caption: `Seedhi state → addLast('${c[i]}').`, vars: { flipped }, panels: view(i, { [dq.length - 1]: 'new' }) });
       }
     }
     const out = (flipped ? [...dq].reverse() : dq).join('');
@@ -111,7 +111,7 @@ export const limitTrace = tracer<{ nums: number[]; limit: number }>({
       maxD.push(nums[r]);
       while (minD.length && minD[minD.length - 1] > nums[r]) minD.pop();
       minD.push(nums[r]);
-      t.frame({ line: 'push', caption: `${nums[r]} andar. Do monotonic deques: maxD ka aage = window max (${maxD[0]}), minD ka aage = window min (${minD[0]}).`, vars: { l, r, best }, legend: { found: 'max', compare: 'min' }, panels: view(r, maxD[0] - minD[0] > limit ? 'error' : 'active') });
+      t.frame({ line: 'push', caption: `${nums[r]} andar. 2 monotonic deques: maxD ka aage = window max (${maxD[0]}), minD ka aage = window min (${minD[0]}).`, vars: { l, r, best }, legend: { found: 'max', compare: 'min' }, panels: view(r, maxD[0] - minD[0] > limit ? 'error' : 'active') });
       while (maxD[0] - minD[0] > limit) {
         if (maxD[0] === nums[l]) maxD.shift();
         if (minD[0] === nums[l]) minD.shift();
@@ -152,7 +152,7 @@ export const shortestTrace = tracer<{ nums: number[]; k: number }>({
       }
       const popped: number[] = [];
       while (dq.length && pre[dq[dq.length - 1]] >= pre[j]) popped.push(dq.pop()!);
-      if (popped.length) t.frame({ line: 'pop', caption: `pre[${j}] = ${pre[j]} ≤ peeche wale (${popped.map((i) => pre[i]).join(', ')}). j start ke roop mein unse behtar (chhota pre → bada sum, aur baad mein → chhoti length). Unhe hatao.`, vars: { best: best === Infinity ? '∞' : best }, panels: view(j, Object.fromEntries(popped.map((i) => [i, 'error' as Tone]))) });
+      if (popped.length) t.frame({ line: 'pop', caption: `pre[${j}] = ${pre[j]} ≤ peeche wale (${popped.map((i) => pre[i]).join(', ')}). j start ke form mein unse better (chhota pre → bada sum, aur baad mein → chhoti length). Unhe hatao.`, vars: { best: best === Infinity ? '∞' : best }, panels: view(j, Object.fromEntries(popped.map((i) => [i, 'error' as Tone]))) });
       dq.push(j);
       t.frame({ line: 'push', caption: `Start candidate ${j} (pre ${pre[j]}) peeche jodo.`, vars: { best: best === Infinity ? '∞' : best }, panels: view(j, { [j]: 'new' }) });
     }

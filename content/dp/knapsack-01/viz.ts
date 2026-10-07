@@ -3,9 +3,9 @@ import type { CallNode, Cell, Panel, Tone } from '@/components/viz/engine/types'
 
 type Tones = Record<number, Tone>;
 type GT = Record<string, Tone>;
-const itemsCheck = ({ items }: { items: number[][] }) => (items.some((r) => r.length !== 2) ? 'Har row mein do numbers: weight value.' : null);
+const itemsCheck = ({ items }: { items: number[][] }) => (items.some((r) => r.length !== 2) ? 'Har row mein 2 numbers: weight value.' : null);
 
-// ---------- 3. Visual intro: lo / chhodo ka ped — states dobara aate hain ----------
+// ---------- 3. Visual intro: lo / chhodo ka tree — states dobara aate hain ----------
 export const choiceTreeTrace = tracer<{ items: number[][]; cap: number }>({
   inputs: [
     { name: 'items', type: 'intGrid', label: 'Items (weight value; …)', default: [[1, 2], [1, 3], [2, 4]], maxRows: 3, maxCols: 2, min: 1, max: 5 },
@@ -19,7 +19,7 @@ export const choiceTreeTrace = tracer<{ items: number[][]; cap: number }>({
     let calls = 0;
     let repeats = 0;
     const legend = { error: 'ye state pehle bhi aayi', found: 'chhoda (skip)', new: 'liya (take)' };
-    t.frame({ caption: `Har item par do raaste: LO (agar jagah hai) ya CHHODO. ${n} items → 2^${n} = ${2 ** n} combinations. Ped dekho — aur dhyaan do kaunsi state (i, w) dobara aati hai.`, legend, panels: [tree.panel()] });
+    t.frame({ caption: `Har item par 2 raaste: LO (agar jagah hai) ya CHHODO. ${n} items → 2^${n} = ${2 ** n} combinations. Tree dekho — aur dhyaan do kaunsi state (i, w) dobara aati hai.`, legend, panels: [tree.panel()] });
     const go = (i: number, w: number, parent?: CallNode, how?: Tone): number => {
       calls++;
       const key = `${i},${w}`;
@@ -37,7 +37,7 @@ export const choiceTreeTrace = tracer<{ items: number[][]; cap: number }>({
       return best;
     };
     const ans = go(0, cap);
-    t.frame({ caption: `Best value = ${ans}. ${calls} calls, ${repeats} state(s) dobara. Asli state sirf (i, w) — kul ${n + 1} × ${cap + 1} = ${(n + 1) * (cap + 1)} se zyada nahi. Unhe table mein yaad rakho → knapsack DP, O(n × W).`, vars: { calls, repeats }, legend, panels: [tree.panel()] });
+    t.frame({ caption: `Best value = ${ans}. ${calls} calls, ${repeats} state(s) dobara. Asli state sirf (i, w) — total ${n + 1} × ${cap + 1} = ${(n + 1) * (cap + 1)} se zyada nahi. Unhe table mein yaad rakho → knapsack DP, O(n × W).`, vars: { calls, repeats }, legend, panels: [tree.panel()] });
     return String(ans);
   },
 });
@@ -96,11 +96,11 @@ export const partitionTrace = tracer<{ nums: number[] }>({
   run({ nums }, t) {
     const total = nums.reduce((a, b) => a + b, 0);
     if (total % 2) {
-      t.frame({ line: 'odd', caption: `Kul ${total} odd hai → do barabar hisse (poore numbers) ho hi nahi sakte. false.`, panels: [array(nums, { label: 'nums' })] });
+      t.frame({ line: 'odd', caption: `Total ${total} odd hai → do barabar hisse (poore numbers) ho hi nahi sakte. false.`, panels: [array(nums, { label: 'nums' })] });
       return 'false';
     }
     const target = total / 2;
-    t.frame({ line: 'loop', caption: `Kul ${total} → har hissa ${target}. Sawaal badla: kya koi subset ka jod ${target}? Ye 0/1 knapsack hai (value ki jagah true/false). dp[s] = jod s ban sakta? dp[0] = T.`, panels: [array(nums, { label: 'nums' })] });
+    t.frame({ line: 'loop', caption: `Total ${total} → har hissa ${target}. Sawaal badla: kya koi subset ka jod ${target}? Ye 0/1 knapsack hai (value ki jagah true/false). dp[s] = jod s ban sakta? dp[0] = T.`, panels: [array(nums, { label: 'nums' })] });
     const { dp, view } = subsetFrames(nums, target, t, 'mark', `dp[0..${target}] (T = ban sakta)`);
     t.frame({ line: 'done', caption: dp[target] ? `dp[${target}] = T → ek hissa ${target}, baaki bhi ${target}. true. O(n × target).` : `dp[${target}] nahi bana → false. O(n × target).`, legend: { found: 'target' }, panels: view([], { [target]: dp[target] ? 'found' : 'error' }) });
     return String(dp[target]);
@@ -109,20 +109,20 @@ export const partitionTrace = tracer<{ nums: number[] }>({
 
 // ---------- Example 2: Last stone weight II ----------
 export const stonesTrace = tracer<{ stones: number[] }>({
-  inputs: [{ name: 'stones', type: 'intArray', label: 'Patthar ke wazan', default: [6, 3, 8, 2], minLen: 1, maxLen: 7, min: 1, max: 9 }],
+  inputs: [{ name: 'stones', type: 'intArray', label: 'Stone ke weight', default: [6, 3, 8, 2], minLen: 1, maxLen: 7, min: 1, max: 9 }],
   run({ stones }, t) {
     const total = stones.reduce((a, b) => a + b, 0);
     const half = Math.floor(total / 2);
-    t.frame({ caption: `Do patthar takraate hain, chhota mit jaata, bada (farak) bachta. Kitna bhi order ho, aakhir mein bacha = |dher A − dher B| (har patthar ya + ya −). Kam karna hai → ek dher total/2 = ${half} ke jitna paas.`, panels: [array(stones, { label: 'stones' })] });
-    const { dp, view } = subsetFrames(stones, half, t, 'mark', `dp[0..${half}] (koi dher ka jod)`);
+    t.frame({ caption: `Do stone collide karte hain, chhota mit jaata, bada (farak) bachta. Kitna bhi order ho, aakhir mein bacha = |pile A − pile B| (har stone ya + ya −). Kam karna hai → ek pile total/2 = ${half} ke jitna paas.`, panels: [array(stones, { label: 'stones' })] });
+    const { dp, view } = subsetFrames(stones, half, t, 'mark', `dp[0..${half}] (koi pile ka jod)`);
     let s = half;
     while (!dp[s]) s--;
-    t.frame({ line: 'best', caption: `${half} tak sabse bada banne wala jod: ${s}. Dher ${s} aur ${total - s} → bacha ${total} − 2 × ${s} = ${total - 2 * s}.`, legend: { found: 'sabse paas' }, panels: view([], { [s]: 'found' }) });
+    t.frame({ line: 'best', caption: `${half} tak sabse bada banne wala jod: ${s}. Pile ${s} aur ${total - s} → bacha ${total} − 2 × ${s} = ${total - 2 * s}.`, legend: { found: 'sabse paas' }, panels: view([], { [s]: 'found' }) });
     return String(total - 2 * s);
   },
 });
 
-// ---------- Example 3: Target sum (ginti) ----------
+// ---------- Example 3: Target sum (count) ----------
 export const targetTrace = tracer<{ nums: number[]; target: number }>({
   inputs: [
     { name: 'nums', type: 'intArray', label: 'nums', default: [2, 1, 3, 1], minLen: 1, maxLen: 6, min: 0, max: 6 },
@@ -131,14 +131,14 @@ export const targetTrace = tracer<{ nums: number[]; target: number }>({
   run({ nums, target }, t) {
     const total = nums.reduce((a, b) => a + b, 0);
     if (Math.abs(target) > total || (total + target) % 2 !== 0) {
-      t.frame({ line: 'check', caption: `P = (kul ${total} + target ${target}) / 2 — ${Math.abs(target) > total ? 'target kul se bada' : 'poora number nahi'} → koi tareeka nahi, 0.`, panels: [array(nums, { label: 'nums' })] });
+      t.frame({ line: 'check', caption: `P = (total ${total} + target ${target}) / 2 — ${Math.abs(target) > total ? 'target kul se bada' : 'poora number nahi'} → koi tareeka nahi, 0.`, panels: [array(nums, { label: 'nums' })] });
       return '0';
     }
     const p = (total + target) / 2;
     const dp: number[] = Array(p + 1).fill(0);
     dp[0] = 1;
     const view = (hot: number[] = [], extra: Tones = {}): Panel[] => [array(nums, { label: 'nums' }), array(dp, { label: `dp[s] = kitne subsets ka jod s (s = 0..${p})`, tones: { ...Object.fromEntries(hot.map((s) => [s, 'new'])), ...extra } })];
-    t.frame({ line: 'check', caption: `+ wale ka jod P, − wale ka N: P − N = ${target}, P + N = ${total} → P = ${p}. Ab: kitne subsets ka jod ${p}? (ginti wala knapsack). dp[0] = 1.`, panels: view() });
+    t.frame({ line: 'check', caption: `+ wale ka jod P, − wale ka N: P − N = ${target}, P + N = ${total} → P = ${p}. Ab: kitne subsets ka jod ${p}? (count wala knapsack). dp[0] = 1.`, panels: view() });
     nums.forEach((x) => {
       const hot: number[] = [];
       for (let s = p; s >= x; s--) if (dp[s - x]) (dp[s] += dp[s - x]), hot.push(s);

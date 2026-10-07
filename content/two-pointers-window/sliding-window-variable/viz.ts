@@ -14,7 +14,7 @@ export const elasticWindow = tracer<{ arr: number[]; limit: number }>({
     let l = 0;
     let sum = 0;
     let best = 0;
-    t.frame({ caption: `Kaam: sabse lambi window jiska sum ≤ ${limit}. Window rubber band jaisi hai — r se khinchti hai, l se sikudti hai.`, vars: { l, sum, best }, panels: [array(arr, { pointers: { l, r: 0 } })] });
+    t.frame({ caption: `Kaam: sabse lambi window jiska sum ≤ ${limit}. Window rubber band jaisi hai — r se khinchti hai, l se shrink hoti hai.`, vars: { l, sum, best }, panels: [array(arr, { pointers: { l, r: 0 } })] });
     for (let r = 0; r < arr.length; r++) {
       sum += arr[r];
       t.frame({ caption: `r aage: ${arr[r]} andar, sum = ${sum}.${sum > limit ? ` ${sum} > ${limit} — zyada ho gaya!` : ''}`, vars: { l, r, sum, best }, legend: LEGEND, panels: [array(arr, { tones: { [r]: 'new' }, pointers: { l, r }, ranges: win(l, r, `sum = ${sum}`, sum > limit ? 'error' : 'active') })] });
@@ -28,7 +28,7 @@ export const elasticWindow = tracer<{ arr: number[]; limit: number }>({
       if (better) best = len;
       t.frame({ caption: better ? `Window valid, length ${len} → naya best!` : `Window valid, length ${len} (best ${best} hi hai).`, vars: { l, r, sum, best }, panels: [array(arr, { pointers: { l, r }, ranges: win(l, r, `len ${len}`, better ? 'found' : 'active') })] });
     }
-    t.frame({ caption: `Answer: ${best}. Dekha? l aur r dono SIRF aage gaye — dono max n kadam → O(n), chahe beech mein while loop ho.`, vars: { best }, panels: [array(arr)] });
+    t.frame({ caption: `Answer: ${best}. Dekha? l aur r dono SIRF aage gaye — dono max n step → O(n), chahe beech mein while loop ho.`, vars: { best }, panels: [array(arr)] });
     return String(best);
   },
 });
@@ -49,7 +49,7 @@ export const minLenTrace = tracer<{ nums: number[]; target: number }>({
       sum += nums[r];
       t.frame({ line: 'expand', caption: `${nums[r]} andar → sum = ${sum}.${sum < target ? ` Abhi ${target} se kam — aur failao.` : ''}`, vars: { l, r, sum, best: b() }, legend: LEGEND, panels: [array(nums, { tones: { [r]: 'new' }, pointers: { l, r }, ranges: win(l, r, `sum = ${sum}`) })] });
       while (sum >= target) {
-        t.frame({ line: 'check', caption: `sum ${sum} ≥ ${target} → window valid! Ab l se sikod ke dekho — shayad aur chhoti valid window mile.`, vars: { l, r, sum, best: b() }, panels: [array(nums, { pointers: { l, r }, ranges: win(l, r, `sum = ${sum}`, 'found') })] });
+        t.frame({ line: 'check', caption: `sum ${sum} ≥ ${target} → window valid! Ab l se shrink kar ke dekho — shayad aur chhoti valid window mile.`, vars: { l, r, sum, best: b() }, panels: [array(nums, { pointers: { l, r }, ranges: win(l, r, `sum = ${sum}`, 'found') })] });
         const len = r - l + 1;
         const better = len < best;
         if (better) best = len;
@@ -78,12 +78,12 @@ export const onesTrace = tracer<{ nums: number[]; k: number }>({
     const zt = (): ToneMap => Object.fromEntries(nums.flatMap((v, i) => (v === 0 && i >= l ? [[i, 'compare' as Tone]] : [])));
     for (let r = 0; r < nums.length; r++) {
       if (nums[r] === 0) zeros++;
-      t.frame({ line: 'expand', caption: nums[r] === 0 ? `0 andar aaya → zeros = ${zeros}${zeros > k ? ` > k (${k}) — itne flip nahi kar sakte!` : ` (≤ ${k}, flip kar lenge).`}` : `1 andar aaya — koi kharcha nahi.`, vars: { l, r, zeros, best }, legend: { compare: 'zero', new: 'andar aaya' }, panels: [array(nums, { tones: { ...zt(), [r]: 'new' }, pointers: { l, r }, ranges: win(l, r, `zeros = ${zeros}`, zeros > k ? 'error' : 'active') })] });
+      t.frame({ line: 'expand', caption: nums[r] === 0 ? `0 andar aaya → zeros = ${zeros}${zeros > k ? ` > k (${k}) — itne flip nahi kar sakte!` : ` (≤ ${k}, flip kar lenge).`}` : `1 andar aaya — koi cost nahi.`, vars: { l, r, zeros, best }, legend: { compare: 'zero', new: 'andar aaya' }, panels: [array(nums, { tones: { ...zt(), [r]: 'new' }, pointers: { l, r }, ranges: win(l, r, `zeros = ${zeros}`, zeros > k ? 'error' : 'active') })] });
       while (zeros > k) {
         const out = nums[l];
         if (out === 0) zeros--;
         l++;
-        t.frame({ line: 'shrink', caption: out === 0 ? `0 bahar gaya → zeros = ${zeros}.${zeros > k ? ' Abhi bhi zyada.' : ' Ab theek.'}` : `1 bahar gaya — zeros wahi (${zeros}), aur sikodo.`, vars: { l, r, zeros, best }, legend: { compare: 'zero', error: 'bahar gaya' }, panels: [array(nums, { tones: { ...zt(), [l - 1]: 'error' }, pointers: { l, r }, ranges: win(l, r, `zeros = ${zeros}`, zeros > k ? 'error' : 'active') })] });
+        t.frame({ line: 'shrink', caption: out === 0 ? `0 bahar gaya → zeros = ${zeros}.${zeros > k ? ' Abhi bhi zyada.' : ' Ab theek.'}` : `1 bahar gaya — zeros wahi (${zeros}), aur shrink karo.`, vars: { l, r, zeros, best }, legend: { compare: 'zero', error: 'bahar gaya' }, panels: [array(nums, { tones: { ...zt(), [l - 1]: 'error' }, pointers: { l, r }, ranges: win(l, r, `zeros = ${zeros}`, zeros > k ? 'error' : 'active') })] });
       }
       const len = r - l + 1;
       const better = len > best;
@@ -144,7 +144,7 @@ export const minWindowTrace = tracer<{ s: string; t: string }>({
     });
     const bestStr = () => (bestLen === Infinity ? '–' : `"${s.slice(bestL, bestL + bestLen)}"`);
     const legend = { compare: 'abhi kam', done: 'poora', new: 'andar aaya', error: 'bahar gaya' };
-    t.frame({ line: 'init', caption: `t = "${pat}" — need mein har char ki ginti. missing = ${missing}: itne chars abhi window mein chahiye.`, vars: { missing }, legend, panels: [array(c), needPanel()] });
+    t.frame({ line: 'init', caption: `t = "${pat}" — need mein har char ki count. missing = ${missing}: itne chars abhi window mein chahiye.`, vars: { missing }, legend, panels: [array(c), needPanel()] });
     for (let r = 0; r < c.length; r++) {
       const ch = c[r];
       const useful = (need[ch] ?? 0) > 0;
@@ -158,7 +158,7 @@ export const minWindowTrace = tracer<{ s: string; t: string }>({
           bestLen = len;
           bestL = l;
         }
-        t.frame({ line: 'update', caption: `missing = 0 → "${c.slice(l, r + 1).join('')}" mein sab mil gaye! ${better ? `Length ${len} → naya best.` : `Length ${len}, best chhota hai.`} Ab l se sikod ke dekho.`, vars: { l, r, missing, best: bestStr() }, legend, panels: [array(c, { pointers: { l, r }, ranges: win(l, r, `len ${len}`, 'found') }), needPanel()] });
+        t.frame({ line: 'update', caption: `missing = 0 → "${c.slice(l, r + 1).join('')}" mein sab mil gaye! ${better ? `Length ${len} → naya best.` : `Length ${len}, best chhota hai.`} Ab l se shrink kar ke dekho.`, vars: { l, r, missing, best: bestStr() }, legend, panels: [array(c, { pointers: { l, r }, ranges: win(l, r, `len ${len}`, 'found') }), needPanel()] });
         const out = c[l];
         if (out in need) need[out]++;
         const broke = (need[out] ?? 0) > 0;

@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // DSU: har group ka ek leader (root). find = leader kaun? union = do groups jodo
+    // DSU: har group ka ek leader (root). find = leader kaun? union = 2 groups jodo
     static class DSU {
         int[] parent, size;
 
@@ -23,7 +23,7 @@ class Main {
             int ra = find(a); //@roots
             int rb = find(b);
             if (ra == rb) return false; // pehle se ek hi group //@same
-            if (size[ra] < size[rb]) { // bada group leader rahe - ped chhota (kam gehra) rehta hai
+            if (size[ra] < size[rb]) { // bada group leader rahe - tree chhota (kam deep) rehta hai
                 int t = ra;
                 ra = rb;
                 rb = t;

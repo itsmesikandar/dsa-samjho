@@ -1,5 +1,5 @@
 class Main {
-    // Lagatar k numbers ka sabse bada sum. Brute force O(n*k); sliding window O(n).
+    // Continuous k numbers ka sabse bada sum. Brute force O(n*k); sliding window O(n).
     static int maxWindowSum(int[] arr, int k) {
         int window = 0;
         for (int i = 0; i < k; i++) window += arr[i]; // pehli window ka sum //@first

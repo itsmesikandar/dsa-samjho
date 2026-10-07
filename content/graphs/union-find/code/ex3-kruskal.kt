@@ -1,6 +1,6 @@
 import kotlin.math.abs
 
-// Kruskal: saari edges sasti se mehngi; jo do ALAG groups jode wahi lo. n - 1 edges = sab jude
+// Kruskal: saari edges sasti se mehngi; jo 2 ALAG groups jode wahi lo. n - 1 edges = sab jude
 fun find(parent: IntArray, x: Int): Int {
     if (parent[x] != x) parent[x] = find(parent, parent[x])
     return parent[x]
@@ -8,7 +8,7 @@ fun find(parent: IntArray, x: Int): Int {
 
 fun minCostConnectPoints(points: Array<IntArray>): Int {
     val n = points.size
-    val edges = mutableListOf<IntArray>() // (cost, i, j) - har jodi ek edge
+    val edges = mutableListOf<IntArray>() // (cost, i, j) - har pair ek edge
     for (i in 0 until n) {
         for (j in i + 1 until n) {
             val cost = abs(points[i][0] - points[j][0]) + abs(points[i][1] - points[j][1])

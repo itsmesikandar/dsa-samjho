@@ -1,13 +1,13 @@
-// Bottom-up merge sort: recursion nahi. Pehle 1-1 size ke tukde jodo, phir 2-2, phir 4-4 ...
+// Bottom-up merge sort: recursion nahi. Pehle 1-1 size ke pieces jodo, phir 2-2, phir 4-4 ...
 fun mergeSortBottomUp(a: IntArray) {
     val n = a.size
     val tmp = IntArray(n)
     var width = 1
     while (width < n) {
         var l = 0
-        while (l < n - width) { // right wala tukda ho tabhi merge
+        while (l < n - width) { // right wala piece ho tabhi merge
             val mid = l + width - 1
-            val r = minOf(l + 2 * width - 1, n - 1) // aakhri tukda chhota ho sakta hai
+            val r = minOf(l + 2 * width - 1, n - 1) // aakhri piece chhota ho sakta hai
             merge(a, l, mid, r, tmp)
             l += 2 * width
         }

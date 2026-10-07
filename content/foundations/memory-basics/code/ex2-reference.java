@@ -9,7 +9,7 @@ class Main {
 
         int[] c = a.clone(); // ab ASLI nayi copy (naya heap block) //@copy
         c[c.length - 1] = 50; // sirf c badla //@write2
-        System.out.println(Arrays.toString(a)); // a pe koi asar nahi
+        System.out.println(Arrays.toString(a)); // a pe koi effect nahi
         System.out.println(Arrays.toString(c));
     }
 }

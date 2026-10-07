@@ -1,4 +1,4 @@
-// Reverse Polish Notation: operator apne do numbers ke BAAD aata hai. "2 1 + 3 *" = (2 + 1) * 3
+// Reverse Polish Notation: operator apne 2 numbers ke BAAD aata hai. "2 1 + 3 *" = (2 + 1) * 3
 fun evalRPN(tokens: Array<String>): Int {
     val st = ArrayDeque<Int>()
     for (t in tokens) {

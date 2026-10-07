@@ -2,7 +2,7 @@ meta:
   id: unbounded-knapsack
   chapter: dp
   title: Unbounded Knapsack
-  subtitle: Har item kitni bhi baar — loop seedha, aur ginti mein loops ka order
+  subtitle: Har item kitni bhi baar — loop seedha, aur count mein loops ka order
   level: intermediate
   minutes: 50
   prereqs: [knapsack-01, dp-1d]
@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Unbounded knapsack** = 0/1 knapsack jaisa, par har item **kitni bhi baar** le sakte ho. Dukaan ka stock khatam nahi hota — sikke, tukde, kadam.
+    **Unbounded knapsack** = 0/1 knapsack jaisa, par har item **kitni bhi baar** le sakte ho. Dukaan ka stock khatam nahi hota — coins, pieces, step.
 
     Template:
     1. **State:** `dp[i][w]` = pehle `i` items (har ek unlimited), jagah `w` → best.
@@ -20,21 +20,21 @@ what:
        - **lo** → `dp[i][w − wt] + value` — **isi row** se, kyunki lene ke baad bhi item `i` available hai.
     3. **1D:** `for (w in wt..W)` — capacity loop **seedha**.
 
-    Teen roop, ek hi dhaancha:
+    3 form, ek hi structure:
 
     | Sawaal | dp mein kya | Update |
     |---|---|---|
-    | Max kamai (rod cutting) | max value | `max(dp[w], dp[w − wt] + v)` |
-    | Kam se kam items (coin change) | min ginti | `min(dp[a], dp[a − c] + 1)` |
-    | Kitne tareeke (coin change II) | ginti | `dp[a] += dp[a − c]` |
+    | Max profit (rod cutting) | max value | `max(dp[w], dp[w − wt] + v)` |
+    | Kam se kam items (coin change) | min count | `min(dp[a], dp[a − c] + 1)` |
+    | Kitne tareeke (coin change II) | count | `dp[a] += dp[a − c]` |
 
     > [!yaad]
-    > **0/1 = ulta loop, unbounded = seedha loop.** Aur ginti mein loops ka **order** bhi matter karta hai: items bahar = combinations, target bahar = sequences (order wale).
+    > **0/1 = ulta loop, unbounded = seedha loop.** Aur count mein loops ka **order** bhi matter karta hai: items bahar = combinations, target bahar = sequences (order wale).
   analogy: |
     **Darzi aur kapde ka thaan:**
-    Darzi ke paas 5 metre ka thaan. Rumaal (1 m) ₹2 mein bikta, dupatta (2 m) ₹5, kurta piece (3 m) ₹9 — aur har cheez ki demand unlimited. Kaise kaate ki kamai max ho?
+    Darzi ke paas 5 metre ka thaan. Rumaal (1 m) ₹2 mein bikta, dupatta (2 m) ₹5, kurta piece (3 m) ₹9 — aur har cheez ki demand unlimited. Kaise kaate ki profit max ho?
 
-    Pehla tukda kuch bhi kaato — bacha thaan phir wahi sawaal hai, bas chhota. Aur dupatta ek baar kaat liya to doosra bhi kaat sakte ho — isliye "lo" ke baad bhi wahi item list available rehti hai. Yahi unbounded knapsack hai.
+    Pehla piece kuch bhi kaato — bacha thaan phir wahi sawaal hai, bas chhota. Aur dupatta ek baar kaat liya to doosra bhi kaat sakte ho — isliye "lo" ke baad bhi wahi item list available rehti hai. Yahi unbounded knapsack hai.
 
 # 2. Kyun chahiye?
 why:
@@ -48,33 +48,33 @@ why:
     | 50 | 2,04,226 |
     | 100 | ~19 crore |
 
-    Coin change mein har amount par har sikka try karo to recursion bhi exponential. Par alag sawaal sirf `amount + 1` hain → DP **O(amount × coins)**.
+    Coin change mein har amount par har coin try karo to recursion bhi exponential. Par alag sawaal sirf `amount + 1` hain → DP **O(amount × coins)**.
 
-    **Greedy kyun nahi?** "Sabse bada sikka pehle":
-    - Sikke `[1, 3, 4]`, amount 6.
-    - Greedy: 4 + 1 + 1 = **3 sikke**.
-    - Sahi: 3 + 3 = **2 sikke**.
+    **Greedy kyun nahi?** "Sabse bada coin pehle":
+    - Coins `[1, 3, 4]`, amount 6.
+    - Greedy: 4 + 1 + 1 = **3 coins**.
+    - Sahi: 3 + 3 = **2 coins**.
 
     > [!socho]
     > Phir dukaandar roz greedy se change deta hai aur galat kyun nahi hota?
     >
-    > Indian notes / sikke (₹1, 2, 5, 10, 20, 50, 100…) ek **canonical** system hai — aise chune gaye ki greedy hamesha best de. Har sikka set aisa nahi hota. Interview mein koi bhi coins diye hon → DP.
+    > Indian notes / coins (₹1, 2, 5, 10, 20, 50, 100…) ek **canonical** system hai — aise choose kiye gaye ki greedy hamesha best de. Har coin set aisa nahi hota. Interview mein koi bhi coins diye hon → DP.
 
 # 3. Visual intro
 visual:
   body: |
-    Rod 5 ki, har length ka daam diya hai. Pehle **har tareeka** gin ke dekho — kaun sa best? Phir dhyaan do: koi bhi pehla tukda kaato, bachi hui rod wahi sawaal hai chhote size par. Daam badal ke dekho best tareeka kaise badalta hai.
+    Rod 5 ki, har length ka price diya hai. Pehle **har tareeka** count kar ke dekho — kaun sa best? Phir dhyaan do: koi bhi pehla piece kaato, bachi hui rod wahi sawaal hai chhote size par. Price badal ke dekho best tareeka kaise badalta hai.
   viz: { tracer: rodCutsTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **Rod cutting:** rod length `n`, `price[k − 1]` = length `k` ke tukde ka daam. Ye unbounded knapsack hai: item = tukde ki length `i` (weight `i`, value `price[i − 1]`), capacity = rod `n`.
+    **Rod cutting:** rod length `n`, `price[k − 1]` = length `k` ke pieces ka price. Ye unbounded knapsack hai: item = pieces ki length `i` (weight `i`, value `price[i − 1]`), capacity = rod `n`.
 
     Table `(n + 1) × (n + 1)`:
-    - Row 0 (koi tukda allowed nahi) → 0.
+    - Row 0 (koi piece allowed nahi) → 0.
     - Cell `(i, w)`:
-      - `i > w` → tukda rod se lamba → upar wala.
+      - `i > w` → piece rod se lamba → upar wala.
       - warna `max(dp[i−1][w], dp[i][w − i] + price[i − 1])` — **isi row** ka `w − i`, kyunki bachi rod mein length `i` phir kaat sakte.
     - Jawab `dp[n][n]`.
 
@@ -90,23 +90,23 @@ operations:
   - op: "Brute force (har combination)"
     time: "Exponential"
     space: "O(W)"
-    why: "Har kadam par har item try; recursion W gehra."
+    why: "Har step par har item try; recursion W deep."
   - op: "Unbounded knapsack (2D)"
     time: "O(n · W)"
     space: "O(n · W)"
-    why: "Har cell upar wala aur isi row ka baayein wala — O(1)."
+    why: "Har cell upar wala aur isi row ka left wala — O(1)."
   - op: "Unbounded knapsack (1D, seedha loop)"
     time: "O(n · W)"
     space: "O(W)"
     why: "Ek array kaafi; seedha chalne se item dobara jud sakta."
-  - op: "Coin change (kam se kam sikke)"
+  - op: "Coin change (kam se kam coins)"
     time: "O(amount · coins)"
     space: "O(amount)"
-    why: "Har amount par har sikka 'aakhri' maan ke min."
+    why: "Har amount par har coin 'aakhri' maan ke min."
   - op: "Coin change II (combinations)"
     time: "O(amount · coins)"
     space: "O(amount)"
-    why: "Sikke bahar, amount andar; har cell ek jod."
+    why: "Coins bahar, amount andar; har cell ek jod."
   - op: "Combination sum IV (sequences)"
     time: "O(target · n)"
     space: "O(target)"
@@ -121,27 +121,27 @@ code:
 
       Doosra order bhi chalta hai: **capacity bahar, items andar** ("jagah `w` par aakhri item kaunsa?"). Max / min ke liye dono order same jawab dete hain — best ek hi hai, kis order mein mila farak nahi padta.
 
-      **Ginti** mein order se jawab badal jaata hai — examples 2 aur 3 dekho.
+      **Count** mein order se jawab badal jaata hai — examples 2 aur 3 dekho.
 
 # 7. Examples
 examples:
   - id: coin-change
     level: easy
-    title: Kam se kam sikke (Coin Change)
+    title: Kam se kam coins (Coin Change)
     source: { name: Coin Change, platform: LeetCode, url: "https://leetcode.com/problems/coin-change/" }
     problem: |
-      Alag alag value ke sikke, har ek kitne bhi. Exact `amount` banane ke liye **kam se kam** kitne sikke? Na ban sake to `-1`.
+      Alag alag value ke coins, har ek kitne bhi. Exact `amount` banane ke liye **kam se kam** kitne coins? Na ban sake to `-1`.
 
       Example: `coins = [1, 3, 4]`, `amount = 6` → **2** (3 + 3)
     intuition: |
-      Greedy (4 + 1 + 1 = 3 sikke) galat — upar dekha.
+      Greedy (4 + 1 + 1 = 3 coins) galat — upar dekha.
 
-      **State:** `dp[a]` = amount `a` ke kam se kam sikke.
-      **Socho aakhri sikka kaunsa:** sikka `c` aakhri hai to pehle `a − c` banaya → `dp[a − c] + 1`. Saare sikkon ka **min**.
+      **State:** `dp[a]` = amount `a` ke kam se kam coins.
+      **Socho aakhri coin kaunsa:** coin `c` aakhri hai to pehle `a − c` banaya → `dp[a − c] + 1`. Saare coins ka **min**.
 
       - `dp[0] = 0` (kuch nahi dena).
       - Baaki shuru mein ∞ ("abhi nahi ban sakta").
-      - ∞ ke liye `amount + 1` lo — itne sikke kabhi nahi lagenge, aur `+ 1` par overflow bhi nahi.
+      - ∞ ke liye `amount + 1` lo — itne coins kabhi nahi lagenge, aur `+ 1` par overflow bhi nahi.
       - Aakhir mein `dp[amount]` abhi bhi `> amount` → `-1`.
 
       > [!galti]
@@ -161,32 +161,32 @@ examples:
     complexity:
       time: "O(amount · coins)"
       space: "O(amount)"
-      why: "Har amount par har sikka ek baar try."
+      why: "Har amount par har coin ek baar try."
 
   - id: coin-change-ii
     level: medium
     title: Kitne combinations? (Coin Change II)
     source: { name: Coin Change II, platform: LeetCode, url: "https://leetcode.com/problems/coin-change-ii/" }
     problem: |
-      Sikke (har ek kitne bhi) aur `amount`. Kitne alag **combinations** se amount banta hai? `1 + 2` aur `2 + 1` ek hi combination hai.
+      Coins (har ek kitne bhi) aur `amount`. Kitne alag **combinations** se amount banta hai? `1 + 2` aur `2 + 1` ek hi combination hai.
 
       Example: `coins = [1, 2, 3]`, `amount = 4` → **4** (1+1+1+1, 1+1+2, 2+2, 1+3)
     intuition: |
-      Ginti wala knapsack: `dp[0] = 1`, phir `dp[a] += dp[a − c]`. Asli sawaal: **kaunsa loop bahar?**
+      Count wala knapsack: `dp[0] = 1`, phir `dp[a] += dp[a − c]`. Asli sawaal: **kaunsa loop bahar?**
 
-      **Sikke bahar, amount andar** (sahi):
-      - Pehle sirf sikka 1 se saare amounts. Phir sikka 2 bhi milao. Phir 3.
-      - Jab sikke `c` ka loop chal raha, `dp` mein sirf pehle wale sikkon (aur `c`) ke combinations hain. Matlab har combination ek hi **fixed order** mein banta (pehle saare 1, phir 2, phir 3) — ek hi baar gina jaata.
+      **Coins bahar, amount andar** (sahi):
+      - Pehle sirf coin 1 se saare amounts. Phir coin 2 bhi milao. Phir 3.
+      - Jab coins `c` ka loop chal raha, `dp` mein sirf pehle wale coins (aur `c`) ke combinations hain. Matlab har combination ek hi **fixed order** mein banta (pehle saare 1, phir 2, phir 3) — ek hi baar gina jaata.
 
-      **Amount bahar, sikke andar** (galat yahan):
-      - Har amount par har sikka "aakhri" ban sakta → `1 + 2` aur `2 + 1` dono gine → 4 ki jagah **7**.
+      **Amount bahar, coins andar** (galat yahan):
+      - Har amount par har coin "aakhri" ban sakta → `1 + 2` aur `2 + 1` dono count kiye → 4 ki jagah **7**.
 
-      Amount loop **seedha** — ek sikka kitni bhi baar.
+      Amount loop **seedha** — ek coin kitni bhi baar.
 
       > [!galti]
-      > Coin Change (min) wala loop order copy kar liya — min ke liye dono order theek the, ginti mein nahi.
+      > Coin Change (min) wala loop order copy kar liya — min ke liye dono order theek the, count mein nahi.
     dryRun: |
-      | Sikka | dp[0..4] |
+      | Coin | dp[0..4] |
       |---|---|
       | shuru | 1 0 0 0 0 |
       | 1 | 1 1 1 1 1 |
@@ -197,25 +197,25 @@ examples:
     complexity:
       time: "O(amount · coins)"
       space: "O(amount)"
-      why: "Har sikke par amount array ek baar."
+      why: "Har coins par amount array ek baar."
 
   - id: combination-sum-iv
     level: tricky
-    title: Order wali ginti (Combination Sum IV)
+    title: Order wali count (Combination Sum IV)
     source: { name: Combination Sum IV, platform: LeetCode, url: "https://leetcode.com/problems/combination-sum-iv/" }
     problem: |
       Alag alag positive numbers aur `target`. Har number kitni bhi baar. Kitni **sequences** ka jod `target` hai? Yahan order matter karta hai — `1 + 3` aur `3 + 1` alag.
 
       Example: `nums = [1, 3, 4]`, `target = 5` → **6** (1+1+1+1+1, 1+1+3, 1+3+1, 3+1+1, 1+4, 4+1)
     intuition: |
-      Naam "combination" hai, par ginni hain **sequences**. Ye asal mein climbing stairs hai: `target` seedhiyan, ek kadam mein `nums` mein se koi bhi chhalang.
+      Naam "combination" hai, par count karni hain **sequences**. Ye asal mein climbing stairs hai: `target` stairs, ek step mein `nums` mein se koi bhi jump.
 
       **State:** `dp[s]` = kitni sequences ka jod `s`.
       **Aakhri number kaunsa?** `x` aakhri hai to pehle `s − x` tak koi bhi sequence → `dp[s] = Σ dp[s − x]`.
 
       Ab **target bahar, numbers andar** — har `s` par saare numbers "aakhri" ban sakte, alag aakhri number = alag sequence. Coin Change II se bilkul ulta order, aur yahi chahiye.
 
-      Same `[1, 3, 4]`, target 5 par sikke wala order sirf **3** deta (1+1+1+1+1, 1+1+3, 1+4).
+      Same `[1, 3, 4]`, target 5 par coins wala order sirf **3** deta (1+1+1+1+1, 1+1+3, 1+4).
 
       > [!galti]
       > Beech ke `dp[s]` bahut bade ho sakte (final fit ho tab bhi). Java / Kotlin mein `Int` chupchaap wrap hota hai aur final jawab phir bhi sahi aata. C++ mein signed overflow undefined — `unsigned` lo.
@@ -238,10 +238,10 @@ examples:
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Items unlimited (sikke, tukde, kadam) aur ek limit / target."
+    - "Items unlimited (coins, pieces, step) aur ek limit / target."
     - "Kam se kam items se exact jod — coin change, perfect squares."
-    - "Kaat ke / tod ke max kamai ya product — rod cutting, integer break."
-    - "Tareeke ginna — combinations (items bahar) ya sequences (target bahar)."
+    - "Kaat ke / tod ke max profit ya product — rod cutting, integer break."
+    - "Tareeke count karna — combinations (items bahar) ya sequences (target bahar)."
   avoid:
     - "Har item ek hi baar → 0/1 knapsack (ulta loop)."
     - "Har item k baar tak (bounded) → k copies / binary splitting karke 0/1."
@@ -251,20 +251,20 @@ when:
     - keyword: "fewest coins / minimum number of items to make sum"
       think: "dp[a] = min(dp[a − c] + 1), ∞ = amount + 1."
     - keyword: "number of combinations that make up amount"
-      think: "Sikke bahar, amount andar (seedha)."
+      think: "Coins bahar, amount andar (seedha)."
     - keyword: "different sequences counted as different"
       think: "Target bahar, numbers andar — climbing stairs jaisa."
     - keyword: "cut rod / break integer, maximize"
-      think: "dp[len] = max(pehla tukda + baaki ka best)."
+      think: "dp[len] = max(pehla piece + baaki ka best)."
     - keyword: "perfect squares / powers, any number of times"
       think: "Items = squares ≤ n, min count."
 
 # 9. Real-world
 realWorld:
   - where: "ATM / vending machine"
-    how: "Kam se kam notes / sikke mein change — currency canonical na ho to DP."
-  - where: "Steel, kapda, lakdi cutting"
-    how: "Bade piece se orders ke tukde kaise kaatein ki waste kam, kamai zyada (cutting stock)."
+    how: "Kam se kam notes / coins mein change — currency canonical na ho to DP."
+  - where: "Steel, kapda, wood cutting"
+    how: "Bade piece se orders ke pieces kaise kaatein ki waste kam, profit zyada (cutting stock)."
   - where: "Daak ticket / stamps"
     how: "Diye gaye stamp values se exact postage, kam se kam stamps."
   - where: "Pack sizes"
@@ -280,36 +280,36 @@ mistakes:
       `for (w in W downTo wt)` — har item ek hi baar juda.
     right: |
       `for (w in wt..W)` — seedha, item kitni bhi baar.
-  - title: "Ginti mein loops ka galat order"
+  - title: "Count mein loops ka galat order"
     type: logic
     wrong: |
-      Combinations chahiye the, par amount bahar aur sikke andar — `1 + 2` aur `2 + 1` dono gine.
+      Combinations chahiye the, par amount bahar aur coins andar — `1 + 2` aur `2 + 1` dono count kiye.
     right: |
-      Combinations: sikke bahar. Sequences (order matter): target bahar.
+      Combinations: coins bahar. Sequences (order matter): target bahar.
   - title: "∞ = Int.MAX_VALUE"
     type: overflow
     wrong: |
       `dp[a - c] + 1` overflow → negative → min mein jeet gaya.
     right: |
       ∞ = `amount + 1`, ya `+ 1` se pehle check `dp[a - c] != INF`.
-  - title: "-1 lautana bhool gaye"
+  - title: "-1 return karna bhool gaye"
     type: logic
     wrong: |
-      Seedha `return dp[amount]` — na banne par `amount + 1` lauta diya.
+      Seedha `return dp[amount]` — na banne par `amount + 1` return kar diya.
     right: |
       `if (dp[amount] > amount) -1 else dp[amount]`.
   - title: "Galat base"
     type: logic
     wrong: |
-      Ginti mein `dp[0] = 0` → sab 0. Ya min mein `dp[0] = ∞`.
+      Count mein `dp[0] = 0` → sab 0. Ya min mein `dp[0] = ∞`.
     right: |
-      Ginti: `dp[0] = 1` (khaali tareeka). Min: `dp[0] = 0`.
+      Count: `dp[0] = 1` (khaali tareeka). Min: `dp[0] = 0`.
   - title: "amount = 0"
     type: empty
     wrong: |
-      Alag `if` mein `-1` ya 0 tareeke lauta diye.
+      Alag `if` mein `-1` ya 0 tareeke return kar diye.
     right: |
-      0 sikke chahiye, aur 1 tareeka (kuch na do). `dp[0]` pehle se sahi — alag `if` ki zaroorat nahi.
+      0 coins chahiye, aur 1 tareeka (kuch na do). `dp[0]` pehle se sahi — alag `if` ki zaroorat nahi.
 
 # 11. Interview corner
 interview:
@@ -319,33 +319,33 @@ interview:
         0/1: lo = dp[i-1][w-wt] + v (upar wali row), 1D mein ulta loop. Unbounded: lo = dp[i][w-wt] + v (isi row), 1D mein seedha loop.
     - q: "Coin change mein greedy kab sahi hai?"
       a: |
-        Canonical coin systems (₹1, 2, 5, 10…) par. Har set par nahi: [1, 3, 4], amount 6 → greedy 3 sikke, sahi 2. Coins input mein diye hon to DP.
+        Canonical coin systems (₹1, 2, 5, 10…) par. Har set par nahi: [1, 3, 4], amount 6 → greedy 3 coins, sahi 2. Coins input mein diye hon to DP.
     - q: "Coin Change II mein loops ka order kyun matter karta?"
       a: |
-        Sikke bahar → har combination ek fixed sikka order mein banta, ek baar gina. Amount bahar → har amount par koi bhi sikka aakhri, to 1+2 aur 2+1 alag gine jaate (permutations).
+        Coins bahar → har combination ek fixed coin order mein banta, ek baar gina. Amount bahar → har amount par koi bhi coin aakhri, to 1+2 aur 2+1 alag count kiye jaate (permutations).
     - q: "Combination Sum IV aur Coin Change II mein farak?"
       a: |
-        Same recurrence dp[s] += dp[s - x], sirf loop order ulta. IV order wali sequences ginta (target bahar), II combinations (sikke bahar).
+        Same recurrence dp[s] += dp[s - x], sirf loop order ulta. IV order wali sequences count karta (target bahar), II combinations (coins bahar).
     - q: "∞ kya rakhoge coin change mein?"
       a: |
-        amount + 1 — itne sikke kabhi nahi lagenge (sabse chhota sikka 1 bhi ho to amount kaafi). Int.MAX_VALUE + 1 overflow.
-    - q: "Kaunse sikke use hue, wo bhi chahiye?"
+        amount + 1 — itne coins kabhi nahi lagenge (sabse chhota coin 1 bhi ho to amount kaafi). Int.MAX_VALUE + 1 overflow.
+    - q: "Kaunse coins use hue, wo bhi chahiye?"
       a: |
-        Har a par jeetne wala sikka last[a] save karo. amount se peeche: a -= last[a] jab tak 0.
+        Har a par jeetne wala coin last[a] save karo. amount se peeche: a -= last[a] jab tak 0.
     - q: "Coin change BFS se bhi ho sakta?"
       a: |
-        Haan: amount = node, har sikka = edge. 0 se amount tak BFS levels = sikke. Same O(amount · coins), pehli baar pahunchte hi ruk sakte.
+        Haan: amount = node, har coin = edge. 0 se amount tak BFS levels = coins. Same O(amount · coins), pehli baar pahunchte hi ruk sakte.
     - q: "Perfect Squares ko knapsack kaise dekhoge?"
       a: |
         Items = saare squares ≤ n (unlimited), min count = coin change. O(n·√n). (Maths: jawab hamesha ≤ 4 — Lagrange.)
-    - q: "Har sikka sirf k baar tak (bounded)?"
+    - q: "Har coin sirf k baar tak (bounded)?"
       followUp: true
       a: |
-        Binary splitting: k ko 1, 2, 4, … tukdon mein todo, har tukda ek 0/1 item. O(W · Σ log k). Ya har item par k tak inner loop.
+        Binary splitting: k ko 1, 2, 4, … pieces mein todo, har piece ek 0/1 item. O(W · Σ log k). Ya har item par k tak inner loop.
     - q: "Amount 10^9 — sirf 'ban sakta ya nahi'?"
       followUp: true
       a: |
-        Sabse chhota sikka m. Remainders 0..m-1 par Dijkstra: dist[r] = sabse chhota bana amount jiska remainder r. X banega agar dist[X mod m] <= X.
+        Sabse chhota coin m. Remainders 0..m-1 par Dijkstra: dist[r] = sabse chhota bana amount jiska remainder r. X banega agar dist[X mod m] <= X.
   mayAsk:
     - "Perfect Squares."
     - "Integer Break."
@@ -371,14 +371,14 @@ practice:
     num: 343
     url: "https://leetcode.com/problems/integer-break/"
     level: easy
-    pattern: Rod cutting, jod ki jagah guna
-    hint: "dp[i] = max(j * (i - j), j * dp[i - j]) — kam se kam do tukde zaroori, isliye 'na todo' option dhyaan se. (LeetCode par medium.)"
+    pattern: Rod cutting, jod ki jagah multiply
+    hint: "dp[i] = max(j * (i - j), j * dp[i - j]) — kam se kam do pieces zaroori, isliye 'na todo' option dhyaan se. (LeetCode par medium.)"
   - name: Perfect Squares
     platform: LeetCode
     num: 279
     url: "https://leetcode.com/problems/perfect-squares/"
     level: medium
-    pattern: Coin change, sikke = squares
+    pattern: Coin change, coins = squares
     hint: "dp[a] = min(dp[a - k*k] + 1). ∞ = n + 1."
   - name: Minimum Cost For Tickets
     platform: LeetCode
@@ -386,13 +386,13 @@ practice:
     url: "https://leetcode.com/problems/minimum-cost-for-tickets/"
     level: medium
     pattern: Pass kitni bhi baar
-    hint: "dp[d] = safar wale din min(dp[d-1] + c1, dp[d-7] + c7, dp[d-30] + c30); baaki din dp[d-1]. Index 0 se neeche = 0."
+    hint: "dp[d] = trip wale din min(dp[d-1] + c1, dp[d-7] + c7, dp[d-30] + c30); baaki din dp[d-1]. Index 0 se neeche = 0."
   - name: Count Ways To Build Good Strings
     platform: LeetCode
     num: 2466
     url: "https://leetcode.com/problems/count-ways-to-build-good-strings/"
     level: medium
-    pattern: Sequences ginna (target bahar)
+    pattern: Sequences count karna (target bahar)
     hint: "dp[len] = dp[len - zero] + dp[len - one], dp[0] = 1. Jawab low se high tak ka jod, mod 10^9 + 7."
   - name: Form Largest Integer With Digits That Add up to Target
     platform: LeetCode
@@ -406,7 +406,7 @@ practice:
     num: 2585
     url: "https://leetcode.com/problems/number-of-ways-to-earn-points/"
     level: hard
-    pattern: Bounded knapsack ginti
+    pattern: Bounded knapsack count
     hint: "Har type k baar tak. Type bahar, s ulta, andar 1..count tak: dp[s] += dp[s - j*marks]. Mod."
 
 # 13. Quick revision
@@ -414,17 +414,17 @@ revision:
   summary:
     - "Unbounded: har item kitni bhi baar; lo = ISI row se: dp[i][w − wt] + value."
     - "1D: capacity loop SEEDHA (wt se W). 0/1 = ulta, unbounded = seedha."
-    - "Teen roop: max (rod cutting), min + ∞ (coin change), ginti dp[0] = 1 (coin change II)."
-    - "Ginti mein order: items bahar = combinations, target bahar = sequences (permutations)."
+    - "3 form: max (rod cutting), min + ∞ (coin change), count dp[0] = 1 (coin change II)."
+    - "Count mein order: items bahar = combinations, target bahar = sequences (permutations)."
     - "Greedy sirf canonical coins (₹1, 2, 5, 10…) par; diye gaye coins par DP."
   cheatsheet: |
     ```kotlin
     // unbounded max (1D, SEEDHA)
     for (i in wt.indices) for (w in wt[i]..W) dp[w] = maxOf(dp[w], dp[w - wt[i]] + v[i])
-    // coin change: kam se kam sikke
+    // coin change: kam se kam coins
     val dp = IntArray(amt + 1) { amt + 1 }; dp[0] = 0
     for (a in 1..amt) for (c in coins) if (c <= a) dp[a] = minOf(dp[a], dp[a - c] + 1)
-    // combinations (sikke BAHAR)
+    // combinations (coins BAHAR)
     for (c in coins) for (a in c..amt) ways[a] += ways[a - c]
     // sequences (target BAHAR)
     for (s in 1..t) for (x in nums) if (x <= s) seq[s] += seq[s - x]
@@ -434,11 +434,11 @@ revision:
       options: ["Kuch nahi", "Unbounded mein capacity loop seedha (wt se W)", "Unbounded mein 2D zaroori", "Unbounded mein dp[0] = 1"]
       answer: 1
       explain: "Seedha chalne se dp[w − wt] mein ye item pehle se ho sakta — dobara judta hai."
-    - q: "Sikke [1, 5, 6], amount 10. Kam se kam sikke?"
+    - q: "Coins [1, 5, 6], amount 10. Kam se kam coins?"
       options: ["5", "2", "3", "4"]
       answer: 1
-      explain: "5 + 5. Greedy 6 + 1 + 1 + 1 + 1 = 5 sikke deta."
-    - q: "Sikke [1, 2], amount 3. Coin Change II (combinations)?"
+      explain: "5 + 5. Greedy 6 + 1 + 1 + 1 + 1 = 5 coins deta."
+    - q: "Coins [1, 2], amount 3. Coin Change II (combinations)?"
       options: ["2", "3", "1", "4"]
       answer: 0
       explain: "1+1+1 aur 1+2. (2+1 alag nahi gina jaata.)"
@@ -457,7 +457,7 @@ connections:
     - id: knapsack-01
       why: "Same table; bas 'lo' isi row se aur 1D loop seedha."
     - id: dp-intro
-      why: "Climbing stairs = Combination Sum IV, chhalang {1, 2}."
+      why: "Climbing stairs = Combination Sum IV, jump {1, 2}."
     - id: greedy-basics
       why: "Coin change greedy kab chalta (canonical coins) aur kab fail."
   usedLater:

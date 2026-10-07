@@ -15,7 +15,7 @@ fun lca(node: TreeNode?, p: Int, q: Int): TreeNode? {
 fun depth(node: TreeNode?, x: Int, d: Int): Int {
     if (node == null) return -1
     if (node.value == x) return d //@found
-    val l = depth(node.left, x, d + 1) // bachchon mein ek kadam aur //@down
+    val l = depth(node.left, x, d + 1) // bachchon mein ek step aur //@down
     return if (l != -1) l else depth(node.right, x, d + 1)
 }
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 class Main {
-    // Two heaps ka general roop: left mein hamesha "rank" sabse chhote. Left ka top = p-th percentile
+    // Two heaps ka general form: left mein hamesha "rank" sabse chhote. Left ka top = p-th percentile
     static List<Integer> runningPercentile(int[] nums, int p) {
         PriorityQueue<Integer> left = new PriorityQueue<>(Collections.reverseOrder());
         PriorityQueue<Integer> right = new PriorityQueue<>();

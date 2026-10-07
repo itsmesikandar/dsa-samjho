@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 
 class Main {
-    // 3 rang: 0 = white (anchhua), 1 = gray (abhi DFS ke raste par), 2 = black (poora ho gaya)
+    // 3 color: 0 = white (untouched), 1 = gray (abhi DFS ke raste par), 2 = black (poora ho gaya)
     static boolean dfs(int u, List<List<Integer>> adj, int[] color, List<Integer> post) { // true = cycle
         color[u] = 1; // gray: u abhi raste par hai //@gray
         for (int v : adj.get(u)) {

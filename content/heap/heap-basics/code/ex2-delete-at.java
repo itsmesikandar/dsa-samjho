@@ -7,7 +7,7 @@ class Main {
     static void deleteAt(List<Integer> a, int k) {
         int last = a.remove(a.size() - 1); // aakhri jagah khaali karo - shape complete rahe //@last
         if (k == a.size()) return; // aakhri hi hatana tha //@end
-        a.set(k, last); // chhed ko aakhri item se bharo //@put
+        a.set(k, last); // hole ko aakhri item se bharo //@put
         int i = k;
         while (i > 0 && a.get((i - 1) / 2) > a.get(i)) { // parent se chhota - upar chadho //@up
             Collections.swap(a, i, (i - 1) / 2);
@@ -25,7 +25,7 @@ class Main {
 
     public static void main(String[] args) {
         List<Integer> h = new ArrayList<>(List.of(1, 10, 2, 11, 12, 3, 4));
-        deleteAt(h, 4); // 12 hatao; aakhri 4 wahan aakar UPAR jaata hai
+        deleteAt(h, 4); // 12 hatao; aakhri 4 wahan shape UPAR jaata hai
         System.out.println(h);
         deleteAt(h, 0); // root hatao = pop; aakhri 3 NEECHE jaata hai
         System.out.println(h);

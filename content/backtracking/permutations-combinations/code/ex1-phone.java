@@ -13,7 +13,7 @@ class Main {
     }
 
     static void bt(String digits, int i, StringBuilder sb, List<String> res) {
-        if (i == digits.length()) { // har digit ka ek letter chun liya //@found
+        if (i == digits.length()) { // har digit ka ek letter choose kar liya //@found
             res.add(sb.toString());
             return;
         }

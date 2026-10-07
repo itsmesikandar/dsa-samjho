@@ -11,57 +11,57 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Interview ke kuch greedy sawaal baar baar aate hain. Sabka dhaancha ek: **ek pass**, ek-do **running numbers**, aur ek **observation** jo saare combinations dekhne se bacha leta hai.
+    Interview ke kuch greedy sawaal baar baar aate hain. Sabka structure ek: **ek pass**, ek-do **running numbers**, aur ek **observation** jo saare combinations dekhne se bacha leta hai.
 
     | Sawaal | Running number | Observation |
     |---|---|---|
-    | Stock — ek sauda | `minPrice` | aaj bechna ho to sabse saste pichhle din khareedo |
-    | Stock — kai saude | `profit` | bada sauda = chhote rozana saudon ka jod |
+    | Stock — ek transaction | `minPrice` | aaj bechna ho to sabse saste pichhle din khareedo |
+    | Stock — kai transactions | `profit` | bada transaction = chhote rozana transactions ka jod |
     | Gas Station | `tank`, `total` | tank minus → beech ke saare start bekaar |
-    | Partition Labels | `end` | tukda letter ke aakhri index tak jaana hi padega |
+    | Partition Labels | `end` | piece letter ke aakhri index tak jaana hi padega |
 
     Har jagah O(n²) / O(2ⁿ) ka seedha tareeka hai — observation use **O(n)** bana deta hai.
 
     > [!yaad]
     > Greedy observation dhoondhne ka sawaal: "kya main kisi poore group of choices ko ek saath **rad** kar sakta hoon?" (Gas station: ek fail = poora range rad.)
   analogy: |
-    **Sabzi mandi ka vyapari:**
-    Har subah daam dekhta hai. "Ek hi baar khareed-bech" → hafte ka sabse sasta din yaad rakhta hai, har din sochta hai aaj bechun to kitna. "Roz kar sakta hoon" → bas jis din kal se daam badha, kal ka maal aaj bech diya. Na koi table, na koi lamba hisaab — ek number dimaag mein.
+    **Sabzi mandi ka trader:**
+    Har subah price dekhta hai. "Ek hi baar khareed-bech" → hafte ka sabse sasta din yaad rakhta hai, har din sochta hai aaj bechun to kitna. "Roz kar sakta hoon" → bas jis din kal se price badha, kal ka maal aaj bech diya. Na koi table, na koi lamba hisaab — ek number dimaag mein.
 
 # 2. Kyun chahiye?
 why:
   body: |
     Ye sawaal **pattern** sikhaate hain jo aage kaam aate hain:
     - **Running min / max** (stock I) → Kadane, sliding window, "best pair i < j".
-    - **Chhote faislon ka jod = bada faisla** (stock II) → telescoping sum.
+    - **Chhote decisions ka jod = bada decision** (stock II) → telescoping sum.
     - **Fail ho to aage se shuru** (gas station) → Kadane jaisa reset.
-    - **Pehle aakhri occurrence nikaalo, phir sweep** (partition labels) → interval merge ka roop.
+    - **Pehle aakhri occurrence nikaalo, phir sweep** (partition labels) → interval merge ka form.
 
     | Sawaal | Seedha | Greedy |
     |---|---|---|
-    | Stock I | O(n²) har jodi | O(n) |
+    | Stock I | O(n²) har pair | O(n) |
     | Gas Station | O(n²) har start | O(n) |
     | Partition Labels | O(n²) har kaat check | O(n) |
 
     > [!socho]
     > Gas station mein start s se i tak pahunche aur i par tank minus hua. s aur i ke beech koi station k start kyun nahi ho sakta?
     >
-    > s se k tak pahunchte waqt tank ≥ 0 tha (warna pehle hi reset hota). Yaani k par hum "kuch bache petrol ke saath" aaye. k se khaali tank shuru karna to aur bura — wo bhi i tak nahi pahunchega.
+    > s se k tak pahunchte time tank ≥ 0 tha (warna pehle hi reset hota). Matlab k par hum "kuch bache petrol ke saath" aaye. k se khaali tank shuru karna to aur bura — wo bhi i tak nahi pahunchega.
 
 # 3. Visual intro
 visual:
   body: |
-    Share ke daam ka chart. Har lagaataar chadhaai hari ho jaati hai aur uska munafa judta hai. Daam badal ke dekho — girawat waale din kabhi kuch nahi jodte.
+    Share ke price ka chart. Har continuous chadhaai green ho jaati hai aur uska profit judta hai. Price badal ke dekho — drop waale din kabhi kuch nahi jodte.
   viz: { tracer: climbTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **Best Time to Buy and Sell Stock (ek sauda):**
+    **Best Time to Buy and Sell Stock (ek transaction):**
     1. `minPrice` = ab tak ka sabse sasta din.
-    2. Har din: aaj ka daam `minPrice` se kam → naya `minPrice`. Warna `best = max(best, aaj - minPrice)`.
+    2. Har din: aaj ka price `minPrice` se kam → naya `minPrice`. Warna `best = max(best, aaj - minPrice)`.
 
-    Kyun sahi: agar aaj bechna hai to sabse achha khareed din = **pichhle** dinon mein sabse sasta. Har bech-din ke liye wo ek number kaafi — saari jodiyan dekhne ki zaroorat nahi.
+    Kyun sahi: agar aaj bechna hai to sabse achha khareed din = **pichhle** dinon mein sabse sasta. Har bech-din ke liye wo ek number kaafi — saari pairs dekhne ki zaroorat nahi.
 
     > [!galti]
     > `max(prices) - min(prices)` — par min baad mein aa sakta hai (bechne ke baad khareed nahi sakte). `[5, 1]` par jawab 0 hai, 4 nahi.
@@ -85,7 +85,7 @@ operations:
   - op: "Partition Labels"
     time: O(n)
     space: O(1)
-    why: "Do pass; last[] sirf 26 letters."
+    why: "2 pass; last[] sirf 26 letters."
   - op: "Two City Scheduling"
     time: "O(n log n)"
     space: O(1)
@@ -96,35 +96,35 @@ code:
   - title: Two City Scheduling — farak se sort
     file: two-city
     note: |
-      2n log interview ke liye; n ko city A, n ko city B bhejna hai. Kharcha kam se kam.
+      2n log interview ke liye; n ko city A, n ko city B bhejna hai. Cost kam se kam.
 
       Har insaan ke liye socho: A bhejne se kitna bachta hai = `a − b` (jitna chhota, utna A ke liye achha). Is farak se sort; pehle n → A, baaki → B.
 
-      Saboot (exchange): agar koi insaan x A mein hai aur y B mein, par `a_y − b_y < a_x − b_x`, to dono ki jagah badlo — kul kharcha kam ya barabar.
+      Proof (exchange): agar koi insaan x A mein hai aur y B mein, par `a_y − b_y < a_x − b_x`, to dono ki jagah badlo — total cost kam ya barabar.
 
-      Sort ki key sahi chunna hi poora greedy hai. (LeetCode 1029.)
+      Sort ki key sahi choose karna hi poora greedy hai. (LeetCode 1029.)
 
 # 7. Examples
 examples:
   - id: stock-ii
     level: easy
-    title: Kai baar khareed-bech — max munafa (Stock II)
+    title: Kai baar khareed-bech — max profit (Stock II)
     source: { name: Best Time to Buy and Sell Stock II, platform: LeetCode, url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/" }
     problem: |
-      Har din ka share daam diya hai. Jitni baar chaho khareedo-becho, par ek waqt mein ek hi share pakad sakte ho (naya khareedne se pehle becho). Max munafa?
+      Har din ka share price diya hai. Jitni baar chaho khareedo-becho, par ek time mein ek hi share pakad sakte ho (naya khareedne se pehle becho). Max profit?
 
       Example: `[7, 2, 5, 1, 6, 4]` → **8** (2 → 5: +3, 1 → 6: +5)
     intuition: |
-      Chadhaai `a → b → c` (badhte daam) ka munafa `c − a` = `(b − a) + (c − b)`. Yaani bada sauda = rozana ke chhote saudon ka jod.
+      Chadhaai `a → b → c` (badhte price) ka profit `c − a` = `(b − a) + (c − b)`. Matlab bada transaction = rozana ke chhote transactions ka jod.
 
-      To bas: har din `aaj > kal` → `profit += aaj − kal`. Girawat → kuch nahi.
+      To bas: har din `aaj > kal` → `profit += aaj − kal`. Drop → kuch nahi.
 
       Kabhi bhi "kal khareeda aaj becha" — ek din mein dono kaam (becho aur wapas khareedo) chalta hai, isliye ye hamesha valid.
 
       > [!galti]
       > Peaks aur valleys dhoondhne ka lamba code likha — chalta hai, par har positive farak jodna wahi jawab ek line mein deta hai.
     dryRun: |
-      | Din | Daam | Kal se farak | Munafa |
+      | Din | Price | Kal se farak | Profit |
       |---|---|---|---|
       | 1 | 2 | −5 | 0 |
       | 2 | 5 | +3 | 3 |
@@ -140,15 +140,15 @@ examples:
 
   - id: gas-station
     level: medium
-    title: Gol sadak par kahan se shuru karein? (Gas Station)
+    title: Gol road par kahan se shuru karein? (Gas Station)
     source: { name: Gas Station, platform: LeetCode, url: "https://leetcode.com/problems/gas-station/" }
     problem: |
-      Gol sadak par n petrol pump. Pump i par `gas[i]` petrol milta hai, i se agle tak jaane mein `cost[i]` lagta hai. Khaali tank ke saath kis pump se shuru karein ki ek poora chakkar ho jaaye? Na ho sake to -1. (Jawab ho to unique hota hai.)
+      Gol road par n petrol pump. Pump i par `gas[i]` petrol milta hai, i se agle tak jaane mein `cost[i]` lagta hai. Khaali tank ke saath kis pump se shuru karein ki ek poora chakkar ho jaaye? Na ho sake to -1. (Jawab ho to unique hota hai.)
 
       Example: gas `[3, 1, 2, 5, 4]`, cost `[4, 2, 3, 1, 3]` → **3**
     intuition: |
-      Do observations:
-      1. **Kul** `gas − cost` < 0 → koi start nahi chalega. ≥ 0 → koi na koi start zaroor chalega.
+      2 observations:
+      1. **Total** `gas − cost` < 0 → koi start nahi chalega. ≥ 0 → koi na koi start zaroor chalega.
       2. Start s se chale, i par tank minus hua → s se i tak koi bhi start nahi ho sakta (beech ke station par hum bache petrol ke saath pahunche the; khaali shuru karna aur bura). To **start = i + 1**, tank = 0.
 
       Ek pass mein dono: `total` aur `tank`. Aakhir mein total ≥ 0 → aakhri start hi jawab.
@@ -158,7 +158,7 @@ examples:
       > [!galti]
       > Har station se poora chakkar simulate kiya → O(n²). n = 10⁵ par TLE.
     dryRun: |
-      | i | gas − cost | tank | Faisla |
+      | i | gas − cost | tank | Decision |
       |---|---|---|---|
       | 0 | −1 | −1 | reset, start = 1 |
       | 1 | −1 | −1 | reset, start = 2 |
@@ -174,22 +174,22 @@ examples:
 
   - id: partition-labels
     level: tricky
-    title: String ke zyada se zyada tukde (Partition Labels)
+    title: String ke zyada se zyada pieces (Partition Labels)
     source: { name: Partition Labels, platform: LeetCode, url: "https://leetcode.com/problems/partition-labels/" }
     problem: |
-      String ko zyada se zyada tukdon mein kaato ki har letter **sirf ek** tukde mein aaye. Tukdon ke size lautao (order mein).
+      String ko zyada se zyada pieces mein kaato ki har letter **sirf ek** pieces mein aaye. Pieces ke size return karo (order mein).
 
       Example: `"abacdcdeffe"` → **[3, 4, 4]** ("aba", "cdcd", "effe")
     intuition: |
-      Letter `x` agar tukde mein hai to tukda kam se kam x ke **aakhri index** tak jaana chahiye.
+      Letter `x` agar pieces mein hai to piece kam se kam x ke **aakhri index** tak jaana chahiye.
 
       1. Pehla pass: `last[letter]` = aakhri index.
-      2. Doosra pass: `end = max(end, last[s[i]])`. Jab `i == end` → is tukde ke saare letters khatam → **kaato** (jitna jaldi kaato utne zyada tukde).
+      2. Doosra pass: `end = max(end, last[s[i]])`. Jab `i == end` → is pieces ke saare letters khatam → **kaato** (jitna jaldi kaato utne zyada pieces).
 
-      Ye asal mein intervals hain: har letter ka `[pehla, aakhri]` interval, aur takraane wale merge — par end ka running max kaafi, sort ki zaroorat nahi (letters pehle se order mein).
+      Ye asal mein intervals hain: har letter ka `[pehla, aakhri]` interval, aur collide hone wale merge — par end ka running max kaafi, sort ki zaroorat nahi (letters pehle se order mein).
 
       > [!galti]
-      > Letter dobara dikhte hi kaat diya, ya end sirf pehle letter ka liya — beech wale letters ka aakhri baad mein ho sakta hai (`"abab"` ek hi tukda).
+      > Letter dobara dikhte hi kaat diya, ya end sirf pehle letter ka liya — beech wale letters ka aakhri baad mein ho sakta hai (`"abab"` ek hi piece).
     dryRun: |
       | i | letter | last | end | Kaato? |
       |---|---|---|---|---|
@@ -203,19 +203,19 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Do pass; last[] 26 size ka."
+      why: "2 pass; last[] 26 size ka."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "'Best pair i < j' (khareed pehle, bech baad) — running min / max."
-    - "Kai baar ki ijaazat aur koi fee nahi — har chhota fayda jodo."
-    - "Gol (circular) safar / balance kabhi minus nahi hona chahiye — total + reset."
-    - "Letters / items ka 'pehla aur aakhri' — running end se tukde."
+    - "Kai baar ki permission aur koi fee nahi — har chhota fayda jodo."
+    - "Gol (circular) trip / balance kabhi minus nahi hona chahiye — total + reset."
+    - "Letters / items ka 'pehla aur aakhri' — running end se pieces."
   avoid:
-    - "Stock mein transaction fee, cooldown ya 'max k saude' → DP (state machine)."
-    - "Tukde kaatne mein koi cost / weight → DP."
-    - "Pehle sab data nahi milta aur peeche mudna padta hai — greedy saboot dobara socho."
+    - "Stock mein transaction fee, cooldown ya 'max k transactions' → DP (state machine)."
+    - "Pieces kaatne mein koi cost / weight → DP."
+    - "Pehle sab data nahi milta aur peeche mudna padta hai — greedy proof dobara socho."
   signals:
     - keyword: "buy once sell once / max difference i < j"
       think: "Running min, ek pass."
@@ -229,15 +229,15 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Trading backtests"
-    how: "Pichhle data par 'sabse achha ek sauda' — running min wala O(n) scan."
+    how: "Pichhle data par 'sabse achha ek transaction' — running min wala O(n) scan."
   - where: "Delivery route ka fuel plan"
     how: "Gol route par kahan se shuru karein ki gaadi kabhi khaali na ho — gas station logic."
   - where: "Batch processing / file chunking"
-    how: "Records ko tukdon mein baanto ki ek user ke saare records ek hi tukde mein — partition labels."
+    how: "Records ko pieces mein divide karo ki ek user ke saare records ek hi pieces mein — partition labels."
   - where: "Company budgeting"
     how: "Mahine ka cash flow; kis mahine se shuru karein ki balance kabhi minus na ho — prefix + reset."
   - where: "Recruiting logistics"
-    how: "Do shehron mein interview — farak se sort karke sasta bantwara (two city)."
+    how: "Do cities mein interview — farak se sort karke sasta division (two city)."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -250,7 +250,7 @@ mistakes:
   - title: "Gas station mein total check bhool gaye"
     type: logic
     wrong: |
-      Sirf start lauta diya — kul petrol kam ho tab bhi koi index aa gaya.
+      Sirf start return kar diya — total petrol kam ho tab bhi koi index aa gaya.
     right: |
       `if (total < 0) return -1`.
   - title: "Gas station: start = n"
@@ -264,29 +264,29 @@ mistakes:
     wrong: |
       `prices[1]` padha bina check — n = 1 par crash.
     right: |
-      Loop `1 until n` khud hi khaali; n = 1 → munafa 0.
+      Loop `1 until n` khud hi khaali; n = 1 → profit 0.
   - title: "Partition mein last[] ki jagah pehla index"
     type: logic
     wrong: |
-      `first[letter]` se end bana diya — tukda chhota kat gaya, letter do tukdon mein.
+      `first[letter]` se end bana diya — piece chhota kat gaya, letter do pieces mein.
     right: |
       Aakhri index; `end = max(end, last[s[i]])`.
   - title: "Two city: sort key galat"
     type: logic
     wrong: |
-      Sirf `a` (city A ka kharcha) se sort — farak ignore.
+      Sirf `a` (city A ka cost) se sort — farak ignore.
     right: |
-      `a − b` se sort; jitna chhota utna A ke liye behtar.
+      `a − b` se sort; jitna chhota utna A ke liye better.
 
 # 11. Interview corner
 interview:
   questions:
     - q: "Stock I aur Stock II mein farak, aur dono ka approach?"
       a: |
-        I: ek sauda — running min, best = max(aaj − min). II: unlimited — har positive farak jodo. Dono O(n), O(1).
+        I: ek transaction — running min, best = max(aaj − min). II: unlimited — har positive farak jodo. Dono O(n), O(1).
     - q: "Stock II ka greedy sahi kyun?"
       a: |
-        Kisi bhi sauda (a se b) ka munafa = beech ke rozana farak ka jod. Negative din chhodne se jod badhta hi hai. To saare positive farak = max.
+        Kisi bhi transaction (a se b) ka profit = beech ke rozana farak ka jod. Negative din chhodne se jod badhta hi hai. To saare positive farak = max.
     - q: "Gas Station mein 'start = i + 1' kyun?"
       a: |
         s se i tak har beech wale station par hum tank ≥ 0 ke saath pahunche the. Wahan se khaali shuru karna aur kam petrol = i ke aage nahi jaayega. To poora range rad.
@@ -301,15 +301,15 @@ interview:
         Greedy nahi chalta — DP states (hold / not hold / cooldown). Fee mein bhi DP (ya modified greedy).
     - q: "Jump Game / Gas Station / Kadane mein common kya hai?"
       a: |
-        Ek running value, aur "ye fail hua to pichhla sab rad, aage se shuru" ka niyam. O(n), O(1).
+        Ek running value, aur "ye fail hua to pichhla sab rad, aage se shuru" ka rule. O(n), O(1).
     - q: "Candy problem (ratings) ka greedy?"
       followUp: true
       a: |
-        Do pass: baayein se (bada rating → pichhle + 1), daayein se (max(apna, agle + 1)). Ek pass ek hi taraf ka niyam pakadta hai.
+        2 pass: left se (bada rating → pichhle + 1), right se (max(apna, agle + 1)). Ek pass ek hi taraf ka rule pakadta hai.
     - q: "Queue Reconstruction by Height?"
       followUp: true
       a: |
-        Lambe pehle (height desc, k asc) sort; har insaan ko index k par insert. Chhote baad mein aate hain, lambon ki ginti nahi badalte.
+        Lambe pehle (height desc, k asc) sort; har insaan ko index k par insert. Chhote baad mein aate hain, lambon ki count nahi badalte.
   mayAsk:
     - "Best Time to Buy and Sell Stock with Transaction Fee."
     - "Candy."
@@ -338,7 +338,7 @@ practice:
     url: "https://leetcode.com/problems/maximum-score-after-splitting-a-string/"
     level: easy
     pattern: Running counts
-    hint: "Pehle kul 1 gino. Har split point par baayein ke 0 aur daayein ke 1 running update. Dono tukde non-empty."
+    hint: "Pehle total 1 count karo. Har split point par left ke 0 aur right ke 1 running update. Dono pieces non-empty."
   - name: Two City Scheduling
     platform: LeetCode
     num: 1029
@@ -358,21 +358,21 @@ practice:
     num: 714
     url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/"
     level: medium
-    pattern: Do states (hold / free)
-    hint: "hold = max(hold, free − price), free = max(free, hold + price − fee). Greedy se DP ki taraf pehla kadam."
+    pattern: 2 states (hold / free)
+    hint: "hold = max(hold, free − price), free = max(free, hold + price − fee). Greedy se DP ki taraf pehla step."
   - name: Candy
     platform: LeetCode
     num: 135
     url: "https://leetcode.com/problems/candy/"
     level: hard
-    pattern: Do pass greedy
-    hint: "Baayein se aur daayein se — har baar sirf ek taraf ka niyam. Har bachche ka max lo."
+    pattern: 2 pass greedy
+    hint: "Left se aur right se — har baar sirf ek taraf ka rule. Har bachche ka max lo."
   - name: IPO
     platform: LeetCode
     num: 502
     url: "https://leetcode.com/problems/ipo/"
     level: hard
-    pattern: Greedy + do heaps
+    pattern: Greedy + 2 heaps
     hint: "Two heaps topic wala: afford hone wale mein sabse zyada profit — har round."
 
 # 13. Quick revision
@@ -396,11 +396,11 @@ revision:
     for (i in s.indices) { end = maxOf(end, last[s[i] - 'a']); if (i == end) { sizes.add(end - start + 1); start = i + 1 } }
     ```
   quiz:
-    - q: "Stock I: [5, 1]. Max munafa?"
+    - q: "Stock I: [5, 1]. Max profit?"
       options: ["4", "0", "-4", "1"]
       answer: 1
       explain: "Pehle khareed, baad mein bech — 5 par khareed ke 1 par bechna ghaata. Kuch na karo: 0."
-    - q: "Stock II: [1, 3, 2, 5]. Max munafa?"
+    - q: "Stock II: [1, 3, 2, 5]. Max profit?"
       options: ["4", "5", "3", "6"]
       answer: 1
       explain: "(3 − 1) + (5 − 2) = 5."
@@ -411,11 +411,11 @@ revision:
     - q: "Partition Labels 'abab' ka jawab?"
       options: ["[2, 2]", "[4]", "[1, 1, 1, 1]", "[3, 1]"]
       answer: 1
-      explain: "a ka aakhri 2, b ka aakhri 3 — poora ek tukda."
-    - q: "Gas station: kul (gas − cost) = −2. Jawab?"
+      explain: "a ka aakhri 2, b ka aakhri 3 — poora ek piece."
+    - q: "Gas station: total (gas − cost) = −2. Jawab?"
       options: ["0", "-1", "Aakhri reset ke baad wala", "n - 1"]
       answer: 1
-      explain: "Kul petrol kam — koi start poora chakkar nahi laga sakta."
+      explain: "Total petrol kam — koi start poora chakkar nahi laga sakta."
 
 # 14. Connections
 connections:
@@ -425,7 +425,7 @@ connections:
     - id: intervals
       why: "Partition labels = letters ke [pehla, aakhri] intervals ka merge."
     - id: greedy-basics
-      why: "Exchange argument aur counterexample — har greedy ka saboot."
+      why: "Exchange argument aur counterexample — har greedy ka proof."
   usedLater:
     - id: dp-1d
       how: "Stock with fee / cooldown / k transactions — greedy se aage, DP states."

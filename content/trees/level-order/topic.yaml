@@ -2,7 +2,7 @@ meta:
   id: level-order
   chapter: trees
   title: Level Order (BFS)
-  subtitle: Queue se tree ko level by level padho — upar se neeche, har level baayein se daayein
+  subtitle: Queue se tree ko level by level padho — upar se neeche, har level left se right
   level: intermediate
   minutes: 35
   prereqs: [binary-tree-basics, queue]
@@ -11,17 +11,17 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Level order** (BFS — Breadth First Search) = tree ko **level by level** padhna. Pehle root (level 0), phir uske bachche (level 1), phir unke bachche (level 2)… har level **baayein se daayein**.
+    **Level order** (BFS — Breadth First Search) = tree ko **level by level** padhna. Pehle root (level 0), phir uske bachche (level 1), phir unke bachche (level 2)… har level **left se right**.
 
     Tree `[3, 9, 20, #, #, 15, 7]` → `[[3], [9, 20], [15, 7]]`
 
     Iska tool hai **queue** (FIFO): jo pehle aaya wo pehle niklega. Node nikalo, uske bachche queue ke **peeche** lagao — wo apne level ke baaki nodes ke baad hi aayenge.
 
     > [!yaad]
-    > DFS = stack (ya recursion) → pehle **gehra**. BFS = queue → pehle **chauda** (saare paas wale).
+    > DFS = stack (ya recursion) → pehle **deep**. BFS = queue → pehle **wide** (saare paas wale).
   analogy: |
     **Shaadi ka family photo:**
-    Photographer pehle daada-daadi ko bulata hai (level 0), phir unke bachchon ko (level 1), phir poton ko (level 2). Har line mein log baayein se daayein khade hote hain.
+    Photographer pehle daada-daadi ko bulata hai (level 0), phir unke bachchon ko (level 1), phir poton ko (level 2). Har line mein log left se right khade hote hain.
 
     Bulane ki list ek line (queue) hai — jise bulaya uske bachchon ke naam list ke **aakhir** mein likh do.
 
@@ -34,7 +34,7 @@ why:
     - **Min depth** — sabse paas wali leaf. BFS pehli leaf par ruk jaata hai; DFS ko poora tree dekhna padta hai.
     - Zigzag, width, cousins (same level, alag parent).
 
-    Aur ye **graph BFS** ka chhota roop hai — shortest path (har edge ka weight same) yahi idea hai.
+    Aur ye **graph BFS** ka chhota form hai — shortest path (har edge ka weight same) yahi idea hai.
 
     > [!socho]
     > Recursion se level order ho sakta hai?
@@ -44,7 +44,7 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Har level ko alag rang. `L0`, `L1`… = root se kitne kadam door. Level order = inhe upar se neeche padhna.
+    Har level ko alag color. `L0`, `L1`… = root se kitne step door. Level order = inhe upar se neeche padhna.
   viz: { tracer: levelsIntro }
 
 # 4. Kaise kaam karta hai
@@ -56,7 +56,7 @@ how:
        - `size` baar: aage se nikalo, value level list mein, bachche (left phir right) peeche daalo.
        - Level list result mein jodo.
 
-    **Size pehle kyun note karte hain?** Loop ke beech naye bachche queue mein judte hain. Agar har baar `queue.size` dekhte to agle level ke nodes bhi is level mein ginte.
+    **Size pehle kyun note karte hain?** Loop ke beech naye bachche queue mein judte hain. Agar har baar `queue.size` dekhte to agle level ke nodes bhi is level mein count karte.
 
     > [!tip]
     > Level ki zaroorat nahi (bas order chahiye)? Size wala andar ka loop hata do — simple `while (q.isNotEmpty())` kaafi hai.
@@ -76,7 +76,7 @@ operations:
   - op: "Min depth (BFS)"
     time: "O(n) worst"
     space: O(w)
-    why: "Pehli leaf par ruk jaata hai — aksar bahut jaldi."
+    why: "Pehli leaf par ruk jaata hai — often bahut jaldi."
   - op: "Right / left side view"
     time: O(n)
     space: O(w)
@@ -129,14 +129,14 @@ examples:
     complexity:
       time: O(n)
       space: O(w)
-      why: "Worst case (leaf sabse neeche) saare nodes; aksar jaldi ruk jaata hai."
+      why: "Worst case (leaf sabse neeche) saare nodes; often jaldi ruk jaata hai."
 
   - id: right-view
     level: medium
-    title: Daayein se dekho to kya dikhega?
+    title: Right se dekho to kya dikhega?
     source: { name: Binary Tree Right Side View, platform: LeetCode, url: "https://leetcode.com/problems/binary-tree-right-side-view/" }
     problem: |
-      Tree ke **daayein** khade ho kar dekho. Har level ka sirf ek node dikhega. Upar se neeche woh values batao.
+      Tree ke **right** khade ho kar dekho. Har level ka sirf ek node dikhega. Upar se neeche woh values batao.
 
       Example: `[1, 2, 3, #, 5, #, 4, 6]` → `[1, 3, 4, 6]`
     intuition: |
@@ -162,21 +162,21 @@ examples:
 
   - id: max-width
     level: tricky
-    title: Tree ki sabse chaudi level
+    title: Tree ki sabse wide level
     source: { name: Maximum Width of Binary Tree, platform: LeetCode, url: "https://leetcode.com/problems/maximum-width-of-binary-tree/" }
     problem: |
-      Level ki **width** = sabse baayein aur sabse daayein node ke beech ki saari jagahen — **beech ke khaali (null) bhi gine jaate hain**. Sabse badi width batao.
+      Level ki **width** = sabse left aur sabse right node ke beech ki saari jagahen — **beech ke khaali (null) bhi count kiye jaate hain**. Sabse badi width batao.
 
       Example: `[1, 3, 2, 5, #, #, 9, 6, #, 7]` → **7** (level 3: 6 aur 7 ke beech 5 khaali)
     intuition: |
-      Nodes ginna kaafi nahi — khaali jagah bhi chahiye. Har node ko **position number** do, jaise complete tree mein (array wala heap):
+      Nodes count karna kaafi nahi — khaali jagah bhi chahiye. Har node ko **position number** do, jaise complete tree mein (array wala heap):
       - Root = 0.
       - Left bachcha = `2i`, right = `2i + 1`.
 
       Width = `aakhri position − pehli position + 1`.
 
       > [!galti]
-      > Positions har level par double hote hain → 30-40 level gehre tree mein `Long` bhi overflow. Fix: har level par `first` ghatao, taaki level 0 se shuru ho.
+      > Positions har level par double hote hain → 30-40 level deep tree mein `Long` bhi overflow. Fix: har level par `first` ghatao, taaki level 0 se shuru ho.
     dryRun: |
       | Level | Nodes (position) | Width |
       |---|---|---|
@@ -201,7 +201,7 @@ when:
     - "Same level ke nodes ko jodna (next pointer, cousins)."
   avoid:
     - "Root se leaf ka raasta / path sum → DFS (raasta stack mein rehta hai)."
-    - "Bahut chauda tree aur memory tight → DFS (O(h) vs O(w))."
+    - "Bahut wide tree aur memory tight → DFS (O(h) vs O(w))."
     - "Subtree se jawab chahiye (height, diameter) → postorder DFS."
   signals:
     - keyword: "level / row / each depth"
@@ -222,7 +222,7 @@ realWorld:
   - where: "Org chart"
     how: "CEO, phir uske direct reports, phir unke — level wise report."
   - where: "Game AI"
-    how: "Chess / puzzle mein pehle 1 chaal wale positions, phir 2 chaal — sabse kam chaal wala hal."
+    how: "Chess / puzzle mein pehle 1 move wale positions, phir 2 move — sabse kam move wala hal."
   - where: "UI / Android view tree"
     how: "Accessibility ya layout inspector — screen ke views ko layer by layer dikhana."
 
@@ -231,7 +231,7 @@ mistakes:
   - title: "Level size loop ke andar padha"
     type: logic
     wrong: |
-      `for (k in 0 until q.size)` — loop chalte waqt `q.size` badhta hai → agle level ke nodes is level mein.
+      `for (k in 0 until q.size)` — loop chalte time `q.size` badhta hai → agle level ke nodes is level mein.
     right: |
       Loop se pehle `val size = q.size`, phir `repeat(size)`.
   - title: "Null bachche queue mein daale"
@@ -249,9 +249,9 @@ mistakes:
   - title: "Width mein position overflow"
     type: overflow
     wrong: |
-      Positions `2i` bina normalize → gehre tree mein numbers 2^depth tak.
+      Positions `2i` bina normalize → deep tree mein numbers 2^depth tak.
     right: |
-      Har level par `i - first` — har level 0 se gino.
+      Har level par `i - first` — har level 0 se count karo.
   - title: "Stack se BFS"
     type: logic
     wrong: |
@@ -264,18 +264,18 @@ interview:
   questions:
     - q: "BFS vs DFS tree mein — kab kya?"
       a: |
-        BFS (queue): level wale sawaal, min depth, paas wala pehle. DFS (recursion/stack): raasta, subtree se jawab, kam memory jab tree chauda ho.
+        BFS (queue): level wale sawaal, min depth, paas wala pehle. DFS (recursion/stack): raasta, subtree se jawab, kam memory jab tree wide ho.
     - q: "Level order ki space?"
       a: |
-        O(w) — w = sabse chauda level. Complete tree mein aakhri level ~n/2, to O(n). Skewed tree mein O(1).
+        O(w) — w = sabse wide level. Complete tree mein aakhri level ~n/2, to O(n). Skewed tree mein O(1).
     - q: "size pehle kyun save karte ho?"
       a: |
         Loop ke beech bachche judte hain; save kiya size = sirf is level ke nodes.
     - q: "Zigzag level order?"
       followUp: true
       a: |
-        Wahi BFS; ek flag har level par palto. Flag on ho to level list ulti (ya `addFirst` deque mein).
-    - q: "Har node ka 'next' pointer apne level ke daayein node par — O(1) space?"
+        Wahi BFS; ek flag har level par flip karo. Flag on ho to level list ulti (ya `addFirst` deque mein).
+    - q: "Har node ka 'next' pointer apne level ke right node par — O(1) space?"
       followUp: true
       a: |
         Upar wala level already jud chuka hai — uski chain par chalo aur neeche wale level ke bachche jodo. Queue nahi chahiye.
@@ -287,7 +287,7 @@ interview:
         Normal BFS, aakhir mein result reverse (ya har level `addFirst`).
     - q: "Tree serialize kaise karoge?"
       a: |
-        BFS mein values likho, null ke liye `#`. Wapas banate waqt queue mein parent, string se do-do values left/right.
+        BFS mein values likho, null ke liye `#`. Wapas banate time queue mein parent, string se 2-2 values left/right.
   mayAsk:
     - "Binary Tree Zigzag Level Order."
     - "Populating Next Right Pointers."
@@ -330,7 +330,7 @@ practice:
     url: "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/"
     level: medium
     pattern: BFS + har level flag
-    hint: "Flag har level par palto; flag on ho to level list reverse karke jodo."
+    hint: "Flag har level par flip karo; flag on ho to level list reverse karke jodo."
   - name: Populating Next Right Pointers in Each Node
     platform: LeetCode
     num: 116
@@ -356,11 +356,11 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "BFS = queue (FIFO); level by level, baayein se daayein."
+    - "BFS = queue (FIFO); level by level, left se right."
     - "size = q.size loop se PEHLE — yahi ek level."
     - "Min depth: pehli leaf par return."
     - "Right view: level ka aakhri; left view: pehla."
-    - "Width: position 2i / 2i + 1, har level normalize. Space O(w) — chauda tree mein bhaari."
+    - "Width: position 2i / 2i + 1, har level normalize. Space O(w) — wide tree mein bhaari."
   cheatsheet: |
     ```kotlin
     val q = ArrayDeque<TreeNode>(); q.addLast(root)
@@ -383,14 +383,14 @@ revision:
       options: ["[[1], [2, 3], [4, 5]]", "[[1], [2, 3], [4], [5]]", "[1, 2, 4, 3, 5]", "[[1], [2], [3], [4, 5]]"]
       answer: 0
       explain: "4 aur 5 dono level 2 par (2 ka left, 3 ka right)."
-    - q: "Min depth mein BFS DFS se behtar kyun?"
+    - q: "Min depth mein BFS DFS se better kyun?"
       options: ["Kam code", "Pehli leaf par ruk sakte hain", "Kam memory hamesha", "Sorted output"]
       answer: 1
       explain: "BFS level by level — pehli leaf = sabse paas. DFS ko sab dekhna padta hai."
     - q: "Complete binary tree (n nodes) mein BFS queue max kitni badi?"
       options: ["O(1)", "O(log n)", "~n/2", "n²"]
       answer: 2
-      explain: "Aakhri level mein lagbhag aadhe nodes."
+      explain: "Aakhri level mein approx aadhe nodes."
     - q: "Width problem mein position i ke left bachche ka position?"
       options: ["i + 1", "2i", "2i + 1", "i / 2"]
       answer: 1

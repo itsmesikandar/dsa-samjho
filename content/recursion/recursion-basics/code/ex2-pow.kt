@@ -12,7 +12,7 @@ fun myPow(x: Double, n: Int): Double {
 // x^n = (x^(n/2))^2, odd n par ek x aur. Har call n aadha: O(log n)
 fun fastPow(x: Double, n: Long): Double {
     if (n == 0L) return 1.0 // x^0 = 1 //@base
-    val half = fastPow(x, n / 2) // SIRF ek call - result do baar use karo //@call
+    val half = fastPow(x, n / 2) // SIRF ek call - result 2 baar use karo //@call
     return if (n % 2 == 0L) half * half else half * half * x //@ret
 }
 

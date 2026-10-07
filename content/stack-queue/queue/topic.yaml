@@ -2,7 +2,7 @@ meta:
   id: queue
   chapter: stack-queue
   title: Queue
-  subtitle: Jo pehle aaya, wo pehle jaayega (FIFO) — line, baari, stream aur BFS ki neev
+  subtitle: Jo pehle aaya, wo pehle jaayega (FIFO) — line, baari, stream aur BFS ki foundation
   level: beginner
   minutes: 30
   prereqs: [stack]
@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Queue** = line. Do kinare:
+    **Queue** = line. Do edge:
     - **Peeche (rear)** se jodo — `enqueue` / `offer` / `addLast`
     - **Aage (front)** se nikaalo — `dequeue` / `poll` / `removeFirst`
     - Aage wala dekho — `peek` / `first()`
@@ -30,7 +30,7 @@ what:
     ```
 
     > [!yaad]
-    > Array ki `removeAt(0)` O(n) hai (sab khiskte hain). Isliye queue ke liye **ArrayDeque** (circular array andar) ya linked list — dono kinaron par O(1).
+    > Array ki `removeAt(0)` O(n) hai (sab shift hote hain). Isliye queue ke liye **ArrayDeque** (circular array andar) ya linked list — dono edges par O(1).
   analogy: |
     **Railway ticket counter ki line.** Naya aadmi peeche lagta hai, ticket aage wale ko milta hai. Koi beech mein ghus nahi sakta (warna jhagda!).
 
@@ -48,7 +48,7 @@ why:
     > [!socho]
     > `ArrayList` ko queue banao: `add` peeche, `removeAt(0)` aage se. 10⁵ items par kya hoga?
     >
-    > Har `removeAt(0)` baaki sab ko ek jagah khiskata hai → O(n). 10⁵ dequeues = 10¹⁰/2 kaam → TLE. ArrayDeque mein head index aage badhta hai bas → O(1).
+    > Har `removeAt(0)` baaki sab ko ek jagah shift karta hai → O(n). 10⁵ dequeues = 10¹⁰/2 kaam → TLE. ArrayDeque mein head index aage badhta hai bas → O(1).
 
 # 3. Visual intro
 visual:
@@ -59,14 +59,14 @@ visual:
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **Do stacks se queue** (interview favourite):
+    **2 stacks se queue** (interview favourite):
     - `push` → `inbox` stack par.
     - `pop / peek` → `outbox` se. Agar `outbox` **khaali** hai, tab hi `inbox` ke saare items pop karke `outbox` mein push karo — order ulta ho jaata hai, sabse purana top par aa jaata hai.
 
-    Ek stack = ulta, do baar ulta = **seedha** (FIFO).
+    Ek stack = ulta, 2 baar ulta = **seedha** (FIFO).
 
     > [!tip]
-    > "Outbox khaali ho **tabhi** shift" — yahi amortized O(1) ka raaz. Har item zindagi mein max ek baar inbox → outbox jaata hai. Har pop par shift karoge to O(n) per op.
+    > "Outbox khaali ho **tabhi** shift" — yahi amortized O(1) ka secret. Har item zindagi mein max ek baar inbox → outbox jaata hai. Har pop par shift karoge to O(n) per op.
   viz: { tracer: twoStacksTrace }
   code: how
 
@@ -87,7 +87,7 @@ operations:
   - op: "ArrayList.removeAt(0)"
     time: O(n)
     space: O(1)
-    why: "Sab items khiskte hain — queue ke liye mat lo."
+    why: "Sab items shift hote hain — queue ke liye mat lo."
   - op: "Beech ka item / search"
     time: O(n)
     space: O(1)
@@ -113,7 +113,7 @@ examples:
     title: Pichhle 3000 ms mein kitni calls?
     source: { name: Number of Recent Calls, platform: LeetCode, url: "https://leetcode.com/problems/number-of-recent-calls/" }
     problem: |
-      `ping(t)` — time `t` par ek request aayi (t hamesha badhta hai). Batao `[t − 3000, t]` mein kitni requests aayi hain (abhi wali samet).
+      `ping(t)` — time `t` par ek request aayi (t hamesha badhta hai). Batao `[t − 3000, t]` mein kitni requests aayi hain (abhi wali including).
 
       Example: ping(1) → 1, ping(100) → 2, ping(3001) → 3, ping(3002) → **3**
     intuition: |
@@ -145,18 +145,18 @@ examples:
     title: Dota2 Senate — baari-baari haq chheeno
     source: { name: Dota2 Senate, platform: LeetCode, url: "https://leetcode.com/problems/dota2-senate/" }
     problem: |
-      Senators ki line (R = Radiant, D = Dire). Har round mein baari-baari har zinda senator ek kaam karta hai: kisi **virodhi** senator ka haq hamesha ke liye chheen leta hai. Jab sirf ek party bache, wo jeet. Dono best khelte hain. Kaun jeetega?
+      Senators ki line (R = Radiant, D = Dire). Har round mein baari-baari har zinda senator ek kaam karta hai: kisi **opponent** senator ka haq hamesha ke liye chheen leta hai. Jab sirf ek party bache, wo jeet. Dono best khelte hain. Kaun jeetega?
 
       Example: `"RDD"` → **"Dire"**
     intuition: |
-      **Greedy:** apni baari par **agle bolne wale virodhi** ko hatao (wo sabse pehle nuksaan karega).
+      **Greedy:** apni baari par **agle bolne wale opponent** ko hatao (wo sabse pehle nuksaan karega).
 
-      **Do queues** (har party ke senators ke index, bolne ke order mein):
+      **2 queues** (har party ke senators ke index, bolne ke order mein):
       - Dono ke aage wale aamne-saamne. Chhota index pehle bola → doosre ko hataya.
       - Jeetne wala agle round mein phir bolega → `index + n` ke saath peeche jodo (taaki is round wale sab uske pehle aayein).
 
       > [!tip]
-      > "Baari-baari, round-robin, chakkar" → queue. `+ n` wali trick se rounds ka order bina alag loop ke sambhal jaata hai.
+      > "Baari-baari, round-robin, chakkar" → queue. `+ n` wali trick se rounds ka order bina alag loop ke handle ho jaata hai.
     dryRun: |
       `RDD` (n = 3): R = [0], D = [1, 2]
 
@@ -188,7 +188,7 @@ examples:
       Naya char: count++, queue mein peeche. Phir **aage se** woh hatao jinka count > 1 (repeat ho chuke — kabhi wapas unique nahi honge). Queue ka aage wala = answer.
 
       > [!tip]
-      > Stack nahi, queue — kyunki "sabse **pehla**" chahiye, "sabse taaza" nahi.
+      > Stack nahi, queue — kyunki "sabse **pehla**" chahiye, "sabse fresh" nahi.
     dryRun: |
       | Char | count | Queue (hatane ke baad) | Output |
       |---|---|---|---|
@@ -211,9 +211,9 @@ when:
     - "Baari-baari simulation (round robin, games)."
     - "BFS — level by level (Graphs, Trees)."
   avoid:
-    - "Sabse taaza pehle chahiye — stack."
+    - "Sabse fresh pehle chahiye — stack."
     - "Sabse chhota/bada pehle chahiye — priority queue (heap)."
-    - "Dono kinaron par kaam — deque (agla topic)."
+    - "Dono edges par kaam — deque (agla topic)."
   signals:
     - keyword: "in order of arrival / first come first served"
       think: "Queue (ArrayDeque)."
@@ -266,7 +266,7 @@ mistakes:
   - title: "Stream mein stack lagaya"
     type: logic
     wrong: |
-      'Pehla unique' ke liye stack → sabse taaza unique mil gaya.
+      'Pehla unique' ke liye stack → sabse fresh unique mil gaya.
     right: |
       Pehla = FIFO = queue.
 
@@ -275,8 +275,8 @@ interview:
   questions:
     - q: "Stack vs queue?"
       a: |
-        Stack LIFO (sabse taaza pehle), queue FIFO (sabse purana pehle). Dono ke main ops O(1).
-    - q: "Queue ko do stacks se kaise?"
+        Stack LIFO (sabse fresh pehle), queue FIFO (sabse purana pehle). Dono ke main ops O(1).
+    - q: "Queue ko 2 stacks se kaise?"
       a: |
         inbox mein push; pop/peek par outbox khaali ho to inbox ke saare items outbox mein daalo. Amortized O(1).
     - q: "Amortized O(1) ka matlab?"
@@ -286,7 +286,7 @@ interview:
     - q: "Stack ko queues se?"
       followUp: true
       a: |
-        Ek queue: push ke baad pehle ke sab items ko ghuma ke peeche daalo (size − 1 baar) — naya aage aa jaata hai. Push O(n), pop O(1).
+        Ek queue: push ke baad pehle ke sab items ko rotate kar ke peeche daalo (size − 1 baar) — naya aage aa jaata hai. Push O(n), pop O(1).
     - q: "Java mein offer vs add, poll vs remove?"
       a: |
         offer/poll/peek fail par false/null; add/remove/element exception. Capacity-bound queues mein farak dikhta hai.
@@ -327,7 +327,7 @@ practice:
     url: "https://leetcode.com/problems/number-of-students-unable-to-eat-lunch/"
     level: easy
     pattern: Queue simulation (ya counting)
-    hint: "Simulation chalega; smart: sirf gino kitne 0 aur 1 wale students hain — sandwich stack top jis type ka ho, us type ka koi student na bache to ruk jao."
+    hint: "Simulation chalega; smart: sirf count karo kitne 0 aur 1 wale students hain — sandwich stack top jis type ka ho, us type ka koi student na bache to ruk jao."
   - name: Dota2 Senate
     platform: LeetCode
     num: 649
@@ -392,7 +392,7 @@ revision:
     - q: "ArrayList.removeAt(0) ki complexity?"
       options: ["O(1)", "O(log n)", "O(n)", "O(n²)"]
       answer: 2
-      explain: "Baaki sab ek jagah khiskte hain."
+      explain: "Baaki sab ek jagah shift hote hain."
     - q: "Two-stack queue mein inbox → outbox shift kab?"
       options: ["Har push par", "Har pop par", "Sirf jab outbox khaali ho", "Kabhi nahi"]
       answer: 2
@@ -410,14 +410,14 @@ revision:
 connections:
   related:
     - id: stack
-      why: "LIFO bhai; do stacks se queue."
+      why: "LIFO bhai; 2 stacks se queue."
     - id: sliding-window-fixed
       why: "Window ke purane items hatana — queue jaisa."
   usedLater:
     - id: circular-queue
       how: "Queue andar se kaise bani — circular array."
     - id: deque
-      how: "Dono kinaron par add/remove."
+      how: "Dono edges par add/remove."
     - id: bfs
       how: "Level by level traversal = queue."
     - id: level-order

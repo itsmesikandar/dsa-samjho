@@ -2,7 +2,7 @@ meta:
   id: linked-list-techniques
   chapter: linked-list
   title: Dummy node & merge techniques
-  subtitle: Nakli pehla node, tail se list banana, do sorted lists jodna, list todna-jodna
+  subtitle: Nakli pehla node, tail se list banana, 2 sorted lists jodna, list todna-jodna
   level: intermediate
   minutes: 40
   prereqs: [singly-linked-list, fast-slow-pointers, reverse-linked-list]
@@ -15,7 +15,7 @@ what:
 
     1. **Dummy node** — head se pehle ek nakli node. "Pehla node kaun hoga / head hi hatana pade to?" wale saare special cases gayab. Answer = `dummy.next`.
     2. **Tail se banana** — `tail.next = node; tail = node`. Nayi list O(1) per node.
-    3. **Merge** — do sorted lists, aage wale compare, chhota tail ke baad.
+    3. **Merge** — 2 sorted lists, aage wale compare, chhota tail ke baad.
     4. **Todna-jodna** — middle (fast/slow) se kaato, aadha reverse karo, baari-baari jodo.
 
     ```kotlin
@@ -29,9 +29,9 @@ what:
     > [!yaad]
     > Ye sab **naye nodes nahi banate** — wahi nodes re-link hote hain. Isliye O(1) extra memory.
   analogy: |
-    **Dummy node = bus ka driver.** Line mein pehle kaun chadhega, ye sawaal nahi — driver pehle se baitha hai, sab uske peeche. Aakhir mein driver ko chhod ke baaki log (dummy.next) ginte ho.
+    **Dummy node = bus ka driver.** Line mein pehle kaun chadhega, ye sawaal nahi — driver pehle se baitha hai, sab uske peeche. Aakhir mein driver ko chhod ke baaki log (dummy.next) count karte ho.
 
-    **Merge = do sorted line ko ek mein milana** — school assembly mein do classes roll number se khadi hain; dono ke aage wale mein chhota pehle aage badhta hai.
+    **Merge = 2 sorted line ko ek mein milana** — school assembly mein do classes roll number se khadi hain; dono ke aage wale mein chhota pehle aage badhta hai.
 
 # 2. Kyun chahiye?
 why:
@@ -46,12 +46,12 @@ why:
     Interview ke bahut linked list mediums **in tools ka combo** hain:
     - Sort List = middle + (recursion) + merge
     - Reorder List = middle + reverse + weave
-    - Partition / Odd-Even = do dummy lists + join
+    - Partition / Odd-Even = 2 dummy lists + join
 
     > [!socho]
     > Partition mein "more" list ke aakhri node ka `next = null` kyun zaroori?
     >
-    > Wo node apna **purana** next leke aaya hai — jo shayad "less" list ka koi node hai. Jodne ke baad circle ban jaayega aur print infinite loop. Nayi list banate waqt aakhri node ka link hamesha kaato.
+    > Wo node apna **purana** next leke aaya hai — jo shayad "less" list ka koi node hai. Jodne ke baad circle ban jaayega aur print infinite loop. Nayi list banate time aakhri node ka link hamesha kaato.
 
 # 3. Visual intro
 visual:
@@ -87,19 +87,19 @@ operations:
     time: O(n log n)
     space: "O(log n) stack"
     why: "Middle + recursion + merge; array nahi chahiye."
-  - op: "Partition / odd-even (do dummy lists)"
+  - op: "Partition / odd-even (2 dummy lists)"
     time: O(n)
     space: O(1)
     why: "Ek pass, re-link."
   - op: "Reorder list"
     time: O(n)
     space: O(1)
-    why: "Middle + reverse + weave, teen O(n) pass."
+    why: "Middle + reverse + weave, 3 O(n) pass."
   - op: "Merge k sorted lists (heap)"
     time: O(N log k)
     space: O(k)
     why: "Heap mein har list ka aage wala."
-  - op: "Dummy node ka kharcha"
+  - op: "Dummy node ka cost"
     time: O(1)
     space: O(1)
     why: "Ek extra node — code ki safai ke badle."
@@ -109,7 +109,7 @@ code:
   - title: Sort List — linked list ka merge sort
     file: sort-list
     note: |
-      Teen tool ek saath: fast/slow se **pehla** beech (fast `head.next` se shuru — taaki 2 nodes bhi 1 + 1 mein tootein, warna infinite recursion), `slow.next = null` se list kaato, dono sort, phir **dummy merge**.
+      3 tool ek saath: fast/slow se **pehla** beech (fast `head.next` se shuru — taaki 2 nodes bhi 1 + 1 mein tootein, warna infinite recursion), `slow.next = null` se list kaato, dono sort, phir **dummy merge**.
 
       Arrays par merge sort ko O(n) tmp chahiye; list par sirf links badalte hain.
 
@@ -137,7 +137,7 @@ examples:
     dryRun: |
       `1 2 3 4 5`
 
-      | Kadam | odd chain | even chain |
+      | Step | odd chain | even chain |
       |---|---|---|
       | shuru | 1 | 2 |
       | 1 | 1 → 3 | 2 → 4 |
@@ -152,7 +152,7 @@ examples:
 
   - id: partition
     level: medium
-    title: x ke hisaab se baanto (order bachao)
+    title: x ke hisaab se divide karo (order bachao)
     source: { name: Partition List, platform: LeetCode, url: "https://leetcode.com/problems/partition-list/" }
     problem: |
       Value `x` se **chhote** saare nodes pehle, baaki (≥ x) baad mein. Dono hisson ke andar **original order** bana rahe.
@@ -161,13 +161,13 @@ examples:
     intuition: |
       Array mein quick sort wala partition order bigaad deta. List mein aasaan aur **stable**:
 
-      - Do dummy lists: `L` (chhote) aur `M` (baaki), dono ke tail.
+      - 2 dummy lists: `L` (chhote) aur `M` (baaki), dono ke tail.
       - Har node ko sahi list ke end mein jodo — aane ka order hi order hai.
       - `M` ke tail ka `next = null` (purana link kaato).
       - `L` ke tail ko `M.next` se jodo. Return `L.next`.
 
       > [!tip]
-      > "Do group mein baanto, order bachao" → do dummy lists. Odd-even, even/odd values, negative/positive — sab isi se.
+      > "Do group mein divide karo, order bachao" → 2 dummy lists. Odd-even, even/odd values, negative/positive — sab isi se.
     dryRun: |
       x = 3
 
@@ -185,7 +185,7 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Ek pass; do dummy nodes."
+      why: "Ek pass; 2 dummy nodes."
 
   - id: reorder
     level: tricky
@@ -198,17 +198,17 @@ examples:
     intuition: |
       Peeche se nodes chahiye — singly mein peeche nahi ja sakte. Array mein copy → O(n) memory.
 
-      **Teen tools ka combo:**
+      **3 tools ka combo:**
       1. **Middle** (fast/slow).
       2. **Doosra aadha reverse** — ab `Ln, Ln−1, …` aage se mil jaate hain. Pehle aadhe ko kaato (`slow.next = null`).
       3. **Weave** — baari-baari ek pehle aadhe se, ek doosre se (merge jaisa, bina compare).
 
       > [!galti]
-      > Pehle aadhe ko kaata nahi (`slow.next = null`) → weave ke baad circle. Hamesha do alag lists bana ke jodo.
+      > Pehle aadhe ko kaata nahi (`slow.next = null`) → weave ke baad circle. Hamesha 2 alag lists bana ke jodo.
     dryRun: |
       `1 2 3 4 5`
 
-      | Step | Halat |
+      | Step | State |
       |---|---|
       | middle | slow = 3 |
       | reverse | pehla: 1 → 2 → 3, doosra: 5 → 4 |
@@ -218,23 +218,23 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Teen O(n) pass, sirf links."
+      why: "3 O(n) pass, sirf links."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "Nayi list bana rahe ho (filter, merge, partition) — dummy + tail."
     - "Head khud badal/hat sakta hai — dummy."
-    - "Do sorted lists jodni hain — merge; k lists → heap ya pairwise."
+    - "2 sorted lists jodni hain — merge; k lists → heap ya pairwise."
     - "Peeche se nodes chahiye bina extra memory — middle + reverse."
   avoid:
     - "Sirf padhna hai (count, search) — dummy ki zaroorat nahi."
-    - "Values badalne ki ijazat aur array chalega — kabhi-kabhi array mein copy simple hai (interview mein pehle poochho)."
+    - "Values badalne ki permission aur array chalega — kabhi-kabhi array mein copy simple hai (interview mein pehle poochho)."
   signals:
     - keyword: "merge two sorted lists"
       think: "Dummy + tail + compare; bacha hissa ek link."
     - keyword: "partition / group odd-even / stable split"
-      think: "Do dummy lists, aakhir mein jodo, tail.next = null."
+      think: "2 dummy lists, aakhir mein jodo, tail.next = null."
     - keyword: "reorder / fold / L0 Ln L1 Ln-1"
       think: "Middle + reverse + weave."
     - keyword: "sort a linked list O(n log n)"
@@ -243,15 +243,15 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Email / chat inbox"
-    how: "Do sorted message streams (devices) ko time ke hisaab se merge karna."
+    how: "2 sorted message streams (devices) ko time ke hisaab se merge karna."
   - where: "Databases"
     how: "Sorted runs ko merge karna (external sort, LSM-tree compaction)."
   - where: "Task schedulers"
-    how: "High aur low priority tasks ko do alag queues mein baantna (partition), phir jodna."
+    how: "High aur low priority tasks ko 2 alag queues mein divide karna (partition), phir jodna."
   - where: "Music shuffle"
-    how: "Playlist ko do hisson mein baant ke baari-baari jodna (riffle shuffle) — reorder jaisa weave."
+    how: "Playlist ko 2 hisson mein divide kar ke baari-baari jodna (riffle shuffle) — reorder jaisa weave."
   - where: "Version control"
-    how: "Do branches ke sorted change lists ka merge."
+    how: "2 branches ke sorted change lists ka merge."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -305,7 +305,7 @@ interview:
         Min-heap of size k (har list ka aage wala): O(N log k). Ya pairwise merge (divide & conquer): O(N log k). Ek-ek karke merge: O(N·k) — slow.
     - q: "Partition stable kaise rakha?"
       a: |
-        Do alag lists mein aane ke order se append — relative order nahi badalta. Array ka in-place partition stable nahi hota.
+        2 alag lists mein aane ke order se append — relative order nahi badalta. Array ka in-place partition stable nahi hota.
     - q: "Reorder list ke steps?"
       a: |
         Middle (fast/slow), second half reverse, first ko kaato, phir alternate weave. O(n), O(1).
@@ -378,7 +378,7 @@ practice:
     url: "https://leetcode.com/problems/reverse-nodes-in-k-group/"
     level: hard
     pattern: Dummy + group reverse + join
-    hint: "Reverse topic ka Example 3 — dummy ki wajah se pehla tukda bhi same code."
+    hint: "Reverse topic ka Example 3 — dummy ki wajah se pehla piece bhi same code."
 
 # 13. Quick revision
 revision:
@@ -386,7 +386,7 @@ revision:
     - "Dummy: head se pehle nakli node; return dummy.next."
     - "Tail se banao: tail.next = x; tail = x; aakhir mein tail.next = null."
     - "Merge: chhota (<=) jodo; bacha hissa ek link."
-    - "Partition/odd-even: do dummy lists, phir jodo — stable."
+    - "Partition/odd-even: 2 dummy lists, phir jodo — stable."
     - "Reorder = middle + reverse + weave; sort list = middle + recurse + merge."
   cheatsheet: |
     ```kotlin
@@ -436,4 +436,4 @@ connections:
     - id: top-k
       how: "Merge k sorted lists heap se."
     - id: queue
-      how: "Queue = tail par jodo, head se nikaalo (linked list roop)."
+      how: "Queue = tail par jodo, head se nikaalo (linked list form)."

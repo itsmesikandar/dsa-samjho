@@ -1,5 +1,5 @@
 class Main {
-    // Ek number akela, baaki sab do-do baar. x ^ x = 0, x ^ 0 = x - jode kat jaate, akela bachta
+    // Ek number akela, baaki sab 2-2 baar. x ^ x = 0, x ^ 0 = x - jode kat jaate, akela bachta
     static int singleNumber(int[] nums) {
         int r = 0;
         for (int x : nums) r ^= x; // order se farak nahi (XOR commutative) //@xor

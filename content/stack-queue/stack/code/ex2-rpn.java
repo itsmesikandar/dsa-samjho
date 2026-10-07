@@ -2,7 +2,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 class Main {
-    // Reverse Polish Notation: operator apne do numbers ke BAAD aata hai. "2 1 + 3 *" = (2 + 1) * 3
+    // Reverse Polish Notation: operator apne 2 numbers ke BAAD aata hai. "2 1 + 3 *" = (2 + 1) * 3
     static int evalRPN(String[] tokens) {
         Deque<Integer> st = new ArrayDeque<>();
         for (String t : tokens) {

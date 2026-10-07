@@ -1,10 +1,10 @@
 fun main() {
     val s = "chai, samosa, jalebi"
-    println(s.length) // characters ki ginti
+    println(s.length) // characters ki count
     println(s[0]) // index se char - O(1)
     println(s.substring(6, 12)) // [6, 12) - NAYI string banti hai, O(k)
     println(s.indexOf("jalebi")) // pehla match - O(n * m) tak
-    println(s.split(", ")) // tukde
+    println(s.split(", ")) // pieces
 
     val chars = "dcba".toCharArray() // String -> CharArray (badal sakte ho)
     chars.sort()

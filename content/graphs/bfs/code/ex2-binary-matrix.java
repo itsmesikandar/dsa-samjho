@@ -1,7 +1,7 @@
 import java.util.ArrayDeque;
 
 class Main {
-    // Grid = implicit graph: har khula cell (0) ek node, 8 padosi cells edges. Length = path ke cells
+    // Grid = implicit graph: har khula cell (0) ek node, 8 neighbor cells edges. Length = path ke cells
     static int shortestPathBinaryMatrix(int[][] grid) {
         int r = grid.length, c = grid[0].length;
         if (grid[0][0] == 1 || grid[r - 1][c - 1] == 1) return -1; // shuru ya aakhir hi band //@blocked

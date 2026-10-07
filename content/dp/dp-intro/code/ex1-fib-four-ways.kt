@@ -1,4 +1,4 @@
-// Ek sawaal, chaar tareeke: recursion -> memo -> tabulation -> do variables
+// Ek sawaal, 4 tareeke: recursion -> memo -> tabulation -> 2 variables
 var calls = 0L
 
 fun fibPlain(n: Int): Long { // 1. seedhi recursion: O(2^n)
@@ -25,7 +25,7 @@ fun fibTwo(n: Int): Long { // 4. sirf pichhle do chahiye - poora array kyun? O(1
     var b = 1L // fib(i + 1)
     repeat(n) {
         val c = a + b
-        a = b // khidki ek aage khiski //@slide
+        a = b // window ek aage shift hui //@slide
         b = c
     }
     return a //@done

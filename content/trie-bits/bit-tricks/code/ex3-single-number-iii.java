@@ -1,11 +1,11 @@
 import java.util.Arrays;
 
 class Main {
-    // Do number akele (a, b), baaki sab do-do baar. Sabka XOR = a ^ b. Uska koi 1 bit = a aur b wahan alag - us bit se do groups
+    // 2 number akele (a, b), baaki sab 2-2 baar. Sabka XOR = a ^ b. Uska koi 1 bit = a aur b wahan alag - us bit se 2 groups
     static int[] singleNumberIII(int[] nums) {
         int all = 0;
         for (int x : nums) all ^= x; // jode kate - bacha a ^ b //@all
-        int diff = all & -all; // sabse daayein ka 1 bit: a aur b isi par alag //@bit
+        int diff = all & -all; // sabse right ka 1 bit: a aur b isi par alag //@bit
         int a = 0;
         int b = 0;
         for (int x : nums) {

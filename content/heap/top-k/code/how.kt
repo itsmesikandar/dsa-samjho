@@ -6,7 +6,7 @@ fun kSmallest(nums: IntArray, k: Int): List<Int> {
     val pq = PriorityQueue<Int>(Collections.reverseOrder())
     for (x in nums) {
         if (pq.size < k) pq.add(x) // jagah khaali - seedha andar //@add
-        else if (x < pq.peek()) { // andar ke sabse bade se chhota - behtar candidate //@check
+        else if (x < pq.peek()) { // andar ke sabse bade se chhota - better candidate //@check
             pq.poll() // sabse bada bahar, naya andar //@swap
             pq.add(x)
         }

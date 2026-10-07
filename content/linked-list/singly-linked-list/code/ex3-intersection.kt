@@ -1,11 +1,11 @@
 class ListNode(var value: Int, var next: ListNode? = null)
 
-// Do lists kahin jaakar ek ho jaati hain (Y shape). Milne wala pehla NODE do (na mile to null).
+// 2 lists kahin jaakar ek ho jaati hain (Y shape). Milne wala pehla NODE do (na mile to null).
 fun getIntersectionNode(a: ListNode?, b: ListNode?): ListNode? {
     var p = a
     var q = b
     while (p !== q) { // same NODE (same object) - sirf same value nahi //@step
-        p = if (p == null) b else p.next // apni list khatam: doosri list ke head par kood jao //@switch
+        p = if (p == null) b else p.next // apni list khatam: doosri list ke head par jump kar jao //@switch
         q = if (q == null) a else q.next
     }
     return p // dono ne barabar raasta chala: milne ki jagah, ya dono null //@meet

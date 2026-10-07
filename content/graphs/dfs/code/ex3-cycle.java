@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // Undirected cycle: DFS mein koi visited padosi mila jo parent NAHI hai - matlab doosre raste se pahunch gaye
+    // Undirected cycle: DFS mein koi visited neighbor mila jo parent NAHI hai - matlab doosre raste se pahunch gaye
     static boolean hasCycleFrom(int u, int parent, List<List<Integer>> adj, boolean[] visited) {
         visited[u] = true; //@enter
         for (int v : adj.get(u)) {

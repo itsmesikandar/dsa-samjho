@@ -16,7 +16,7 @@ fun eliminationOrder(n: Int, k: Int): List<Int> {
     val out = mutableListOf<Int>()
     var prev = last // jise hataana hai uske PICHHLE par khade raho
     repeat(n) {
-        repeat(k - 1) { prev = prev.next } // k - 1 aage gino (circle hai, null kabhi nahi)
+        repeat(k - 1) { prev = prev.next } // k - 1 aage count karo (circle hai, null kabhi nahi)
         val gone = prev.next
         out.add(gone.value)
         prev.next = gone.next // circle se bahar

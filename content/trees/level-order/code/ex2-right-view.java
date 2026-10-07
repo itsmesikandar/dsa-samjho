@@ -14,7 +14,7 @@ class Main {
         }
     }
 
-    // Tree ko DAAYEIN se dekho: har level ka sabse daayein node dikhega. Upar se neeche woh values.
+    // Tree ko RIGHT se dekho: har level ka sabse right node dikhega. Upar se neeche woh values.
     static List<Integer> rightSideView(TreeNode root) {
         List<Integer> res = new ArrayList<>();
         if (root == null) return res;
@@ -24,7 +24,7 @@ class Main {
             int size = q.size();
             for (int k = 0; k < size; k++) {
                 TreeNode n = q.poll();
-                if (k == size - 1) res.add(n.val); // level ka AAKHRI = sabse daayein //@last
+                if (k == size - 1) res.add(n.val); // level ka AAKHRI = sabse right //@last
                 if (n.left != null) q.add(n.left); //@push
                 if (n.right != null) q.add(n.right);
             }

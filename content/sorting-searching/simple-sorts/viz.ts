@@ -11,7 +11,7 @@ export const bubbleBars = tracer<{ arr: number[] }>({
     const id = ids(a.length);
     const n = a.length;
     const bars = (tones: ToneMap): Panel => ({ kind: 'bars', values: [...a], ids: [...id], tones });
-    t.frame({ caption: 'Bubble sort: padosi jodi (j, j + 1) dekho — bada wala left mein hai to swap. Har pass mein sabse bada bar end tak "bubble" ho jaata hai.', panels: [bars({})] });
+    t.frame({ caption: 'Bubble sort: neighbor pair (j, j + 1) dekho — bada wala left mein hai to swap. Har pass mein sabse bada bar end tak "bubble" ho jaata hai.', panels: [bars({})] });
     for (let pass = 0; pass < n - 1; pass++) {
       const fixed = range(n - pass, n - 1, 'done');
       let swapped = false;
@@ -22,10 +22,10 @@ export const bubbleBars = tracer<{ arr: number[] }>({
           swap(a, j, j + 1);
           swap(id, j, j + 1);
           swapped = true;
-          t.frame({ caption: `Swap → bada ${a[j + 1]} ek kadam daayein.`, vars: { pass: pass + 1, j }, panels: [bars({ ...fixed, [j]: 'swap', [j + 1]: 'swap' })] });
+          t.frame({ caption: `Swap → bada ${a[j + 1]} ek step right.`, vars: { pass: pass + 1, j }, panels: [bars({ ...fixed, [j]: 'swap', [j + 1]: 'swap' })] });
         }
       }
-      t.frame({ caption: swapped ? `Pass ${pass + 1} khatam: ${a[n - 1 - pass]} apni pakki jagah par (hara).` : `Is pass mein ek bhi swap nahi → array sorted. Jaldi ruk gaye (best case O(n)).`, vars: { pass: pass + 1 }, panels: [bars(swapped ? range(n - 1 - pass, n - 1, 'done') : range(0, n - 1, 'done'))] });
+      t.frame({ caption: swapped ? `Pass ${pass + 1} khatam: ${a[n - 1 - pass]} apni pakki jagah par (green).` : `Is pass mein ek bhi swap nahi → array sorted. Jaldi ruk gaye (best case O(n)).`, vars: { pass: pass + 1 }, panels: [bars(swapped ? range(n - 1 - pass, n - 1, 'done') : range(0, n - 1, 'done'))] });
       if (!swapped) return listStr(a);
     }
     t.frame({ caption: `Sorted ${listStr(a)}. Compares ≈ n²/2 → O(n²).`, panels: [bars(range(0, n - 1, 'done'))] });
@@ -58,7 +58,7 @@ function insertion(t: Recorder, input: number[], extra: (shifts: number, moved: 
       id[j] = keyId;
       shifts++;
       mine++;
-      t.frame({ line: 'shift', caption: `${a[j + 1]} > ${key} → ${a[j + 1]} ek jagah daayein khiska. Khaali jagah ab index ${j}.`, vars: { i, j, key, shifts }, panels: view(key, { ...range(0, i, 'done'), [j + 1]: 'swap' }, { j }) });
+      t.frame({ line: 'shift', caption: `${a[j + 1]} > ${key} → ${a[j + 1]} ek jagah right shift hua. Khaali jagah ab index ${j}.`, vars: { i, j, key, shifts }, panels: view(key, { ...range(0, i, 'done'), [j + 1]: 'swap' }, { j }) });
       j--;
     }
     a[j + 1] = key;
@@ -131,14 +131,14 @@ export const swapsTrace = tracer<{ arr: number[] }>({
         }
       }
     }
-    t.frame({ line: 'swap', caption: `Total swaps = ${swaps} = inversions. Ye O(n²) hai; merge sort se inversions O(n log n) mein gin sakte hain.`, vars: { swaps }, panels: [array(a, { ids: id, tones: range(0, n - 1, 'done') })] });
+    t.frame({ line: 'swap', caption: `Total swaps = ${swaps} = inversions. Ye O(n²) hai; merge sort se inversions O(n log n) mein count kar sakte hain.`, vars: { swaps }, panels: [array(a, { ids: id, tones: range(0, n - 1, 'done') })] });
     return String(swaps);
   },
 });
 
 // ---------- Example 3: nearly sorted ----------
 export const nearlyTrace = tracer<{ arr: number[] }>({
-  inputs: [{ name: 'arr', type: 'intArray', label: 'arr (lagbhag sorted)', default: [6, 5, 3, 2, 8, 10, 9], minLen: 1, maxLen: 8, min: 1, max: 20 }],
+  inputs: [{ name: 'arr', type: 'intArray', label: 'arr (approx sorted)', default: [6, 5, 3, 2, 8, 10, 9], minLen: 1, maxLen: 8, min: 1, max: 20 }],
   run({ arr }, t) {
     const sorted = [...arr].sort((x, y) => x - y);
     const used = new Set<number>();
@@ -149,6 +149,6 @@ export const nearlyTrace = tracer<{ arr: number[] }>({
       k = Math.max(k, Math.abs(p - i));
     });
     t.frame({ line: 'pick', caption: `Is input mein har item apni sahi jagah se max k = ${k} door hai. Insertion sort ka andar wala loop kisi item ke liye ${k} se zyada nahi chalega.`, vars: { k }, panels: [array(arr)] });
-    return insertion(t, arr, (s, moved) => `Shifts = ${s}, sabse zyada ek item ne ${Math.max(0, ...moved)} kadam liye (≤ k = ${k}). Total ≤ n·k = ${arr.length * k} → O(n·k).`);
+    return insertion(t, arr, (s, moved) => `Shifts = ${s}, sabse zyada ek item ne ${Math.max(0, ...moved)} step liye (≤ k = ${k}). Total ≤ n·k = ${arr.length * k} → O(n·k).`);
   },
 });

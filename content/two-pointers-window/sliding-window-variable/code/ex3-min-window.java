@@ -1,9 +1,9 @@
 class Main {
-    // s ka sabse chhota substring jismein t ke saare characters (ginti ke saath) hon
+    // s ka sabse chhota substring jismein t ke saare characters (count ke saath) hon
     static String minWindow(String s, String t) {
         int[] need = new int[128]; // har char ki kitni zaroorat baaki (negative = window mein extra)
         for (char c : t.toCharArray()) need[c]++;
-        int missing = t.length(); // abhi kitne chars kam hain (ginti ke saath) //@init
+        int missing = t.length(); // abhi kitne chars kam hain (count ke saath) //@init
         int l = 0;
         int bestL = 0;
         int bestLen = Integer.MAX_VALUE;

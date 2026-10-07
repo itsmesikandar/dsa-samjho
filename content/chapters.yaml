@@ -32,9 +32,9 @@
 
 - id: two-pointers-window
   title: Two Pointers & Sliding Window
-  subtitle: O(n²) ko O(n) banane ke do sabse kaam ke patterns
+  subtitle: O(n²) ko O(n) banane ke 2 sabse kaam ke patterns
   topics:
-    - { id: two-pointers-opposite, title: Two Pointers (dono kinaron se) }
+    - { id: two-pointers-opposite, title: Two Pointers (dono edges se) }
     - { id: two-pointers-same, title: Two Pointers (same direction) }
     - { id: sliding-window-fixed, title: Sliding Window (fixed size) }
     - { id: sliding-window-variable, title: Sliding Window (variable size) }
@@ -48,7 +48,7 @@
 
 - id: sorting-searching
   title: Sorting & Searching
-  subtitle: Bubble se Merge/Quick sort tak, aur Binary Search ke saare roop
+  subtitle: Bubble se Merge/Quick sort tak, aur Binary Search ke saare form
   topics:
     - { id: simple-sorts, title: "Bubble, Selection, Insertion Sort" }
     - { id: merge-sort, title: Merge Sort }
@@ -127,7 +127,7 @@
 
 - id: dp
   title: Dynamic Programming
-  subtitle: Recursion + yaaddasht = DP. Memoization se tabulation tak
+  subtitle: Recursion + memory = DP. Memoization se tabulation tak
   topics:
     - { id: dp-intro, title: DP introduction }
     - { id: dp-1d, title: 1D DP }

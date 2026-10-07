@@ -6,7 +6,7 @@ fun main() {
 
     val c = a.copyOf() // ab ASLI nayi copy (naya heap block) //@copy
     c[c.size - 1] = 50 // sirf c badla //@write2
-    println(a.contentToString()) // a pe koi asar nahi
+    println(a.contentToString()) // a pe koi effect nahi
     println(c.contentToString())
 }
 

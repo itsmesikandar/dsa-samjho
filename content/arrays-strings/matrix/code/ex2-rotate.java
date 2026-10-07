@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // n x n matrix ko 90 degree clockwise ghumao - usi matrix mein (in-place)
+    // n x n matrix ko 90 degree clockwise rotate karo - usi matrix mein (in-place)
     static void rotate(int[][] m) {
         int n = m.length;
         // Step 1: transpose - diagonal ke upar wale cell ko neeche wale se swap

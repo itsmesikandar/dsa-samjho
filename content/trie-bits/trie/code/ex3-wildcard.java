@@ -13,7 +13,7 @@ class WNode {
     boolean isEnd = false;
 }
 
-// Words daalo; search mein '.' = koi bhi ek akshar
+// Words daalo; search mein '.' = koi bhi ek letter
 class WordDictionary {
     private final WNode root = new WNode();
 
@@ -35,14 +35,14 @@ class WordDictionary {
     private boolean dfs(WNode node, String word, int i) {
         if (i == word.length()) return node.isEnd; // pattern khatam - word bhi yahin khatam hona chahiye //@end
         char ch = word.charAt(i);
-        if (ch == '.') { // koi bhi akshar - har bachche mein try karo //@dot
+        if (ch == '.') { // koi bhi letter - har bachche mein try karo //@dot
             for (WNode child : node.next) {
                 if (child != null && dfs(child, word, i + 1)) return true;
             }
             return false;
         }
         WNode child = node.next[ch - 'a'];
-        if (child == null) return false; // is akshar ka raasta hi nahi //@char
+        if (child == null) return false; // is letter ka raasta hi nahi //@char
         return dfs(child, word, i + 1);
     }
 }

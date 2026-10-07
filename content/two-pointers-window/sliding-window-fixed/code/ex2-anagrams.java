@@ -8,8 +8,8 @@ class Main {
         List<Integer> res = new ArrayList<>();
         int k = p.length();
         if (k > s.length()) return res;
-        int[] need = new int[26]; // p ke har letter ki ginti
-        int[] have = new int[26]; // window ke har letter ki ginti
+        int[] need = new int[26]; // p ke har letter ki count
+        int[] have = new int[26]; // window ke har letter ki count
         for (char c : p.toCharArray()) need[c - 'a']++; //@init
         for (int r = 0; r < s.length(); r++) {
             have[s.charAt(r) - 'a']++; // naya char window mein //@add

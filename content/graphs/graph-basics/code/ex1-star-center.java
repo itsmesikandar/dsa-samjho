@@ -11,7 +11,7 @@ class Main {
         return -1;
     }
 
-    // Shortcut: center HAR edge mein hai - to pehli do edges ka common node hi center. O(1)
+    // Shortcut: center HAR edge mein hai - to pehli 2 edges ka common node hi center. O(1)
     static int findCenter(int[][] edges) {
         int a = edges[0][0], b = edges[0][1]; //@first
         int c = edges[1][0], d = edges[1][1]; //@second

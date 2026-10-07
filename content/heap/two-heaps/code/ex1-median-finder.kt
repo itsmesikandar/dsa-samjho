@@ -1,7 +1,7 @@
 import java.util.Collections
 import java.util.PriorityQueue
 
-// Har number pehle left se guzarta hai - isliye "kis heap mein?" wala if nahi chahiye
+// Har number pehle left se pass hota hai - isliye "kis heap mein?" wala if nahi chahiye
 class MedianFinder {
     private val left = PriorityQueue<Int>(Collections.reverseOrder()) // chhota aadha (max-heap)
     private val right = PriorityQueue<Int>() // bada aadha (min-heap)

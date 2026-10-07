@@ -13,7 +13,7 @@ const queue = (t: T, q: string[], next = 0): Panel => ({
 });
 const nested = (ls: number[][]) => listStr(ls.map(listStr));
 
-// ---------- 3. Visual intro: level = root se doori ----------
+// ---------- 3. Visual intro: level = root se distance ----------
 export const levelsIntro = tracer<{ levels: (number | null)[] }>({
   inputs: [{ name: 'levels', type: 'tree', label: 'Tree (level order)', default: [3, 9, 20, null, null, 15, 7], maxNodes: 9, min: 0, max: 99 }],
   run({ levels }, t) {
@@ -29,10 +29,10 @@ export const levelsIntro = tracer<{ levels: (number | null)[] }>({
         badges[id] = `L${d}`;
       }
       out.push(cur.map((id) => val(tr, id)));
-      t.frame({ caption: d === 0 ? 'Level 0 = sirf root. Level = root se kitne kadam door.' : `Level ${d}: root se ${d} kadam door wale saare nodes — baayein se daayein ${listStr(out[d])}.`, legend: { found: 'ye level', done: 'pehle wale levels' }, panels: [treeView(tr.nodes, tr.root, { tones, badges }), { kind: 'text', label: 'Levels', text: out.map((l, i) => `L${i}: ${listStr(l)}`).join('\n') }] });
+      t.frame({ caption: d === 0 ? 'Level 0 = sirf root. Level = root se kitne step door.' : `Level ${d}: root se ${d} step door wale saare nodes — left se right ${listStr(out[d])}.`, legend: { found: 'ye level', done: 'pehle wale levels' }, panels: [treeView(tr.nodes, tr.root, { tones, badges }), { kind: 'text', label: 'Levels', text: out.map((l, i) => `L${i}: ${listStr(l)}`).join('\n') }] });
       cur = cur.flatMap((id) => kids(tr, id));
     }
-    t.frame({ caption: tr.root ? `Level order = upar se neeche, har level baayein se daayein: ${nested(out)}. DFS ek shaakh mein gehra jaata; BFS pehle saare paas wale.` : 'Khaali tree — koi level nahi.', panels: [treeView(tr.nodes, tr.root, { tones, badges })] });
+    t.frame({ caption: tr.root ? `Level order = upar se neeche, har level left se right: ${nested(out)}. DFS ek branch mein deep jaata; BFS pehle saare paas wale.` : 'Khaali tree — koi level nahi.', panels: [treeView(tr.nodes, tr.root, { tones, badges })] });
     return nested(out);
   },
 });
@@ -125,7 +125,7 @@ export const rightViewTrace = tracer<{ levels: (number | null)[] }>({
       return '[]';
     }
     const tones: Record<string, Tone> = {};
-    const legend = { compare: 'abhi', muted: 'chhup gaya', found: 'daayein se dikhta' };
+    const legend = { compare: 'abhi', muted: 'chhup gaya', found: 'right se dikhta' };
     const q = [tr.root];
     const view = (cur?: string): Panel[] => [treeView(tr.nodes, tr.root, { tones: cur ? { ...tones, [cur]: 'compare' } : tones, pointers: { cur } }), queue(tr, q), { kind: 'text', label: 'View', text: listStr(res) }];
     while (q.length) {
@@ -136,14 +136,14 @@ export const rightViewTrace = tracer<{ levels: (number | null)[] }>({
         if (k === size - 1) {
           res.push(val(tr, id));
           tones[id] = 'found';
-          t.frame({ line: 'last', caption: `${val(tr, id)} is level ka AAKHRI (k = size − 1) → daayein khade aadmi ko yahi dikhega. View mein jodo.`, legend, panels: view() });
+          t.frame({ line: 'last', caption: `${val(tr, id)} is level ka AAKHRI (k = size − 1) → right khade aadmi ko yahi dikhega. View mein jodo.`, legend, panels: view() });
         } else {
           tones[id] = 'muted';
-          t.frame({ line: 'push', caption: `${val(tr, id)} (${k + 1}/${size}) — iske daayein aur node hai, to ye peeche chhup gaya. Bas bachche queue mein.`, legend, panels: view(id) });
+          t.frame({ line: 'push', caption: `${val(tr, id)} (${k + 1}/${size}) — iske right aur node hai, to ye peeche chhup gaya. Bas bachche queue mein.`, legend, panels: view(id) });
         }
       }
     }
-    t.frame({ line: 'last', caption: `Right view ${listStr(res)}. Dhyaan: daayein wala node LEFT bachcha bhi ho sakta hai — agar us level par wahi aakhri hai.`, panels: view() });
+    t.frame({ line: 'last', caption: `Right view ${listStr(res)}. Dhyaan: right wala node LEFT bachcha bhi ho sakta hai — agar us level par wahi aakhri hai.`, panels: view() });
     return listStr(res);
   },
 });
@@ -159,7 +159,7 @@ export const widthTrace = tracer<{ levels: (number | null)[] }>({
     }
     const tones: Record<string, Tone> = {};
     const badges: Record<string, string> = {};
-    const legend = { compare: 'abhi', found: 'level ke kinaare', done: 'ho gaya' };
+    const legend = { compare: 'abhi', found: 'level ke edge', done: 'ho gaya' };
     let q: [string, number][] = [[tr.root, 0]];
     let best = 0;
     const view = (cur?: string): Panel[] => [
@@ -179,7 +179,7 @@ export const widthTrace = tracer<{ levels: (number | null)[] }>({
         const n = tr.nodes.get(id)!;
         if (n.left) nq.push([n.left, 2 * i]);
         if (n.right) nq.push([n.right, 2 * i + 1]);
-        t.frame({ line: 'pos', caption: `${n.value} ka position ${i}. Complete tree jaisa numbering: left bachcha 2·${i} = ${2 * i}, right 2·${i} + 1 = ${2 * i + 1} — beech ke khaali bhi gine jaate hain.`, legend, panels: view(id) });
+        t.frame({ line: 'pos', caption: `${n.value} ka position ${i}. Complete tree jaisa numbering: left bachcha 2·${i} = ${2 * i}, right 2·${i} + 1 = ${2 * i + 1} — beech ke khaali bhi count kiye jaate hain.`, legend, panels: view(id) });
       }
       const w = last + 1;
       best = Math.max(best, w);
@@ -190,7 +190,7 @@ export const widthTrace = tracer<{ levels: (number | null)[] }>({
       tones[q[q.length - 1][0]] = 'done';
       q = nq;
     }
-    t.frame({ line: 'width', caption: `Max width ${best}. Sirf nodes ginte to beech ke khaali chhoot jaate — position number se khaali jagah bhi gin li.`, panels: view() });
+    t.frame({ line: 'width', caption: `Max width ${best}. Sirf nodes count karte to beech ke khaali chhoot jaate — position number se khaali jagah bhi count kar li.`, panels: view() });
     return String(best);
   },
 });

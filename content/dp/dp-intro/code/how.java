@@ -1,8 +1,8 @@
 class Main {
-    // Recursion + yaaddasht (memo): har fib(k) sirf EK baar nikaalo, dobara poocha to memo se
+    // Recursion + memory (memo): har fib(k) sirf EK baar nikaalo, dobara poocha to memo se
     static long fib(int n, long[] memo) {
         if (n <= 1) return n; // base case: fib(0) = 0, fib(1) = 1 //@base
-        if (memo[n] != 0) return memo[n]; // pehle nikaala hua - seedha lautao //@hit
+        if (memo[n] != 0) return memo[n]; // pehle nikaala hua - seedha return karo //@hit
         memo[n] = fib(n - 1, memo) + fib(n - 2, memo); // pehli baar - nikaalo aur likh lo //@save
         return memo[n];
     }

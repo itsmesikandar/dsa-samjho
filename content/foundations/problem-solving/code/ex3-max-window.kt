@@ -1,4 +1,4 @@
-// Lagatar k numbers ka sabse bada sum. Brute force O(n*k); sliding window O(n).
+// Continuous k numbers ka sabse bada sum. Brute force O(n*k); sliding window O(n).
 fun maxWindowSum(arr: IntArray, k: Int): Int {
     var window = 0
     for (i in 0 until k) window += arr[i] // pehli window ka sum //@first

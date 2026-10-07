@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 class Main {
     // Har item apni sorted jagah se zyada se zyada k door hai. Sort karo.
-    // Insertion sort: koi bhi item k se zyada jagah peeche nahi khiskega -> O(n*k), O(n^2) nahi
+    // Insertion sort: koi bhi item k se zyada jagah peeche nahi shift hoga -> O(n*k), O(n^2) nahi
     static int sortNearlySorted(int[] a) {
         int shifts = 0;
         for (int i = 1; i < a.length; i++) {

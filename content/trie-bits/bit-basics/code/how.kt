@@ -6,8 +6,8 @@ fun main() {
     println(a or b) // OR: koi ek 1 to 1 -> 1110 = 14 //@or
     println(a xor b) // XOR: alag ho to 1 -> 0110 = 6 //@xor
     println(a.inv()) // NOT: saare 32 bits ulte -> -13 (two's complement) //@not
-    println(a shl 1) // left shift: har bit ek kadam baayein = x2 -> 24 //@shl
-    println(a shr 1) // right shift: ek kadam daayein = /2 -> 6 //@shr
+    println(a shl 1) // left shift: har bit ek step left = x2 -> 24 //@shl
+    println(a shr 1) // right shift: ek step right = /2 -> 6 //@shr
 }
 
 // Output:

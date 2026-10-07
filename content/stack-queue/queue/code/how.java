@@ -2,7 +2,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 class Main {
-    // Do stacks se queue (FIFO): naye items 'inbox' mein, nikaalna 'outbox' se
+    // 2 stacks se queue (FIFO): naye items 'inbox' mein, nikaalna 'outbox' se
     static class MyQueue {
         private final Deque<Integer> inbox = new ArrayDeque<>();
         private final Deque<Integer> outbox = new ArrayDeque<>();

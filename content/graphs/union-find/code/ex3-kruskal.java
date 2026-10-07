@@ -3,7 +3,7 @@ import java.util.Comparator;
 import java.util.List;
 
 class Main {
-    // Kruskal: saari edges sasti se mehngi; jo do ALAG groups jode wahi lo. n - 1 edges = sab jude
+    // Kruskal: saari edges sasti se mehngi; jo 2 ALAG groups jode wahi lo. n - 1 edges = sab jude
     static int find(int[] parent, int x) {
         if (parent[x] != x) parent[x] = find(parent, parent[x]);
         return parent[x];
@@ -11,7 +11,7 @@ class Main {
 
     static int minCostConnectPoints(int[][] points) {
         int n = points.length;
-        List<int[]> edges = new ArrayList<>(); // (cost, i, j) - har jodi ek edge
+        List<int[]> edges = new ArrayList<>(); // (cost, i, j) - har pair ek edge
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
                 int cost = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1]);

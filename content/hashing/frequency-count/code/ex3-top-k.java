@@ -4,7 +4,7 @@ class Main {
     // Sabse zyada baar aane wale k numbers - bucket sort se O(n), bina poora sort kiye
     static List<Integer> topKFrequent(int[] nums, int k) {
         Map<Integer, Integer> freq = new HashMap<>();
-        for (int x : nums) freq.merge(x, 1, Integer::sum); // pehle ginti //@count
+        for (int x : nums) freq.merge(x, 1, Integer::sum); // pehle count //@count
         // bucket[f] = wo numbers jo exactly f baar aaye. f zyada se zyada n ho sakta hai.
         List<List<Integer>> bucket = new ArrayList<>(); //@bucket
         for (int i = 0; i <= nums.length; i++) bucket.add(new ArrayList<>());

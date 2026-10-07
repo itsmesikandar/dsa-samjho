@@ -1,7 +1,7 @@
-// Recursion + yaaddasht (memo): har fib(k) sirf EK baar nikaalo, dobara poocha to memo se
+// Recursion + memory (memo): har fib(k) sirf EK baar nikaalo, dobara poocha to memo se
 fun fib(n: Int, memo: LongArray): Long {
     if (n <= 1) return n.toLong() // base case: fib(0) = 0, fib(1) = 1 //@base
-    if (memo[n] != 0L) return memo[n] // pehle nikaala hua - seedha lautao //@hit
+    if (memo[n] != 0L) return memo[n] // pehle nikaala hua - seedha return karo //@hit
     memo[n] = fib(n - 1, memo) + fib(n - 2, memo) // pehli baar - nikaalo aur likh lo //@save
     return memo[n]
 }

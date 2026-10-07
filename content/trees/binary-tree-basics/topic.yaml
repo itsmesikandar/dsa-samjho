@@ -2,7 +2,7 @@ meta:
   id: binary-tree-basics
   chapter: trees
   title: Binary Tree basics
-  subtitle: Har node ke max do bachche — root, leaf, height, aur "left ka jawab + right ka jawab" wali soch
+  subtitle: Har node ke max 2 bachche — root, leaf, height, aur "left ka jawab + right ka jawab" wali soch
   level: beginner
   minutes: 35
   prereqs: [recursion-patterns, queue]
@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Binary tree** = nodes ka ulta ped: sabse upar **root**, har node ke zyada se zyada **do bachche** — `left` aur `right`.
+    **Binary tree** = nodes ka ulta tree: sabse upar **root**, har node ke zyada se zyada **2 bachche** — `left` aur `right`.
 
     ```kotlin
     class TreeNode(var value: Int) {
@@ -20,7 +20,7 @@ what:
     }
     ```
 
-    Shabd jo baar-baar aayenge:
+    Word jo baar-baar aayenge:
     - **Leaf** — jiske koi bachche nahi.
     - **Depth** — root se kitna neeche (root = 0 ya 1, problem dekho).
     - **Height** — node se sabse door leaf tak.
@@ -47,14 +47,14 @@ why:
     > [!socho]
     > 1000 nodes ka tree. Height kitni ho sakti hai?
     >
-    > Balanced ho to ~10 (log₂ 1000). Par agar har node ka sirf ek bachcha (line jaisa — **skewed**) to **1000**. Isliye tree algorithms ki complexity mein aksar **O(h)** likhte hain — h balanced par log n, bura case n.
+    > Balanced ho to ~10 (log₂ 1000). Par agar har node ka sirf ek bachcha (line jaisa — **skewed**) to **1000**. Isliye tree algorithms ki complexity mein often **O(h)** likhte hain — h balanced par log n, bura case n.
 
 # 3. Visual intro
 visual:
   body: |
-    LeetCode tree ko ek line mein kaise likhta hai? **Level order** — upar se neeche, baayein se daayein, khaali jagah = `#` (null).
+    LeetCode tree ko ek line mein kaise likhta hai? **Level order** — upar se neeche, left se right, khaali jagah = `#` (null).
 
-    Dekho queue se tree kaise banta hai — har parent ke liye agle do values uske left/right.
+    Dekho queue se tree kaise banta hai — har parent ke liye agle 2 values uske left/right.
   viz: { tracer: buildTrace }
 
 # 4. Kaise kaam karta hai
@@ -68,7 +68,7 @@ how:
     `[3, 9, 20, #, #, 15, 7]` → 9 ki height 1, 20 ki 2 → root 1 + 2 = **3**.
 
     > [!tip]
-    > Ye **bottom-up** recursion hai — bachchon ke jawab upar aate hain. Example 2 **top-down** hai — upar ki jaankari parameter se neeche jaati hai. Har tree problem in dono mein se ek (ya dono).
+    > Ye **bottom-up** recursion hai — bachchon ke jawab upar aate hain. Example 2 **top-down** hai — upar ki information parameter se neeche jaati hai. Har tree problem in dono mein se ek (ya dono).
   viz: { tracer: depthTrace }
   code: how
 
@@ -77,7 +77,7 @@ operations:
   - op: "Traverse / visit sab nodes"
     time: O(n)
     space: "O(h) stack"
-    why: "Har node ek baar; recursion gehraai = height."
+    why: "Har node ek baar; recursion depth = height."
   - op: "Height / size / sum"
     time: O(n)
     space: O(h)
@@ -88,7 +88,7 @@ operations:
     why: "Koi order nahi — sab dekho. (BST mein O(h).)"
   - op: "Height: balanced vs skewed"
     time: "log n vs n"
-    space: "lagu nahi"
+    space: "apply nahi"
     why: "Shape par sab depend karta hai."
   - op: "Complete tree node count"
     time: O(log² n)
@@ -104,7 +104,7 @@ code:
   - title: Level order se tree banana aur wapas
     file: build
     note: |
-      Har tree example mein yahi `build` function hai — LeetCode ke input format jaisa. Queue mein woh nodes jinke bachche abhi lagne hain; har parent ke liye agle do values.
+      Har tree example mein yahi `build` function hai — LeetCode ke input format jaisa. Queue mein woh nodes jinke bachche abhi lagne hain; har parent ke liye agle 2 values.
 
       Java mein `null` waali queue ke liye `LinkedList` (ArrayDeque null allow nahi karta).
 
@@ -142,7 +142,7 @@ examples:
 
   - id: good-nodes
     level: medium
-    title: Good nodes gino
+    title: Good nodes count karo
     source: { name: Count Good Nodes in Binary Tree, platform: LeetCode, url: "https://leetcode.com/problems/count-good-nodes-in-binary-tree/" }
     problem: |
       Node **good** hai agar root se us node tak ke raaste mein koi node usse **bada** nahi. Kitne good nodes?
@@ -153,10 +153,10 @@ examples:
       - `node.value ≥ maxSoFar` → good.
       - Bachchon ko `max(maxSoFar, node.value)` bhejo.
 
-      Bottom-up se mushkil — bachche ko upar ka raasta pata hi nahi. Isliye pehchano: jaankari upar se chahiye → parameter; neeche se chahiye → return value.
+      Bottom-up se mushkil — bachche ko upar ka raasta pata hi nahi. Isliye pehchano: information upar se chahiye → parameter; neeche se chahiye → return value.
 
       > [!galti]
-      > Global `max` variable rakha → ek shaakh ka max doosri shaakh mein ghus gaya. Max **raaste** ka hai — parameter (har call ka apna) hi sahi.
+      > Global `max` variable rakha → ek branch ka max doosri branch mein ghus gaya. Max **raaste** ka hai — parameter (har call ka apna) hi sahi.
     dryRun: |
       | Node | Raaste ka max | Good? |
       |---|---|---|
@@ -178,16 +178,16 @@ examples:
     title: Complete tree ke nodes — O(n) se tez
     source: { name: Count Complete Tree Nodes, platform: LeetCode, url: "https://leetcode.com/problems/count-complete-tree-nodes/" }
     problem: |
-      **Complete** binary tree (har level bhara, aakhri level baayein se bhara) ke nodes gino — O(n) se tez.
+      **Complete** binary tree (har level bhara, aakhri level left se bhara) ke nodes count karo — O(n) se tez.
 
       Example: `[1, 2, 3, 4, 5, 6]` → **6**
     intuition: |
-      Seedha ginti O(n). Complete hone ka fayda uthao:
-      - Sabse **baayein** raasta ki lambai `lh`, sabse **daayein** ki `rh`.
+      Seedha count O(n). Complete hone ka fayda uthao:
+      - Sabse **left** raasta ki length `lh`, sabse **right** ki `rh`.
       - `lh == rh` → subtree **perfect** hai → nodes = `2^h − 1` — formula, andar jaane ki zaroorat nahi!
-      - Warna `1 + count(left) + count(right)` — aur in dono mein se **ek pakka perfect** hai (turant formula), sirf ek taraf gehra jaana padta hai.
+      - Warna `1 + count(left) + count(right)` — aur in dono mein se **ek pakka perfect** hai (turant formula), sirf ek taraf deep jaana padta hai.
 
-      Har level par ek raasta naapna O(log n), levels log n → **O(log² n)**.
+      Har level par ek raasta measure karna O(log n), levels log n → **O(log² n)**.
 
       > [!tip]
       > "Extra guarantee (complete / sorted / BST) di hai to O(n) se tez socho" — interview ka standard follow-up.
@@ -208,23 +208,23 @@ examples:
     complexity:
       time: O(log² n)
       space: O(log n)
-      why: "log n levels × raasta naapna log n."
+      why: "log n levels × raasta measure karna log n."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "Data mein parent-child / hierarchy hai."
     - "Problem input TreeNode hai — recursion (left + right + main) socho."
-    - "Jaankari neeche bhejni hai → parameter; upar laani hai → return."
+    - "Information neeche bhejni hai → parameter; upar laani hai → return."
   avoid:
     - "Sirf sorted list chahiye aur insert kam — sorted array + binary search."
     - "Har node ke kai bachche / cycles — graph (Graphs chapter)."
-    - "Bahut gehra skewed tree + recursion — stack overflow; iterative lo."
+    - "Bahut deep skewed tree + recursion — stack overflow; iterative lo."
   signals:
     - keyword: "maximum depth / height / count / sum of tree"
       think: "Bottom-up: f(left), f(right), combine."
     - keyword: "path from root, ancestors, good nodes"
-      think: "Top-down: parameter mein raaste ki jaankari."
+      think: "Top-down: parameter mein raaste ki information."
     - keyword: "mirror / invert / symmetric"
       think: "Har node par swap ya do subtrees saath-saath compare."
     - keyword: "complete tree, fast count"
@@ -239,7 +239,7 @@ realWorld:
   - where: "HTML DOM"
     how: "Webpage ke tags ek tree — browser isi ko render karta hai."
   - where: "Decision trees (ML)"
-    how: "Har node ek sawaal (haan/naa) — do bachche. Prediction = root se leaf tak chalna."
+    how: "Har node ek sawaal (haan/naa) — 2 bachche. Prediction = root se leaf tak chalna."
   - where: "Tournament brackets"
     how: "IPL / World Cup knockout — binary tree; final = root."
 
@@ -254,13 +254,13 @@ mistakes:
   - title: "Height ki definition"
     type: off-by-one
     wrong: |
-      Kuch problems edges ginti hain (leaf ki height 0), kuch nodes (leaf = 1). Galat wali li.
+      Kuch problems edges count hain (leaf ki height 0), kuch nodes (leaf = 1). Galat wali li.
     right: |
       Problem padho: 'number of nodes along the path' = nodes; 'edges' = nodes − 1.
   - title: "Global variable top-down info ke liye"
     type: logic
     wrong: |
-      Raaste ka max global — ek shaakh ka max doosri mein.
+      Raaste ka max global — ek branch ka max doosri mein.
     right: |
       Parameter mein bhejo (har call ki apni copy).
   - title: "Leaf ki pehchaan"
@@ -284,14 +284,14 @@ interview:
         h(null) = 0, h(node) = 1 + max(h(left), h(right)). O(n) time, O(h) stack.
     - q: "Full, complete, perfect, balanced mein fark?"
       a: |
-        Full: har node ke 0 ya 2 bachche. Complete: sab levels bhare, aakhri baayein se. Perfect: sab levels poore bhare (2^h − 1 nodes). Balanced: har node par left/right height ka fark ≤ 1.
+        Full: har node ke 0 ya 2 bachche. Complete: sab levels bhare, aakhri left se. Perfect: sab levels poore bhare (2^h − 1 nodes). Balanced: har node par left/right height ka fark ≤ 1.
     - q: "Top-down aur bottom-up recursion kab?"
       a: |
-        Jaankari upar se chahiye (raaste ka max, depth) → parameter (top-down). Bachchon se chahiye (height, size) → return (bottom-up).
+        Information upar se chahiye (raaste ka max, depth) → parameter (top-down). Bachchon se chahiye (height, size) → return (bottom-up).
     - q: "Same Tree / Symmetric Tree kaise?"
       followUp: true
       a: |
-        Do nodes saath recursion: dono null → true; ek null / value alag → false; warna (a.left, b.left) aur (a.right, b.right) — symmetric mein (a.left, b.right) aur (a.right, b.left).
+        2 nodes saath recursion: dono null → true; ek null / value alag → false; warna (a.left, b.left) aur (a.right, b.right) — symmetric mein (a.left, b.right) aur (a.right, b.left).
     - q: "Tree ko array mein kaise rakhoge?"
       a: |
         Complete tree: index i ke bachche 2i + 1, 2i + 2, parent (i − 1) / 2. Heap aise hi bana hai.
@@ -304,7 +304,7 @@ interview:
         Level order (null ke saath) ya preorder with null markers — dono se tree wapas ban sakta hai.
     - q: "Count complete tree nodes O(log² n) kyun?"
       a: |
-        Har level par ek subtree perfect (formula), doosre mein neeche jaate hain; har level par height naapna O(log n).
+        Har level par ek subtree perfect (formula), doosre mein neeche jaate hain; har level par height measure karna O(log n).
   mayAsk:
     - "Same Tree."
     - "Symmetric Tree."
@@ -368,7 +368,7 @@ practice:
     url: "https://leetcode.com/problems/binary-tree-cameras/"
     level: hard
     pattern: Bottom-up states (greedy)
-    hint: "Har node 3 halat: camera hai / covered / covered nahi. Bachcha 'covered nahi' → yahan camera. Leaves par camera mat lagao, unke parent par."
+    hint: "Har node 3 state: camera hai / covered / covered nahi. Bachcha 'covered nahi' → yahan camera. Leaves par camera mat lagao, unke parent par."
 
 # 13. Quick revision
 revision:
@@ -390,7 +390,7 @@ revision:
     - q: "[1, 2, 3, 4] (level order) ki height (nodes mein)?"
       options: ["2", "3", "4", "1"]
       answer: 1
-      explain: "1 → 2 → 4: teen nodes."
+      explain: "1 → 2 → 4: 3 nodes."
     - q: "Leaf kaun?"
       options: ["Jiska left null", "Jiske dono bachche null", "Root", "Jiska right null"]
       answer: 1

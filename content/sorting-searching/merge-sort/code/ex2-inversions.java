@@ -1,5 +1,5 @@
 class Main {
-    // Inversions gino: i < j aur a[i] > a[j]. Merge sort ke merge mein O(n log n)
+    // Inversions count karo: i < j aur a[i] > a[j]. Merge sort ke merge mein O(n log n)
     static long countInversions(int[] arr) {
         return sortCount(arr.clone(), 0, arr.length - 1, new int[arr.length]);
     }

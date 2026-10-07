@@ -1,11 +1,11 @@
 class Main {
     // n + 1 numbers, sab 1..n ke beech -> kam se kam ek repeat. Array badle bina, O(1) memory mein dhoondho.
     static int findDuplicate(int[] nums) {
-        // i -> nums[i] ko 'next' maano. Duplicate value par do arrows aate hain = circle ki shuruaat.
+        // i -> nums[i] ko 'next' maano. Duplicate value par 2 arrows aate hain = circle ki shuruaat.
         int slow = nums[0], fast = nums[0];
         do {
-            slow = nums[slow]; // 1 kadam //@step
-            fast = nums[nums[fast]]; // 2 kadam
+            slow = nums[slow]; // 1 step //@step
+            fast = nums[nums[fast]]; // 2 step
         } while (slow != fast);
         slow = nums[0]; // circle start dhoondhne wala Floyd ka doosra hissa //@restart
         while (slow != fast) {

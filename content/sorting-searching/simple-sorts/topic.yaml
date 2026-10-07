@@ -2,7 +2,7 @@ meta:
   id: simple-sorts
   chapter: sorting-searching
   title: "Bubble, Selection, Insertion Sort"
-  subtitle: Teen seedhe O(n²) sorts — kaise chalte hain, kab kaam aate hain, aur kyun interview mein poochte hain
+  subtitle: 3 seedhe O(n²) sorts — kaise chalte hain, kab kaam aate hain, aur kyun interview mein poochte hain
   level: beginner
   minutes: 35
   prereqs: [array, big-o-time]
@@ -11,20 +11,20 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Sorting** = items ko order mein lagana (chhote se bade, ya ulta). Teen sabse simple tareeke:
+    **Sorting** = items ko order mein lagana (chhote se bade, ya ulta). 3 sabse simple tareeke:
 
     | Sort | Idea ek line mein |
     |---|---|
-    | **Bubble** | Padosi jodi galat order mein? Swap. Har pass mein sabse bada end tak chala jaata hai. |
+    | **Bubble** | Neighbor pair galat order mein? Swap. Har pass mein sabse bada end tak chala jaata hai. |
     | **Selection** | Bache hue mein se **sabse chhota** dhoondho, use aage rakh do. |
     | **Insertion** | Ek-ek item uthao, pichhle **sorted hisse** mein sahi jagah ghusa do. |
 
-    Teeno **in-place** (O(1) extra memory) aur worst case **O(n²)**.
+    All 3 **in-place** (O(1) extra memory) aur worst case **O(n²)**.
 
     > [!yaad]
-    > **Stable sort** = barabar values ka purana order bana rahe. Bubble aur insertion stable hain; selection **nahi** (lamba swap barabar wale ko kood jaata hai).
+    > **Stable sort** = barabar values ka purana order bana rahe. Bubble aur insertion stable hain; selection **nahi** (lamba swap barabar wale ko jump kar jaata hai).
   analogy: |
-    **Taash ke patte haath mein lagana** = insertion sort. Naya patta uthaya, haath ke sorted patton mein sahi jagah sarka diya.
+    **Cards ke patte haath mein lagana** = insertion sort. Naya patta uthaya, haath ke sorted patton mein sahi jagah sarka diya.
 
     **School assembly mein line lagana** = selection sort. Teacher poori line mein sabse chhota bachcha dhoondhti hai, use aage bulati hai. Phir baaki mein se sabse chhota…
 
@@ -35,7 +35,7 @@ why:
   body: |
     Real code mein tum `sort()` hi likhoge (O(n log n)). Phir ye kyun seekhein?
 
-    - **Insertion sort sach mein use hota hai:** chhote arrays (≤ ~20 items) aur **lagbhag sorted** data par ye sabse fast hai. Java/Kotlin ka built-in sort (TimSort) andar chhote tukdon ke liye insertion sort hi chalata hai.
+    - **Insertion sort sach mein use hota hai:** chhote arrays (≤ ~20 items) aur **approx sorted** data par ye sabse fast hai. Java/Kotlin ka built-in sort (TimSort) andar chhote pieces ke liye insertion sort hi chalata hai.
     - **Ideas baar-baar aate hain:** selection = "k chhote dhoondho", bubble ke swaps = **inversions**, insertion = "sorted list mein naya item daalo".
     - Interview mein **complexity, stability, best/worst case** poochte hain — inhi se samjho.
 
@@ -47,7 +47,7 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    **Bubble sort** bars par. Peele = compare ho rahe padosi, laal/narangi = swap, hare = pakki jagah.
+    **Bubble sort** bars par. Peele = compare ho rahe neighbor, red/narangi = swap, hare = pakki jagah.
 
     Dekho: har pass ke baad sabse bada bacha bar end par pahunch jaata hai. Apna array daal ke try karo — sorted array par ek pass mein ruk jaata hai.
   viz: { tracer: bubbleBars }
@@ -55,17 +55,17 @@ visual:
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **Insertion sort** (teeno mein sabse kaam ka):
+    **Insertion sort** (all 3 mein sabse kaam ka):
 
     1. Index 0 akela — sorted.
     2. `i = 1` se: `key = a[i]` uthao (jagah khaali).
-    3. Left mein jab tak item `> key`, use ek jagah **daayein khiskao**.
+    3. Left mein jab tak item `> key`, use ek jagah **right shift karo**.
     4. Jahan ruke, wahan `key` rakho.
 
     Ab `0..i` sorted. Aage badho.
 
     > [!tip]
-    > `a[j] > key` (strict `>`) se barabar items aage nahi kudte — isliye insertion sort **stable** hai. `>=` likha to stability toot jaayegi.
+    > `a[j] > key` (strict `>`) se barabar items aage nahi jump karte — isliye insertion sort **stable** hai. `>=` likha to stability toot jaayegi.
   viz: { tracer: insertionTrace }
   code: how
 
@@ -82,15 +82,15 @@ operations:
   - op: "Insertion sort"
     time: "Best O(n), worst O(n²)"
     space: O(1)
-    why: "Stable, adaptive (lagbhag sorted par fast), online (items aate-aate sort)."
+    why: "Stable, adaptive (approx sorted par fast), online (items aate-aate sort)."
   - op: "Insertion sort, k-sorted input"
     time: O(n·k)
     space: O(1)
-    why: "Har item max k jagah khiskta hai."
-  - op: "Shifts / adjacent swaps ki ginti"
+    why: "Har item max k jagah shift hota hai."
+  - op: "Shifts / adjacent swaps ki count"
     time: "= inversions"
-    space: "lagu nahi"
-    why: "Har adjacent swap thik ek ulta jodi theek karta hai."
+    space: "apply nahi"
+    why: "Har adjacent swap thik ek ulta pair theek karta hai."
   - op: "Built-in sort (TimSort / Dual-Pivot Quicksort)"
     time: O(n log n)
     space: "O(n) / O(log n)"
@@ -125,7 +125,7 @@ examples:
       Yahan sort ke liye selection sort likha hai (practice). Asli code mein `heights.sorted()` likho.
 
       > [!tip]
-      > Heights 1..100 tak hain → **counting sort**: har height kitni baar aayi gino, phir order mein bharo. O(n + 100) = O(n). Chhoti range = counting sort socho.
+      > Heights 1..100 tak hain → **counting sort**: har height kitni baar aayi count karo, phir order mein bharo. O(n + 100) = O(n). Chhoti range = counting sort socho.
     dryRun: |
       | Index | heights | expected | Sahi? |
       |---|---|---|---|
@@ -147,18 +147,18 @@ examples:
     title: Kitne adjacent swaps lagenge? (inversions)
     source: { name: Inversion of Array, platform: GFG, url: "https://www.geeksforgeeks.org/problems/inversion-of-array-1587115620/1" }
     problem: |
-      Sirf **padosi** items ko swap kar sakte ho. Array sort karne mein **kam se kam** kitne swaps lagenge?
+      Sirf **neighbor** items ko swap kar sakte ho. Array sort karne mein **kam se kam** kitne swaps lagenge?
 
       Example: `[2, 4, 1, 3, 5]` → **3**
     intuition: |
-      **Inversion** = aisa jodi `(i, j)` jahan `i < j` par `a[i] > a[j]` (ulta order). `[2, 4, 1, 3, 5]` mein: (2,1), (4,1), (4,3) → 3.
+      **Inversion** = aisa pair `(i, j)` jahan `i < j` par `a[i] > a[j]` (ulta order). `[2, 4, 1, 3, 5]` mein: (2,1), (4,1), (4,3) → 3.
 
       Ek adjacent swap **thik ek** inversion khatam karta hai (sirf un do ka order badla, baaki sab ke saath relative order wahi). Sorted array mein 0 inversions. To:
 
       **minimum swaps = inversions**, aur bubble sort exactly utne hi swaps karta hai.
 
       > [!socho]
-      > n = 10⁵ ho to? Bubble O(n²) = 10¹⁰ — bahut slow. **Merge sort** ke merge step mein inversions O(n log n) mein gine jaate hain — Merge Sort topic ka example.
+      > n = 10⁵ ho to? Bubble O(n²) = 10¹⁰ — bahut slow. **Merge sort** ke merge step mein inversions O(n log n) mein count kiye jaate hain — Merge Sort topic ka example.
     dryRun: |
       `[2, 4, 1, 3, 5]`
 
@@ -176,26 +176,26 @@ examples:
 
   - id: nearly-sorted
     level: tricky
-    title: Lagbhag sorted array (har item k door)
+    title: Approx sorted array (har item k door)
     source: { name: Nearly sorted, platform: GFG, url: "https://www.geeksforgeeks.org/problems/nearly-sorted-1587115620/1" }
     problem: |
-      Array lagbhag sorted hai: har item apni **sahi (sorted) jagah se zyada se zyada `k` door** hai. Ise sort karo.
+      Array approx sorted hai: har item apni **sahi (sorted) jagah se zyada se zyada `k` door** hai. Ise sort karo.
 
       Example: `[6, 5, 3, 2, 8, 10, 9]`, k = 3 → `[2, 3, 5, 6, 8, 9, 10]`
     intuition: |
-      General sort O(n log n). Par yahan **extra jaankari** hai — har item paas hi hai. Kaun sa sort isse fayda uthata hai?
+      General sort O(n log n). Par yahan **extra information** hai — har item paas hi hai. Kaun sa sort isse fayda uthata hai?
 
-      **Insertion sort:** har key utna hi peeche khiskti hai jitne bade items uske left mein hain. k-sorted mein wo **≤ k** hain (warna key apni jagah se k se zyada door hoti). To andar ka loop ≤ k → **O(n·k)**.
+      **Insertion sort:** har key utna hi peeche shift hoti hai jitne bade items uske left mein hain. k-sorted mein wo **≤ k** hain (warna key apni jagah se k se zyada door hoti). To andar ka loop ≤ k → **O(n·k)**.
 
-      k chhota (jaise 3) → lagbhag **O(n)**!
+      k chhota (jaise 3) → approx **O(n)**!
 
       > [!tip]
       > k bada ho to **min-heap of size k + 1** → O(n log k). Heap chapter (Top-K) mein. Interview mein dono batao: k chhota → insertion, k bada → heap.
 
       > [!galti]
-      > "Lagbhag sorted" sun ke quick sort mat lagao — simple pivot (pehla/aakhri item) sorted data par O(n²) ho jaata hai.
+      > "Approx sorted" sun ke quick sort mat lagao — simple pivot (pehla/aakhri item) sorted data par O(n²) ho jaata hai.
     dryRun: |
-      | key | Peeche khiska | Array ke baad |
+      | key | Peeche shift hua | Array ke baad |
       |---|---|---|
       | 5 | 1 (6) | 5 6 3 2 8 10 9 |
       | 3 | 2 (6, 5) | 3 5 6 2 8 10 9 |
@@ -213,9 +213,9 @@ examples:
 when:
   use:
     - "Array bahut chhota hai (≤ ~20) — insertion sort ka overhead sabse kam."
-    - "Data lagbhag sorted hai ya items ek-ek karke aa rahe hain — insertion sort."
+    - "Data approx sorted hai ya items ek-ek karke aa rahe hain — insertion sort."
     - "Swaps / writes mehenge hain — selection sort (max n − 1 swaps)."
-    - "Inversions ya 'adjacent swaps' ginne hain — bubble ka idea (bade n par merge sort)."
+    - "Inversions ya 'adjacent swaps' count karne hain — bubble ka idea (bade n par merge sort)."
   avoid:
     - "n bada (> 10⁴) aur random data — O(n²) TLE; built-in sort lo."
     - "Stable sort chahiye — selection mat lo."
@@ -233,15 +233,15 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Java / Kotlin sort"
-    how: "TimSort andar 32-64 size ke chhote tukdon ko insertion sort se sort karta hai, phir merge."
-  - where: "Taash / card games apps"
+    how: "TimSort andar 32-64 size ke chhote pieces ko insertion sort se sort karta hai, phir merge."
+  - where: "Cards / card games apps"
     how: "Haath ke patte lagana — naya patta aate hi insertion."
   - where: "Leaderboard (live)"
-    how: "Ek player ka score badla — sirf wo item apni nayi jagah tak khiskao (insertion step), poora sort nahi."
+    how: "Ek player ka score badla — sirf wo item apni nayi jagah tak shift karo (insertion step), poora sort nahi."
   - where: "Embedded / flash memory"
     how: "Likhna mehenga — selection sort kam se kam writes karta hai."
   - where: "Rankings comparison"
-    how: "Do logon ki movie ranking kitni alag? Inversions gino (Kendall tau distance)."
+    how: "2 logon ki movie ranking kitni alag? Inversions count karo (Kendall tau distance)."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -260,30 +260,30 @@ mistakes:
   - title: "Insertion mein >= likha"
     type: logic
     wrong: |
-      `while (j >= 0 && a[j] >= key)` — barabar items bhi khiske → stability gayi, extra kaam.
+      `while (j >= 0 && a[j] >= key)` — barabar items bhi shift hue → stability gayi, extra kaam.
     right: |
       Strict `>` — barabar item par ruk jao, key uske baad baithe.
   - title: "Insertion mein key ko pehle save nahi kiya"
     type: logic
     wrong: |
-      Shift karte waqt `a[i]` overwrite ho gaya, phir `a[j + 1] = a[i]` galat value.
+      Shift karte time `a[i]` overwrite ho gaya, phir `a[j + 1] = a[i]` galat value.
     right: |
       Shuru mein `val key = a[i]`.
   - title: "Khaali ya 1 item ka array"
     type: empty
     right: |
-      Teeno sorts ke loops (`1 until n`, `0 until n - 1`) n = 0 ya 1 par khud skip ho jaate hain — alag check nahi chahiye. Bas `a[n - 1]` jaisa index seedha mat padhna jab n = 0 ho.
+      All 3 sorts ke loops (`1 until n`, `0 until n - 1`) n = 0 ya 1 par khud skip ho jaate hain — alag check nahi chahiye. Bas `a[n - 1]` jaisa index seedha mat padhna jab n = 0 ho.
 
 # 11. Interview corner
 interview:
   questions:
-    - q: "Teeno simple sorts ki best / worst complexity?"
+    - q: "All 3 simple sorts ki best / worst complexity?"
       a: |
-        Bubble (flag ke saath): best O(n), worst O(n²). Selection: hamesha O(n²). Insertion: best O(n), worst O(n²). Teeno O(1) space.
+        Bubble (flag ke saath): best O(n), worst O(n²). Selection: hamesha O(n²). Insertion: best O(n), worst O(n²). All 3 O(1) space.
     - q: "Stable sort kya hai? Kaunse stable hain?"
       a: |
         Barabar keys ka original order bana rahe. Bubble, insertion stable; selection nahi. Stability tab zaroori jab pehle ek field se sort kiya ho aur ab doosre se karna ho.
-    - q: "Lagbhag sorted data ke liye kaunsa simple sort?"
+    - q: "Approx sorted data ke liye kaunsa simple sort?"
       a: |
         Insertion — adaptive hai: kaam = O(n + inversions). k-sorted par O(n·k).
     - q: "Selection sort kab better hai?"
@@ -292,7 +292,7 @@ interview:
     - q: "Inversions kya hain aur bubble sort se rishta?"
       followUp: true
       a: |
-        i < j, a[i] > a[j] wale jode. Har adjacent swap ek inversion hataata hai, to bubble ke swaps = inversions. O(n log n) ginti merge sort se.
+        i < j, a[i] > a[j] wale jode. Har adjacent swap ek inversion hataata hai, to bubble ke swaps = inversions. O(n log n) count merge sort se.
     - q: "Built-in sort andar insertion sort kyun use karta hai?"
       a: |
         Chhote n par O(n²) ka constant chhota hai, recursion/merge ka overhead nahi. TimSort chhote runs insertion se banata hai.
@@ -302,7 +302,7 @@ interview:
     - q: "Kya comparison sort O(n log n) se tez ho sakta hai?"
       followUp: true
       a: |
-        Nahi (worst case) — n! orders mein se ek chunna hai, har compare 2 raaste → log₂(n!) ≈ n log n compares. Counting/radix sort comparison nahi karte, isliye O(n) ho sakte hain.
+        Nahi (worst case) — n! orders mein se ek choose karna hai, har compare 2 raaste → log₂(n!) ≈ n log n compares. Counting/radix sort comparison nahi karte, isliye O(n) ho sakte hain.
   mayAsk:
     - "Sort Colors (0, 1, 2) ek pass mein."
     - "Insertion Sort List (linked list par)."
@@ -324,14 +324,14 @@ practice:
     url: "https://leetcode.com/problems/can-make-arithmetic-progression-from-sequence/"
     level: easy
     pattern: Sort then check neighbours
-    hint: "Sort karo; har padosi ka fark same hona chahiye."
+    hint: "Sort karo; har neighbor ka fark same hona chahiye."
   - name: Find Target Indices After Sorting Array
     platform: LeetCode
     num: 2089
     url: "https://leetcode.com/problems/find-target-indices-after-sorting-array/"
     level: easy
     pattern: Counting instead of sorting
-    hint: "Sort bhi chalega; par target se chhote kitne (less) aur barabar kitne (eq) gino — answer less..less+eq−1."
+    hint: "Sort bhi chalega; par target se chhote kitne (less) aur barabar kitne (eq) count karo — answer less..less+eq−1."
   - name: Insertion Sort List
     platform: LeetCode
     num: 147
@@ -359,20 +359,20 @@ practice:
     url: "https://leetcode.com/problems/count-of-smaller-numbers-after-self/"
     level: hard
     pattern: Inversions per element (merge sort)
-    hint: "Brute O(n²) TLE. Merge sort mein jab right half ka item pehle jaata hai, wo left ke bache items ke liye 'chhota baad mein' hai — index ke saath gino."
+    hint: "Brute O(n²) TLE. Merge sort mein jab right half ka item pehle jaata hai, wo left ke bache items ke liye 'chhota baad mein' hai — index ke saath count karo."
   - name: Minimum Possible Integer After at Most K Adjacent Swaps On Digits
     platform: LeetCode
     num: 1505
     url: "https://leetcode.com/problems/minimum-possible-integer-after-at-most-k-adjacent-swaps-on-digits/"
     level: hard
     pattern: Adjacent swaps = distance (bubble idea) + Fenwick tree
-    hint: "Har position par sabse chhota digit chuno jo k swaps mein aage aa sake (doori = swaps). Doori nikaalne ke liye pehle hata diye gaye digits gino (BIT)."
+    hint: "Har position par sabse chhota digit choose karo jo k swaps mein aage aa sake (distance = swaps). Distance nikaalne ke liye pehle hata diye gaye digits count karo (BIT)."
 
 # 13. Quick revision
 revision:
   summary:
-    - "Bubble: padosi swap, best O(n) flag se; selection: min dhoondho, hamesha O(n²); insertion: sorted hisse mein ghusao."
-    - "Teeno O(1) space. Bubble + insertion stable, selection nahi."
+    - "Bubble: neighbor swap, best O(n) flag se; selection: min dhoondho, hamesha O(n²); insertion: sorted hisse mein insert karo."
+    - "All 3 O(1) space. Bubble + insertion stable, selection nahi."
     - "Insertion = adaptive: O(n + inversions), k-sorted par O(n·k)."
     - "Adjacent swaps = inversions."
     - "Real code: built-in sort; chhote/lagbhag sorted: insertion."
@@ -394,7 +394,7 @@ revision:
     ```
   quiz:
     - q: "Pehle se sorted array par kaunsa sort O(n²) hi lega?"
-      options: ["Insertion", "Bubble (flag ke saath)", "Selection", "Teeno O(n)"]
+      options: ["Insertion", "Bubble (flag ke saath)", "Selection", "All 3 O(n)"]
       answer: 2
       explain: "Selection har baar poora bacha hissa scan karta hai."
     - q: "[3, 1, 2] mein kitne inversions?"
@@ -402,7 +402,7 @@ revision:
       answer: 1
       explain: "(3,1) aur (3,2)."
     - q: "Kaunsa sort stable NAHI hai?"
-      options: ["Bubble", "Insertion", "Selection", "Teeno stable"]
+      options: ["Bubble", "Insertion", "Selection", "All 3 stable"]
       answer: 2
       explain: "Lamba swap barabar values ka order badal sakta hai: [2a, 2b, 1] → [1, 2b, 2a]."
     - q: "Har item max 2 door hai (k = 2), n = 10⁶. Insertion sort?"
@@ -425,7 +425,7 @@ connections:
     - id: merge-sort
       how: "O(n log n) + inversions count."
     - id: quick-sort
-      how: "Partition idea; sorted data par simple pivot ka khatra."
+      how: "Partition idea; sorted data par simple pivot ka risk."
     - id: sorting-in-practice
       how: "TimSort andar insertion sort; stable sort ka use."
     - id: top-k

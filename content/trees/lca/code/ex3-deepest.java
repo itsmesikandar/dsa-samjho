@@ -11,15 +11,15 @@ class Main {
         }
     }
 
-    // (is subtree ki height, sabse gehre leaves ka LCA)
+    // (is subtree ki height, sabse deep leaves ka LCA)
     record Res(int h, TreeNode node) {}
 
     static Res deep(TreeNode node) {
         if (node == null) return new Res(0, null);
         Res l = deep(node.left);
         Res r = deep(node.right);
-        if (l.h() == r.h()) return new Res(l.h() + 1, node); // dono taraf barabar gehre - yahi LCA //@tie
-        return l.h() > r.h() ? new Res(l.h() + 1, l.node()) : new Res(r.h() + 1, r.node()); // gehri taraf ka jawab //@deeper
+        if (l.h() == r.h()) return new Res(l.h() + 1, node); // dono taraf barabar deep - yahi LCA //@tie
+        return l.h() > r.h() ? new Res(l.h() + 1, l.node()) : new Res(r.h() + 1, r.node()); // deep taraf ka jawab //@deeper
     }
 
     static TreeNode build(Integer... xs) {

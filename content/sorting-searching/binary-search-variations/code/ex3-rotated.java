@@ -1,5 +1,5 @@
 class Main {
-    // Sorted (distinct) array ko kisi point par ghuma diya. Target ka index; na ho to -1. O(log n).
+    // Sorted (distinct) array ko kisi point par rotate kar diya. Target ka index; na ho to -1. O(log n).
     static int search(int[] a, int target) {
         int lo = 0, hi = a.length - 1;
         while (lo <= hi) {

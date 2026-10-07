@@ -12,25 +12,25 @@ class Main {
         }
     }
 
-    // k-k nodes ke tukde ulte karo; aakhir mein k se kam bache to waise hi chhodo
+    // k-k nodes ke pieces ulte karo; aakhir mein k se kam bache to waise hi chhodo
     static ListNode reverseKGroup(ListNode head, int k) {
         ListNode dummy = new ListNode(0, head);
-        ListNode groupPrev = dummy; // pichhle (ulte ho chuke) tukde ka aakhri node
+        ListNode groupPrev = dummy; // pichhle (ulte ho chuke) pieces ka aakhri node
         while (true) {
             ListNode kth = groupPrev;
             for (int i = 0; i < k && kth != null; i++) kth = kth.next; // aage poore k nodes hain? //@check
             if (kth == null) break; // k se kam bache: chhod do
-            ListNode groupNext = kth.next; // agle tukde ka pehla
-            ListNode prev = groupNext; // ulta tukda seedha agle tukde se jude, isliye prev yahan se
+            ListNode groupNext = kth.next; // agle pieces ka pehla
+            ListNode prev = groupNext; // ulta piece seedha agle pieces se jude, isliye prev yahan se
             ListNode cur = groupPrev.next;
-            while (cur != groupNext) { // tukde ke arrows ulte //@flip
+            while (cur != groupNext) { // pieces ke arrows ulte //@flip
                 ListNode nxt = cur.next;
                 cur.next = prev;
                 prev = cur;
                 cur = nxt;
             }
-            ListNode oldFirst = groupPrev.next; // ulte hone ke baad ye tukde ka aakhri hai
-            groupPrev.next = kth; // pichhla tukda ab is tukde ke naye pehle (purane k-th) se jude //@join
+            ListNode oldFirst = groupPrev.next; // ulte hone ke baad ye pieces ka aakhri hai
+            groupPrev.next = kth; // pichhla piece ab is pieces ke naye pehle (purane k-th) se jude //@join
             groupPrev = oldFirst;
         }
         return dummy.next;

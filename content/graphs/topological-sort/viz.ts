@@ -59,19 +59,19 @@ export const lineupTrace = tracer<{ edges: number[][] }>({
       for (let v = 0; v < N; v++) if (!placed.includes(v)) badges[v] = `in ${left[v]}`;
       return [graphView(N, edges, { directed: true, pos, tones, badges, label: 'Upar: baaki kaam · Neeche: order' })];
     };
-    const legend = { new: 'free (koi intezaar nahi)', active: 'abhi line mein aaya', done: 'line mein' };
-    t.frame({ caption: 'Kaam aur unki shartein: u → v matlab "pehle u, phir v". Aisa order chahiye jisme har arrow AAGE ki taraf jaaye. Badge "in k" = kitne kaamon ka intezaar hai (in-degree).', legend, panels: view() });
+    const legend = { new: 'free (koi wait nahi)', active: 'abhi line mein aaya', done: 'line mein' };
+    t.frame({ caption: 'Kaam aur unki conditions: u → v matlab "pehle u, phir v". Aisa order chahiye jisme har arrow AAGE ki taraf jaaye. Badge "in k" = kitne kaamon ka wait hai (in-degree).', legend, panels: view() });
     for (const u of order) {
       placed.push(u);
       const freed: number[] = [];
       edges.forEach(([a, b]) => a === u && --left[b] === 0 && freed.push(b));
-      t.frame({ caption: `${u} line mein — iska koi intezaar baaki nahi tha.${freed.length ? ` Iske jaate hi ${freed.join(', ')} free.` : ''}`, legend, panels: view(u) });
+      t.frame({ caption: `${u} line mein — iska koi wait baaki nahi tha.${freed.length ? ` Iske jaate hi ${freed.join(', ')} free.` : ''}`, legend, panels: view(u) });
     }
     if (order.length === N) {
-      t.frame({ caption: `Sab arrows baayein se daayein! Yahi topological order: ${listStr(order)}. Ek graph ke kai sahi orders ho sakte hain (jaise free nodes mein kaun pehle).`, legend, panels: view() });
+      t.frame({ caption: `Sab arrows left se right! Yahi topological order: ${listStr(order)}. Ek graph ke kai sahi orders ho sakte hain (jaise free nodes mein kaun pehle).`, legend, panels: view() });
     } else {
       const stuck = Array.from({ length: N }, (_, v) => v).filter((v) => !placed.includes(v));
-      t.frame({ caption: `${stuck.join(', ')} kabhi free nahi hue — ye ek doosre ka intezaar kar rahe hain (cycle). Cycle mein koi "pehla" nahi ho sakta → topological order possible nahi.`, legend: { ...legend, error: 'cycle mein phanse' }, panels: view(undefined, true) });
+      t.frame({ caption: `${stuck.join(', ')} kabhi free nahi hue — ye ek doosre ka wait kar rahe hain (cycle). Cycle mein koi "pehla" nahi ho sakta → topological order possible nahi.`, legend: { ...legend, error: 'cycle mein phanse' }, panels: view(undefined, true) });
     }
     return listStr(order);
   },
@@ -102,18 +102,18 @@ export const kahnTrace = tracer<{ edges: number[][] }>({
     };
     t.frame({ line: 'build', caption: `Har edge u → v: adj[u] mein v, aur indeg[v]++. In-degree = "kitne kaam pehle hone chahiye". In-degrees: ${indeg.map((d, x) => `${x}:${d}`).join(', ')}.`, legend, panels: view() });
     for (let v = 0; v < N; v++) if (indeg[v] === 0) queue.push(v);
-    t.frame({ line: 'ready', caption: queue.length ? `In-degree 0 wale (${queue.join(', ')}) ka koi intezaar nahi → queue mein. Ye abhi ho sakte hain.` : 'Kisi ki in-degree 0 nahi — har node kisi ka intezaar kar raha hai. Shuru hi nahi ho sakta (cycle).', legend, panels: view() });
+    t.frame({ line: 'ready', caption: queue.length ? `In-degree 0 wale (${queue.join(', ')}) ka koi wait nahi → queue mein. Ye abhi ho sakte hain.` : 'Kisi ki in-degree 0 nahi — har node kisi ka wait kar raha hai. Shuru hi nahi ho sakta (cycle).', legend, panels: view() });
     while (queue.length) {
       const u = queue.shift()!;
       order.push(u);
-      t.frame({ line: 'take', caption: `${u} nikala → order mein. Ab ${u} ke baad wale (${adj[u].length ? adj[u].join(', ') : 'koi nahi'}) ka ek intezaar kam hoga.`, vars: { u }, legend, panels: view(u) });
+      t.frame({ line: 'take', caption: `${u} nikala → order mein. Ab ${u} ke baad wale (${adj[u].length ? adj[u].join(', ') : 'koi nahi'}) ka ek wait kam hoga.`, vars: { u }, legend, panels: view(u) });
       for (const v of adj[u]) {
         indeg[v]--;
         if (indeg[v] === 0) {
           queue.push(v);
           t.frame({ line: 'free', caption: `indeg[${v}]-- → 0. ${v} ke saare "pehle" wale ho gaye → queue mein.`, vars: { u, v, indeg: 0 }, legend, panels: view(u, v, 'new') });
         } else {
-          t.frame({ line: 'dec', caption: `indeg[${v}]-- → ${indeg[v]}. Abhi bhi ${indeg[v]} aur ka intezaar.`, vars: { u, v, indeg: indeg[v] }, legend, panels: view(u, v) });
+          t.frame({ line: 'dec', caption: `indeg[${v}]-- → ${indeg[v]}. Abhi bhi ${indeg[v]} aur ka wait.`, vars: { u, v, indeg: indeg[v] }, legend, panels: view(u, v) });
         }
       }
     }
@@ -160,7 +160,7 @@ export const canFinishTrace = tracer<{ pre: number[][] }>({
       t.frame({ line: freed.length ? 'free' : 'take', caption: `Course ${c} padha (done = ${doneList.length}).${freed.length ? ` ${freed.join(', ')} ke saare pre ho gaye → queue.` : ''}`, vars: { c, done: doneList.length }, legend, panels: view(c) });
     }
     const ok = doneList.length === n;
-    t.frame({ line: 'check', caption: ok ? `done = ${n} = saare courses → true. O(V + E).` : `done = ${doneList.length} < ${n}. Bache courses ek doosre ke pre ka intezaar kar rahe hain (cycle) → false.`, legend, panels: view(undefined, !ok) });
+    t.frame({ line: 'check', caption: ok ? `done = ${n} = saare courses → true. O(V + E).` : `done = ${doneList.length} < ${n}. Bache courses ek doosre ke pre ka wait kar rahe hain (cycle) → false.`, legend, panels: view(undefined, !ok) });
     return String(ok);
   },
 });
@@ -206,7 +206,7 @@ export const semestersTrace = tracer<{ rel: number[][] }>({
   },
 });
 
-// ---------- Example 3: Course Schedule II — DFS + 3 rang ----------
+// ---------- Example 3: Course Schedule II — DFS + 3 color ----------
 const COL_DEFAULT = [[1, 0], [2, 0], [3, 1], [3, 2], [4, 3], [4, 5]];
 const COL_POS: Pos = { 0: [0, 40], 1: [30, 0], 2: [30, 80], 3: [60, 40], 4: [100, 40], 5: [80, 100] };
 
@@ -218,7 +218,7 @@ export const colorsTrace = tracer<{ pre: number[][] }>({
     const color: number[] = Array(N).fill(0);
     const post: number[] = [];
     const stack: number[] = [];
-    const legend = { active: 'gray (raste par)', done: 'black (poora)', compare: 'padosi check', error: 'cycle' };
+    const legend = { active: 'gray (raste par)', done: 'black (poora)', compare: 'neighbor check', error: 'cycle' };
     const view = (u?: number, v?: number, vt: Tone = 'compare', cyc: number[] = []): Panel[] => {
       const tones: Tones = {};
       color.forEach((c, x) => c && (tones[x] = c === 1 ? 'active' : 'done'));
@@ -241,14 +241,14 @@ export const colorsTrace = tracer<{ pre: number[][] }>({
       for (const v of adj[u]) {
         if (color[v] === 1) {
           const cyc = stack.slice(stack.indexOf(v));
-          t.frame({ line: 'cycle', caption: `${v} GRAY hai — yaani abhi ke raste par. ${u} → ${v} wapas raste par le jaata hai: ${[...cyc, v].join(' → ')}. Cycle → koi order nahi.`, vars: { u, v }, legend, panels: view(u, v, 'error', cyc) });
+          t.frame({ line: 'cycle', caption: `${v} GRAY hai — matlab abhi ke raste par. ${u} → ${v} wapas raste par le jaata hai: ${[...cyc, v].join(' → ')}. Cycle → koi order nahi.`, vars: { u, v }, legend, panels: view(u, v, 'error', cyc) });
           return true;
         }
         if (color[v] === 2) {
           t.frame({ line: 'go', caption: `${v} black — poora ho chuka, postorder mein pehle se. Cycle nahi (alag raste se aaye), skip.`, vars: { u, v }, legend, panels: view(u, v, 'done') });
           continue;
         }
-        t.frame({ line: 'go', caption: `${v} white (anchhua) → dfs(${v}).`, vars: { u, v }, legend, panels: view(u, v) });
+        t.frame({ line: 'go', caption: `${v} white (untouched) → dfs(${v}).`, vars: { u, v }, legend, panels: view(u, v) });
         if (dfs(v)) return true;
       }
       color[u] = 2;

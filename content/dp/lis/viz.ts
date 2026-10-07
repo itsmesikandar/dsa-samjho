@@ -37,7 +37,7 @@ export const greedyLisTrace = tracer<{ nums: number[] }>({
   inputs: [{ name: 'nums', type: 'intArray', label: 'nums', default: [3, 9, 4, 5, 1, 6, 2], minLen: 2, maxLen: 9, min: 1, max: 20 }],
   run({ nums }, t) {
     const picked = [0];
-    t.frame({ caption: `Badhta subsequence: kuch elements chuno, order wahi, har agla pichhle se BADA. Pehla try — greedy: ${nums[0]} se shuru, aage jo bhi bada mile turant le lo.`, legend: { new: 'liya', active: 'abhi' }, panels: [bars(nums, { 0: 'new' })] });
+    t.frame({ caption: `Badhta subsequence: kuch elements choose karo, order wahi, har agla pichhle se BADA. Pehla try — greedy: ${nums[0]} se shuru, aage jo bhi bada mile turant le lo.`, legend: { new: 'liya', active: 'abhi' }, panels: [bars(nums, { 0: 'new' })] });
     for (let i = 1; i < nums.length; i++) {
       const last = nums[picked[picked.length - 1]];
       const take = nums[i] > last;
@@ -46,7 +46,7 @@ export const greedyLisTrace = tracer<{ nums: number[] }>({
       t.frame({ caption: take ? `${nums[i]} > ${last} → le liya. Chain: ${picked.map((k) => nums[k]).join(', ')}.` : `${nums[i]} ≤ ${last} → nahi le sakte.${picked.length > 1 && nums[i] > nums[picked[picked.length - 2]] ? ` (${last} na liya hota to ${nums[i]} kaam aata…)` : ''}`, vars: { greedy: picked.length }, legend: { new: 'liya', active: 'chhoda' }, panels: [bars(nums, tones)] });
     }
     const best = lisIdx(nums);
-    t.frame({ caption: best.length > picked.length ? `Greedy: ${picked.length}. Asli LIS: ${best.map((k) => nums[k]).join(', ')} = ${best.length}. Ek bada number jaldi le liya to aage ke chhote-chhote kadam band. Har element par 'lo ya chhodo' — 2ⁿ raaste. DP: har i ke liye "i par khatam hone wali sabse lambi chain" yaad rakho.` : `Is baar greedy (${picked.length}) sahi nikla — par hamesha nahi (default input dekho: 9 jaldi lene se 4, 5, 6 chhoot gaye). DP: har i par khatam hone wali sabse lambi chain yaad rakho.`, vars: { greedy: picked.length, LIS: best.length }, legend: { found: 'asli LIS' }, panels: [bars(nums, tonesOf(best, 'found'))] });
+    t.frame({ caption: best.length > picked.length ? `Greedy: ${picked.length}. Asli LIS: ${best.map((k) => nums[k]).join(', ')} = ${best.length}. Ek bada number jaldi le liya to aage ke chhote-chhote step band. Har element par 'lo ya chhodo' — 2ⁿ raaste. DP: har i ke liye "i par khatam hone wali sabse lambi chain" yaad rakho.` : `Is baar greedy (${picked.length}) sahi nikla — par hamesha nahi (default input dekho: 9 jaldi lene se 4, 5, 6 chhoot gaye). DP: har i par khatam hone wali sabse lambi chain yaad rakho.`, vars: { greedy: picked.length, LIS: best.length }, legend: { found: 'asli LIS' }, panels: [bars(nums, tonesOf(best, 'found'))] });
     return String(best.length);
   },
 });
@@ -59,7 +59,7 @@ export const lisDpTrace = tracer<{ nums: number[] }>({
     const dp: number[] = Array(n).fill(1);
     const parent: number[] = Array(n).fill(-1);
     const view = (bt: Tones = {}, dt: Tones = {}): Panel[] => [bars(nums, bt), array(dp, { label: 'dp[i] = i par KHATAM hone wala sabse lamba badhta subsequence', tones: dt })];
-    t.frame({ line: 'init', caption: 'Har element akela bhi ek chain (length 1) → dp sab 1. Ab har i par: peeche ke har j jahan nums[j] < nums[i] — j wali chain ke peeche i jod sakte ho. Sabse lambi chuno.', panels: view() });
+    t.frame({ line: 'init', caption: 'Har element akela bhi ek chain (length 1) → dp sab 1. Ab har i par: peeche ke har j jahan nums[j] < nums[i] — j wali chain ke peeche i jod sakte ho. Sabse lambi choose karo.', panels: view() });
     for (let i = 0; i < n; i++) {
       const ok: number[] = [];
       for (let j = 0; j < i; j++) {
@@ -81,23 +81,23 @@ export const lisDpTrace = tracer<{ nums: number[] }>({
   },
 });
 
-// ---------- Example 1: Lagaataar badhta hissa (subarray) ----------
+// ---------- Example 1: Continuous badhta hissa (subarray) ----------
 export const lcisTrace = tracer<{ nums: number[] }>({
   inputs: [{ name: 'nums', type: 'intArray', label: 'nums', default: [2, 6, 7, 3, 5, 8, 9, 1], minLen: 1, maxLen: 10, min: 1, max: 20 }],
   run({ nums }, t) {
     let best = 0;
     let cur = 0;
     let bestEnd = 0;
-    t.frame({ caption: 'Yahan LAGAATAAR chahiye (subarray). To bas ek counter: pichhle se bada → silsila aage (+1), warna naya silsila (1).', panels: [bars(nums)] });
+    t.frame({ caption: 'Yahan CONTINUOUS chahiye (subarray). To bas ek counter: pichhle se bada → chain aage (+1), warna naya chain (1).', panels: [bars(nums)] });
     for (let i = 0; i < nums.length; i++) {
       const up = i > 0 && nums[i - 1] < nums[i];
       cur = up ? cur + 1 : 1;
       if (cur > best) (best = cur), (bestEnd = i);
       const run = Array.from({ length: cur }, (_, k) => i - k);
-      t.frame({ line: 'step', caption: i === 0 ? `${nums[0]}: shuru, cur = 1.` : up ? `${nums[i]} > ${nums[i - 1]} → silsila badha, cur = ${cur}.` : `${nums[i]} ≤ ${nums[i - 1]} → toota, naya shuru: cur = 1.`, vars: { cur, best }, legend: { new: 'abhi ka silsila' }, panels: [bars(nums, tonesOf(run, 'new'))] });
+      t.frame({ line: 'step', caption: i === 0 ? `${nums[0]}: shuru, cur = 1.` : up ? `${nums[i]} > ${nums[i - 1]} → chain badha, cur = ${cur}.` : `${nums[i]} ≤ ${nums[i - 1]} → toota, naya shuru: cur = 1.`, vars: { cur, best }, legend: { new: 'abhi ka chain' }, panels: [bars(nums, tonesOf(run, 'new'))] });
     }
     const lis = lisIdx(nums).length;
-    t.frame({ line: 'done', caption: `Sabse lamba lagaataar = ${best}. Gap allowed hota (LIS) to ${lis}${lis > best ? ' — subsequence chhote hisse jod sakta hai' : ''}. O(n), O(1).`, legend: { found: 'jawab' }, panels: [bars(nums, tonesOf(Array.from({ length: best }, (_, k) => bestEnd - k), 'found'))] });
+    t.frame({ line: 'done', caption: `Sabse lamba continuous = ${best}. Gap allowed hota (LIS) to ${lis}${lis > best ? ' — subsequence chhote hisse jod sakta hai' : ''}. O(n), O(1).`, legend: { found: 'jawab' }, panels: [bars(nums, tonesOf(Array.from({ length: best }, (_, k) => bestEnd - k), 'found'))] });
     return String(best);
   },
 });
@@ -123,11 +123,11 @@ export const tailsTrace = tracer<{ nums: number[] }>({
 
 // ---------- Example 3: Russian doll envelopes ----------
 export const dollTrace = tracer<{ env: number[][] }>({
-  inputs: [{ name: 'env', type: 'intGrid', label: 'Lifafe (width height; …)', default: [[3, 4], [5, 6], [5, 5], [5, 7], [2, 2], [6, 8]], maxRows: 7, maxCols: 2, min: 1, max: 9 }],
-  check: ({ env }) => (env.some((r) => r.length !== 2) ? 'Har row mein do numbers: width height.' : null),
+  inputs: [{ name: 'env', type: 'intGrid', label: 'Envelopes (width height; …)', default: [[3, 4], [5, 6], [5, 5], [5, 7], [2, 2], [6, 8]], maxRows: 7, maxCols: 2, min: 1, max: 9 }],
+  check: ({ env }) => (env.some((r) => r.length !== 2) ? 'Har row mein 2 numbers: width height.' : null),
   run({ env }, t) {
     const lab = (e: number[]) => `${e[0]}×${e[1]}`;
-    t.frame({ caption: 'Lifafa A, lifafe B ke andar tabhi jab A ki width AUR height dono chhoti. Do cheezein ek saath — ek ko sort se sambhaalo, doosre par LIS.', panels: [array(env.map(lab), { label: 'lifafe (w×h)' })] });
+    t.frame({ caption: 'Envelope A, envelopes B ke andar tabhi jab A ki width AUR height dono chhoti. 2 cheezein ek saath — ek ko sort se handle karo, doosre par LIS.', panels: [array(env.map(lab), { label: 'envelopes (w×h)' })] });
     const sorted = [...env].sort((a, b) => a[0] - b[0] || b[1] - a[1]);
     const heights = sorted.map((e) => e[1]);
     const wrong = [...env].sort((a, b) => a[0] - b[0] || a[1] - b[1]).map((e) => e[1]);
@@ -145,7 +145,7 @@ export const dollTrace = tracer<{ env: number[][] }>({
       tails[pos] = h;
       t.frame({ line: 'place', caption: `${lab(e)}: height ${h} → ${grow ? `tails ke end mein, chain ${tails.length} ki` : `tails[${pos}] ki jagah`}.`, vars: { size: tails.length }, legend: { active: 'abhi', new: 'tails mein' }, panels: [array(sorted.map(lab), { label: 'sorted', tones: { [i]: 'active' } }), array(tails, { label: 'tails (heights)', tones: { [pos]: 'new' } })] });
     });
-    t.frame({ line: 'done', caption: `Jawab ${tails.length} lifafe. Same width par height bhi badhte order mein sort karte to ${wrongLen}${wrongLen > tails.length ? ' — GALAT, same width wale ek chain mein gin liye' : ''}. O(n log n).`, legend: { found: 'jawab' }, panels: [array(sorted.map(lab), { label: 'sorted' }), array(tails, { label: 'tails', tones: tonesOf(tails.map((_, k) => k), 'found') })] });
+    t.frame({ line: 'done', caption: `Jawab ${tails.length} envelopes. Same width par height bhi badhte order mein sort karte to ${wrongLen}${wrongLen > tails.length ? ' — GALAT, same width wale ek chain mein gin liye' : ''}. O(n log n).`, legend: { found: 'jawab' }, panels: [array(sorted.map(lab), { label: 'sorted' }), array(tails, { label: 'tails', tones: tonesOf(tails.map((_, k) => k), 'found') })] });
     return String(tails.length);
   },
 });

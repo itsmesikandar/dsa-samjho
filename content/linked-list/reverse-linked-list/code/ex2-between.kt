@@ -1,21 +1,21 @@
 class ListNode(var value: Int, var next: ListNode? = null)
 
-// Sirf position left se right tak (1 se ginti) wala tukda ulta karo, ek pass mein
+// Sirf position left se right tak (1 se count) wala piece ulta karo, ek pass mein
 fun reverseBetween(head: ListNode?, left: Int, right: Int): ListNode? {
     val dummy = ListNode(0, head) // left = 1 ho tab bhi 'pehle wala' node mile
     var before: ListNode = dummy
-    for (i in 1 until left) before = before.next!! // tukde se theek pehle wala node //@walk
-    val start = before.next!! // tukde ka pehla - ulta hone ke baad aakhri banega
+    for (i in 1 until left) before = before.next!! // pieces se theek pehle wala node //@walk
+    val start = before.next!! // pieces ka pehla - ulta hone ke baad aakhri banega
     var prev: ListNode? = null
     var cur: ListNode? = start
-    for (i in left..right) { // sirf tukde ke arrows ulte //@flip
+    for (i in left..right) { // sirf pieces ke arrows ulte //@flip
         val c = cur!!
         val nxt = c.next
         c.next = prev
         prev = c
         cur = nxt
     }
-    before.next = prev // pehle wala ab tukde ke naye shuru ko pakde //@join
+    before.next = prev // pehle wala ab pieces ke naye shuru ko pakde //@join
     start.next = cur // purana shuru (ab aakhri) baaki list ko pakde
     return dummy.next
 }

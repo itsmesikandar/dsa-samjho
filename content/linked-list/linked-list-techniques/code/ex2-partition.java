@@ -14,7 +14,7 @@ class Main {
 
     // x se chhote sab pehle, baaki baad mein; dono hisson ka andar ka order wahi rahe
     static ListNode partition(ListNode head, int x) {
-        ListNode lessDummy = new ListNode(0, null); // do alag lists banao, dono ka nakli shuru
+        ListNode lessDummy = new ListNode(0, null); // 2 alag lists banao, dono ka nakli shuru
         ListNode moreDummy = new ListNode(0, null);
         ListNode less = lessDummy, more = moreDummy;
         for (ListNode cur = head; cur != null; cur = cur.next) {

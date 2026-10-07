@@ -134,7 +134,7 @@ export const consecTrace = tracer<{ nums: number[] }>({
       }
       let len = 1;
       const tones: ToneMap = { [idx(x)]: 'active' };
-      t.frame({ line: 'count', caption: `${x}: ${x - 1} set mein nahi → ${x} ek sequence ki SHURUAAT hai. Aage ginte hain.`, vars: { x, len, best }, panels: [array(line, { label: 'set (sorted view)', tones })] });
+      t.frame({ line: 'count', caption: `${x}: ${x - 1} set mein nahi → ${x} ek sequence ki SHURUAAT hai. Aage count karte hain.`, vars: { x, len, best }, panels: [array(line, { label: 'set (sorted view)', tones })] });
       while (set.has(x + len)) {
         tones[idx(x + len)] = 'active';
         len++;
@@ -144,7 +144,7 @@ export const consecTrace = tracer<{ nums: number[] }>({
       best = Math.max(best, len);
       t.frame({ line: 'best', caption: better ? `Sequence ${x}..${x + len - 1}, length ${len} → naya best!` : `Length ${len}, best (${best}) wahi.`, vars: { x, len, best }, panels: [array(line, { label: 'set (sorted view)', tones: Object.fromEntries(Object.keys(tones).map((k) => [k, (better ? 'found' : 'done') as Tone])) })] });
     }
-    t.frame({ caption: `Answer ${best}. Har number sirf ek sequence mein gina jaata hai (sirf shuruaat se ginti) → total O(n). Sort karte to O(n log n).`, vars: { best }, panels: [array(line, { label: 'set (sorted view)' })] });
+    t.frame({ caption: `Answer ${best}. Har number sirf ek sequence mein gina jaata hai (sirf shuruaat se count) → total O(n). Sort karte to O(n log n).`, vars: { best }, panels: [array(line, { label: 'set (sorted view)' })] });
     return String(best);
   },
 });

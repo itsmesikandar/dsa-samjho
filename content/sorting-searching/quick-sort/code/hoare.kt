@@ -1,4 +1,4 @@
-// Hoare-style partition: do pointers dono kinaron se, galat taraf wale items ka jodi swap.
+// Hoare-style partition: 2 pointers dono edges se, galat taraf wale items ka pair swap.
 // Lomuto se kam swaps, aur sab barabar items par bhi beech se todta hai.
 fun quickSortHoare(a: IntArray, l: Int, r: Int) {
     if (l >= r) return

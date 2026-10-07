@@ -38,10 +38,10 @@ class Main {
         }
         List<List<Integer>> levels = bfsLevels(adj, 0);
         System.out.println(levels);
-        System.out.println("0 se sabse door: " + levels.get(levels.size() - 1) + " (" + (levels.size() - 1) + " kadam)");
+        System.out.println("0 se sabse door: " + levels.get(levels.size() - 1) + " (" + (levels.size() - 1) + " step)");
     }
 }
 
 // Output:
 // [[0], [1, 2], [3, 4], [5, 6]]
-// 0 se sabse door: [5, 6] (3 kadam)
+// 0 se sabse door: [5, 6] (3 step)

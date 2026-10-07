@@ -4,7 +4,7 @@ import type { Cell, GridPanel, Tone, ToneMap } from '@/components/viz/engine/typ
 // ---------- 3. Visual intro: staircase of totals ----------
 export const staircase = tracer<{ arr: number[]; l: number; r: number }>({
   inputs: [
-    { name: 'arr', type: 'intArray', label: 'Har din ka kharcha', default: [3, 1, 4, 1, 5, 9], minLen: 1, maxLen: 8, min: 1, max: 9 },
+    { name: 'arr', type: 'intArray', label: 'Har din ka cost', default: [3, 1, 4, 1, 5, 9], minLen: 1, maxLen: 8, min: 1, max: 9 },
     { name: 'l', type: 'int', label: 'l (range shuru)', default: 1, min: 0, max: 7 },
     { name: 'r', type: 'int', label: 'r (range end)', default: 3, min: 0, max: 7 },
   ],
@@ -12,20 +12,20 @@ export const staircase = tracer<{ arr: number[]; l: number; r: number }>({
   run({ arr, l, r }, t) {
     const pre = [0];
     t.frame({
-      caption: 'arr = har din ka kharcha. Sawaal: "din l se din r tak kul kitna kharcha?" — har baar loop chala ke jodna slow hai. Ek "passbook" banate hain.',
+      caption: 'arr = har din ka cost. Sawaal: "din l se din r tak total kitna cost?" — har baar loop chala ke jodna slow hai. Ek "passbook" banate hain.',
       panels: [array(arr, { label: 'arr' }), { kind: 'bars', label: 'pre (ab tak ka total)', values: [...pre] }],
     });
     arr.forEach((x, i) => {
       pre.push(pre[i] + x);
       t.frame({
-        caption: `pre[${i + 1}] = pre[${i}] + arr[${i}] = ${pre[i]} + ${x} = ${pre[i + 1]}. Passbook ka balance jaisa — har din purane total mein naya kharcha.`,
+        caption: `pre[${i + 1}] = pre[${i}] + arr[${i}] = ${pre[i]} + ${x} = ${pre[i + 1]}. Passbook ka balance jaisa — har din purane total mein naya cost.`,
         vars: { i },
         panels: [array(arr, { label: 'arr', tones: { [i]: 'active' } }), { kind: 'bars', label: 'pre (ab tak ka total)', values: [...pre], tones: { [i + 1]: 'new' } }],
       });
     });
     const ans = pre[r + 1] - pre[l];
     t.frame({
-      caption: `Din ${l} se ${r} ka kharcha = pre[${r + 1}] − pre[${l}] = ${pre[r + 1]} − ${pre[l]} = ${ans}. Do seedhiyon ki unchai ka fark = beech ka hissa. Loop nahi — O(1)!`,
+      caption: `Din ${l} se ${r} ka cost = pre[${r + 1}] − pre[${l}] = ${pre[r + 1]} − ${pre[l]} = ${ans}. Do stairs ki height ka fark = beech ka hissa. Loop nahi — O(1)!`,
       vars: { l, r, answer: ans },
       legend: { compare: 'pre[l] (ghatao)', found: 'pre[r+1] / answer' },
       panels: [
@@ -76,7 +76,7 @@ export const pivotTrace = tracer<{ arr: number[] }>({
   run({ arr }, t) {
     const total = arr.reduce((a, b) => a + b, 0);
     let left = 0;
-    t.frame({ line: 'total', caption: `total = ${total}. Har i par: left pata hai (chalte-chalte jodte jaayenge), aur right = total − left − arr[i]. Do loops ki zaroorat nahi!`, vars: { total }, panels: [array(arr)] });
+    t.frame({ line: 'total', caption: `total = ${total}. Har i par: left pata hai (chalte-chalte jodte jaayenge), aur right = total − left − arr[i]. 2 loops ki zaroorat nahi!`, vars: { total }, panels: [array(arr)] });
     for (let i = 0; i < arr.length; i++) {
       const right = total - left - arr[i];
       const ranges = [];
@@ -127,7 +127,7 @@ export const productTrace = tracer<{ nums: number[] }>({
       });
       right *= nums[i];
     }
-    t.frame({ line: 'done', caption: `Answer ${listStr(res)}. Do pass → O(n). Output array chhod ke sirf ek variable (right) → O(1) extra space.`, panels: [array(nums, { label: 'nums' }), array(res, { label: 'res' })] });
+    t.frame({ line: 'done', caption: `Answer ${listStr(res)}. 2 pass → O(n). Output array chhod ke sirf ek variable (right) → O(1) extra space.`, panels: [array(nums, { label: 'nums' }), array(res, { label: 'res' })] });
     return listStr(res);
   },
 });

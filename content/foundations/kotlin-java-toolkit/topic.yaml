@@ -2,7 +2,7 @@ meta:
   id: kotlin-java-toolkit
   chapter: foundations
   title: DSA ke liye Kotlin & Java toolkit
-  subtitle: Arrays, collections, StringBuilder, overflow — har problem mein kaam aane wale auzaar
+  subtitle: Arrays, collections, StringBuilder, overflow — har problem mein kaam aane wale tool
   level: beginner
   minutes: 35
   prereqs: [memory-basics, big-o-time]
@@ -29,9 +29,9 @@ what:
     > [!yaad]
     > Kotlin ka `mutableListOf()` andar se Java ka `ArrayList` hi hai, `mutableMapOf()` = `LinkedHashMap`, `hashMapOf()` = `HashMap`. Kotlin JVM par Java ki hi collections use karta hai — complexity same.
   analogy: |
-    **Mistri ka auzaar ka thaila** socho. Har kaam ke liye sahi auzaar — kil ke liye hathoda, screw ke liye screwdriver. Hathode se screw lagaoge to kaam hoga, par galat aur dheere.
+    **Mistri ka tool ka thaila** socho. Har kaam ke liye sahi tool — kil ke liye hammer, screw ke liye screwdriver. Hammer se screw lagaoge to kaam hoga, par galat aur dheere.
 
-    DSA mein bhi: "pehle dekha hai?" → **HashSet**. "Sabse chhota baar-baar?" → **PriorityQueue**. "Jo last aaya pehle niklega" → **ArrayDeque as stack**. Sahi auzaar chuno, code aadha ho jaata hai.
+    DSA mein bhi: "pehle dekha hai?" → **HashSet**. "Sabse chhota baar-baar?" → **PriorityQueue**. "Jo last aaya pehle niklega" → **ArrayDeque as stack**. Sahi tool choose karo, code aadha ho jaata hai.
 
 # 2. Kyun chahiye?
 why:
@@ -44,7 +44,7 @@ why:
     > [!socho]
     > Queue chahiye. `ArrayList` mein `add()` aur `removeAt(0)` se kaam chalega?
     >
-    > Chalega, par `removeAt(0)` har baar saare items left khiskata hai → **O(n)**. n operations → O(n²). `ArrayDeque.removeFirst()` **O(1)** hai. Sahi auzaar!
+    > Chalega, par `removeAt(0)` har baar saare items left shift karta hai → **O(n)**. n operations → O(n²). `ArrayDeque.removeFirst()` **O(1)** hai. Sahi tool!
 
 # 3. Visual intro
 visual:
@@ -53,7 +53,7 @@ visual:
 
     `List<Int>` (Java: `ArrayList<Integer>`) mein har number ek **alag object** (Integer) ban jaata hai — isko **boxing** kehte hain. List mein sirf un objects ke **addresses** hote hain. Animation mein arrows dekho.
 
-    Nateeja: List ~4-5 guna zyada memory leti hai aur thodi dheemi hai. Isliye DSA mein jahan size fixed ho, **`IntArray` / `int[]`** lo.
+    Result: List ~4-5 times zyada memory leti hai aur thodi slow hai. Isliye DSA mein jahan size fixed ho, **`IntArray` / `int[]`** lo.
   viz: { tracer: boxingMemory }
 
 # 4. Kaise kaam karta hai
@@ -96,7 +96,7 @@ operations:
   - op: "ArrayDeque `addFirst/addLast/removeFirst/removeLast`"
     time: "O(1) amortized"
     space: O(1)
-    why: "Circular array — dono kinaron par seedha kaam."
+    why: "Circular array — dono edges par seedha kaam."
   - op: "PriorityQueue `add` / `poll`; `peek`"
     time: "O(log n); O(1)"
     space: O(1)
@@ -156,7 +156,7 @@ examples:
     complexity:
       time: O(n)
       space: O(k)
-      why: "Har char par O(1) map update; k = alag characters ki ginti (sorted print O(k log k))."
+      why: "Har char par O(1) map update; k = alag characters ki count (sorted print O(k log k))."
 
   - id: group
     level: medium
@@ -199,9 +199,9 @@ examples:
 
       Saath mein dekho ki `Int` mein seedha multiply karne se kya hota hai.
     intuition: |
-      13! = 6,227,020,800 — ye `Int` ki limit (~2.1 × 10⁹) se bada hai. `Int` mein multiply karoge to **koi error nahi aayega** — number chupchaap ghoom ke galat (1932053504) ho jaayega. Yahi sabse khatarnak bug hai.
+      13! = 6,227,020,800 — ye `Int` ki limit (~2.1 × 10⁹) se bada hai. `Int` mein multiply karoge to **koi error nahi aayega** — number chupchaap ghoom ke galat (1932053504) ho jaayega. Yahi sabse dangerous bug hai.
 
-      Fix do cheezon se:
+      Fix 2 cheezon se:
       1. **`Long`** mein multiply (Long ~9.2 × 10¹⁸ tak jaata hai).
       2. Har step ke baad **`% MOD`** — taaki result hamesha MOD se chhota rahe, aur agla multiply bhi Long mein fit ho.
 
@@ -249,7 +249,7 @@ realWorld:
   - where: "Android: `SparseArray` / `ArrayMap`"
     how: "Android ne `HashMap<Integer, X>` ki boxing aur memory bachane ke liye `SparseArray` banaya — int keys seedhe array mein. Yahi boxing wala lesson."
   - where: "Kotlin collections in app code"
-    how: "`groupBy`, `associateBy`, `sortedWith`, `distinct` — ViewModel mein list transform karte waqt roz use hote hain. Andar wahi HashMap/sort chal raha hai."
+    how: "`groupBy`, `associateBy`, `sortedWith`, `distinct` — ViewModel mein list transform karte time roz use hote hain. Andar wahi HashMap/sort chal raha hai."
   - where: "Navigation back stack"
     how: "Screen stack = LIFO. Andar `ArrayDeque` jaisa structure — naya screen upar, back = upar wala hatao."
   - where: "Payments / counters"
@@ -325,7 +325,7 @@ interview:
     - q: "Comparator likho: marks descending, phir naam ascending."
       a: |
         Kotlin: `compareByDescending<Student> { it.marks }.thenBy { it.name }`. Java: `Comparator.comparingInt((Student s) -> s.marks).reversed().thenComparing(s -> s.name)`.
-    - q: "String immutable hone ka DSA par kya asar hai?"
+    - q: "String immutable hone ka DSA par kya effect hai?"
       a: |
         Har modification nayi String banata hai — loop mein `+` O(n²). Isliye `StringBuilder` (ya `CharArray`) use karte hain. Fayda: String safely HashMap key ban sakti hai.
     - q: "`list.contains(x)` loop ke andar — kya problem hai?"
@@ -391,7 +391,7 @@ practice:
     url: "https://leetcode.com/problems/count-of-range-sum/"
     level: hard
     pattern: Long prefix sums + TreeMap/sorting
-    hint: "Prefix sums Long mein (overflow!). Har prefix ke liye pichle prefixes mein se kitne [p − upper, p − lower] range mein hain — sorted structure se gino."
+    hint: "Prefix sums Long mein (overflow!). Har prefix ke liye pichle prefixes mein se kitne [p − upper, p − lower] range mein hain — sorted structure se count karo."
   - name: "nCr % (10⁹ + 7) for n ≤ 10⁶"
     platform: Custom
     level: hard
@@ -445,7 +445,7 @@ connections:
     - id: memory-basics
       why: "Boxing, references aur Int/Long sizes — sab memory ki kahaani."
     - id: big-o-time
-      why: "Har collection operation ki complexity — galat auzaar = galat Big-O."
+      why: "Har collection operation ki complexity — galat tool = galat Big-O."
   usedLater:
     - id: dynamic-array
       how: "ArrayList andar se kaise badhti hai — doubling ka asli implementation."

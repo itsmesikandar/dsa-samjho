@@ -13,7 +13,7 @@ class Main {
     // x^n = (x^(n/2))^2, odd n par ek x aur. Har call n aadha: O(log n)
     static double fastPow(double x, long n) {
         if (n == 0) return 1.0; // x^0 = 1 //@base
-        double half = fastPow(x, n / 2); // SIRF ek call - result do baar use karo //@call
+        double half = fastPow(x, n / 2); // SIRF ek call - result 2 baar use karo //@call
         return n % 2 == 0 ? half * half : half * half * x; //@ret
     }
 

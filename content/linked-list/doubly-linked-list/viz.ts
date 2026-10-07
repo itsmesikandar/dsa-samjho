@@ -28,7 +28,7 @@ export const twoWay = tracer<{ values: number[] }>({
   run({ values }, t) {
     const { nodes, head, ids } = makeDList(values, false);
     const tail = ids[ids.length - 1];
-    t.frame({ caption: 'Doubly linked list: har node ke paas DO arrows — next (aage) aur prev (peeche, dashed). head aur tail dono yaad.', panels: [listView(nodes, head, { doubly: true, pointers: { head, tail } })] });
+    t.frame({ caption: 'Doubly linked list: har node ke paas 2 arrows — next (aage) aur prev (peeche, dashed). head aur tail dono yaad.', panels: [listView(nodes, head, { doubly: true, pointers: { head, tail } })] });
     for (const id of ids) t.frame({ caption: `Aage chalna: cur = cur.next → ${nodes.get(id)!.value}.`, panels: [listView(nodes, head, { doubly: true, pointers: { cur: id }, tones: { [id]: 'compare' } })] });
     for (const id of [...ids].reverse()) t.frame({ caption: `Peeche chalna: tail se shuru, cur = cur.prev → ${nodes.get(id)!.value}. Singly mein ye possible hi nahi tha.`, panels: [listView(nodes, head, { doubly: true, pointers: { cur: id }, tones: { [id]: 'active' } })] });
     const ring = new Map<string, LNode>();
@@ -132,7 +132,7 @@ export const browserTrace = tracer<Record<string, never>>({
         moved++;
       }
       outputs.push(urlOf.get(cur)!);
-      t.frame({ line: dir, caption: `${dir}(${steps}): ${moved} kadam ${dir === 'back' ? 'prev' : 'next'} ki taraf${moved < steps ? ` (aage raasta khatam, ${steps - moved} kadam bekaar)` : ''} → ${urlOf.get(cur)}.`, panels: view() });
+      t.frame({ line: dir, caption: `${dir}(${steps}): ${moved} step ${dir === 'back' ? 'prev' : 'next'} ki taraf${moved < steps ? ` (aage raasta khatam, ${steps - moved} kadam bekaar)` : ''} → ${urlOf.get(cur)}.`, panels: view() });
     };
     t.frame({ line: 'visit', caption: 'Har page ek node. back = prev, forward = next. Doubly list isliye ki dono taraf jaana hai.', panels: view() });
     visit('google.com');

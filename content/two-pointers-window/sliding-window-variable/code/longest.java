@@ -1,5 +1,5 @@
 class Main {
-    // Sabse lamba lagatar subarray jiska sum <= limit (saare numbers positive)
+    // Sabse lamba continuous subarray jiska sum <= limit (saare numbers positive)
     static int longestWithSumAtMost(int[] nums, int limit) {
         int l = 0;
         int sum = 0;

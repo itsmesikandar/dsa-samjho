@@ -1,4 +1,4 @@
-// House robber: padosi do ghar ek saath nahi. Har ghar par do hi faisle - lo ya chhodo
+// House robber: neighbor 2 ghar ek saath nahi. Har ghar par do hi decision - lo ya chhodo
 fun rob(nums: IntArray): Int {
     val n = nums.size
     val dp = IntArray(n + 1) // dp[i] = pehle i gharon (0..i-1) se max paisa

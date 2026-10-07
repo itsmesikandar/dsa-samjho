@@ -13,7 +13,7 @@ class Main {
         }
     }
 
-    // Teeno DFS orders - farak sirf ek line ki jagah ka: node ko KAB likhte ho
+    // All 3 DFS orders - farak sirf ek line ki jagah ka: node ko KAB likhte ho
     static void preorder(TreeNode r, List<Integer> out) {
         if (r == null) return;
         out.add(r.val); // pehle node

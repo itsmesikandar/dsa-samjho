@@ -5,7 +5,7 @@ type Pos = Record<number, readonly [number, number]>;
 type Tones = Record<number, Tone>;
 const GROUP_TONES: Tone[] = ['found', 'compare', 'swap', 'new', 'done', 'error'];
 
-/** DSU ka jungle: har ped ka root upar, bachche neeche. Edge = child → parent */
+/** DSU ka jungle: har tree ka root upar, bachche neeche. Edge = child → parent */
 function forest(parent: number[], base: number, opts: { tones?: Tones; label?: string; badges?: Record<number, string> } = {}): Panel {
   const ids = parent.map((_, i) => i).filter((i) => i >= base);
   const kids: number[][] = parent.map(() => []);
@@ -30,7 +30,7 @@ function forest(parent: number[], base: number, opts: { tones?: Tones; label?: s
   const edges = ids.filter((v) => parent[v] !== v).map((v) => [v, parent[v]]);
   return graphView(ids.length, edges, { base, directed: true, pos, tones: opts.tones, badges: opts.badges, label: opts.label ?? 'Jungle: arrow = parent (upar = leader)' });
 }
-/** find with path compression — raste ke nodes lautata hai (pehle wala path) */
+/** find with path compression — raste ke nodes return karta hai (pehle wala path) */
 function findPath(parent: number[], x: number): number[] {
   const path = [x];
   while (parent[path[path.length - 1]] !== path[path.length - 1]) path.push(parent[path[path.length - 1]]);
@@ -42,7 +42,7 @@ const rootOf = (parent: number[], x: number) => {
   while (parent[x] !== x) x = parent[x];
   return x;
 };
-/** har node ko uske group (root) ka rang */
+/** har node ko uske group (root) ka color */
 const groupTones = (parent: number[], base: number): Tones => {
   const order: number[] = [];
   const tones: Tones = {};
@@ -57,7 +57,7 @@ const groupTones = (parent: number[], base: number): Tones => {
   }
   return tones;
 };
-/** groupTones ke rangon ka legend: "leader r ka group" */
+/** groupTones ke colors ka legend: "leader r ka group" */
 const groupLegend = (parent: number[], base: number): Partial<Record<Tone, string>> => {
   const tones = groupTones(parent, base);
   const legend: Partial<Record<Tone, string>> = {};
@@ -67,7 +67,7 @@ const groupLegend = (parent: number[], base: number): Partial<Record<Tone, strin
 
 const N = 8;
 const PAIRS_DEFAULT = [[0, 1], [2, 3], [0, 2], [4, 5], [3, 4], [1, 3], [6, 7]];
-const pairsSpec = { name: 'pairs', type: 'edges' as const, label: 'union(a, b) jodiyan, nodes 0..7', default: PAIRS_DEFAULT, nodes: N, maxEdges: 8 };
+const pairsSpec = { name: 'pairs', type: 'edges' as const, label: 'union(a, b) pairs, nodes 0..7', default: PAIRS_DEFAULT, nodes: N, maxEdges: 8 };
 
 // ---------- 3. Visual intro: dosti ke groups aur unke leader ----------
 export const leadersTrace = tracer<{ pairs: number[][] }>({
@@ -85,12 +85,12 @@ export const leadersTrace = tracer<{ pairs: number[][] }>({
         forest(parent, 0, { tones }),
       ];
     };
-    t.frame({ legend: { active: 'abhi wali jodi' }, caption: `${N} log, sab akele — har koi khud apna leader. Sawaal baar baar aayega: "a aur b ek group mein hain?" Har group ka ek LEADER rakho: dono ka leader same → same group.`, panels: view() });
+    t.frame({ legend: { active: 'abhi wali pair' }, caption: `${N} log, sab akele — har koi khud apna leader. Sawaal baar baar aayega: "a aur b ek group mein hain?" Har group ka ek LEADER rakho: dono ka leader same → same group.`, panels: view() });
     for (const [a, b] of pairs) {
       let ra = rootOf(parent, a);
       let rb = rootOf(parent, b);
       if (ra === rb) {
-        t.frame({ legend: { ...groupLegend(parent, 0), active: 'abhi wali jodi' }, caption: `${a} aur ${b}: dono ka leader ${ra} — pehle se ek group. Kuch nahi badla.`, panels: view([a, b]) });
+        t.frame({ legend: { ...groupLegend(parent, 0), active: 'abhi wali pair' }, caption: `${a} aur ${b}: dono ka leader ${ra} — pehle se ek group. Kuch nahi badla.`, panels: view([a, b]) });
         done.push([a, b]);
         continue;
       }
@@ -100,10 +100,10 @@ export const leadersTrace = tracer<{ pairs: number[][] }>({
       parent[rb] = ra;
       size[ra] += size[rb];
       done.push([a, b]);
-      t.frame({ legend: { ...groupLegend(parent, 0), active: 'abhi wali jodi' }, caption: `${a} aur ${b} dost bane → unke groups milo. Chhote group ka leader ${rb} ab bade group ke leader ${ra} ke neeche. Poora group ek pal mein shift — har member ko alag se badalna nahi pada.`, panels: view([a, b]) });
+      t.frame({ legend: { ...groupLegend(parent, 0), active: 'abhi wali pair' }, caption: `${a} aur ${b} dost bane → unke groups milo. Chhote group ka leader ${rb} ab bade group ke leader ${ra} ke neeche. Poora group ek pal mein shift — har member ko alag se badalna nahi pada.`, panels: view([a, b]) });
     }
     const groups = parent.filter((p, i) => p === i).length;
-    t.frame({ legend: groupLegend(parent, 0), caption: `${groups} groups (jitne leader). Do log same group mein? → dono ka leader dekho. Ped chhote rakhne ki tricks (size + path compression) se ye lagbhag O(1).`, panels: view() });
+    t.frame({ legend: groupLegend(parent, 0), caption: `${groups} groups (jitne leader). 2 log same group mein? → dono ka leader dekho. Tree chhote rakhne ki tricks (size + path compression) se ye approx O(1).`, panels: view() });
     return String(groups);
   },
 });
@@ -129,7 +129,7 @@ export const dsuTrace = tracer<{ pairs: number[][] }>({
       if (moved.length) {
         const tones: Tones = { [root]: 'active' };
         path.slice(0, -1).forEach((v) => (tones[v] = 'compare'));
-        t.frame({ line: 'find', caption: `find(${x}): ${path.join(' → ')}. Raste mein ${moved.join(', ')} ab SEEDHA leader ${root} se jude (path compression) — agli baar ek hi kadam.`, vars: { x, leader: root }, legend, panels: view(tones, moved) });
+        t.frame({ line: 'find', caption: `find(${x}): ${path.join(' → ')}. Raste mein ${moved.join(', ')} ab SEEDHA leader ${root} se jude (path compression) — agli baar ek hi step.`, vars: { x, leader: root }, legend, panels: view(tones, moved) });
       }
       return root;
     };
@@ -138,15 +138,15 @@ export const dsuTrace = tracer<{ pairs: number[][] }>({
       let rb = doFind(b);
       t.frame({ line: 'roots', caption: `union(${a}, ${b}): find(${a}) = ${ra}, find(${b}) = ${rb}.`, vars: { a, b, ra, rb }, legend, panels: view({ [ra]: 'active', [rb]: 'active', [a]: 'compare', [b]: 'compare' }) });
       if (ra === rb) {
-        t.frame({ line: 'same', caption: `Dono ka leader ${ra} → pehle se ek group. return false (ye jodi kuch nahi jodti — graph mein ye edge cycle banati).`, vars: { a, b }, legend, panels: view({ [ra]: 'muted' }) });
+        t.frame({ line: 'same', caption: `Dono ka leader ${ra} → pehle se ek group. return false (ye pair kuch nahi jodti — graph mein ye edge cycle banati).`, vars: { a, b }, legend, panels: view({ [ra]: 'muted' }) });
         continue;
       }
       if (size[ra] < size[rb]) [ra, rb] = [rb, ra];
       parent[rb] = ra;
       size[ra] += size[rb];
-      t.frame({ line: 'link', caption: `size: ${ra} ka group ${size[ra] - size[rb]}, ${rb} ka ${size[rb]} → chhota (${rb}) bade (${ra}) ke neeche. parent[${rb}] = ${ra}, size[${ra}] = ${size[ra]}. Ped gehra nahi hota.`, vars: { a, b, leader: ra }, legend, panels: view({ [ra]: 'active', [rb]: 'found' }, [rb, ra]) });
+      t.frame({ line: 'link', caption: `size: ${ra} ka group ${size[ra] - size[rb]}, ${rb} ka ${size[rb]} → chhota (${rb}) bade (${ra}) ke neeche. parent[${rb}] = ${ra}, size[${ra}] = ${size[ra]}. Tree deep nahi hota.`, vars: { a, b, leader: ra }, legend, panels: view({ [ra]: 'active', [rb]: 'found' }, [rb, ra]) });
     }
-    t.frame({ caption: `parent = [${parent.join(', ')}]. Size + compression ke saath har find lagbhag O(1) (α(n) ≤ 4). Bina dono ke ped linked list ban sakta hai — O(n).`, legend, panels: view() });
+    t.frame({ caption: `parent = [${parent.join(', ')}]. Size + compression ke saath har find approx O(1) (α(n) ≤ 4). Bina dono ke tree linked list ban sakta hai — O(n).`, legend, panels: view() });
     return `[${parent.join(', ')}]`;
   },
 });
@@ -156,7 +156,7 @@ const PROV_DEFAULT = [[0, 1], [1, 2], [3, 4]];
 const PROV_POS: Pos = { 0: [0, 0], 1: [35, 30], 2: [0, 70], 3: [70, 0], 4: [100, 45], 5: [75, 100] };
 
 export const provincesTrace = tracer<{ pairs: number[][] }>({
-  inputs: [{ name: 'pairs', type: 'edges', label: 'Seedhi sadak wale shehar (a-b), shehar 0..5', default: PROV_DEFAULT, nodes: 6, maxEdges: 8 }],
+  inputs: [{ name: 'pairs', type: 'edges', label: 'Seedhi road wale city (a-b), city 0..5', default: PROV_DEFAULT, nodes: 6, maxEdges: 8 }],
   run({ pairs }, t) {
     const n = 6;
     const m: number[][] = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)));
@@ -175,7 +175,7 @@ export const provincesTrace = tracer<{ pairs: number[][] }>({
         graphView(n, pairs, { pos, tones, badges, edgeTones: cell ? { [`${cell[0]}-${cell[1]}`]: hot } : {}, label: `Provinces: ${provinces} (badge = leader)` }),
       ];
     };
-    t.frame({ line: 'init', caption: `Matrix mein 1 = seedhi sadak. Shuru mein har shehar alag province → provinces = ${n}. Matrix symmetric hai — sirf i < j (upar wala aadha) dekho.`, vars: { provinces }, panels: view() });
+    t.frame({ line: 'init', caption: `Matrix mein 1 = seedhi road. Shuru mein har city alag province → provinces = ${n}. Matrix symmetric hai — sirf i < j (upar wala aadha) dekho.`, vars: { provinces }, panels: view() });
     for (let i = 0; i < n; i++) {
       for (let j = i + 1; j < n; j++) {
         if (!m[i][j]) continue;
@@ -186,13 +186,13 @@ export const provincesTrace = tracer<{ pairs: number[][] }>({
         if (ri !== rj) {
           parent[rj] = ri;
           provinces--;
-          t.frame({ line: 'merge', caption: `[${i}][${j}] = 1: leader ${ri} ≠ ${rj} → do alag provinces jude. provinces = ${provinces}.`, vars: { i, j, provinces }, legend: { found: 'jode (alag the)' }, panels: view([i, j], 'found') });
+          t.frame({ line: 'merge', caption: `[${i}][${j}] = 1: leader ${ri} ≠ ${rj} → 2 alag provinces jude. provinces = ${provinces}.`, vars: { i, j, provinces }, legend: { found: 'jode (alag the)' }, panels: view([i, j], 'found') });
         } else {
           t.frame({ line: 'check', caption: `[${i}][${j}] = 1, par dono ka leader ${ri} — pehle se ek province (kisi aur raste se jude). Kuch nahi ghatta.`, vars: { i, j, provinces }, legend: { muted: 'pehle se ek province' }, panels: view([i, j], 'muted') });
         }
       }
     }
-    t.frame({ line: 'done', caption: `${provinces} province${provinces === 1 ? '' : 's'} = n - (safal unions). Matrix padhna O(n²), har union lagbhag O(1).`, vars: { provinces }, panels: view() });
+    t.frame({ line: 'done', caption: `${provinces} province${provinces === 1 ? '' : 's'} = n - (successful unions). Matrix padhna O(n²), har union approx O(1).`, vars: { provinces }, panels: view() });
     return String(provinces);
   },
 });
@@ -221,7 +221,7 @@ export const redundantTrace = tracer<{ edges: number[][] }>({
         forest(parent, 1),
       ];
     };
-    t.frame({ caption: 'Tree mein ek extra edge jodi gayi — ab ek cycle hai. Edges ko order mein jodo; jis edge ke dono sire PEHLE SE jude hain, wahi cycle poori karti hai.', legend, panels: view(-1) });
+    t.frame({ caption: 'Tree mein ek extra edge pair gayi — ab ek cycle hai. Edges ko order mein jodo; jis edge ke dono sire PEHLE SE jude hain, wahi cycle poori karti hai.', legend, panels: view(-1) });
     for (let k = 0; k < edges.length; k++) {
       const [a, b] = edges[k];
       const ra = rootOf(parent, a);
@@ -244,7 +244,7 @@ export const redundantTrace = tracer<{ edges: number[][] }>({
 // ---------- Example 3: Min cost to connect all points (Kruskal) ----------
 export const kruskalTrace = tracer<{ pts: number[][] }>({
   inputs: [{ name: 'pts', type: 'intGrid', label: 'Points (x y; x y; …)', default: [[0, 0], [1, 3], [4, 1], [6, 4], [2, 6]], maxRows: 6, maxCols: 2, min: 0, max: 9 }],
-  check: ({ pts }) => (pts.some((r) => r.length !== 2) ? 'Har row mein do numbers: x y.' : null),
+  check: ({ pts }) => (pts.some((r) => r.length !== 2) ? 'Har row mein 2 numbers: x y.' : null),
   run({ pts }, t) {
     const n = pts.length;
     const all: number[][] = [];
@@ -266,13 +266,13 @@ export const kruskalTrace = tracer<{ pts: number[][] }>({
         et[`${all[k][1]}-${all[k][2]}`] = cur;
       }
       return [
-        graphView(n, show, { weighted: true, pos, edgeTones: et, label: `Points (x, y) · kul kharcha ${total}` }),
+        graphView(n, show, { weighted: true, pos, edgeTones: et, label: `Points (x, y) · total cost ${total}` }),
         array(all.map(([w, i, j]) => `${w}:${i}-${j}`), { label: 'Saari edges, sasti pehle (cost:i-j)', pointers: k < all.length ? { e: k } : {}, tones: { ...st, ...(k < all.length && cur ? { [k]: cur } : {}) } }),
       ];
     };
-    t.frame({ line: 'sort', caption: `Har do points ke beech edge, cost = |x1 - x2| + |y1 - y2|. ${all.length} edges, sasti se mehngi sort. Kruskal: sasti edge lo, bas wo do ALAG groups jode.`, legend, panels: view(all.length) });
+    t.frame({ line: 'sort', caption: `Har 2 points ke beech edge, cost = |x1 - x2| + |y1 - y2|. ${all.length} edges, sasti se mehngi sort. Kruskal: sasti edge lo, bas wo 2 ALAG groups jode.`, legend, panels: view(all.length) });
     if (n === 1) {
-      t.frame({ line: 'done', caption: 'Ek hi point — jodne ko kuch nahi, kharcha 0.', legend, panels: view(all.length) });
+      t.frame({ line: 'done', caption: 'Ek hi point — jodne ko kuch nahi, cost 0.', legend, panels: view(all.length) });
       return '0';
     }
     for (let k = 0; k < all.length; k++) {
@@ -290,9 +290,9 @@ export const kruskalTrace = tracer<{ pts: number[][] }>({
       total += w;
       taken.push([w, i, j]);
       st[k] = 'found';
-      t.frame({ line: 'take', caption: `${i}-${j} (${w}): alag groups → lo. Kul = ${total}. (${taken.length}/${n - 1} edges)`, vars: { cost: w, total }, legend, panels: view(k) });
+      t.frame({ line: 'take', caption: `${i}-${j} (${w}): alag groups → lo. Total = ${total}. (${taken.length}/${n - 1} edges)`, vars: { cost: w, total }, legend, panels: view(k) });
       if (taken.length === n - 1) {
-        t.frame({ line: 'done', caption: `${n - 1} edges = saare ${n} points jude (tree). Minimum kharcha ${total}. Baaki mehngi edges dekhne ki zaroorat nahi. O(n² log n) — sort ki wajah se.`, legend, panels: view(all.length) });
+        t.frame({ line: 'done', caption: `${n - 1} edges = saare ${n} points jude (tree). Minimum cost ${total}. Baaki mehngi edges dekhne ki zaroorat nahi. O(n² log n) — sort ki wajah se.`, legend, panels: view(all.length) });
         break;
       }
     }

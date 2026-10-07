@@ -1,7 +1,7 @@
 // Gol raaste par stations: i par gas[i] milta, agle station tak cost[i] lagta. Kahan se shuru karein ki
 // poora chakkar ho jaaye? Na ho to -1. (Answer ho to ek hi hota hai.)
 fun canCompleteCircuit(gas: IntArray, cost: IntArray): Int {
-    var total = 0 // poore chakkar ka hisaab: < 0 to namumkin
+    var total = 0 // poore chakkar ka hisaab: < 0 to impossible
     var tank = 0 // abhi wale start se ab tak tank
     var start = 0
     for (i in gas.indices) {

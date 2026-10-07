@@ -1,4 +1,4 @@
-// Paas-paas ke do same letters hatao - baar-baar, jab tak koi aisa jodi na bache
+// Paas-paas ke do same letters hatao - baar-baar, jab tak koi aisa pair na bache
 fun removeDuplicates(s: String): String {
     val st = StringBuilder() // StringBuilder hi stack hai: end = top
     for (c in s) {

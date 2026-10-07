@@ -6,7 +6,7 @@ const halves = (l: number, mid: number, r: number): ArrRange[] => [
   { from: mid + 1, to: r, label: 'right', tone: 'compare' },
 ];
 
-// ---------- 3. Visual intro: do sorted lines ko jodna ----------
+// ---------- 3. Visual intro: 2 sorted lines ko jodna ----------
 export const mergeTwo = tracer<{ a: number[]; b: number[] }>({
   inputs: [
     { name: 'a', type: 'intArray', label: 'A (sorted)', default: [2, 5, 8, 12], minLen: 1, maxLen: 5, min: 0, max: 20, sorted: true },
@@ -22,7 +22,7 @@ export const mergeTwo = tracer<{ a: number[]; b: number[] }>({
       array(b, { label: 'B', tones: tb, pointers: j < b.length ? { j } : {} }),
       array(out, { label: 'Result', tones: to, pointers: k < out.length ? { k } : {} }),
     ];
-    t.frame({ caption: 'Do SORTED lines. Dono ka sabse chhota hamesha unke AAGE hai — to sirf do aage wale compare karo, chhota result mein. Bas itna hi merge hai.', panels: view() });
+    t.frame({ caption: '2 SORTED lines. Dono ka sabse chhota hamesha unke AAGE hai — to sirf do aage wale compare karo, chhota result mein. Bas itna hi merge hai.', panels: view() });
     while (i < a.length && j < b.length) {
       const takeA = a[i] <= b[j];
       t.frame({ caption: `A[${i}] = ${a[i]} vs B[${j}] = ${b[j]} → ${takeA ? a[i] : b[j]} chhota.`, vars: { i, j, k }, panels: view({ [i]: 'compare' }, { [j]: 'compare' }) });
@@ -52,7 +52,7 @@ export const mergeSortTrace = tracer<{ arr: number[] }>({
       sort(mid + 1, r, depth + 1);
       merge(t, a, tmp, l, mid, r, depth);
     };
-    t.frame({ line: 'base', caption: 'Merge sort: aadha karte jao jab tak 1 item na bache (1 item = sorted). Phir lautte waqt sorted tukdon ko merge karo.', panels: [array(a)] });
+    t.frame({ line: 'base', caption: 'Merge sort: aadha karte jao jab tak 1 item na bache (1 item = sorted). Phir wapas aate time sorted pieces ko merge karo.', panels: [array(a)] });
     sort(0, a.length - 1, 0);
     t.frame({ line: 'copy', caption: `Sorted ${listStr(a)}. log₂ n levels × har level O(n) merge = O(n log n). tmp array = O(n) extra.`, panels: [array(a, { tones: Object.fromEntries(a.map((_, q) => [q, 'done'])) })] });
     return listStr(a);
@@ -136,7 +136,7 @@ export const invTrace = tracer<{ arr: number[] }>({
       if (l >= r) return 0;
       const mid = Math.floor((l + r) / 2);
       let count = go(l, mid) + go(mid + 1, r);
-      t.frame({ line: 'halves', caption: `Halves ${listStr(a.slice(l, mid + 1))} aur ${listStr(a.slice(mid + 1, r + 1))} sorted, unke andar ke inversions gin liye. Ab sirf CROSS wale (ek left, ek right).`, vars: { total }, panels: [array(a, { ranges: halves(l, mid, r) })] });
+      t.frame({ line: 'halves', caption: `Halves ${listStr(a.slice(l, mid + 1))} aur ${listStr(a.slice(mid + 1, r + 1))} sorted, unke andar ke inversions count kar liye. Ab sirf CROSS wale (ek left, ek right).`, vars: { total }, panels: [array(a, { ranges: halves(l, mid, r) })] });
       let i = l;
       let j = mid + 1;
       let k = l;
@@ -175,7 +175,7 @@ export const reversePairsTrace = tracer<{ nums: number[] }>({
       if (l >= r) return 0;
       const mid = Math.floor((l + r) / 2);
       let count = go(l, mid) + go(mid + 1, r);
-      t.frame({ line: 'halves', caption: `Halves sorted: ${listStr(a.slice(l, mid + 1))} | ${listStr(a.slice(mid + 1, r + 1))}. Merge se PEHLE cross jode gino: left ka x, right ka y, x > 2y.`, vars: { total }, panels: [array(a, { ranges: halves(l, mid, r) })] });
+      t.frame({ line: 'halves', caption: `Halves sorted: ${listStr(a.slice(l, mid + 1))} | ${listStr(a.slice(mid + 1, r + 1))}. Merge se PEHLE cross jode count karo: left ka x, right ka y, x > 2y.`, vars: { total }, panels: [array(a, { ranges: halves(l, mid, r) })] });
       let j = mid + 1;
       for (let i = l; i <= mid; i++) {
         while (j <= r && a[i] > 2 * a[j]) j++;
@@ -188,11 +188,11 @@ export const reversePairsTrace = tracer<{ nums: number[] }>({
       }
       const merged = a.slice(l, r + 1).sort((x, y) => x - y);
       for (let p = l; p <= r; p++) a[p] = merged[p - l];
-      t.frame({ line: 'merge', caption: `Ab normal merge → ${listStr(merged)}. (Ginti aur merge alag-alag — merge ki condition a[i] ≤ a[j] hai, ginti ki x > 2y.)`, vars: { total }, panels: [array(a, { ranges: [{ from: l, to: r, label: 'merged', tone: 'found' }] })] });
+      t.frame({ line: 'merge', caption: `Ab normal merge → ${listStr(merged)}. (Count aur merge alag-alag — merge ki condition a[i] ≤ a[j] hai, count ki x > 2y.)`, vars: { total }, panels: [array(a, { ranges: [{ from: l, to: r, label: 'merged', tone: 'found' }] })] });
       return count;
     };
     const ans = go(0, a.length - 1);
-    t.frame({ line: 'merge', caption: `Reverse pairs = ${ans}. Har level par ginti O(n) (j sirf aage) + merge O(n) → O(n log n).`, vars: { total: ans }, panels: [array(a)] });
+    t.frame({ line: 'merge', caption: `Reverse pairs = ${ans}. Har level par count O(n) (j sirf aage) + merge O(n) → O(n log n).`, vars: { total: ans }, panels: [array(a)] });
     return String(ans);
   },
 });

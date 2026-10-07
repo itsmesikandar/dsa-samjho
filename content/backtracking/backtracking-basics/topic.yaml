@@ -11,12 +11,12 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Backtracking** = saare possible jawab banane ka tareeka — ek-ek faisla lo, aage badho, aur jab raasta khatam (ya galat) ho to **wapas aa ke faisla badlo**.
+    **Backtracking** = saare possible jawab banane ka tareeka — ek-ek decision lo, aage badho, aur jab raasta khatam (ya galat) ho to **wapas aa ke decision badlo**.
 
-    Teen kadam (har backtracking code mein):
-    1. **Choose** — ek option chuno (path mein daalo).
-    2. **Explore** — baaki faislon ke liye recursion.
-    3. **Un-choose** — option wapas nikaalo, taaki agla option saaf halat se try ho.
+    3 step (har backtracking code mein):
+    1. **Choose** — ek option choose karo (path mein daalo).
+    2. **Explore** — baaki decisions ke liye recursion.
+    3. **Un-choose** — option wapas nikaalo, taaki agla option saaf state se try ho.
 
     ```kotlin
     fun bt(state) {
@@ -31,11 +31,11 @@ what:
     ```
 
     > [!yaad]
-    > Ye **multi-branch recursion** hi hai (Recursion patterns) — bas ek shared `path` jise har kadam ke baad **undo** karte hain. Answer list mein hamesha **copy** daalo (`path.toList()`).
+    > Ye **multi-branch recursion** hi hai (Recursion patterns) — bas ek shared `path` jise har step ke baad **undo** karte hain. Answer list mein hamesha **copy** daalo (`path.toList()`).
   analogy: |
-    **Bhool-bhulaiya (maze).** Har mod par ek raasta chuno. Aage dead end mila? **Wapas pichhle mod tak** aao aur doosra raasta lo. Tab tak jab tak bahar ka raasta na mile (ya saare raaste dekh lo).
+    **Bhool-bhulaiya (maze).** Har mod par ek raasta choose karo. Aage dead end mila? **Wapas pichhle mod tak** aao aur doosra raasta lo. Tab tak jab tak bahar ka raasta na mile (ya saare raaste dekh lo).
 
-    Wapas aate waqt jo chalk ka nishaan lagaya tha, mita do — yahi "un-choose".
+    Wapas aate time jo chalk ka mark lagaya tha, hata do — yahi "un-choose".
 
 # 2. Kyun chahiye?
 why:
@@ -43,7 +43,7 @@ why:
     Kuch problems ka koi formula / greedy nahi — **saare options** dekhne padte hain: saare subsets, saare permutations, Sudoku, N-Queens, word search.
 
     Brute force "sab bana ke check karo" bhi yahi hai, par backtracking **smart** hai:
-    - Ek-ek faisla lete waqt hi galat raasta pehchaan lo → **poori shaakh kaat do** (pruning). Combination Sum mein bada number aaya → aage ke sab chhod do.
+    - Ek-ek decision lete time hi galat raasta pehchaan lo → **poori branch kaat do** (pruning). Combination Sum mein bada number aaya → aage ke sab chhod do.
     - Ek hi `path` reuse — har option ke liye nayi list nahi.
 
     > [!socho]
@@ -54,15 +54,15 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Har item par do raaste: **+** (lo) ya **−** (chhodo). Ye **decision tree** hai — har patta (leaf) ek subset.
+    Har item par 2 raaste: **+** (lo) ya **−** (chhodo). Ye **decision tree** hai — har patta (leaf) ek subset.
 
-    Dekho DFS kaise ek shaakh ke end tak jaata hai, phir **wapas** aa ke doosri shaakh.
+    Dekho DFS kaise ek branch ke end tak jaata hai, phir **wapas** aa ke doosri branch.
   viz: { tracer: subsetTree }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **Subsets** (loop wala dhaancha):
+    **Subsets** (loop wala structure):
     - Har call par path **khud ek subset** hai → result mein copy.
     - `start` se aage ke har item ke liye: choose → `bt(i + 1)` → un-choose.
     - `i + 1` (aur `start`) se **peeche ke items dobara nahi** aate — isliye `[1, 2]` aur `[2, 1]` dono nahi bante.
@@ -70,7 +70,7 @@ how:
     `[1, 2, 3]` → `[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]`
 
     > [!tip]
-    > Do dhaanche yaad rakho: **loop wala** (har call par "agla kaun?" — subsets, combinations) aur **lo/chhodo wala** (har item par 2 raaste — code section). Dono same answers, alag order.
+    > Do structure yaad rakho: **loop wala** (har call par "agla kaun?" — subsets, combinations) aur **lo/chhodo wala** (har item par 2 raaste — code section). Dono same answers, alag order.
   viz: { tracer: subsetsTrace }
   code: how
 
@@ -91,24 +91,24 @@ operations:
   - op: "Pruning ka fayda"
     time: "Worst same, practically bahut kam"
     space: "same"
-    why: "Galat shaakhein jaldi kat jaati hain."
+    why: "Galat branches jaldi kat jaati hain."
   - op: "Palindrome partitioning"
     time: O(n · 2ⁿ)
     space: O(n)
     why: "Har gap par kaato ya na kaato; palindrome check O(n)."
   - op: "Recursion stack"
-    time: "lagu nahi"
+    time: "apply nahi"
     space: "O(depth)"
-    why: "Gehraai = faislon ki ginti (n)."
+    why: "Depth = decisions ki count (n)."
 
 # 6. Code
 code:
-  - title: Lo / chhodo wala dhaancha
+  - title: Lo / chhodo wala structure
     file: take-skip
     note: |
-      Har item ke liye ek level: pehle **lo** (path mein daalo, aage jao, wapas nikaalo), phir **chhodo** (seedha aage). Leaf par (saare items ka faisla) result.
+      Har item ke liye ek level: pehle **lo** (path mein daalo, aage jao, wapas nikaalo), phir **chhodo** (seedha aage). Leaf par (saare items ka decision) result.
 
-      Jab har item par binary choice ho (subset sum, target sum, XOR) — ye dhaancha seedha fit hota hai. Aur memo lagane mein aasaan (DP chapter).
+      Jab har item par binary choice ho (subset sum, target sum, XOR) — ye structure seedha fit hota hai. Aur memo lagane mein aasaan (DP chapter).
 
 # 7. Examples
 examples:
@@ -121,7 +121,7 @@ examples:
 
       Example: `[5, 1, 6]` → **28**
     intuition: |
-      Lo / chhodo dhaancha, par path ki jagah **running XOR** parameter mein:
+      Lo / chhodo structure, par path ki jagah **running XOR** parameter mein:
       - Lo: `go(i + 1, x xor nums[i])`
       - Chhodo: `go(i + 1, x)`
       - Leaf: `x` return; dono raaston ka jod upar.
@@ -150,15 +150,15 @@ examples:
 
       Example: `[2, 3, 6, 7]`, target 7 → `[[2, 2, 3], [7]]`
     intuition: |
-      Loop wala dhaancha, `remain` ke saath:
+      Loop wala structure, `remain` ke saath:
       - `remain == 0` → mila.
       - Option `i` (start se): choose `c[i]`, `bt(i, remain − c[i])` — **i** se (same number dobara chalega), `i + 1` nahi.
       - `start` ki wajah se peeche nahi jaate → `[2, 3]` aur `[3, 2]` dobara nahi.
 
-      **Pruning:** pehle sort. `c[i] > remain` → aage sab bade → `break`. Poori shaakhein kat jaati hain.
+      **Pruning:** pehle sort. `c[i] > remain` → aage sab bade → `break`. Poori branches kat jaati hain.
 
       > [!galti]
-      > `bt(0, …)` se har baar shuru kiya → `[2, 2, 3]`, `[2, 3, 2]`, `[3, 2, 2]` teeno aa gaye. `start` pass karo.
+      > `bt(0, …)` se har baar shuru kiya → `[2, 2, 3]`, `[2, 3, 2]`, `[3, 2, 2]` all 3 aa gaye. `start` pass karo.
     dryRun: |
       sorted `[2, 3, 6, 7]`, target 7
 
@@ -177,20 +177,20 @@ examples:
     complexity:
       time: "O(n^(T/min)) worst"
       space: "O(T/min) stack"
-      why: "Gehraai = target / sabse chhota number; pruning se practically bahut kam."
+      why: "Depth = target / sabse chhota number; pruning se practically bahut kam."
 
   - id: palindrome-partition
     level: tricky
-    title: Palindrome tukdon mein kaato
+    title: Palindrome pieces mein kaato
     source: { name: Palindrome Partitioning, platform: LeetCode, url: "https://leetcode.com/problems/palindrome-partitioning/" }
     problem: |
-      String ko aise tukdon mein kaato ki **har tukda palindrome** ho. Saare tareeke do.
+      String ko aise pieces mein kaato ki **har piece palindrome** ho. Saare tareeke do.
 
       Example: `"aab"` → `[["a", "a", "b"], ["aa", "b"]]`
     intuition: |
-      Faisla: **agla tukda kitna lamba?** `start` se `end` tak har lambai try karo:
+      Decision: **agla piece kitna lamba?** `start` se `end` tak har length try karo:
       - `s[start..end]` palindrome nahi → **skip** (pruning — is raaste koi jawab nahi).
-      - Palindrome → tukda path mein, `bt(end + 1)`, phir hatao.
+      - Palindrome → piece path mein, `bt(end + 1)`, phir hatao.
       - `start == length` → poora kat gaya → result.
 
       > [!tip]
@@ -198,7 +198,7 @@ examples:
     dryRun: |
       `"aab"`
 
-      | start | Tukda | Palindrome? | Path |
+      | start | Piece | Palindrome? | Path |
       |---|---|---|---|
       | 0 | a | ✓ | a |
       | 1 | a | ✓ | a a |
@@ -222,16 +222,16 @@ when:
     - "n chhota (≤ 15–20) aur exponential theek hai."
     - "Partition / split ke saare tareeke."
   avoid:
-    - "Sirf GINTI chahiye ya best value — aksar DP (overlapping subproblems)."
+    - "Sirf COUNT chahiye ya best value — often DP (overlapping subproblems)."
     - "n bada (10⁵) — exponential kabhi nahi chalega; greedy/DP socho."
     - "Ek hi jawab chahiye aur greedy se mil jaata hai."
   signals:
     - keyword: "all subsets / power set"
-      think: "Loop dhaancha, start index, har node result."
+      think: "Loop structure, start index, har node result."
     - keyword: "all combinations that sum to target"
       think: "Sort + remain + break pruning."
     - keyword: "partition string so that each part …"
-      think: "Har lambai ka tukda try, valid ho to recurse."
+      think: "Har length ka piece try, valid ho to recurse."
     - keyword: "n ≤ 15 / 20 in constraints"
       think: "2ⁿ ya n! chal jaayega — backtracking."
 
@@ -244,7 +244,7 @@ realWorld:
   - where: "Scheduling"
     how: "Exams / meetings ka timetable jismein constraints hon — options try karo, clash par wapas."
   - where: "Games AI"
-    how: "Chess / tic-tac-toe mein chaalein try karna (game tree search)."
+    how: "Chess / tic-tac-toe mein moves try karna (game tree search)."
   - where: "Config / test generation"
     how: "Saare feature combinations generate karna testing ke liye."
 
@@ -279,14 +279,14 @@ mistakes:
     wrong: |
       Khaali array ke subsets mein `[[]]` bhool gaye (sirf `[]` return).
     right: |
-      Khaali set bhi subset hai — loop dhaancha har call par path add karta hai, to `[[]]` apne aap.
+      Khaali set bhi subset hai — loop structure har call par path add karta hai, to `[[]]` apne aap.
 
 # 11. Interview corner
 interview:
   questions:
     - q: "Backtracking aur brute force mein fark?"
       a: |
-        Brute force saare candidates poore bana ke check karta hai. Backtracking ek-ek faisla lete waqt galat raasta pehchaan ke poori shaakh kaat deta hai (pruning) — wahi exponential, par practically bahut tez.
+        Brute force saare candidates poore bana ke check karta hai. Backtracking ek-ek decision lete time galat raasta pehchaan ke poori branch kaat deta hai (pruning) — wahi exponential, par practically bahut tez.
     - q: "Backtracking ka template batao."
       a: |
         bt(state): base par result mein copy; har option: valid? choose → bt(next) → un-choose.
@@ -331,14 +331,14 @@ practice:
     url: "https://leetcode.com/problems/binary-watch/"
     level: easy
     pattern: Choose k LEDs out of 10
-    hint: "10 LEDs mein se turnedOn chuno (combinations), ya seedha har h (0..11), m (0..59) ke bits gino."
+    hint: "10 LEDs mein se turnedOn choose karo (combinations), ya seedha har h (0..11), m (0..59) ke bits count karo."
   - name: Binary Tree Paths
     platform: LeetCode
     num: 257
     url: "https://leetcode.com/problems/binary-tree-paths/"
     level: easy
     pattern: Path backtracking on tree
-    hint: "Trees chapter ke baad: node path mein daalo, leaf par path string banao, wapas aate waqt hatao."
+    hint: "Trees chapter ke baad: node path mein daalo, leaf par path string banao, wapas aate time hatao."
   - name: Subsets
     platform: LeetCode
     num: 78
@@ -366,14 +366,14 @@ practice:
     url: "https://leetcode.com/problems/word-break-ii/"
     level: hard
     pattern: Partition backtracking + memo
-    hint: "Palindrome Partitioning jaisa, par tukda dictionary mein hona chahiye. Same start baar-baar aata hai — start → sentences ka memo."
+    hint: "Palindrome Partitioning jaisa, par piece dictionary mein hona chahiye. Same start baar-baar aata hai — start → sentences ka memo."
   - name: Expression Add Operators
     platform: LeetCode
     num: 282
     url: "https://leetcode.com/problems/expression-add-operators/"
     level: hard
     pattern: Backtracking with running value and last operand
-    hint: "Har position par number ka tukda lo (leading zero dhyaan), +, −, * try karo. * ke liye 'last operand' rakho: value − last + last × cur."
+    hint: "Har position par number ka piece lo (leading zero dhyaan), +, −, * try karo. * ke liye 'last operand' rakho: value − last + last × cur."
 
 # 13. Quick revision
 revision:
@@ -400,7 +400,7 @@ revision:
     - q: "[1, 2, 3] ke kitne subsets?"
       options: ["6", "7", "8", "9"]
       answer: 2
-      explain: "2³ = 8 (khaali samet)."
+      explain: "2³ = 8 (khaali including)."
     - q: "res.add(path) (bina copy) ka result?"
       options: ["Sahi", "Saari entries same list — aakhir mein khaali", "Compile error", "Duplicates"]
       answer: 1
@@ -416,13 +416,13 @@ revision:
     - q: "Backtracking ki space (output chhod ke)?"
       options: ["O(1)", "O(depth)", "O(2ⁿ)", "O(n!)"]
       answer: 1
-      explain: "Recursion stack + path = gehraai."
+      explain: "Recursion stack + path = depth."
 
 # 14. Connections
 connections:
   related:
     - id: recursion-patterns
-      why: "Multi-branch recursion ka dhaancha."
+      why: "Multi-branch recursion ka structure."
     - id: dfs
       why: "Backtracking = decision tree par DFS."
   usedLater:

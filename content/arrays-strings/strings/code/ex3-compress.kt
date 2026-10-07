@@ -1,4 +1,4 @@
-// "aaabbc" -> "a3b2c": har lagatar run ka char + uski ginti (ginti sirf tab jab 1 se zyada)
+// "aaabbc" -> "a3b2c": har continuous run ka char + uski count (count sirf tab jab 1 se zyada)
 fun compress(s: String): String {
     val sb = StringBuilder()
     var i = 0
@@ -6,7 +6,7 @@ fun compress(s: String): String {
         var j = i // naya run yahan se shuru //@start
         while (j < s.length && s[j] == s[i]) j++ // jab tak same char, aage badho //@run
         sb.append(s[i]) // run ka char likho //@write
-        if (j - i > 1) sb.append(j - i) // run lamba hai to ginti bhi
+        if (j - i > 1) sb.append(j - i) // run lamba hai to count bhi
         i = j // agla run //@next
     }
     return sb.toString() //@done
@@ -15,7 +15,7 @@ fun compress(s: String): String {
 fun main() {
     println(compress("aaabbc"))
     println(compress("abc")) // koi run nahi - waisa hi
-    println(compress("zzzzzzzzzzzz")) // 12 baar z -> do digit ki ginti
+    println(compress("zzzzzzzzzzzz")) // 12 baar z -> do digit ki count
 }
 
 // Output:

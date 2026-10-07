@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 
 class Main {
-    // (padosi, weight) pairs ko Kotlin Pair jaisa print karo: [(1, 5), (2, 3)]
+    // (neighbor, weight) pairs ko Kotlin Pair jaisa print karo: [(1, 5), (2, 3)]
     static String show(List<int[]> list) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < list.size(); i++) {
@@ -23,7 +23,7 @@ class Main {
         for (int[] e : edges) mat[e[0]][e[1]] = e[2];
         for (int[] row : mat) System.out.println(Arrays.toString(row));
 
-        // 2. Adjacency list: har node ke (padosi, weight) pairs. Memory n + m
+        // 2. Adjacency list: har node ke (neighbor, weight) pairs. Memory n + m
         List<List<int[]>> adj = new ArrayList<>();
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
         for (int[] e : edges) adj.get(e[0]).add(new int[] {e[1], e[2]});

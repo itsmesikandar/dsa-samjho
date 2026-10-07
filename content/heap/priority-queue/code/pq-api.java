@@ -31,4 +31,4 @@ class Main {
 // [1, 2, 8, 5, 3]
 // [1, 2, 3, 5, 8]
 // 8
-// aam seb
+// common seb

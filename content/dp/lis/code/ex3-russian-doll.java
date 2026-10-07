@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // Lifafa andar tabhi jaata jab width aur height DONO chhote. Width se sort (same width par height ULTI), phir heights par LIS
+    // Envelope andar tabhi jaata jab width aur height DONO chhote. Width se sort (same width par height ULTI), phir heights par LIS
     static int maxEnvelopes(int[][] envelopes) {
         Arrays.sort(envelopes, (a, b) -> a[0] != b[0] ? Integer.compare(a[0], b[0]) : Integer.compare(b[1], a[1])); // same width - bada pehle, taaki dono ek chain mein na aayen //@sort
         int[] tails = new int[envelopes.length];

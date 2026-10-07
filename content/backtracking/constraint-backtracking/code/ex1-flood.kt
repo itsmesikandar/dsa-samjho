@@ -1,11 +1,11 @@
-// Image (rangon ki grid). (sr, sc) se shuru: usi rang ke saare jude (upar/neeche/baayein/daayein) cells naye rang se bharo.
+// Image (colors ki grid). (sr, sc) se shuru: usi color ke saare jude (upar/neeche/baayein/daayein) cells naye color se bharo.
 fun floodFill(image: Array<IntArray>, sr: Int, sc: Int, color: Int): Array<IntArray> {
     val old = image[sr][sc]
-    if (old == color) return image // same rang: kuch nahi karna (warna infinite recursion)
+    if (old == color) return image // same color: kuch nahi karna (warna infinite recursion)
     fun fill(r: Int, c: Int) {
-        if (r !in image.indices || c !in image[0].indices || image[r][c] != old) return // bahar ya alag rang: ruko //@stop
-        image[r][c] = color // rang diya - yahi 'visited' ka nishaan bhi hai //@paint
-        fill(r + 1, c) // chaaron taraf phailo //@spread
+        if (r !in image.indices || c !in image[0].indices || image[r][c] != old) return // bahar ya alag color: ruko //@stop
+        image[r][c] = color // color diya - yahi 'visited' ka mark bhi hai //@paint
+        fill(r + 1, c) // all 4 taraf spread karo //@spread
         fill(r - 1, c)
         fill(r, c + 1)
         fill(r, c - 1)

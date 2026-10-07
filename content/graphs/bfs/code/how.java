@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // BFS: queue se level by level - pehle saare 1 kadam door, phir 2 kadam door...
+    // BFS: queue se level by level - pehle saare 1 step door, phir 2 step door...
     static List<Integer> bfs(List<List<Integer>> adj, int start) {
         boolean[] visited = new boolean[adj.size()];
         List<Integer> order = new ArrayList<>();
@@ -15,7 +15,7 @@ class Main {
             order.add(u);
             for (int v : adj.get(u)) {
                 if (!visited[v]) { // pehli baar dikha? //@check
-                    visited[v] = true; // queue mein DAALTE hi mark - warna do baar aa sakta //@mark
+                    visited[v] = true; // queue mein DAALTE hi mark - warna 2 baar aa sakta //@mark
                     queue.offer(v);
                 }
             }

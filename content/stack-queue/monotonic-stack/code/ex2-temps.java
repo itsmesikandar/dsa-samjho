@@ -10,7 +10,7 @@ class Main {
         for (int i = 0; i < t.length; i++) {
             while (!st.isEmpty() && t[st.peek()] < t[i]) { // aaj in sabse garam hai //@pop
                 int d = st.pop();
-                res[d] = i - d; // value nahi, DOORI chahiye - isliye index rakhe
+                res[d] = i - d; // value nahi, DISTANCE chahiye - isliye index rakhe
             }
             st.push(i); //@push
         }

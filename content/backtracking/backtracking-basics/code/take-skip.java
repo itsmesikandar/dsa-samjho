@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // Doosra dhaancha: har item par DO raaste - lo ya chhodo (binary decision tree)
+    // Doosra structure: har item par 2 raaste - lo ya chhodo (binary decision tree)
     static List<List<Integer>> subsetsBinary(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
         go(nums, 0, new ArrayList<>(), res);
@@ -10,7 +10,7 @@ class Main {
     }
 
     static void go(int[] nums, int i, List<Integer> path, List<List<Integer>> res) {
-        if (i == nums.length) { // saare items ka faisla ho gaya: ek poora subset
+        if (i == nums.length) { // saare items ka decision ho gaya: ek poora subset
             res.add(new ArrayList<>(path));
             return;
         }

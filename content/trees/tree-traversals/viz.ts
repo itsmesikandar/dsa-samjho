@@ -5,7 +5,7 @@ type T = { nodes: Map<string, TNode>; root: string | null };
 const make = (levels: (number | null)[]) => buildTree(levels) as T;
 const ser = (t: T) => listStr(levelOrderOf(t.nodes, t.root).map((v) => (v === null ? 'null' : v)));
 
-// ---------- 3. Visual intro: teen orders ek saath ----------
+// ---------- 3. Visual intro: 3 orders ek saath ----------
 export const threeOrders = tracer<{ levels: (number | null)[] }>({
   inputs: [{ name: 'levels', type: 'tree', label: 'Tree (level order)', default: [1, 2, 3, 4, 5], maxNodes: 7, min: 0, max: 99 }],
   run({ levels }, t) {
@@ -32,7 +32,7 @@ export const threeOrders = tracer<{ levels: (number | null)[] }>({
       t.frame({ caption: `${n.value} ke dono subtrees poore → AAKHRI baar → postorder mein likho. Upar wapas.`, legend, panels: [treeView(tr.nodes, tr.root, { tones, pointers: { here: id } }), lists()] });
     };
     dfs(tr.root);
-    t.frame({ caption: 'Ek hi DFS chakkar har node par 3 baar aata hai: aate waqt (pre), left ke baad (in), jaate waqt (post). Kis waqt likhte ho — wahi order.', panels: [treeView(tr.nodes, tr.root, { tones }), lists()] });
+    t.frame({ caption: 'Ek hi DFS chakkar har node par 3 baar aata hai: aate time (pre), left ke baad (in), jaate time (post). Kis time likhte ho — wahi order.', panels: [treeView(tr.nodes, tr.root, { tones }), lists()] });
     return listStr(pre);
   },
 });
@@ -54,7 +54,7 @@ export const inorderTrace = tracer<{ levels: (number | null)[] }>({
     while (cur || st.length) {
       while (cur) {
         st.push(cur);
-        t.frame({ line: 'push', caption: `${tr.nodes.get(cur)!.value} stack par — iska left pehle aana hai, isliye ise baad ke liye rakho. Baayein chalo.`, legend: { compare: 'stack mein', done: 'likh diya' }, panels: view() });
+        t.frame({ line: 'push', caption: `${tr.nodes.get(cur)!.value} stack par — iska left pehle aana hai, isliye ise baad ke liye rakho. Left chalo.`, legend: { compare: 'stack mein', done: 'likh diya' }, panels: view() });
         cur = tr.nodes.get(cur)!.left;
       }
       const id = st.pop()!;
@@ -104,7 +104,7 @@ export const pathSumTrace = tracer<{ levels: (number | null)[]; target: number }
       return ok;
     };
     found = go(tr.root, target, []);
-    t.frame({ line: 'recurse', caption: found ? `Root se leaf tak sum ${target} wala raasta hai → true. (|| ki wajah se mila to baaki shaakhein dekhi hi nahi.)` : `Koi raasta ${target} nahi deta → false.`, panels: [treeView(tr.nodes, tr.root, { tones, badges })] });
+    t.frame({ line: 'recurse', caption: found ? `Root se leaf tak sum ${target} wala raasta hai → true. (|| ki wajah se mila to baaki branches dekhi hi nahi.)` : `Koi raasta ${target} nahi deta → false.`, panels: [treeView(tr.nodes, tr.root, { tones, badges })] });
     return String(found);
   },
 });
@@ -138,7 +138,7 @@ export const constructTrace = tracer<{ levels: (number | null)[] }>({
       array(ino, { label: 'inorder', ranges: lo <= hi ? [{ from: lo, to: hi, label: 'abhi ka subtree', tone: 'active' }] : [], tones: hot !== undefined ? { [hot]: 'found' } : {} }),
       treeView(out, rootId, { label: 'Ban raha tree' }),
     ];
-    t.frame({ line: 'root', caption: `Preorder = root pehle. Inorder = root ke baayein left subtree, daayein right. In do se tree wapas ban jaata hai.`, panels: view(0, ino.length - 1) });
+    t.frame({ line: 'root', caption: `Preorder = root pehle. Inorder = root ke left left subtree, right right. In do se tree wapas ban jaata hai.`, panels: view(0, ino.length - 1) });
     const mk = (lo: number, hi: number, attach?: (id: string) => void): string | null => {
       if (lo > hi) return null;
       const v = pre[p++];
@@ -147,7 +147,7 @@ export const constructTrace = tracer<{ levels: (number | null)[] }>({
       if (attach) attach(id);
       else rootId = id;
       const m = pos.get(v)!;
-      t.frame({ line: 'split', caption: `Preorder ka agla = ${v} → is subtree ka root. Inorder mein ${v} index ${m} par: baayein ${m - lo} node (left), daayein ${hi - m} (right).`, panels: view(lo, hi, m) });
+      t.frame({ line: 'split', caption: `Preorder ka agla = ${v} → is subtree ka root. Inorder mein ${v} index ${m} par: left ${m - lo} node (left), right ${hi - m} (right).`, panels: view(lo, hi, m) });
       mk(lo, m - 1, (c) => (out.get(id)!.left = c));
       mk(m + 1, hi, (c) => (out.get(id)!.right = c));
       return id;
@@ -171,7 +171,7 @@ export const flattenTrace = tracer<{ levels: (number | null)[] }>({
       if (c.left) {
         let tail = c.left;
         while (tr.nodes.get(tail)!.right) tail = tr.nodes.get(tail)!.right!;
-        t.frame({ line: 'tail', caption: `${c.value} ka left hai. Left subtree ka preorder mein AAKHRI node = sabse daayein (${tr.nodes.get(tail)!.value}). Uske baad ${c.value} ka purana right aayega.`, legend: { compare: 'cur', active: 'tail', done: 'chain mein' }, panels: [treeView(tr.nodes, tr.root, { tones: { ...done, [cur]: 'compare', [tail]: 'active' } })] });
+        t.frame({ line: 'tail', caption: `${c.value} ka left hai. Left subtree ka preorder mein AAKHRI node = sabse right (${tr.nodes.get(tail)!.value}). Uske baad ${c.value} ka purana right aayega.`, legend: { compare: 'cur', active: 'tail', done: 'chain mein' }, panels: [treeView(tr.nodes, tr.root, { tones: { ...done, [cur]: 'compare', [tail]: 'active' } })] });
         tr.nodes.get(tail)!.right = c.right;
         c.right = c.left;
         c.left = null;

@@ -2,7 +2,7 @@ meta:
   id: circular-queue
   chapter: stack-queue
   title: Circular Queue
-  subtitle: Array ko gol mod do — head aur tail ghoomte hain, kuch khiskta nahi, sab O(1)
+  subtitle: Array ko gol mod do — head aur tail ghoomte hain, kuch shift hota nahi, sab O(1)
   level: intermediate
   minutes: 30
   prereqs: [queue, array]
@@ -11,13 +11,13 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Array se queue banao to dequeue par problem: aage se nikaala to ya to sab khiskao (O(n)), ya aage ki jagah **bekaar** chhod do.
+    Array se queue banao to dequeue par problem: aage se nikaala to ya to sab shift karo (O(n)), ya aage ki jagah **bekaar** chhod do.
 
     **Circular queue:** array ko **gol** maano — aakhri index ke baad wapas 0.
     - `head` = aage wala item.
     - `count` = kitne bhare.
     - Agli khaali jagah (tail) = `(head + count) % k`.
-    - Dequeue = `head = (head + 1) % k` — kuch khiskaana nahi.
+    - Dequeue = `head = (head + 1) % k` — kuch shift karna nahi.
 
     ```kotlin
     a[(head + count) % k] = x; count++        // enqueue
@@ -27,7 +27,7 @@ what:
     > [!yaad]
     > `%` (modulo) se index ghoomta hai. `head == tail` ka matlab **khaali bhi** ho sakta hai aur **bhara bhi** — isliye `count` rakho (ya ek jagah hamesha khaali chhodo).
   analogy: |
-    **Merry-go-round (jhoola).** Seats gol ghoom rahi hain. Jo seat khaali hui, agla bachcha usi par baithta hai — seats kahin khiskti nahi.
+    **Merry-go-round (swing).** Seats gol ghoom rahi hain. Jo seat khaali hui, agla bachcha usi par baithta hai — seats kahin shift hoti nahi.
 
     Ya **ghadi** — 12 ke baad phir 1. `% 12` wala hisaab.
 
@@ -79,7 +79,7 @@ operations:
   - op: "Simple array queue mein dequeue (shift)"
     time: O(n)
     space: O(1)
-    why: "Sab items aage khiskte — circular mein nahi."
+    why: "Sab items aage shift hote — circular mein nahi."
   - op: "Moving average (ring buffer)"
     time: O(1)
     space: O(k)
@@ -89,7 +89,7 @@ operations:
     space: O(n)
     why: "Naya double array, items order mein copy."
   - op: "Memory"
-    time: "lagu nahi"
+    time: "apply nahi"
     space: O(k)
     why: "Fixed — kabhi badhta nahi (design wala)."
 
@@ -144,7 +144,7 @@ examples:
 
       Example: k = 3: insertLast(1), insertLast(2), insertFront(3) ✓, insertFront(4) ✗ (full), getRear() → **2**
     intuition: |
-      Circular queue + do naye kaam:
+      Circular queue + 2 naye kaam:
       - **insertFront:** head ek **peeche** → `head = (head − 1 + k) % k`, wahan likho.
       - **deleteLast:** sirf `count--` — rear `(head + count − 1)` apne aap ek peeche aa gaya.
 
@@ -180,14 +180,14 @@ examples:
     intuition: |
       Har start try karo, poora chakkar simulate (circular index) → O(n²).
 
-      **Do observations:**
-      1. Poore chakkar ka `total = Σ(gas − cost)` < 0 → kahin se bhi namumkin.
+      **2 observations:**
+      1. Poore chakkar ka `total = Σ(gas − cost)` < 0 → kahin se bhi impossible.
       2. Start `s` se chale aur `i` par tank minus ho gaya → `s..i` mein **kisi se bhi** shuru karke `i + 1` tak nahi pahunchoge (beech ke station tak tank ≥ 0 tha — wahan se shuru karna matlab kam fuel). To seedha `start = i + 1`.
 
       Ek pass: tank minus → reset. Aakhir mein total ≥ 0 to bacha hua start sahi (ghoom ke bhi).
 
       > [!tip]
-      > Circular problem ko kabhi-kabhi "array do baar" (`i % n`, 0..2n) chala ke seedha banate hain. Yahan total wali trick se ek hi pass kaafi.
+      > Circular problem ko kabhi-kabhi "array 2 baar" (`i % n`, 0..2n) chala ke seedha banate hain. Yahan total wali trick se ek hi pass kaafi.
     dryRun: |
       diff = gas − cost = `[−2, −2, −2, 3, 3]`
 
@@ -295,7 +295,7 @@ interview:
         Tank s se i tak minus hua to s..i ka koi bhi start fail (beech tak tank ≥ 0 tha). Aur total ≥ 0 ho to bacha start ghoom ke bhi kaafi fuel rakhta hai.
     - q: "Circular array ke problems (Next Greater II) kaise?"
       a: |
-        Index 0..2n − 1 chalao, a[i % n] use karo — jaise array do baar likha ho.
+        Index 0..2n − 1 chalao, a[i % n] use karo — jaise array 2 baar likha ho.
     - q: "Thread-safe ring buffer?"
       a: |
         Single producer/consumer ke liye lock-free (do atomic indexes). Warna ArrayBlockingQueue (Java) — andar circular array + locks.
@@ -330,7 +330,7 @@ practice:
     url: "https://leetcode.com/problems/shortest-distance-to-target-string-in-a-circular-array/"
     level: easy
     pattern: Circular distance
-    hint: "Har target index j ke liye doori = min(|i − j|, n − |i − j|)."
+    hint: "Har target index j ke liye distance = min(|i − j|, n − |i − j|)."
   - name: Design Circular Queue
     platform: LeetCode
     num: 622
@@ -365,7 +365,7 @@ practice:
     url: "https://leetcode.com/problems/time-taken-to-cross-the-door/"
     level: hard
     pattern: Two queues simulation
-    hint: "Enter aur exit ki do queues; har second rule ke hisaab se kaunsi queue jaaye (pichhle second ka use dekho). Khaali seconds par reset."
+    hint: "Enter aur exit ki 2 queues; har second rule ke hisaab se kaunsi queue jaaye (pichhle second ka use dekho). Khaali seconds par reset."
 
 # 13. Quick revision
 revision:
@@ -418,8 +418,8 @@ connections:
       why: "Moving average = fixed window sum."
   usedLater:
     - id: deque
-      how: "Dono kinaron par O(1) — ArrayDeque yahi circular array hai."
+      how: "Dono edges par O(1) — ArrayDeque yahi circular array hai."
     - id: monotonic-stack
-      how: "Next Greater II — circular array do baar chalana."
+      how: "Next Greater II — circular array 2 baar chalana."
     - id: greedy-classics
       how: "Gas Station jaisa greedy proof."

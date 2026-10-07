@@ -5,7 +5,7 @@ fun dailyTemperatures(t: IntArray): IntArray {
     for (i in t.indices) {
         while (st.isNotEmpty() && t[st.last()] < t[i]) { // aaj in sabse garam hai //@pop
             val d = st.removeLast()
-            res[d] = i - d // value nahi, DOORI chahiye - isliye index rakhe
+            res[d] = i - d // value nahi, DISTANCE chahiye - isliye index rakhe
         }
         st.addLast(i) //@push
     }

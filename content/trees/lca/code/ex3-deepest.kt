@@ -3,13 +3,13 @@ class TreeNode(var value: Int) {
     var right: TreeNode? = null
 }
 
-// Return: (is subtree ki height, sabse gehre leaves ka LCA)
+// Return: (is subtree ki height, sabse deep leaves ka LCA)
 fun deep(node: TreeNode?): Pair<Int, TreeNode?> {
     if (node == null) return Pair(0, null)
     val l = deep(node.left)
     val r = deep(node.right)
-    if (l.first == r.first) return Pair(l.first + 1, node) // dono taraf barabar gehre - yahi LCA //@tie
-    return if (l.first > r.first) Pair(l.first + 1, l.second) else Pair(r.first + 1, r.second) // gehri taraf ka jawab //@deeper
+    if (l.first == r.first) return Pair(l.first + 1, node) // dono taraf barabar deep - yahi LCA //@tie
+    return if (l.first > r.first) Pair(l.first + 1, l.second) else Pair(r.first + 1, r.second) // deep taraf ka jawab //@deeper
 }
 
 fun build(vararg xs: Int?): TreeNode? {

@@ -25,7 +25,7 @@ class Main {
         List<Integer> out = new ArrayList<>();
         CNode prev = last; // jise hataana hai uske PICHHLE par khade raho
         for (int r = 0; r < n; r++) {
-            for (int s = 0; s < k - 1; s++) prev = prev.next; // k - 1 aage gino (circle hai, null kabhi nahi)
+            for (int s = 0; s < k - 1; s++) prev = prev.next; // k - 1 aage count karo (circle hai, null kabhi nahi)
             CNode gone = prev.next;
             out.add(gone.value);
             prev.next = gone.next; // circle se bahar

@@ -1,5 +1,5 @@
 class Main {
-    // Sirf letters/digits dekho, case ignore karo. Dono kinaron se milao.
+    // Sirf letters/digits dekho, case ignore karo. Dono edges se milao.
     static boolean isPalindrome(String s) {
         int l = 0; //@init
         int r = s.length() - 1;

@@ -15,18 +15,18 @@ what:
 
     Ye sirf **DAG** (Directed Acyclic Graph — directed, bina cycle) mein possible hai. Cycle (a → b → a) mein koi "pehla" ho hi nahi sakta.
 
-    Do tareeke, dono O(V + E):
-    1. **Kahn's algorithm (BFS):** jiski **in-degree 0** (koi intezaar nahi) use nikalo; uske baad walon ki in-degree ghatao; jo 0 ho jaaye wo queue mein.
+    2 tareeke, dono O(V + E):
+    1. **Kahn's algorithm (BFS):** jiski **in-degree 0** (koi wait nahi) use nikalo; uske baad walon ki in-degree ghatao; jo 0 ho jaaye wo queue mein.
     2. **DFS:** node ka postorder (saare "baad wale" khatam hone ke baad) list mein daalo; aakhir mein list **ulti**.
 
     Bonus: dono tareeke **cycle** bhi pakadte hain — Kahn mein kuch nodes kabhi free nahi hote; DFS mein "gray" (raste wala) node dobara milta hai.
 
     > [!yaad]
-    > Ek DAG ke **kai** sahi topological orders ho sakte hain. Interview mein "koi bhi ek" lautana kaafi hota hai, jab tak khaas order na maanga ho.
+    > Ek DAG ke **kai** sahi topological orders ho sakte hain. Interview mein "koi bhi ek" return karna kaafi hota hai, jab tak special order na maanga ho.
   analogy: |
-    **Subah taiyaar hona:** baniyan se pehle shirt nahi, mozey se pehle joote nahi, par ghadi kabhi bhi. Ye shartein arrows hain.
+    **Subah taiyaar hona:** baniyan se pehle shirt nahi, mozey se pehle joote nahi, par ghadi kabhi bhi. Ye conditions arrows hain.
 
-    Kahn ka tareeka: "abhi kya pehen sakta hoon jiski koi shart baaki nahi?" — wo pehno, phir dekho kaun naya free hua. Shartein ghoom kar khud par aa jaayein (joote se pehle mozey, mozey se pehle joote) → taiyaar ho hi nahi sakte = cycle.
+    Kahn ka tareeka: "abhi kya pehen sakta hoon jiski koi condition baaki nahi?" — wo pehno, phir dekho kaun naya free hua. Conditions ghoom kar khud par aa jaayein (joote se pehle mozey, mozey se pehle joote) → taiyaar ho hi nahi sakte = cycle.
 
 # 2. Kyun chahiye?
 why:
@@ -48,7 +48,7 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Upar bikhre hue kaam, badge = kitne kaamon ka intezaar (in-degree). Jiska intezaar 0 hai wo neeche line mein aata hai. Aakhir mein dekho: line mein **har arrow baayein se daayein**. Ek ulti edge daal ke cycle bana ke dekho — kuch nodes kabhi neeche nahi aayenge.
+    Upar bikhre hue kaam, badge = kitne kaamon ka wait (in-degree). Jiska wait 0 hai wo neeche line mein aata hai. Aakhir mein dekho: line mein **har arrow left se right**. Ek ulti edge daal ke cycle bana ke dekho — kuch nodes kabhi neeche nahi aayenge.
   viz: { tracer: lineupTrace }
 
 # 4. Kaise kaam karta hai
@@ -58,9 +58,9 @@ how:
     1. Har edge u → v: `adj[u].add(v)`, `indeg[v]++`.
     2. Saare `indeg == 0` wale queue mein.
     3. Queue se u nikalo → order mein. Har `v` in `adj[u]`: `indeg[v]--`; 0 ho gaya → queue mein.
-    4. Aakhir mein `order.size < n` → cycle (bache nodes ek doosre ka intezaar karte reh gaye).
+    4. Aakhir mein `order.size < n` → cycle (bache nodes ek doosre ka wait karte reh gaye).
 
-    Ye BFS hi hai — bas "visited" ki jagah "in-degree 0 hua?" ka niyam.
+    Ye BFS hi hai — bas "visited" ki jagah "in-degree 0 hua?" ka rule.
 
     > [!galti]
     > Edge ki disha ulti padh li. `[course, pre]` mein arrow **pre → course** hai. Ulta banaoge to order bhi ulta aayega (aur in-degree galat nodes ki).
@@ -88,7 +88,7 @@ operations:
   - op: "Level-wise (semesters / rounds)"
     time: "O(V + E)"
     space: O(V)
-    why: "Kahn mein har round ka queue.size — levels ginti = DAG ka sabse lamba rasta."
+    why: "Kahn mein har round ka queue.size — levels count = DAG ka sabse lamba rasta."
 
 # 6. Code
 code:
@@ -112,9 +112,9 @@ examples:
 
       Example: n = 4, `[[1,0],[2,0],[3,1],[3,2]]` → **true** (0, phir 1 aur 2, phir 3)
     intuition: |
-      Sawaal asal mein: **kya graph mein directed cycle hai?** Cycle hai → kuch courses ek doosre ka intezaar karte rahenge → false.
+      Sawaal asal mein: **kya graph mein directed cycle hai?** Cycle hai → kuch courses ek doosre ka wait karte rahenge → false.
 
-      Kahn chalao aur bas gino kitne courses queue se nikle. `done == n` → true. Order store karne ki zaroorat bhi nahi.
+      Kahn chalao aur bas count karo kitne courses queue se nikle. `done == n` → true. Order store karne ki zaroorat bhi nahi.
 
       Arrow ki disha: `[a, b]` → **b → a** (pehle b). Yahi sabse common galti hai.
 
@@ -143,14 +143,14 @@ examples:
 
       Example: n = 7, `[[0,2],[1,2],[2,3],[2,4],[3,5],[4,5]]` → **4**
     intuition: |
-      Ek semester = jitne courses abhi free hain, **sab** ek saath. Ye Kahn ka **level by level** roop hai (BFS ka `queue.size` wala pattern):
+      Ek semester = jitne courses abhi free hain, **sab** ek saath. Ye Kahn ka **level by level** form hai (BFS ka `queue.size` wala pattern):
       - Round shuru: `semesters++`, queue mein jitne hain sab is semester.
       - Unke baad wale jo free hue → agle round mein.
 
-      Jawab = levels ki ginti = DAG ka **sabse lamba rasta** (nodes mein). Course 6 jaisa akela course pehle hi semester mein chala jaata hai — wo jawab nahi badhata.
+      Jawab = levels ki count = DAG ka **sabse lamba rasta** (nodes mein). Course 6 jaisa akela course pehle hi semester mein chala jaata hai — wo jawab nahi badhata.
 
       > [!galti]
-      > Har nikale course par `semesters++` kar diya → ye courses gin raha hai, semesters nahi. Level ke shuru mein `queue.size` le ke ek hi baar badhao.
+      > Har nikale course par `semesters++` kar diya → ye courses count kar raha hai, semesters nahi. Level ke shuru mein `queue.size` le ke ek hi baar badhao.
     dryRun: |
       | Semester | Courses | Free hue |
       |---|---|---|
@@ -163,20 +163,20 @@ examples:
     complexity:
       time: "O(V + E)"
       space: "O(V + E)"
-      why: "Normal Kahn hi — sirf rounds gine. Har node ek baar, har edge ek baar."
+      why: "Normal Kahn hi — sirf rounds count kiye. Har node ek baar, har edge ek baar."
 
   - id: three-colors
     level: tricky
-    title: Course order DFS se — 3 rang se cycle pakdo (Course Schedule II)
+    title: Course order DFS se — 3 color se cycle pakdo (Course Schedule II)
     source: { name: Course Schedule II, platform: LeetCode, url: "https://leetcode.com/problems/course-schedule-ii/" }
     problem: |
-      Example 1 jaisa hi, par ab ek **sahi order** lautao (koi bhi ek). Cycle ho to khaali array. Is baar DFS se karo.
+      Example 1 jaisa hi, par ab ek **sahi order** return karo (koi bhi ek). Cycle ho to khaali array. Is baar DFS se karo.
 
       Example: n = 6, `[[1,0],[2,0],[3,1],[3,2],[4,3],[4,5]]` → **[5, 0, 2, 1, 3, 4]** (ek sahi jawab)
     intuition: |
       **DFS postorder:** node tab list mein jaata hai jab uske **saare baad wale** ho chuke. To list mein har node apne baad walon ke **baad** hai → list **ulti** karo = topological order.
 
-      **Cycle kaise?** Undirected wala "visited + parent nahi" yahan galat hai (0 → 1, 0 → 2, 1 → 2 mein 2 do raston se milta hai par cycle nahi). Isliye 3 rang:
+      **Cycle kaise?** Undirected wala "visited + parent nahi" yahan galat hai (0 → 1, 0 → 2, 1 → 2 mein 2 do raston se milta hai par cycle nahi). Isliye 3 color:
       - **white (0):** abhi chhua nahi.
       - **gray (1):** DFS ke **abhi ke raste** par (stack mein).
       - **black (2):** poora ho gaya.
@@ -186,7 +186,7 @@ examples:
       > [!galti]
       > Sirf `visited` boolean rakha aur visited mila to cycle maan liya → black (poore) nodes par bhi galat "cycle". Gray aur black alag rakhna hi poora trick hai.
     dryRun: |
-      | Kadam | Rang | Postorder |
+      | Step | Color | Postorder |
       |---|---|---|
       | dfs(0) → 1 → 3 → 4 | 0,1,3,4 gray | |
       | 4 ke baad koi nahi | 4 black | 4 |
@@ -205,21 +205,21 @@ examples:
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "'Pehle X phir Y' jaisi shartein (prerequisites, dependencies) aur ek valid order chahiye."
+    - "'Pehle X phir Y' jaisi conditions (prerequisites, dependencies) aur ek valid order chahiye."
     - "Directed graph mein cycle hai ya nahi (deadlock, circular dependency)."
     - "Rounds / semesters / stages — kam se kam kitne (level-wise Kahn)."
-    - "DAG par DP (sabse lamba rasta, raste ginna) — topo order mein process karo."
+    - "DAG par DP (sabse lamba rasta, raste count karna) — topo order mein process karo."
   avoid:
     - "Undirected graph — wahan topological order ka matlab hi nahi; cycle ke liye DFS + parent / union-find."
     - "Edges par weights aur 'sabse sasta rasta' general graph mein → Dijkstra (DAG ho to topo + DP bhi chalega)."
-    - "Shartein nahi, bas connectivity poochhi → BFS / DFS / union-find."
+    - "Conditions nahi, bas connectivity poochhi → BFS / DFS / union-find."
   signals:
     - keyword: "prerequisites / course schedule / dependencies"
       think: "Kahn: in-degree 0 se shuru; done == n?"
     - keyword: "build order / task order / install order"
       think: "Topological sort; cycle ho to error."
     - keyword: "directed graph mein cycle"
-      think: "Kahn count, ya DFS 3 rang (gray dobara mila)."
+      think: "Kahn count, ya DFS 3 color (gray dobara mila)."
     - keyword: "alien dictionary / order of letters"
       think: "Adjacent words ke pehle alag letter se edge, phir topo sort."
 
@@ -247,7 +247,7 @@ mistakes:
   - title: "Cycle check bhool gaye"
     type: logic
     wrong: |
-      Kahn ka order seedha lauta diya — cycle hone par adhoora order (kuch nodes gayab).
+      Kahn ka order seedha return kar diya — cycle hone par adhoora order (kuch nodes gayab).
     right: |
       `if (order.size < n) return emptyList()` (ya false / -1).
   - title: "Akele nodes (koi edge nahi) chhoot gaye"
@@ -261,17 +261,17 @@ mistakes:
     wrong: |
       DFS mein "visited mila → cycle" — diamond (0 → 1 → 3, 0 → 2 → 3) mein galat true.
     right: |
-      3 rang: sirf **gray** (abhi ke raste wala) dobara mile to cycle.
+      3 color: sirf **gray** (abhi ke raste wala) dobara mile to cycle.
   - title: "DFS postorder ulta karna bhool gaye"
     type: logic
     wrong: |
-      Postorder hi lauta diya → har node apne baad walon ke BAAD — order bilkul ulta.
+      Postorder hi return kar diya → har node apne baad walon ke BAAD — order bilkul ulta.
     right: |
       `post.reversed()` — ya stack mein push karke pop karo.
   - title: "Duplicate edges"
     type: other
     wrong: |
-      Same `[a, b]` do baar → in-degree 2, par adj mein bhi 2 baar — Kahn theek chalta hai. Par agar adj ko Set bana diya aur indeg do baar badhaya → node kabhi free nahi hota.
+      Same `[a, b]` 2 baar → in-degree 2, par adj mein bhi 2 baar — Kahn theek chalta hai. Par agar adj ko Set bana diya aur indeg 2 baar badhaya → node kabhi free nahi hota.
     right: |
       adj aur indeg ko ek saath consistent rakho (dono list, ya dono dedupe).
 
@@ -283,32 +283,32 @@ interview:
         Directed graph ke nodes ki line jisme har edge u → v mein u pehle. Sirf DAG mein possible; cycle ho to nahi.
     - q: "Kahn's algorithm samjhao. Complexity?"
       a: |
-        In-degree gino, 0 wale queue mein; nikalo, baad walon ki in-degree ghatao, 0 hone par queue mein. O(V + E) time, O(V + E) space.
+        In-degree count karo, 0 wale queue mein; nikalo, baad walon ki in-degree ghatao, 0 hone par queue mein. O(V + E) time, O(V + E) space.
     - q: "Kahn se cycle kaise pakdoge?"
       a: |
         Aakhir mein order mein n se kam nodes. Bache nodes ki in-degree kabhi 0 nahi hui — wo cycle mein (ya cycle ke baad) hain.
     - q: "DFS se topological sort kaise?"
       a: |
-        Postorder mein node list mein daalo (saare padosi khatam hone ke baad), aakhir mein list ulti. Cycle ke liye 3 rang.
+        Postorder mein node list mein daalo (saare neighbor khatam hone ke baad), aakhir mein list ulti. Cycle ke liye 3 color.
     - q: "Directed cycle mein visited boolean kyun kaafi nahi?"
       a: |
-        Ek node do alag raston se aa sakta hai bina cycle ke (diamond). Cycle tabhi jab node abhi ke DFS raste par ho — isliye gray (in-stack) alag state.
+        Ek node 2 alag raston se aa sakta hai bina cycle ke (diamond). Cycle tabhi jab node abhi ke DFS raste par ho — isliye gray (in-stack) alag state.
     - q: "Kya topological order unique hota hai?"
       a: |
-        Zaroori nahi. Unique tabhi jab Kahn mein har kadam queue mein sirf ek node ho (yaani order mein har jodi ke beech edge ho — Hamiltonian path).
+        Zaroori nahi. Unique tabhi jab Kahn mein har step queue mein sirf ek node ho (matlab order mein har pair ke beech edge ho — Hamiltonian path).
     - q: "Minimum semesters / parallel time kaise?"
       a: |
-        Kahn level by level — levels ki ginti. Har course ka time alag ho to: finish[v] = max(finish[u]) + time[v], topo order mein (Parallel Courses III).
+        Kahn level by level — levels ki count. Har course ka time alag ho to: finish[v] = max(finish[u]) + time[v], topo order mein (Parallel Courses III).
     - q: "Alien Dictionary kaise solve karoge?"
       followUp: true
       a: |
-        Lagaataar words ke pehle alag letter se edge (a ka letter → b ka letter). Agar lamba word apne prefix se pehle aaye → invalid. Phir topo sort; cycle → invalid.
+        Continuous words ke pehle alag letter se edge (a ka letter → b ka letter). Agar lamba word apne prefix se pehle aaye → invalid. Phir topo sort; cycle → invalid.
     - q: "DAG mein sabse lamba rasta?"
       followUp: true
       a: |
         Topo order mein chalo: dist[v] = max(dist[v], dist[u] + w). General graph mein ye NP-hard hai, DAG mein O(V + E).
   mayAsk:
-    - "Course Schedule II (order lautao)."
+    - "Course Schedule II (order return karo)."
     - "Alien Dictionary."
     - "Find All Possible Recipes from Given Supplies."
     - "Parallel Courses / Parallel Courses III."
@@ -327,7 +327,7 @@ practice:
     num: 2924
     url: "https://leetcode.com/problems/find-champion-ii/"
     level: easy
-    pattern: In-degree 0 ginna
+    pattern: In-degree 0 count karna
     hint: "Sirf in-degree chahiye. In-degree 0 wale exactly ek → wahi; warna -1."
   - name: Topological order khud likho (dono tareeke)
     platform: Custom
@@ -340,28 +340,28 @@ practice:
     url: "https://leetcode.com/problems/find-all-possible-recipes-from-given-supplies/"
     level: medium
     pattern: Kahn (strings ke saath)
-    hint: "Ingredient → recipe edge, indeg[recipe] = ingredients ki ginti. Supplies se shuru (queue). Recipe ki indeg 0 → bana sakte, wo bhi queue mein (doosri recipe ka ingredient)."
+    hint: "Ingredient → recipe edge, indeg[recipe] = ingredients ki count. Supplies se shuru (queue). Recipe ki indeg 0 → bana sakte, wo bhi queue mein (doosri recipe ka ingredient)."
   - name: Minimum Height Trees
     platform: LeetCode
     num: 310
     url: "https://leetcode.com/problems/minimum-height-trees/"
     level: medium
     pattern: Patte (leaves) chheelna — undirected Kahn
-    hint: "Degree 1 wale (leaves) queue mein, level by level hatao, padosiyon ki degree ghatao. Jab ≤ 2 nodes bachein wahi centers."
+    hint: "Degree 1 wale (leaves) queue mein, level by level hatao, neighbors ki degree ghatao. Jab ≤ 2 nodes bachein wahi centers."
   - name: Find Eventual Safe States
     platform: LeetCode
     num: 802
     url: "https://leetcode.com/problems/find-eventual-safe-states/"
     level: medium
-    pattern: Ulta graph + Kahn (ya 3 rang)
-    hint: "Edges ulti karo; out-degree 0 (terminal) wale safe — ulte graph mein Kahn. Ya DFS 3 rang: jo cycle tak nahi pahunchte wo safe."
+    pattern: Ulta graph + Kahn (ya 3 color)
+    hint: "Edges ulti karo; out-degree 0 (terminal) wale safe — ulte graph mein Kahn. Ya DFS 3 color: jo cycle tak nahi pahunchte wo safe."
   - name: Alien Dictionary
     platform: LeetCode
     num: 269
     url: "https://leetcode.com/problems/alien-dictionary/"
     level: hard
     pattern: Words se edges + topo sort
-    hint: "Lagaataar words ka pehla alag letter → edge. Prefix wala case ('abc' ke baad 'ab') → invalid. Saare letters nodes; Kahn; cycle → ''. (LeetCode premium — GFG par 'Alien Dictionary' free.)"
+    hint: "Continuous words ka pehla alag letter → edge. Prefix wala case ('abc' ke baad 'ab') → invalid. Saare letters nodes; Kahn; cycle → ''. (LeetCode premium — GFG par 'Alien Dictionary' free.)"
   - name: Parallel Courses III
     platform: LeetCode
     num: 2050
@@ -400,7 +400,7 @@ revision:
       options: ["3 → 1", "1 → 3", "Dono", "Undirected 1 — 3"]
       answer: 1
       explain: "Pehle 1, phir 3 → arrow 1 → 3."
-    - q: "DFS 3 rang mein cycle kab?"
+    - q: "DFS 3 color mein cycle kab?"
       options: ["White node mila", "Black node mila", "Gray node mila", "Koi bhi visited mila"]
       answer: 2
       explain: "Gray = abhi ke raste par. Usse wapas milna = back edge = cycle. Black alag raste se poora hua node hai."
@@ -413,9 +413,9 @@ revision:
 connections:
   related:
     - id: bfs
-      why: "Kahn's algorithm = BFS jahan 'in-degree 0' hi entry ka niyam hai."
+      why: "Kahn's algorithm = BFS jahan 'in-degree 0' hi entry ka rule hai."
     - id: dfs
-      why: "DFS postorder ulta = topo order; 3 rang wala cycle check."
+      why: "DFS postorder ulta = topo order; 3 color wala cycle check."
     - id: priority-queue
       why: "Queue ki jagah min-heap → sabse chhota topological order."
   usedLater:

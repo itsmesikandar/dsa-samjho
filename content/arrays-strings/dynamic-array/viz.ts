@@ -85,7 +85,7 @@ export const growTrace = tracer<{ values: number[] }>({
           bigger[i] = data[i];
           t.frame({
             line: 'copy',
-            caption: `bigger[${i}] = data[${i}] = ${data[i]}. Ye copy hi resize ka kharcha hai — O(size).`,
+            caption: `bigger[${i}] = data[${i}] = ${data[i]}. Ye copy hi resize ka cost hai — O(size).`,
             vars: { i },
             panels: [view({ [i]: 'compare' }, { i }), array(bigger, { label: `bigger (capacity ${bigger.length})`, tones: { ...range(0, i - 1, 'done'), [i]: 'new' }, pointers: { i } })],
           });
@@ -126,15 +126,15 @@ export const opsTrace = tracer<{ arr: number[] }>({
     show('init', `List banayi: ${listStr(list)}.`);
     list.push(5);
     id.push('n5');
-    show('add', 'add(5) → end par. Kisi ko khiskana nahi pada — O(1) (amortized).', { [list.length - 1]: 'new' });
-    show('addfront', 'add(0, 1) karne se pehle: index 0 khaali karne ke liye SAARE items ek kadam right khiskenge.', range(0, list.length - 1, 'compare'));
+    show('add', 'add(5) → end par. Kisi ko shift karna nahi pada — O(1) (amortized).', { [list.length - 1]: 'new' });
+    show('addfront', 'add(0, 1) karne se pehle: index 0 khaali karne ke liye SAARE items ek step right shift honge.', range(0, list.length - 1, 'compare'));
     list.unshift(1);
     id.unshift('n1');
-    show('addfront', `add(0, 1) → ${list.length - 1} items khiske, phir 1 shuru mein. Isliye O(n).`, { 0: 'new' });
-    show('remove', `removeAt(2) → ${list[2]} hatana hai. Uske baad wale items left khiskenge.`, { 2: 'error', ...range(3, list.length - 1, 'compare') });
+    show('addfront', `add(0, 1) → ${list.length - 1} items shift hue, phir 1 shuru mein. Isliye O(n).`, { 0: 'new' });
+    show('remove', `removeAt(2) → ${list[2]} hatana hai. Uske baad wale items left shift honge.`, { 2: 'error', ...range(3, list.length - 1, 'compare') });
     list.splice(2, 1);
     id.splice(2, 1);
-    show('remove', `Hata diya; gap bharne ke liye ${list.length - 2} items khiske — O(n).`, range(2, list.length - 1, 'swap'));
+    show('remove', `Hata diya; gap bharne ke liye ${list.length - 2} items shift hue — O(n).`, range(2, list.length - 1, 'swap'));
     list[1] = 8;
     show('set', 'list[1] = 8 → seedha index par likha. O(1).', { 1: 'found' });
     t.frame({
@@ -157,7 +157,7 @@ export const removeAllX = tracer<{ arr: number[]; x: number }>({
     let w = 0;
     t.frame({ legend: { error: 'hatana hai', compare: 'rakhna hai' },
       line: 'init',
-      caption: `Do pointers: r padhta hai, w batata hai agla "rakhne layak" item kahan likhna hai. Har item ko removeAt karte to har baar shifting → O(n²).`,
+      caption: `2 pointers: r padhta hai, w batata hai agla "rakhne layak" item kahan likhna hai. Har item ko removeAt karte to har baar shifting → O(n²).`,
       vars: { w, x },
       panels: [array(list, { pointers: { w } })],
     });
@@ -202,40 +202,40 @@ export const removeTrap = tracer<{ arr: number[] }>({
     const a = [...arr];
     const id = arr.map((_, k) => `w${k}`);
     let i = 0;
-    t.frame({ legend: { error: 'hatana hai', compare: 'khiska hua (skip hoga)' }, caption: 'GALAT tareeka: i = 0 se aage badho, even mile to removeAt(i), aur har baar i++.', vars: { i }, panels: [array(a, { ids: [...id], pointers: { i } })] });
+    t.frame({ legend: { error: 'hatana hai', compare: 'shift hua hua (skip hoga)' }, caption: 'GALAT tareeka: i = 0 se aage badho, even mile to removeAt(i), aur har baar i++.', vars: { i }, panels: [array(a, { ids: [...id], pointers: { i } })] });
     while (i < a.length) {
       if (a[i] % 2 === 0) {
         const gone = a[i];
-        t.frame({ legend: { error: 'hatana hai', compare: 'khiska hua (skip hoga)' }, line: 'remove', caption: `list[${i}] = ${gone} even hai → removeAt(${i}).`, vars: { i }, panels: [array(a, { ids: [...id], tones: { [i]: 'error' }, pointers: { i } })] });
+        t.frame({ legend: { error: 'hatana hai', compare: 'shift hua hua (skip hoga)' }, line: 'remove', caption: `list[${i}] = ${gone} even hai → removeAt(${i}).`, vars: { i }, panels: [array(a, { ids: [...id], tones: { [i]: 'error' }, pointers: { i } })] });
         a.splice(i, 1);
         id.splice(i, 1);
         const moved = a[i];
-        t.frame({ legend: { error: 'hatana hai', compare: 'khiska hua (skip hoga)' },
+        t.frame({ legend: { error: 'hatana hai', compare: 'shift hua hua (skip hoga)' },
           line: 'inc',
-          caption: moved === undefined ? `Hata diya. i++ → list khatam.` : `Hata diya — ab ${moved} khisak ke index ${i} par aa gaya. Par ab i++ hoga, to ${moved} kabhi check hi nahi hoga!`,
+          caption: moved === undefined ? `Hata diya. i++ → list khatam.` : `Hata diya — ab ${moved} shift ho ke index ${i} par aa gaya. Par ab i++ hoga, to ${moved} kabhi check hi nahi hoga!`,
           vars: { i },
           panels: [array(a, { ids: [...id], tones: moved === undefined ? {} : { [i]: moved % 2 === 0 ? 'error' : 'compare' }, pointers: { i } })],
         });
       } else {
-        t.frame({ legend: { error: 'hatana hai', compare: 'khiska hua (skip hoga)' }, line: 'inc', caption: `list[${i}] = ${a[i]} odd hai → rakho, i++.`, vars: { i }, panels: [array(a, { ids: [...id], tones: { [i]: 'done' }, pointers: { i } })] });
+        t.frame({ legend: { error: 'hatana hai', compare: 'shift hua hua (skip hoga)' }, line: 'inc', caption: `list[${i}] = ${a[i]} odd hai → rakho, i++.`, vars: { i }, panels: [array(a, { ids: [...id], tones: { [i]: 'done' }, pointers: { i } })] });
       }
       i++;
     }
     const wrong = [...a];
     const leftover = wrong.filter((v) => v % 2 === 0);
-    t.frame({ legend: { error: 'hatana hai', compare: 'khiska hua (skip hoga)' },
+    t.frame({ legend: { error: 'hatana hai', compare: 'shift hua hua (skip hoga)' },
       caption: leftover.length
         ? `Result ${listStr(wrong)} — even numbers ${leftover.join(', ')} bach gaye! Bug: remove ke baad wale item ko skip kar diya.`
-        : `Result ${listStr(wrong)} — is input par bug nahi dikha (lagatar do even nahi the). Par logic phir bhi galat hai.`,
+        : `Result ${listStr(wrong)} — is input par bug nahi dikha (continuous do even nahi the). Par logic phir bhi galat hai.`,
       panels: [array(wrong, { tones: Object.fromEntries(wrong.map((v, k) => [k, v % 2 === 0 ? 'error' : 'done'])) })],
     });
     const b = [...arr];
     const bid = arr.map((_, k) => `r${k}`);
     for (let j = b.length - 1; j >= 0; j--) {
       const even = b[j] % 2 === 0;
-      t.frame({ legend: { error: 'hatana hai', compare: 'khiska hua (skip hoga)' },
+      t.frame({ legend: { error: 'hatana hai', compare: 'shift hua hua (skip hoga)' },
         line: 'back',
-        caption: even ? `SAHI tareeka (peeche se): list[${j}] = ${b[j]} even → hatao. Iske peeche wale items khiskte hain, jo hum dekh chuke hain — koi skip nahi.` : `list[${j}] = ${b[j]} odd → rakho.`,
+        caption: even ? `SAHI tareeka (peeche se): list[${j}] = ${b[j]} even → hatao. Iske peeche wale items shift hote hain, jo hum dekh chuke hain — koi skip nahi.` : `list[${j}] = ${b[j]} odd → rakho.`,
         vars: { i: j },
         panels: [array(b, { ids: [...bid], tones: { [j]: even ? 'error' : 'done' }, pointers: { i: j } })],
       });
@@ -244,7 +244,7 @@ export const removeTrap = tracer<{ arr: number[] }>({
         bid.splice(j, 1);
       }
     }
-    t.frame({ legend: { error: 'hatana hai', compare: 'khiska hua (skip hoga)' },
+    t.frame({ legend: { error: 'hatana hai', compare: 'shift hua hua (skip hoga)' },
       caption: `Sahi result: ${listStr(b)}. Aur bhi aasaan: removeAll { it % 2 == 0 } (Java: removeIf) — O(n) aur bug-free.`,
       panels: [array(b, { ids: [...bid], tones: range(0, b.length - 1, 'done') })],
     });

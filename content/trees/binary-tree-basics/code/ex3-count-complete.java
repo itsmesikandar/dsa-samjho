@@ -11,12 +11,12 @@ class Main {
         }
     }
 
-    // Complete tree (har level bhara, aakhri level left se bhara) ke nodes O(n) se tez gino
+    // Complete tree (har level bhara, aakhri level left se bhara) ke nodes O(n) se tez count karo
     static int countNodes(TreeNode root) {
         if (root == null) return 0; //@base
         int lh = 0, rh = 0;
-        for (TreeNode n = root; n != null; n = n.left) lh++; // sabse baayein raasta ki lambai
-        for (TreeNode n = root; n != null; n = n.right) rh++; // sabse daayein raasta ki lambai
+        for (TreeNode n = root; n != null; n = n.left) lh++; // sabse left raasta ki length
+        for (TreeNode n = root; n != null; n = n.right) rh++; // sabse right raasta ki length
         if (lh == rh) return (1 << lh) - 1; // dono barabar = perfect tree: 2^h - 1, neeche jaana hi nahi //@perfect
         return 1 + countNodes(root.left) + countNodes(root.right); // warna dono taraf (ek taraf pakka perfect hoga) //@split
     }

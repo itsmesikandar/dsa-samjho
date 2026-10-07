@@ -9,7 +9,7 @@ fun inorder(root: TreeNode?): List<Int> {
     val st = ArrayDeque<TreeNode>()
     var cur = root
     while (cur != null || st.isNotEmpty()) {
-        while (cur != null) { // jitna ho sake baayein jao; raaste ke nodes stack par (inhe baad mein dekhna hai) //@push
+        while (cur != null) { // jitna ho sake left jao; raaste ke nodes stack par (inhe baad mein dekhna hai) //@push
             st.addLast(cur)
             cur = cur.left
         }

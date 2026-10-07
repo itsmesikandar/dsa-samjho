@@ -1,14 +1,14 @@
 import java.util.PriorityQueue
 
-// Har baar do sabse chhoti rassiyan jodo: jaldi judi rassi ki lambai aage baar baar ginti hai
+// Har baar 2 sabse chhoti ropes jodo: jaldi judi rope ki length aage baar baar count hai
 fun minCost(ropes: IntArray): Long {
-    val pq = PriorityQueue<Long>() // min-heap; Long - kharcha bada ho sakta hai //@build
+    val pq = PriorityQueue<Long>() // min-heap; Long - cost bada ho sakta hai //@build
     for (r in ropes) pq.add(r.toLong())
     var cost = 0L
     while (pq.size > 1) {
-        val s = pq.poll() + pq.poll() // do sabse chhoti jodo; kharcha = dono ki lambai //@join
+        val s = pq.poll() + pq.poll() // 2 sabse chhoti jodo; cost = dono ki length //@join
         cost += s
-        pq.add(s) // nayi rassi wapas - aage ye bhi judegi //@push
+        pq.add(s) // nayi rope wapas - aage ye bhi judegi //@push
     }
     return cost //@end
 }

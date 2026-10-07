@@ -18,7 +18,7 @@ class Main {
             return;
         }
         for (int i = start; i < c.length; i++) {
-            if (c[i] > remain) break; // is shaakh ke aage sab bekaar - kaat do (pruning) //@prune
+            if (c[i] > remain) break; // is branch ke aage sab bekaar - kaat do (pruning) //@prune
             path.add(c[i]); //@choose
             bt(c, i, remain - c[i], path, res); // i se hi: same number dobara le sakte; i se pehle nahi (warna [2,3] aur [3,2] dono)
             path.remove(path.size() - 1); //@unchoose

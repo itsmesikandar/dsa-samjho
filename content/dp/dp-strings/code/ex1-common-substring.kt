@@ -1,4 +1,4 @@
-// Sabse lamba common SUBSTRING (lagaataar, gap nahi). LCS jaisa table, par mismatch par 0 - silsila toot gaya
+// Sabse lamba common SUBSTRING (continuous, gap nahi). LCS jaisa table, par mismatch par 0 - chain toot gaya
 fun longestCommonSubstr(a: String, b: String): Int {
     val dp = Array(a.length + 1) { IntArray(b.length + 1) } // dp[i][j] = a[i-1] aur b[j-1] par KHATAM hone wala common substring
     var best = 0

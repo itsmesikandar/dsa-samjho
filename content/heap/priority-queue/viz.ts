@@ -27,7 +27,7 @@ export const pqPrint = tracer<{ arr: number[] }>({
     const same = listStr(inside) === listStr(sorted);
     t.frame({
       caption: same
-        ? `println(pq) → ${listStr(inside)}. Is baar sorted dikh raha hai — sanyog hai! Ye andar ka heap array hai (level order), guarantee nahi.`
+        ? `println(pq) → ${listStr(inside)}. Is baar sorted dikh raha hai — coincidence hai! Ye andar ka heap array hai (level order), guarantee nahi.`
         : `println(pq) → ${listStr(inside)}. Ye SORTED nahi! Ye andar ka heap array hai (level order). toString, for-loop, toList — sab yahi order dete hain.`,
       legend,
       panels: views(pq.a, { 0: 'found' }),
@@ -55,7 +55,7 @@ export const triageTrace = tracer<{ sev: number[] }>({
     const order: string[] = [];
     const legend = { new: 'naya', swap: 'swap', compare: 'parent', done: 'jagah theek', found: 'agla ilaaj' };
     const vars = () => ({ order: listStr(order) });
-    t.frame({ line: 'cmp', caption: 'Node "5B" = severity 5, mareez B. Comparator: zyada severity upar; barabar ho to jo pehle aaya wo upar. Heap ka poora order sirf isi ek function se tay hota hai.', vars: vars(), legend, panels: views(a, {}, 'PQ andar') });
+    t.frame({ line: 'cmp', caption: 'Node "5B" = severity 5, patient B. Comparator: zyada severity upar; barabar ho to jo pehle aaya wo upar. Heap ka poora order sirf isi ek function se decide hota hai.', vars: vars(), legend, panels: views(a, {}, 'PQ andar') });
     sev.forEach((s, i) => {
       a.push({ v: `${s}${name(i)}`, s, i, id: `p${i}` });
       let k = a.length - 1;
@@ -89,26 +89,26 @@ export const triageTrace = tracer<{ sev: number[] }>({
         k = m;
       }
     }
-    t.frame({ line: 'poll', caption: `Ilaaj ka order ${listStr(order)}. Har add / poll O(log n) — comparator har level par sirf ek-do baar chala.`, vars: vars(), legend, panels: views(a, {}, 'PQ andar') });
+    t.frame({ line: 'poll', caption: `Ilaaj ka order ${listStr(order)}. Har add / poll O(log n) — comparator har level par sirf ek-2 baar chala.`, vars: vars(), legend, panels: views(a, {}, 'PQ andar') });
     return listStr(order);
   },
 });
 
 // ---------- Example 1: Last Stone Weight ----------
 export const lastStoneTrace = tracer<{ stones: number[] }>({
-  inputs: [{ name: 'stones', type: 'intArray', label: 'Pattharon ka wazan', default: [2, 7, 4, 1, 8, 1], minLen: 1, maxLen: 8, min: 1, max: 30 }],
+  inputs: [{ name: 'stones', type: 'intArray', label: 'Stones ka weight', default: [2, 7, 4, 1, 8, 1], minLen: 1, maxLen: 8, min: 1, max: 30 }],
   run({ stones }, t) {
     const pq = heapSim<Item>((x, y) => x.v > y.v);
     stones.forEach((v, i) => pq.add({ v, id: `s${i}` }));
     let next = stones.length;
-    const legend = { found: 'sabse bhaari (y)', compare: 'doosra bhaari (x)', new: 'bacha tukda' };
+    const legend = { found: 'sabse bhaari (y)', compare: 'doosra bhaari (x)', new: 'bacha piece' };
     const label = 'PQ (max-heap)';
-    t.frame({ line: 'build', caption: `Saare patthar max-heap (reverseOrder) mein. Root = sabse bhaari = ${pq.a[0].v}. Har round mein do sabse bhaari chahiye — heap dono O(log n) mein deta hai.`, legend, panels: views(pq.a, { 0: 'found' }, label) });
+    t.frame({ line: 'build', caption: `Saare stone max-heap (reverseOrder) mein. Root = sabse bhaari = ${pq.a[0].v}. Har round mein 2 sabse bhaari chahiye — heap dono O(log n) mein deta hai.`, legend, panels: views(pq.a, { 0: 'found' }, label) });
     while (pq.a.length > 1) {
       const sec = second(pq.a, (x, y) => x > y);
       const y = pq.a[0].v;
       const x = pq.a[sec].v;
-      t.frame({ line: 'take', caption: `poll() do baar → y = ${y}, x = ${x}. Doosra sabse bhaari hamesha root ka koi bachcha hota hai.`, vars: { y, x }, legend, panels: views(pq.a, { 0: 'found', [sec]: 'compare' }, label) });
+      t.frame({ line: 'take', caption: `poll() 2 baar → y = ${y}, x = ${x}. Doosra sabse bhaari hamesha root ka koi bachcha hota hai.`, vars: { y, x }, legend, panels: views(pq.a, { 0: 'found', [sec]: 'compare' }, label) });
       pq.poll();
       pq.poll();
       if (y !== x) {
@@ -120,7 +120,7 @@ export const lastStoneTrace = tracer<{ stones: number[] }>({
       }
     }
     const ans = pq.a.length ? pq.a[0].v : 0;
-    t.frame({ line: 'end', caption: pq.a.length ? `Ek patthar bacha → jawab ${ans}. Har round O(log n), n rounds tak → O(n log n).` : 'Koi patthar nahi bacha → jawab 0.', legend, panels: views(pq.a, pq.a.length ? { 0: 'found' } : {}, label) });
+    t.frame({ line: 'end', caption: pq.a.length ? `Ek stone bacha → jawab ${ans}. Har round O(log n), n rounds tak → O(n log n).` : 'Koi stone nahi bacha → jawab 0.', legend, panels: views(pq.a, pq.a.length ? { 0: 'found' } : {}, label) });
     return String(ans);
   },
 });
@@ -177,28 +177,28 @@ export const heapSortTrace = tracer<{ arr: number[] }>({
 
 // ---------- Example 3: Minimum cost of ropes ----------
 export const ropesTrace = tracer<{ ropes: number[] }>({
-  inputs: [{ name: 'ropes', type: 'intArray', label: 'Rassiyon ki lambai', default: [4, 3, 2, 6], minLen: 1, maxLen: 8, min: 1, max: 50 }],
+  inputs: [{ name: 'ropes', type: 'intArray', label: 'Ropes ki length', default: [4, 3, 2, 6], minLen: 1, maxLen: 8, min: 1, max: 50 }],
   run({ ropes }, t) {
     const pq = heapSim<Item>((x, y) => x.v < y.v);
     ropes.forEach((v, i) => pq.add({ v, id: `r${i}` }));
     let next = ropes.length;
     let cost = 0;
-    const legend = { found: 'sabse chhoti', compare: 'doosri chhoti', new: 'nayi rassi' };
+    const legend = { found: 'sabse chhoti', compare: 'doosri chhoti', new: 'nayi rope' };
     const label = 'PQ (min-heap)';
-    t.frame({ line: 'build', caption: 'Saari rassiyan min-heap mein. Jod ka kharcha = dono ki lambai. Jo rassi jaldi judti hai, uski lambai aage ke har jod mein phir ginti hai → chhoti rassiyan pehle jodo.', vars: { cost }, legend, panels: views(pq.a, { 0: 'found' }, label) });
+    t.frame({ line: 'build', caption: 'Saari ropes min-heap mein. Jod ka cost = dono ki length. Jo rope jaldi judti hai, uski length aage ke har jod mein phir count hai → chhoti ropes pehle jodo.', vars: { cost }, legend, panels: views(pq.a, { 0: 'found' }, label) });
     while (pq.a.length > 1) {
       const sec = second(pq.a, (x, y) => x < y);
       const x = pq.a[0].v;
       const y = pq.a[sec].v;
-      t.frame({ line: 'join', caption: `Do sabse chhoti: ${x} + ${y} = ${x + y}. Kharcha ${cost} + ${x + y} = ${cost + x + y}.`, vars: { cost }, legend, panels: views(pq.a, { 0: 'found', [sec]: 'compare' }, label) });
+      t.frame({ line: 'join', caption: `2 sabse chhoti: ${x} + ${y} = ${x + y}. Cost ${cost} + ${x + y} = ${cost + x + y}.`, vars: { cost }, legend, panels: views(pq.a, { 0: 'found', [sec]: 'compare' }, label) });
       pq.poll();
       pq.poll();
       cost += x + y;
       const id = `r${next++}`;
       pq.add({ v: x + y, id });
-      t.frame({ line: 'push', caption: `Nayi rassi ${x + y} wapas heap mein — ye bhi aage judegi, isliye bade jod jitna ho sake baad mein.`, vars: { cost }, legend, panels: views(pq.a, { [at(pq.a, id)]: 'new' }, label) });
+      t.frame({ line: 'push', caption: `Nayi rope ${x + y} wapas heap mein — ye bhi aage judegi, isliye bade jod jitna ho sake baad mein.`, vars: { cost }, legend, panels: views(pq.a, { [at(pq.a, id)]: 'new' }, label) });
     }
-    t.frame({ line: 'end', caption: ropes.length === 1 ? 'Ek hi rassi — jodna nahi, kharcha 0.' : `Ek rassi bachi (${pq.a[0].v}). Kul kharcha ${cost} — sabse kam. Har round O(log n) → total O(n log n).`, vars: { cost }, legend, panels: views(pq.a, {}, label) });
+    t.frame({ line: 'end', caption: ropes.length === 1 ? 'Ek hi rope — jodna nahi, cost 0.' : `Ek rope bachi (${pq.a[0].v}). Total cost ${cost} — sabse kam. Har round O(log n) → total O(n log n).`, vars: { cost }, legend, panels: views(pq.a, {}, label) });
     return String(cost);
   },
 });

@@ -1,5 +1,5 @@
 class Main {
-    // Paas-paas ke do same letters hatao - baar-baar, jab tak koi aisa jodi na bache
+    // Paas-paas ke do same letters hatao - baar-baar, jab tak koi aisa pair na bache
     static String removeDuplicates(String s) {
         StringBuilder st = new StringBuilder(); // StringBuilder hi stack hai: end = top
         for (char c : s.toCharArray()) {

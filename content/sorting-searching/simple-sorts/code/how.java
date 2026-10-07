@@ -1,12 +1,12 @@
 import java.util.Arrays;
 
 class Main {
-    // Insertion sort: taash ke patton jaisa - har naya item pichhle sorted hisse mein sahi jagah baithta hai
+    // Insertion sort: cards ke patton jaisa - har naya item pichhle sorted hisse mein sahi jagah baithta hai
     static void insertionSort(int[] a) {
         for (int i = 1; i < a.length; i++) {
-            int key = a[i]; // ise sahi jagah bithana hai //@pick
+            int key = a[i]; // ise sahi jagah place karna hai //@pick
             int j = i - 1;
-            while (j >= 0 && a[j] > key) { // key se bade items ek-ek jagah daayein khiskao //@shift
+            while (j >= 0 && a[j] > key) { // key se bade items ek-ek jagah right shift karo //@shift
                 a[j + 1] = a[j];
                 j--;
             }

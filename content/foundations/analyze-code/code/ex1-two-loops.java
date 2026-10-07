@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // Do alag arrays ka total sum: ek loop ke BAAD doosra loop
+    // 2 alag arrays ka total sum: ek loop ke BAAD doosra loop
     static int sumBoth(int[] a, int[] b) {
         int s = 0;
         for (int x : a) s += x; // n baar //@loopA

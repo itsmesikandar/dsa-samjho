@@ -1,4 +1,4 @@
-// Bubble sort: padosiyon ko compare karo, galat order ho to swap.
+// Bubble sort: neighbors ko compare karo, galat order ho to swap.
 // Har pass mein bacha hua sabse bada item end tak 'bubble' ho jaata hai.
 fun bubbleSort(a: IntArray) {
     val n = a.size

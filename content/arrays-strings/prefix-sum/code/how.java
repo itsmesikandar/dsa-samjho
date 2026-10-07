@@ -8,7 +8,7 @@ class Main {
             for (int i = 0; i < arr.length; i++) pre[i + 1] = pre[i] + arr[i]; // ab tak ka total + agla item //@build
         }
 
-        // arr[l..r] (dono shamil) ka sum
+        // arr[l..r] (dono include) ka sum
         long sum(int l, int r) {
             return pre[r + 1] - pre[l]; //@query
         }

@@ -21,7 +21,7 @@ class Main {
         Deque<TreeNode> st = new ArrayDeque<>();
         TreeNode cur = root;
         while (cur != null || !st.isEmpty()) {
-            while (cur != null) { // jitna ho sake baayein jao; raaste ke nodes stack par (inhe baad mein dekhna hai) //@push
+            while (cur != null) { // jitna ho sake left jao; raaste ke nodes stack par (inhe baad mein dekhna hai) //@push
                 st.push(cur);
                 cur = cur.left;
             }

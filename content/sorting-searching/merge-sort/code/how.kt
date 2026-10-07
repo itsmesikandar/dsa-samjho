@@ -1,4 +1,4 @@
-// Merge sort: aadha karo, dono halves ko sort karo (recursion), phir do sorted halves ko jodo (merge)
+// Merge sort: aadha karo, dono halves ko sort karo (recursion), phir 2 sorted halves ko jodo (merge)
 fun mergeSort(a: IntArray, l: Int, r: Int, tmp: IntArray) {
     if (l >= r) return // 0 ya 1 item: pehle se sorted //@base
     val mid = (l + r) / 2 //@split

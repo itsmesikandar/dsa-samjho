@@ -26,9 +26,9 @@ class Main {
 
         int pop() {
             int top = a.get(0);
-            int last = a.remove(a.size() - 1); // aakhri nikaalo - beech mein chhed nahi banta //@last
+            int last = a.remove(a.size() - 1); // aakhri nikaalo - beech mein hole nahi banta //@last
             if (!a.isEmpty()) {
-                a.set(0, last); // root par rakho, phir neeche dhakelo (sift down) //@root
+                a.set(0, last); // root par rakho, phir neeche push karo (sift down) //@root
                 int i = 0;
                 while (true) {
                     int l = 2 * i + 1, r = l + 1, m = i;

@@ -1,7 +1,7 @@
 import java.util.Collections
 import java.util.PriorityQueue
 
-// Two heaps ka general roop: left mein hamesha "rank" sabse chhote. Left ka top = p-th percentile
+// Two heaps ka general form: left mein hamesha "rank" sabse chhote. Left ka top = p-th percentile
 fun runningPercentile(nums: IntArray, p: Int): List<Int> {
     val left = PriorityQueue<Int>(Collections.reverseOrder())
     val right = PriorityQueue<Int>()

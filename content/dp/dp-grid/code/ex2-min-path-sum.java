@@ -1,5 +1,5 @@
 class Main {
-    // Har cell ka kharcha. Neeche / daayein chal ke kam se kam jod. dp[i][j] = (i, j) tak ka sabse sasta rasta
+    // Har cell ka cost. Neeche / right chal ke kam se kam jod. dp[i][j] = (i, j) tak ka sabse sasta rasta
     static int minPathSum(int[][] grid) {
         int m = grid.length, n = grid[0].length;
         int[][] dp = new int[m][n];
@@ -7,7 +7,7 @@ class Main {
             for (int j = 0; j < n; j++) {
                 int best;
                 if (i == 0 && j == 0) best = 0; // shuruaat //@start
-                else if (i == 0) best = dp[i][j - 1]; // pehli row: sirf baayein se
+                else if (i == 0) best = dp[i][j - 1]; // pehli row: sirf left se
                 else if (j == 0) best = dp[i - 1][j]; // pehla column: sirf upar se
                 else best = Math.min(dp[i - 1][j], dp[i][j - 1]); // dono mein sasta //@cell
                 dp[i][j] = grid[i][j] + best;

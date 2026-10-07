@@ -25,7 +25,7 @@ export const ringDemo = tracer<{ k: number; ops: string }>({
     const a: Cell[] = Array(k).fill(null);
     let head = 0;
     let count = 0;
-    t.frame({ caption: `${k} jagah ka array, gol mod diya. head = aage wala, rear = aakhri. Nikaalne par items khiskte NAHI — sirf head aage badhta hai.`, panels: [ring(a, head, count)] });
+    t.frame({ caption: `${k} jagah ka array, gol mod diya. head = aage wala, rear = aakhri. Nikaalne par items shift hote NAHI — sirf head aage badhta hai.`, panels: [ring(a, head, count)] });
     for (const c of ops) {
       if (c === 'o') {
         if (!count) {
@@ -74,7 +74,7 @@ export const cqTrace = tracer<{ k: number; ops: string }>({
         head = (head + 1) % k;
         count--;
         outs.push('true');
-        t.frame({ line: 'deq', caption: `deQueue(): head = (head + 1) % ${k} = ${head}, count = ${count}. Value mitaayi bhi nahi — wo jagah ab queue ka hissa hi nahi.`, vars: vars(), panels: [ring(a, head, count)] });
+        t.frame({ line: 'deq', caption: `deQueue(): head = (head + 1) % ${k} = ${head}, count = ${count}. Value hatayi bhi nahi — wo jagah ab queue ka hissa hi nahi.`, vars: vars(), panels: [ring(a, head, count)] });
       } else {
         if (count === k) {
           outs.push('false');
@@ -105,7 +105,7 @@ export const ticketsTrace = tracer<{ tickets: number[]; k: number }>({
     let time = 0;
     let i = 0;
     const view = (tone?: Tone): Panel[] => [array(left, { label: 'Bache tickets', pointers: { i, k }, tones: { ...Object.fromEntries(left.map((v, j) => [j, (v === 0 ? 'muted' : undefined) as Tone])), [k]: 'compare', ...(tone ? { [i]: tone } : {}) } })];
-    t.frame({ line: 'buy', caption: `Line mein har insaan ek ticket leta hai, phir peeche. Aakhri ke baad wapas pehla — index (i + 1) % ${tickets.length}. Neela = jiska time chahiye.`, legend: { compare: `k (${k})`, muted: 'line se bahar' }, panels: view() });
+    t.frame({ line: 'buy', caption: `Line mein har insaan ek ticket leta hai, phir peeche. Aakhri ke baad wapas pehla — index (i + 1) % ${tickets.length}. Blue = jiska time chahiye.`, legend: { compare: `k (${k})`, muted: 'line se bahar' }, panels: view() });
     for (;;) {
       if (left[i] > 0) {
         left[i]--;
@@ -197,7 +197,7 @@ export const gasTrace = tracer<{ gas: number[]; cost: number[] }>({
       }
     }
     const ans = total >= 0 ? start : -1;
-    t.frame({ line: 'answer', caption: total >= 0 ? `total = ${total} ≥ 0 → poore chakkar mein gas kaafi hai, aur start ${start} se aage kabhi minus nahi hua → ghoom ke bhi pahunchoge. Answer ${start}. O(n).` : `total = ${total} < 0 → kahin se bhi shuru karo, chakkar namumkin → −1.`, vars: { total, start }, panels: view(Math.min(start, gas.length - 1), ans >= 0 ? 'found' : 'error') });
+    t.frame({ line: 'answer', caption: total >= 0 ? `total = ${total} ≥ 0 → poore chakkar mein gas kaafi hai, aur start ${start} se aage kabhi minus nahi hua → ghoom ke bhi pahunchoge. Answer ${start}. O(n).` : `total = ${total} < 0 → kahin se bhi shuru karo, chakkar impossible → −1.`, vars: { total, start }, panels: view(Math.min(start, gas.length - 1), ans >= 0 ? 'found' : 'error') });
     return String(ans);
   },
 });

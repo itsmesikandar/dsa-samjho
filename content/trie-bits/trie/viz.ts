@@ -36,7 +36,7 @@ function insert(root: TN, w: string) {
 
 const countNodes = (n: TN): number => 1 + [...n.kids.values()].reduce((s, k) => s + countNodes(k), 0);
 
-/** trie ko graph panel mein: depth = y, patte baayein se daayein (a-z order), parent beech mein */
+/** trie ko graph panel mein: depth = y, patte left se right (a-z order), parent beech mein */
 function trieView(root: TN, tones: NT = {}, label = 'Trie (★ = yahan word khatam)'): Panel {
   const xs = new Map<string, number>();
   let leaf = 0;
@@ -76,17 +76,17 @@ export const trieBuildTrace = tracer<{ list: string }>({
   run({ list }, t) {
     const ws = words(list);
     const root = mk('');
-    t.frame({ caption: 'Khaali trie — sirf root (•). Har word ko akshar akshar neeche chalke daalenge. Jo raasta pehle se hai wahi use hoga, naya sirf jahan zaroorat.', panels: [trieView(root)] });
+    t.frame({ caption: 'Khaali trie — sirf root (•). Har word ko letter letter neeche chalke daalenge. Jo raasta pehle se hai wahi use hoga, naya sirf jahan zaroorat.', panels: [trieView(root)] });
     let total = 0;
     for (const w of ws) {
       total += w.length;
       const { path, fresh } = insert(root, w);
       const shared = w.length - fresh.length;
       const tones: NT = { ...toneAll(path.slice(1).map((n) => n.id), 'compare'), ...toneAll(fresh, 'new') };
-      t.frame({ caption: fresh.length === 0 ? `"${w}": poora raasta pehle se tha — bas aakhri node par ★ lagaya.` : shared ? `"${w}": pehle ${shared} akshar "${w.slice(0, shared)}" ka raasta pehle se — sirf ${fresh.length} ${fresh.length === 1 ? 'naya' : 'naye'} node.` : `"${w}": koi common prefix nahi — ${fresh.length} ${fresh.length === 1 ? 'naya' : 'naye'} node.`, vars: { word: w, nodes: countNodes(root) - 1 }, legend: { compare: 'pehle se tha', new: 'naya bana' }, panels: [trieView(root, tones)] });
+      t.frame({ caption: fresh.length === 0 ? `"${w}": poora raasta pehle se tha — bas aakhri node par ★ lagaya.` : shared ? `"${w}": pehle ${shared} letter "${w.slice(0, shared)}" ka raasta pehle se — sirf ${fresh.length} ${fresh.length === 1 ? 'naya' : 'naye'} node.` : `"${w}": koi common prefix nahi — ${fresh.length} ${fresh.length === 1 ? 'naya' : 'naye'} node.`, vars: { word: w, nodes: countNodes(root) - 1 }, legend: { compare: 'pehle se tha', new: 'naya bana' }, panels: [trieView(root, tones)] });
     }
     const n = countNodes(root) - 1;
-    t.frame({ caption: `${ws.length} words, ${total} akshar — par trie mein sirf ${n} node: common prefix ek hi baar. Ab "kis prefix se kaunse words?" — prefix tak chalo, neeche ke saare ★ wahi words. Search ka kharcha word ki length, dictionary ke size se nahi.`, vars: { akshar: total, nodes: n }, panels: [trieView(root)] });
+    t.frame({ caption: `${ws.length} words, ${total} letter — par trie mein sirf ${n} node: common prefix ek hi baar. Ab "kis prefix se kaunse words?" — prefix tak chalo, neeche ke saare ★ wahi words. Search ka cost word ki length, dictionary ke size se nahi.`, vars: { akshar: total, nodes: n }, panels: [trieView(root)] });
     return String(n);
   },
 });
@@ -102,7 +102,7 @@ export const trieOpsTrace = tracer<{ list: string; q: string }>({
     const root = mk('');
     for (const w of words(list)) {
       const { path, fresh } = insert(root, w);
-      t.frame({ line: 'end', caption: `insert("${w}"): har akshar par bachcha hai to us par chalo, nahi to naya banao (${fresh.length} ${fresh.length === 1 ? 'naya' : 'naye'}). Aakhri node par isEnd = true (★).`, legend: { compare: 'raasta', new: 'naya' }, panels: [trieView(root, { ...toneAll(path.slice(1).map((n) => n.id), 'compare'), ...toneAll(fresh, 'new') })] });
+      t.frame({ line: 'end', caption: `insert("${w}"): har letter par bachcha hai to us par chalo, nahi to naya banao (${fresh.length} ${fresh.length === 1 ? 'naya' : 'naye'}). Aakhri node par isEnd = true (★).`, legend: { compare: 'raasta', new: 'naya' }, panels: [trieView(root, { ...toneAll(path.slice(1).map((n) => n.id), 'compare'), ...toneAll(fresh, 'new') })] });
     }
     let cur: TN | undefined = root;
     const seen: string[] = [];
@@ -138,7 +138,7 @@ export const replaceTrace = tracer<{ roots: string; sentence: string }>({
   run({ roots, sentence }, t) {
     const root = mk('');
     for (const r of words(roots)) insert(root, r);
-    t.frame({ caption: `Saare roots trie mein daal diye. Ab sentence ka har word: trie mein akshar akshar chalo — jaise hi koi ★ (root khatam) mile, wahin ruko: wahi SABSE CHHOTA root.`, panels: [trieView(root), array(sentence.split(' '), { label: 'sentence ke words' })] });
+    t.frame({ caption: `Saare roots trie mein daal diye. Ab sentence ka har word: trie mein letter letter chalo — jaise hi koi ★ (root khatam) mile, wahin ruko: wahi SABSE CHHOTA root.`, panels: [trieView(root), array(sentence.split(' '), { label: 'sentence ke words' })] });
     const out: string[] = [];
     const parts = sentence.split(' ');
     parts.forEach((w, wi) => {
@@ -164,7 +164,7 @@ export const replaceTrace = tracer<{ roots: string; sentence: string }>({
       t.frame({ line: res !== w ? 'root' : 'walk', caption: w ? `"${w}": ${why}` : 'Khaali word — waisa hi.', vars: { word: w }, legend: { compare: 'chala', new: 'root mila' }, panels: [trieView(root, { ...toneAll(seen, 'compare'), ...(res !== w ? { [cur.id]: 'new' } : {}) }), array(parts.map((p, k) => (k < wi ? out[k] : p)), { label: 'sentence', tones: { [wi]: 'active' } })] });
     });
     const ans = out.join(' ');
-    t.frame({ caption: `Jawab: "${ans}". Har word par sirf root ki length tak chale — kul O(sentence ki length).`, legend: { compare: 'badla' }, panels: [trieView(root), array(out, { label: 'jawab', tones: Object.fromEntries(out.map((o, k) => [k, o !== parts[k] ? 'compare' : undefined]).filter((e) => e[1])) })] });
+    t.frame({ caption: `Jawab: "${ans}". Har word par sirf root ki length tak chale — total O(sentence ki length).`, legend: { compare: 'badla' }, panels: [trieView(root), array(out, { label: 'jawab', tones: Object.fromEntries(out.map((o, k) => [k, o !== parts[k] ? 'compare' : undefined]).filter((e) => e[1])) })] });
     return ans;
   },
 });
@@ -201,12 +201,12 @@ export const suggestTrace = tracer<{ list: string; word: string }>({
       t.frame({ line: 'type', caption: cur ? `"${word.slice(0, i + 1)}" type kiya → node par likhe: ${top.join(', ')}.` : `"${word.slice(0, i + 1)}": raasta nahi — is prefix ka koi product nahi → [] (aage bhi sab khaali).`, vars: { prefix: word.slice(0, i + 1) }, legend: { compare: 'raasta', active: 'abhi' }, panels: [trieView(root, { ...toneAll(seen, 'compare'), ...(cur ? { [cur.id]: 'active' } : {}) }), array(top.length ? top : ['—'], { label: 'suggestions (max 3)' })] });
     }
     const s = `[${ans.map((a) => `[${a.join(', ')}]`).join(', ')}]`;
-    t.frame({ line: 'done', caption: `Jawab: ${s}. Har akshar par ek kadam aur list pehle se taiyaar → typing ke saath O(1) per akshar.`, panels: [trieView(root, toneAll(seen, 'compare'))] });
+    t.frame({ line: 'done', caption: `Jawab: ${s}. Har letter par ek step aur list pehle se taiyaar → typing ke saath O(1) per letter.`, panels: [trieView(root, toneAll(seen, 'compare'))] });
     return s;
   },
 });
 
-// ---------- Example 3: Wildcard search ('.' = koi bhi akshar) ----------
+// ---------- Example 3: Wildcard search ('.' = koi bhi letter) ----------
 export const wildcardTrace = tracer<{ list: string; pat: string }>({
   inputs: [
     { name: 'list', type: 'string', label: 'Words (comma se alag)', default: 'roti,rota,ram,rasta', minLen: 1, maxLen: 24, charset: 'abcdefghijklmnopqrstuvwxyz,' },
@@ -218,7 +218,7 @@ export const wildcardTrace = tracer<{ list: string; pat: string }>({
     for (const w of words(list)) insert(root, w);
     const dead: string[] = [];
     const path: string[] = [];
-    t.frame({ caption: `Pattern "${pat}". Normal akshar → ek hi bachcha. '.' → HAR bachche mein try (DFS). Kahin bhi poora pattern ★ par khatam → true.`, panels: [trieView(root)] });
+    t.frame({ caption: `Pattern "${pat}". Normal letter → ek hi bachcha. '.' → HAR bachche mein try (DFS). Kahin bhi poora pattern ★ par khatam → true.`, panels: [trieView(root)] });
     const view = (extra: NT = {}) => trieView(root, { ...toneAll(dead, 'error'), ...toneAll(path, 'compare'), ...extra });
     const dfs = (n: TN, i: number): boolean => {
       if (i === pat.length) {
@@ -241,7 +241,7 @@ export const wildcardTrace = tracer<{ list: string; pat: string }>({
       return false;
     };
     const ok = dfs(root, 0);
-    t.frame({ caption: ok ? `search("${pat}") = true. '.' wale akshar par branches khulti hain, par jo raasta galat ho turant band — poore dictionary ko nahi dekhna padta.` : `search("${pat}") = false — har raasta band gali.`, legend: { compare: 'mila raasta', error: 'band gali' }, panels: [view()] });
+    t.frame({ caption: ok ? `search("${pat}") = true. '.' wale letter par branches khulti hain, par jo raasta galat ho turant band — poore dictionary ko nahi dekhna padta.` : `search("${pat}") = false — har raasta band gali.`, legend: { compare: 'mila raasta', error: 'band gali' }, panels: [view()] });
     return String(ok);
   },
 });

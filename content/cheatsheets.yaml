@@ -15,18 +15,18 @@
     | O(n!) | Factorial | Saare permutations | ✗ — sirf n ≤ ~10 |
 
     > [!yaad]
-    > Constants chhod do (O(2n) = O(n)), sabse bada term rakho (O(n² + n) = O(n²)). Do alag inputs ho to dono likho: O(n + m), O(n · m).
+    > Constants chhod do (O(2n) = O(n)), sabse bada term rakho (O(n² + n) = O(n²)). 2 alag inputs ho to dono likho: O(n + m), O(n · m).
 
 - id: constraints
-  title: Constraints dekh ke complexity chuno
+  title: Constraints dekh ke complexity choose karo
   intro: Question ki limit padhte hi pata chal jaata hai kaunsa approach chalega.
   body: |
-    | n kitna | Ye chalega | Aksar kya lagta hai |
+    | n kitna | Ye chalega | Often kya lagta hai |
     |---|---|---|
     | n ≤ 10 | O(n!) | Permutations, backtracking |
     | n ≤ 20 | O(2ⁿ · n) | Subsets, bitmask, bitmask DP |
-    | n ≤ 500 | O(n³) | Teen loops, interval DP |
-    | n ≤ 5,000 | O(n²) | Do loops, 2D DP |
+    | n ≤ 500 | O(n³) | 3 loops, interval DP |
+    | n ≤ 5,000 | O(n²) | 2 loops, 2D DP |
     | n ≤ 10⁵ – 10⁶ | O(n log n) ya O(n) | Sort, heap, binary search, two pointers, sliding window, HashMap |
     | n ≤ 10⁹ | O(√n) ya O(log n) | Maths, binary search on answer |
     | n ≤ 10¹⁸ | O(log n) ya O(1) | Fast power, formula |
@@ -36,14 +36,14 @@
 
 - id: data-structures
   title: Data structures — har operation ki cost
-  intro: Sahi structure chuno, aadha kaam wahin ho jaata hai.
+  intro: Sahi structure choose karo, aadha kaam wahin ho jaata hai.
   body: |
     | Structure | Index se | Search | Insert | Delete | Yaad rakho |
     |---|---|---|---|---|---|
     | Array (`IntArray`) | O(1) | O(n) | O(n) | O(n) | Size fixed |
     | Dynamic array (`ArrayList`) | O(1) | O(n) | End: O(1)*, beech: O(n) | End: O(1), beech: O(n) | * amortized |
     | Linked list | O(n) | O(n) | O(1) — node pata ho | O(1) — node pata ho | Pahunchna mehenga |
-    | Stack / Queue / Deque (`ArrayDeque`) | — | O(n) | O(1) | O(1) | Sirf kinaron par |
+    | Stack / Queue / Deque (`ArrayDeque`) | — | O(n) | O(1) | O(1) | Sirf edges par |
     | HashMap / HashSet | — | O(1) avg | O(1) avg | O(1) avg | Worst O(n), order nahi |
     | TreeMap / TreeSet | — | O(log n) | O(log n) | O(log n) | Sorted, floor / ceiling |
     | Heap (`PriorityQueue`) | min / max: O(1) | O(n) | O(log n) | poll: O(log n), remove(x): O(n) | Sirf top tez |
@@ -53,7 +53,7 @@
 
 - id: sorting
   title: Sorting algorithms
-  intro: Interview mein naam, complexity aur stable hai ya nahi — teeno pooche jaate hain.
+  intro: Interview mein naam, complexity aur stable hai ya nahi — all 3 pooche jaate hain.
   body: |
     | Algorithm | Best | Average | Worst | Extra space | Stable? |
     |---|---|---|---|---|---|
@@ -81,7 +81,7 @@
     | T(n) = 2T(n − 1) + O(1) | Tower of Hanoi | O(2ⁿ) |
     | T(n) = T(n − 1) + T(n − 2) + O(1) | Naive Fibonacci | O(2ⁿ) (asal mein ~1.6ⁿ) |
 
-    Space = recursion ki gehraai (stack depth) + extra memory. Binary search recursion O(log n), linked list par recursion O(n).
+    Space = recursion ki depth (stack depth) + extra memory. Binary search recursion O(log n), linked list par recursion O(n).
 
 - id: kotlin-java
   title: Kotlin vs Java — DSA collections
@@ -95,7 +95,7 @@
     | Stack | `ArrayDeque<Int>()` — `addLast`, `removeLast`, `last()` | `ArrayDeque<Integer>` — `push`, `pop`, `peek` |
     | Queue | `ArrayDeque<Int>()` — `addLast`, `removeFirst`, `first()` | `ArrayDeque<Integer>` — `offer`, `poll`, `peek` |
     | HashMap | `HashMap<K, V>()` ya `mutableMapOf()` (LinkedHashMap) | `new HashMap<>()` |
-    | Ginti karna | `m[x] = (m[x] ?: 0) + 1` | `m.merge(x, 1, Integer::sum)` |
+    | Count karna | `m[x] = (m[x] ?: 0) + 1` | `m.merge(x, 1, Integer::sum)` |
     | Default value | `m.getOrDefault(k, 0)` ya `m[k] ?: 0` | `m.getOrDefault(k, 0)` |
     | HashSet | `HashSet<Int>()` ya `mutableSetOf()` | `new HashSet<>()` |
     | Sorted map | `TreeMap<K, V>()` | `new TreeMap<>()` |
@@ -107,7 +107,7 @@
     | Binary search | `a.binarySearch(x)` | `Arrays.binarySearch(a, x)` |
     | Array print | `a.contentToString()` | `Arrays.toString(a)` |
     | Bada number | `Long`, `1L`, `x.toLong()` | `long`, `1L`, `(long) x` |
-    | Akshar → index | `c - 'a'` | `c - 'a'` |
+    | Letter → index | `c - 'a'` | `c - 'a'` |
 
     > [!galti]
     > Comparator mein `a - b` mat likho — bade / negative numbers par overflow. `Integer.compare(a, b)` ya `compareBy` lo.

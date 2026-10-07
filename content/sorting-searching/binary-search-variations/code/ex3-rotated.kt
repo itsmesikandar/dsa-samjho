@@ -1,4 +1,4 @@
-// Sorted (distinct) array ko kisi point par ghuma diya. Target ka index; na ho to -1. O(log n).
+// Sorted (distinct) array ko kisi point par rotate kar diya. Target ka index; na ho to -1. O(log n).
 fun search(a: IntArray, target: Int): Int {
     var lo = 0
     var hi = a.size - 1

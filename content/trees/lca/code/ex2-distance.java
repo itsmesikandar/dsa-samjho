@@ -23,7 +23,7 @@ class Main {
     static int depth(TreeNode node, int x, int d) {
         if (node == null) return -1;
         if (node.val == x) return d; //@found
-        int l = depth(node.left, x, d + 1); // bachchon mein ek kadam aur //@down
+        int l = depth(node.left, x, d + 1); // bachchon mein ek step aur //@down
         return l != -1 ? l : depth(node.right, x, d + 1);
     }
 

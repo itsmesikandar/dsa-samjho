@@ -1,11 +1,11 @@
 class Main {
-    // Climbing stairs ka general roop: allowed kadam ek set mein. dp[i] = sab s ke liye dp[i - s] ka jod
+    // Climbing stairs ka general form: allowed step ek set mein. dp[i] = sab s ke liye dp[i - s] ka jod
     static long countWays(int n, int[] steps) {
         long[] dp = new long[n + 1];
         dp[0] = 1; // khaali rasta - 1 tareeka
         for (int i = 1; i <= n; i++) {
             for (int s : steps) {
-                if (s <= i) dp[i] += dp[i - s]; // aakhri kadam s ka tha - pehle i - s tak pahunche the
+                if (s <= i) dp[i] += dp[i - s]; // aakhri step s ka tha - pehle i - s tak pahunche the
             }
         }
         return dp[n];

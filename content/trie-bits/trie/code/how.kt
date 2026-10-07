@@ -17,7 +17,7 @@ class Trie {
         cur.isEnd = true // poora word yahan khatam //@end
     }
 
-    // s ke saare aksharon ka raasta - mila to aakhri node, warna null
+    // s ke saare letters ka raasta - mila to aakhri node, warna null
     private fun walk(s: String): TrieNode? {
         var cur = root
         for (ch in s) {

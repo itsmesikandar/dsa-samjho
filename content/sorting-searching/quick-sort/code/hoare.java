@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // Hoare-style partition: do pointers dono kinaron se, galat taraf wale items ka jodi swap.
+    // Hoare-style partition: 2 pointers dono edges se, galat taraf wale items ka pair swap.
     // Lomuto se kam swaps, aur sab barabar items par bhi beech se todta hai.
     static void quickSortHoare(int[] a, int l, int r) {
         if (l >= r) return;

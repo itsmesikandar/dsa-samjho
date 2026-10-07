@@ -7,7 +7,7 @@ class Main {
         int curStart = 0; // abhi wale subarray ki shuruaat
         int best = nums[0], bestL = 0, bestR = 0;
         for (int i = 1; i < nums.length; i++) {
-            if (cur < 0) { // purana sum bojh hai (negative) -> chhodo, yahin se naya shuru //@restart
+            if (cur < 0) { // purana sum load hai (negative) -> chhodo, yahin se naya shuru //@restart
                 cur = nums[i];
                 curStart = i;
             } else { // purana sum faydemand -> jodte raho //@extend

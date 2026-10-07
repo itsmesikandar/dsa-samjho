@@ -1,4 +1,4 @@
-// Multi-source BFS: saare sade santre ek saath queue mein. Ek level = ek minute
+// Multi-source BFS: saare rotten oranges ek saath queue mein. Ek level = ek minute
 fun orangesRotting(grid: Array<IntArray>): Int {
     val r = grid.size
     val c = grid[0].size
@@ -6,7 +6,7 @@ fun orangesRotting(grid: Array<IntArray>): Int {
     var fresh = 0
     for (i in 0 until r) {
         for (j in 0 until c) {
-            if (grid[i][j] == 2) queue.addLast(intArrayOf(i, j)) // har sada santra ek source //@sources
+            if (grid[i][j] == 2) queue.addLast(intArrayOf(i, j)) // har sada orange ek source //@sources
             else if (grid[i][j] == 1) fresh++
         }
     }
@@ -14,20 +14,20 @@ fun orangesRotting(grid: Array<IntArray>): Int {
     var minutes = 0
     while (queue.isNotEmpty() && fresh > 0) {
         minutes++ // naya level = naya minute //@minute
-        repeat(queue.size) { // sirf is minute ke sade santre
+        repeat(queue.size) { // sirf is minute ke rotten oranges
             val (x, y) = queue.removeFirst()
             for ((dx, dy) in dirs) {
                 val nx = x + dx
                 val ny = y + dy
                 if (nx in 0 until r && ny in 0 until c && grid[nx][ny] == 1) {
-                    grid[nx][ny] = 2 // padosi sad gaya - grid hi visited ka kaam karta hai //@rot
+                    grid[nx][ny] = 2 // neighbor sad gaya - grid hi visited ka kaam karta hai //@rot
                     fresh--
                     queue.addLast(intArrayOf(nx, ny))
                 }
             }
         }
     }
-    return if (fresh == 0) minutes else -1 // koi taaza santra pahunch se bahar //@done
+    return if (fresh == 0) minutes else -1 // koi fresh orange pahunch se bahar //@done
 }
 
 fun main() {

@@ -12,9 +12,9 @@ class Main {
     // List ka beech wala node (do beech ho to doosra wala)
     static ListNode middleNode(ListNode head) {
         ListNode slow = head, fast = head; //@init
-        while (fast != null && fast.next != null) { // fast do kadam le sake tab tak
-            slow = slow.next; // slow: 1 kadam //@step
-            fast = fast.next.next; // fast: 2 kadam
+        while (fast != null && fast.next != null) { // fast do step le sake tab tak
+            slow = slow.next; // slow: 1 step //@step
+            fast = fast.next.next; // fast: 2 step
         }
         return slow; // fast end par pahuncha = slow aadhe raaste par //@done
     }

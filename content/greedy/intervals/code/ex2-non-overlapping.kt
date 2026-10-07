@@ -5,9 +5,9 @@ fun eraseOverlapIntervals(intervals: Array<IntArray>): Int {
     var removed = 0
     for (iv in intervals) {
         if (iv[0] >= end) {
-            end = iv[1] // takraata nahi - rakho //@keep
+            end = iv[1] // collide karta nahi - rakho //@keep
         } else {
-            removed++ // takraata hai - isi ko hatao (iska end pichhle se bada ya barabar) //@drop
+            removed++ // collide karta hai - isi ko hatao (iska end pichhle se bada ya barabar) //@drop
         }
     }
     return removed //@done

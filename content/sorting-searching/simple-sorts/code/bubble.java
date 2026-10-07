@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // Bubble sort: padosiyon ko compare karo, galat order ho to swap.
+    // Bubble sort: neighbors ko compare karo, galat order ho to swap.
     // Har pass mein bacha hua sabse bada item end tak 'bubble' ho jaata hai.
     static void bubbleSort(int[] a) {
         int n = a.length;

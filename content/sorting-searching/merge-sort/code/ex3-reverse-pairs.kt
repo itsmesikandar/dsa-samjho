@@ -5,7 +5,7 @@ fun sortCount(a: IntArray, l: Int, r: Int, tmp: IntArray): Int {
     if (l >= r) return 0 //@base
     val mid = (l + r) / 2
     var count = sortCount(a, l, mid, tmp) + sortCount(a, mid + 1, r, tmp) //@halves
-    // MERGE SE PEHLE alag ginti: dono halves sorted hain, to j kabhi peeche nahi jaata
+    // MERGE SE PEHLE alag count: dono halves sorted hain, to j kabhi peeche nahi jaata
     var j = mid + 1
     for (i in l..mid) {
         while (j <= r && a[i].toLong() > 2L * a[j]) j++ // Long: 2 * a[j] Int mein overflow ho sakta hai //@count

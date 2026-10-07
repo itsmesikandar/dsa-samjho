@@ -1,9 +1,9 @@
-// Doosra dhaancha: har item par DO raaste - lo ya chhodo (binary decision tree)
+// Doosra structure: har item par 2 raaste - lo ya chhodo (binary decision tree)
 fun subsetsBinary(nums: IntArray): List<List<Int>> {
     val res = mutableListOf<List<Int>>()
     val path = mutableListOf<Int>()
     fun go(i: Int) {
-        if (i == nums.size) { // saare items ka faisla ho gaya: ek poora subset
+        if (i == nums.size) { // saare items ka decision ho gaya: ek poora subset
             res.add(path.toList())
             return
         }

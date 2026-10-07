@@ -33,7 +33,7 @@ export const growthChart = tracer<{ maxN: number }>({
     }
     t.frame({
       caption:
-        'Seekh: chhote n par sab lagbhag barabar lagte hain, par n bada hote hi fark aasman-zameen ka ho jaata hai. Ye "shape" hi Big-O hai — exact seconds nahi.',
+        'Seekh: chhote n par sab approx barabar lagte hain, par n bada hote hi fark aasman-zameen ka ho jaata hai. Ye "shape" hi Big-O hai — exact seconds nahi.',
       vars: { n: maxN },
       panels: [chart(maxN)],
     });
@@ -41,7 +41,7 @@ export const growthChart = tracer<{ maxN: number }>({
   },
 });
 
-// ---------- 4. How: loop ke steps gino ----------
+// ---------- 4. How: loop ke steps count karo ----------
 export const countSteps = tracer<{ arr: number[] }>({
   inputs: [{ name: 'arr', type: 'intArray', label: 'Array', default: [4, 1, 3, 2], minLen: 1, maxLen: 10, min: -99, max: 99 }],
   run({ arr }, t) {
@@ -145,7 +145,7 @@ export const countPairs = tracer<{ arr: number[]; target: number }>({
     }
     t.frame({
       line: 'done',
-      caption: `Total ${checks} checks = n(n-1)/2 = ${n}×${n - 1}/2. n double karo to checks lagbhag 4 guna! Yahi O(n²) hai. n = 10⁵ par ~5×10⁹ checks — bahut slow.`,
+      caption: `Total ${checks} checks = n(n-1)/2 = ${n}×${n - 1}/2. n double karo to checks approx 4 times! Yahi O(n²) hai. n = 10⁵ par ~5×10⁹ checks — bahut slow.`,
       vars: { checks, count },
       panels: [array(arr)],
     });
@@ -163,7 +163,7 @@ export const halvings = tracer<{ n: number }>({
     const bars = () => ({ kind: 'bars' as const, label: 'x ki value har round ke baad', values: [...seen], tones: { [seen.length - 1]: 'active' as Tone } });
     t.frame({
       line: 'loop',
-      caption: `x = ${n}. Har round mein x ko aadha karenge jab tak 1 na bache. Andaza lagao — kitne round lagenge?`,
+      caption: `x = ${n}. Har round mein x ko aadha karenge jab tak 1 na bache. Estimate lagao — kitne round lagenge?`,
       vars: { x, steps },
       panels: [bars()],
     });

@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.Deque;
 
 class Main {
-    // Har item ke liye: uske DAAYEIN pehla bada number (na ho to -1)
+    // Har item ke liye: uske RIGHT pehla bada number (na ho to -1)
     static int[] nextGreater(int[] nums) {
         int[] res = new int[nums.length];
         Arrays.fill(res, -1);
@@ -12,9 +12,9 @@ class Main {
             while (!st.isEmpty() && nums[st.peek()] < nums[i]) { // nums[i] in sabka pehla bada hai //@pop
                 res[st.pop()] = nums[i];
             }
-            st.push(i); // i ka answer abhi baaki - intezaar karo //@push
+            st.push(i); // i ka answer abhi baaki - wait karo //@push
         }
-        return res; // stack mein bache: daayein koi bada nahi -> -1 hi raha //@done
+        return res; // stack mein bache: right koi bada nahi -> -1 hi raha //@done
     }
 
     public static void main(String[] args) {

@@ -4,7 +4,7 @@ fun lengthOfLongestSubstring(s: String): Int {
     var l = 0
     var best = 0
     for (r in s.indices) {
-        while (s[r] in inWindow) { // s[r] pehle se andar: purani copy nikalne tak sikodo //@shrink
+        while (s[r] in inWindow) { // s[r] pehle se andar: purani copy nikalne tak shrink karo //@shrink
             inWindow.remove(s[l])
             l++
         }

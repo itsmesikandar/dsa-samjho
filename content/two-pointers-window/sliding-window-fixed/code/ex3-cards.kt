@@ -2,12 +2,12 @@
 fun maxScore(cards: IntArray, k: Int): Int {
     val n = cards.size
     val total = cards.sum()
-    val w = n - k // jo cards BACHENGE, wo hamesha beech ka lagatar hissa hain
+    val w = n - k // jo cards BACHENGE, wo hamesha beech ka continuous hissa hain
     var sum = 0
     for (i in 0 until w) sum += cards[i] // pehla 'bacha hua' hissa //@first
     var minSum = sum
     for (r in w until n) {
-        sum += cards[r] - cards[r - w] // size w ki window aage khiski //@slide
+        sum += cards[r] - cards[r - w] // size w ki window aage shift hui //@slide
         minSum = minOf(minSum, sum) // bache hue ka sum jitna kam, utha hua utna zyada //@best
     }
     return total - minSum

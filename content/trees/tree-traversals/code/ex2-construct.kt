@@ -12,7 +12,7 @@ fun buildTree(pre: IntArray, ino: IntArray): TreeNode? {
         if (lo > hi) return null //@base
         val v = pre[p++] // preorder ka agla = is subtree ka ROOT //@root
         val node = TreeNode(v)
-        val m = pos.getValue(v) // inorder mein root ke baayein = left subtree, daayein = right //@split
+        val m = pos.getValue(v) // inorder mein root ke left = left subtree, right = right //@split
         node.left = make(lo, m - 1) // pehle left: preorder mein left subtree wale pehle aate hain
         node.right = make(m + 1, hi)
         return node

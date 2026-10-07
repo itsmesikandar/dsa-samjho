@@ -1,4 +1,4 @@
-// Two Sum II: sorted array, answer 1-indexed. Template: dono kinaron se, sum dekh ke pointer hilao
+// Two Sum II: sorted array, answer 1-indexed. Template: dono edges se, sum dekh ke pointer move karo
 fun twoSumSorted(numbers: IntArray, target: Int): IntArray {
     var l = 0
     var r = numbers.size - 1

@@ -8,6 +8,7 @@
 ## Content
 - Topic = `content/<chapter>/<topic>/` → `topic.yaml`, `viz.ts`, `code/*.kt` + `*.java`. Order in `content/chapters.yaml`.
 - Simple Hinglish (Roman script), short sentences, Indian daily-life analogies. Technical terms stay English.
+- Only everyday spoken Hindi. Formal/rare Hindi word → English (neev→foundation, kadam→step, padosi→neighbor, ginti→count, baayein/daayein→left/right, lagbhag→approx). Numbers as digits (sau→100, "do pointers"→"2 pointers").
 - YAML prose: `|` blocks or quoted strings (a bare `: `, or `,` inside `{ }`, breaks YAML).
 - Callouts: `> [!yaad]`, `> [!galti]`, `> [!tip]`, `> [!socho]`.
 - Frame captions explain WHY. Paraphrase problems, never copy LeetCode/GFG text. Complexity = time + space + why.

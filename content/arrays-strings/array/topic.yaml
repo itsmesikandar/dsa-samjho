@@ -29,7 +29,7 @@ what:
     **Railway coach ki numbered seats** socho. S4 coach mein seats line mein lagi hain: 1, 2, 3… TT ko seat 37 chahiye, to wo har seat check nahi karta — seedha 37 number pe pahunch jaata hai.
 
     Array bhi bilkul aisa hi hai. Bas do fark:
-    - Ginti **0 se** shuru hoti hai (seat 1 = index 0).
+    - Count **0 se** shuru hoti hai (seat 1 = index 0).
     - Coach mein seats na badhti hain na ghatti — waise hi array ki size fixed hai.
 
 # 2. Kyun chahiye?
@@ -43,14 +43,14 @@ why:
     // ... m60 tak 60 alag variables!
     ```
 
-    Isme teen problem hain:
+    Isme 3 problem hain:
     1. **Loop nahi chala sakte** — saare marks ka total chahiye to 60 baar `+` likhna padega.
     2. **15th student chahiye** to `m15` naam yaad rakho — number se nahi pahunch sakte.
     3. Kal 61 students ho gaye to code hi badalna padega.
 
     Array ek **naam** deta hai (`marks`) aur ek **index** deta hai (`marks[14]`). Ab loop chalao, sort karo, kuch bhi karo.
 
-    **Sabse badi taakat:** index se access **O(1)** hai — item kitna bhi door ho, time same. Ye kaise hota hai, agle section ke animation mein dekho.
+    **Sabse badi power:** index se access **O(1)** hai — item kitna bhi door ho, time same. Ye kaise hota hai, agle section ke animation mein dekho.
 
     > [!socho]
     > Agar items memory mein ek line mein na hote, idhar-udhar bikhre hote, to kya `arr[1000]` seedha mil paata?
@@ -69,17 +69,17 @@ visual:
     `Int` = 4 bytes. To `arr[3]` ka address = base + 3 × 4 = base + 12.
 
     > [!yaad]
-    > JVM (Kotlin/Java) mein asli address hum dekh nahi sakte — ye numbers samjhane ke liye hain. Array object ke saath ek chhota header bhi hota hai (jisme length wagairah hoti hai). Par idea bilkul yahi hai.
+    > JVM (Kotlin/Java) mein asli address hum dekh nahi sakte — ye numbers samjhane ke liye hain. Array object ke saath ek chhota header bhi hota hai (jisme length etc. hoti hai). Par idea bilkul yahi hai.
   viz: { tracer: memoryLayout }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    Access to O(1) hai. Par **beech mein naya item daalna** mehenga hai. Kyun? Dabbe line mein chipke hain — beech mein jagah banane ke liye baaki items ko **khiskana (shift)** padta hai.
+    Access to O(1) hai. Par **beech mein naya item daalna** mehenga hai. Kyun? Dabbe line mein chipke hain — beech mein jagah banane ke liye baaki items ko **shift karna (shift)** padta hai.
 
     Index par value daalne ka plan:
     1. Check karo — jagah bachi hai? Index sahi range mein hai?
-    2. **Aakhri item se shuru karke** index tak, har item ko ek kadam right copy karo.
+    2. **Aakhri item se shuru karke** index tak, har item ko ek step right copy karo.
     3. Ab index wala dabba "khaali" hai — value rakh do.
     4. `size` ek badha do.
 
@@ -109,15 +109,15 @@ operations:
   - op: "Insert at end (jagah ho to)"
     time: O(1)
     space: O(1)
-    why: "Kisi ko khiskana nahi — bas `arr[size] = x` aur `size++`."
+    why: "Kisi ko shift karna nahi — bas `arr[size] = x` aur `size++`."
   - op: "Insert at index i"
     time: O(n)
     space: O(1)
-    why: "i ke baad ke saare items ek kadam right khiskane padte hain."
+    why: "i ke baad ke saare items ek step right shift karne padte hain."
   - op: "Delete at index i"
     time: O(n)
     space: O(1)
-    why: "Gap bharne ke liye i ke baad ke saare items left khiskte hain."
+    why: "Gap bharne ke liye i ke baad ke saare items left shift hote hain."
   - op: "Delete at end"
     time: O(1)
     space: O(1)
@@ -140,7 +140,7 @@ code:
   - title: Index se delete (left shift)
     file: delete-at
     note: |
-      Insert ka ulta: gap bharne ke liye baad ke items left khiskte hain. Isliye ye bhi O(n) hai.
+      Insert ka ulta: gap bharne ke liye baad ke items left shift hote hain. Isliye ye bhi O(n) hai.
 
 # 7. Examples
 examples:
@@ -187,9 +187,9 @@ examples:
     intuition: |
       Nayi array banake ulta copy karna aasaan hai, par usme O(n) extra memory lagti hai.
 
-      Dhyaan se dekho: ulta karne mein **pehla aur aakhri** jagah badalte hain, **doosra aur second-last** jagah badalte hain… Yaani dono kinaron se ek-ek pair swap karo aur andar ki taraf badho.
+      Dhyaan se dekho: ulta karne mein **pehla aur aakhri** jagah badalte hain, **doosra aur second-last** jagah badalte hain… Matlab dono edges se ek-ek pair swap karo aur andar ki taraf badho.
 
-      Do pointers rakho — `l` shuru pe, `r` end pe. Swap karo, phir `l++`, `r--`. Jab `l` aur `r` mil jaayein (ya cross kar jaayein) — kaam khatam.
+      2 pointers rakho — `l` shuru pe, `r` end pe. Swap karo, phir `l++`, `r--`. Jab `l` aur `r` mil jaayein (ya cross kar jaayein) — kaam khatam.
 
       > [!tip]
       > Ye **two pointers** pattern ka pehla taste hai. Chapter 3 mein ye bahut kaam aayega.
@@ -215,7 +215,7 @@ examples:
     title: Array ko k steps right rotate karo
     source: { name: Rotate Array, platform: LeetCode, url: "https://leetcode.com/problems/rotate-array/" }
     problem: |
-      Ek array aur ek number `k` diya hai. Har item ko **k jagah right** khisakao. Jo items end se bahar giren, wo gol ghoom ke shuru mein aa jaayein. **Extra array use kiye bina** karo.
+      Ek array aur ek number `k` diya hai. Har item ko **k jagah right** shift karo. Jo items end se bahar giren, wo gol ghoom ke shuru mein aa jaayein. **Extra array use kiye bina** karo.
 
       Example: `[1, 2, 3, 4, 5, 6, 7]`, `k = 3` → `[5, 6, 7, 1, 2, 3, 4]`
     intuition: |
@@ -244,12 +244,12 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Teen reverse; har item zyada se zyada do baar swap hota hai → O(n). Koi nayi array nahi → O(1)."
+      why: "3 reverse; har item zyada se zyada 2 baar swap hota hai → O(n). Koi nayi array nahi → O(1)."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Items ki **ginti pehle se pata** hai, ya bahut kam badalti hai."
+    - "Items ki **count pehle se pata** hai, ya bahut kam badalti hai."
     - "**Index se baar-baar access** chahiye — `arr[i]` O(1) hai."
     - "Data ko **order mein** rakhna hai aur shuru se end tak loop chalana hai."
     - "Memory kam aur speed zyada chahiye — koi extra pointer nahi, CPU cache-friendly."
@@ -286,7 +286,7 @@ mistakes:
     type: off-by-one
     wrong: |
       ```kotlin
-      for (i in 0..arr.size) println(arr[i])   // 0..size mein size bhi shamil hai!
+      for (i in 0..arr.size) println(arr[i])   // 0..size mein size bhi include hai!
       ```
       Last step pe `arr[size]` → **ArrayIndexOutOfBoundsException**.
     right: |
@@ -304,7 +304,7 @@ mistakes:
     type: overflow
     wrong: |
       ```kotlin
-      var sum = 0          // Int ki limit ~2.1 arab (2,147,483,647)
+      var sum = 0          // Int ki limit ~2.1 billion (2,147,483,647)
       for (x in arr) sum += x
       ```
       10⁵ items, har item 10⁹ → sum Int mein fit nahi hota aur **chupke se galat (negative) answer** aata hai. Koi error nahi aata!
@@ -313,10 +313,10 @@ mistakes:
       var sum = 0L         // Long use karo
       for (x in arr) sum += x
       ```
-  - title: "Do arrays ko `==` se compare karna"
+  - title: "2 arrays ko `==` se compare karna"
     type: logic
     wrong: |
-      `a == b` sirf ye check karta hai ki **dono same object** hain — andar ke values nahi. Same values wale do alag arrays par bhi `false` aayega.
+      `a == b` sirf ye check karta hai ki **dono same object** hain — andar ke values nahi. Same values wale 2 alag arrays par bhi `false` aayega.
     right: |
       Kotlin: `a.contentEquals(b)`. Java: `Arrays.equals(a, b)`.
   - title: "`val b = a` ko copy samajhna"
@@ -346,7 +346,7 @@ interview:
         - `ArrayList<Integer>` mein numbers boxed objects hote hain — `int[]` se zyada memory.
     - q: "Beech mein insert O(n) kyun hai?"
       a: |
-        Jagah banane ke liye index ke baad ke saare items ek kadam right khiskane padte hain. Worst case (index 0) mein saare n items.
+        Jagah banane ke liye index ke baad ke saare items ek step right shift karne padte hain. Worst case (index 0) mein saare n items.
     - q: "Agar order matter nahi karta, to index i wala item O(1) mein kaise delete karoge?"
       followUp: true
       a: |
@@ -372,7 +372,7 @@ interview:
     - "Check karo array sorted hai ya nahi."
     - "Sorted array se duplicates hatao (in-place)."
     - "1 se n tak ke numbers mein se missing number dhoondo."
-    - "Do sorted arrays ko merge karo."
+    - "2 sorted arrays ko merge karo."
 
 # 12. Practice
 practice:
@@ -389,7 +389,7 @@ practice:
     url: "https://leetcode.com/problems/max-consecutive-ones/"
     level: easy
     pattern: Single pass counter
-    hint: "Do variables: current streak aur best streak. 0 aaye to current = 0."
+    hint: "2 variables: current streak aur best streak. 0 aaye to current = 0."
   - name: Remove Element
     platform: LeetCode
     num: 27
@@ -431,7 +431,7 @@ practice:
     url: "https://leetcode.com/problems/trapping-rain-water/"
     level: hard
     pattern: Left max / right max arrays
-    hint: "Har bar ke upar paani = min(leftMax, rightMax) - height. leftMax aur rightMax pehle do alag arrays mein nikaal lo."
+    hint: "Har bar ke upar paani = min(leftMax, rightMax) - height. leftMax aur rightMax pehle 2 alag arrays mein nikaal lo."
 
 # 13. Quick revision
 revision:
@@ -461,10 +461,10 @@ revision:
       options: ["Array chhota hota hai", "Address formula se seedha nikal aata hai (base + i × size)", "Array hamesha sorted hota hai", "CPU fast hota hai"]
       answer: 1
       explain: "Contiguous memory + same size items = ek formula se seedha address."
-    - q: "10 items ke array mein index 0 par insert karne ke liye kitne items khiskenge?"
+    - q: "10 items ke array mein index 0 par insert karne ke liye kitne items shift honge?"
       options: ["0", "1", "5", "10"]
       answer: 3
-      explain: "Saare 10 items ek kadam right — isliye worst case O(n)."
+      explain: "Saare 10 items ek step right — isliye worst case O(n)."
     - q: "`val b = a` (a ek IntArray hai) ke baad `b[0] = 5` karne se kya hoga?"
       options: ["Sirf b badlega", "a aur b dono mein 5 dikhega — dono same array hain", "Compile error", "a ki nayi copy ban jaayegi"]
       answer: 1

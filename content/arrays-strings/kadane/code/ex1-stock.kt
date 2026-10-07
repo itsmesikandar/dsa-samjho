@@ -11,7 +11,7 @@ fun maxProfit(prices: IntArray): Int {
 
 fun main() {
     println(maxProfit(intArrayOf(7, 1, 5, 3, 6, 4)))
-    println(maxProfit(intArrayOf(7, 6, 4, 3, 1))) // daam girte hi rahe - na kharido
+    println(maxProfit(intArrayOf(7, 6, 4, 3, 1))) // price girte hi rahe - na kharido
 }
 
 // Output:

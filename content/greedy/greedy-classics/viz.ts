@@ -2,18 +2,18 @@ import { array, listStr, tracer } from '@/components/viz/engine/tracer';
 import type { ChartSeries, Panel, Tone } from '@/components/viz/engine/types';
 
 type Tones = Record<number, Tone>;
-const pricesSpec = { name: 'prices', type: 'intArray' as const, label: 'Har din ka daam', default: [7, 2, 5, 1, 6, 4], minLen: 1, maxLen: 9, min: 1, max: 15 };
-/** prices ko chart mein: x = din, y = daam */
+const pricesSpec = { name: 'prices', type: 'intArray' as const, label: 'Har din ka price', default: [7, 2, 5, 1, 6, 4], minLen: 1, maxLen: 9, min: 1, max: 15 };
+/** prices ko chart mein: x = din, y = price */
 const priceChart = (prices: number[], extra: ChartSeries[] = [], marker?: number): Panel => ({
   kind: 'chart',
-  label: 'Share ka daam',
-  series: [{ label: 'daam', points: prices.map((p, i) => [i, p] as [number, number]), tone: 'muted' }, ...extra],
+  label: 'Share ka price',
+  series: [{ label: 'price', points: prices.map((p, i) => [i, p] as [number, number]), tone: 'muted' }, ...extra],
   marker,
   xLabel: 'din',
   yMax: Math.max(...prices) + 1,
 });
 
-// ---------- 3. Visual intro: har chadhaai ka munafa ----------
+// ---------- 3. Visual intro: har chadhaai ka profit ----------
 export const climbTrace = tracer<{ prices: number[] }>({
   inputs: [pricesSpec],
   run({ prices }, t) {
@@ -26,14 +26,14 @@ export const climbTrace = tracer<{ prices: number[] }>({
     }
     const series: ChartSeries[] = [];
     let total = 0;
-    t.frame({ caption: 'Har din share ka daam. Jitni baar chaho khareedo-becho (ek waqt ek share). Sabse zyada munafa kaise?', panels: [priceChart(prices)] });
+    t.frame({ caption: 'Har din share ka price. Jitni baar chaho khareedo-becho (ek time ek share). Sabse zyada profit kaise?', panels: [priceChart(prices)] });
     runs.forEach(([a, b], k) => {
       const gain = prices[b] - prices[a];
       total += gain;
       series.push({ label: `chadhaai ${k + 1}: +${gain}`, points: prices.slice(a, b + 1).map((p, i) => [a + i, p] as [number, number]), tone: 'found' });
-      t.frame({ caption: `Din ${a} (₹${prices[a]}) se din ${b} (₹${prices[b]}) tak lagaataar chadhaai → khareedo neeche, becho upar: +${gain}. Kul ${total}.`, panels: [priceChart(prices, [...series])] });
+      t.frame({ caption: `Din ${a} (₹${prices[a]}) se din ${b} (₹${prices[b]}) tak continuous chadhaai → khareedo neeche, becho upar: +${gain}. Total ${total}.`, panels: [priceChart(prices, [...series])] });
     });
-    t.frame({ caption: runs.length ? `Har chadhaai pakdi, har girawat chhodi → ${total}. Isse zyada ho hi nahi sakta: munafa sirf chadhaai se aata hai, aur har chadhaai le li. Ye "greedy" — har din ka chhota faisla.` : 'Daam kabhi nahi chadha → munafa 0. Khareedo hi mat.', panels: [priceChart(prices, [...series])] });
+    t.frame({ caption: runs.length ? `Har chadhaai pakdi, har drop chhodi → ${total}. Isse zyada ho hi nahi sakta: profit sirf chadhaai se aata hai, aur har chadhaai le li. Ye "greedy" — har din ka chhota decision.` : 'Price kabhi nahi chadha → profit 0. Khareedo hi mat.', panels: [priceChart(prices, [...series])] });
     return String(total);
   },
 });
@@ -54,8 +54,8 @@ export const oneTradeTrace = tracer<{ prices: number[] }>({
       if (i !== undefined) tones[i] = 'active';
       return [priceChart(prices, extra, i), array(prices, { label: 'prices', tones, pointers: i !== undefined ? { aaj: i } : {} })];
     };
-    const legend = { compare: 'ab tak ka sabse sasta', active: 'aaj', found: 'sabse achha sauda' };
-    t.frame({ line: 'init', caption: 'Ek hi baar khareedna, baad mein ek hi baar bechna. Har jodi (khareed din, bech din) dekhna O(n²). Greedy: har din bas ek sawaal — "aaj bechein to ab tak ke SABSE SASTE din se kitna milega?"', legend, panels: view() });
+    const legend = { compare: 'ab tak ka sabse sasta', active: 'aaj', found: 'sabse achha transaction' };
+    t.frame({ line: 'init', caption: 'Ek hi baar khareedna, baad mein ek hi baar bechna. Har pair (khareed din, bech din) dekhna O(n²). Greedy: har din bas ek sawaal — "aaj bechein to ab tak ke SABSE SASTE din se kitna milega?"', legend, panels: view() });
     prices.forEach((p, i) => {
       if (p < minPrice) {
         minPrice = p;
@@ -78,21 +78,21 @@ export const stockIITrace = tracer<{ prices: number[] }>({
   run({ prices }, t) {
     let profit = 0;
     const tones: Tones = {};
-    const legend = { found: 'chadhaai — munafa liya', muted: 'girawat — chhodi', active: 'aaj' };
-    const view = (i?: number): Panel[] => [{ kind: 'bars', label: `Daam · munafa ${profit}`, values: prices, tones: { ...tones, ...(i !== undefined ? { [i]: 'active' } : {}) }, pointers: i !== undefined ? [{ name: 'i', index: i }] : [] }];
-    t.frame({ line: 'day', caption: 'Jitni baar chaho khareedo-becho. Bada sauda (din 2 se din 6) = beech ke saare chhote saudon ka jod — to bas har din dekho: aaj kal se mehnga? To "kal khareeda, aaj becha".', legend, panels: view() });
+    const legend = { found: 'chadhaai — profit liya', muted: 'drop — chhodi', active: 'aaj' };
+    const view = (i?: number): Panel[] => [{ kind: 'bars', label: `Price · profit ${profit}`, values: prices, tones: { ...tones, ...(i !== undefined ? { [i]: 'active' } : {}) }, pointers: i !== undefined ? [{ name: 'i', index: i }] : [] }];
+    t.frame({ line: 'day', caption: 'Jitni baar chaho khareedo-becho. Bada transaction (din 2 se din 6) = beech ke saare chhote transactions ka jod — to bas har din dekho: aaj kal se mehnga? To "kal khareeda, aaj becha".', legend, panels: view() });
     for (let i = 1; i < prices.length; i++) {
       const d = prices[i] - prices[i - 1];
       if (d > 0) {
         profit += d;
         tones[i] = 'found';
-        t.frame({ line: 'up', caption: `Din ${i}: ₹${prices[i]} > kal ₹${prices[i - 1]} → +${d}. Kul ${profit}.`, vars: { i, profit }, legend, panels: view(i) });
+        t.frame({ line: 'up', caption: `Din ${i}: ₹${prices[i]} > kal ₹${prices[i - 1]} → +${d}. Total ${profit}.`, vars: { i, profit }, legend, panels: view(i) });
       } else {
         tones[i] = 'muted';
         t.frame({ line: 'day', caption: `Din ${i}: ₹${prices[i]} ≤ kal ₹${prices[i - 1]} → is din kuch nahi (share pakad ke rakhna ghata deta).`, vars: { i, profit }, legend, panels: view(i) });
       }
     }
-    t.frame({ line: 'done', caption: `Kul munafa ${profit}. O(n), O(1). Lagaataar chadhaaiyon ka jod = neeche khareed ke upar bechna — same.`, vars: { profit }, legend, panels: view() });
+    t.frame({ line: 'done', caption: `Total profit ${profit}. O(n), O(1). Continuous chadhaaiyon ka jod = neeche khareed ke upar bechna — same.`, vars: { profit }, legend, panels: view() });
     return String(profit);
   },
 });
@@ -100,7 +100,7 @@ export const stockIITrace = tracer<{ prices: number[] }>({
 // ---------- Example 2: Gas station ----------
 export const gasTrace = tracer<{ st: number[][] }>({
   inputs: [{ name: 'st', type: 'intGrid', label: 'Stations (gas cost; gas cost; …)', default: [[3, 4], [1, 2], [2, 3], [5, 1], [4, 3]], maxRows: 7, maxCols: 2, min: 0, max: 9 }],
-  check: ({ st }) => (st.some((r) => r.length !== 2) ? 'Har row mein do numbers: gas cost.' : null),
+  check: ({ st }) => (st.some((r) => r.length !== 2) ? 'Har row mein 2 numbers: gas cost.' : null),
   run({ st }, t) {
     const n = st.length;
     const diff = st.map(([g, c]) => g - c);
@@ -115,7 +115,7 @@ export const gasTrace = tracer<{ st: number[][] }>({
         if (start < n) tn[`${r},${start}`] = 'found';
         if (i !== undefined) tn[`${r},${i}`] = tn[`${r},${i}`] === 'error' ? 'error' : 'active';
       }
-      return [{ kind: 'grid', label: `Gol sadak par stations · tank ${tank}, kul ${total}`, values: [st.map((r) => r[0]), st.map((r) => r[1]), diff], rowLabels: ['gas', 'cost', 'gas - cost'], colLabels: st.map((_, k) => String(k)), tones: tn }];
+      return [{ kind: 'grid', label: `Gol road par stations · tank ${tank}, total ${total}`, values: [st.map((r) => r[0]), st.map((r) => r[1]), diff], rowLabels: ['gas', 'cost', 'gas - cost'], colLabels: st.map((_, k) => String(k)), tones: tn }];
     };
     t.frame({ caption: 'Station i par gas[i] petrol milta hai, agle tak jaane mein cost[i] lagta hai. Kahan se shuru karein ki poora chakkar ho jaaye? Har start try karna O(n²).', legend, panels: view() });
     for (let i = 0; i < n; i++) {
@@ -128,11 +128,11 @@ export const gasTrace = tracer<{ st: number[][] }>({
         start = i + 1;
         tank = 0;
       } else {
-        t.frame({ line: 'fill', caption: `Station ${i}: ${diff[i] >= 0 ? '+' : ''}${diff[i]} → tank ${tank} (start ${start} se). Kul hisaab ${total}.`, vars: { tank, total, start }, legend, panels: view(i) });
+        t.frame({ line: 'fill', caption: `Station ${i}: ${diff[i] >= 0 ? '+' : ''}${diff[i]} → tank ${tank} (start ${start} se). Total hisaab ${total}.`, vars: { tank, total, start }, legend, panels: view(i) });
       }
     }
     const ans = total >= 0 ? start : -1;
-    t.frame({ line: 'done', caption: total >= 0 ? `Kul petrol − kul kharcha = ${total} ≥ 0 → chakkar possible, aur start = ${start}. (Jo kami pehle hissa mein thi, wo ${start} se aage ke bache petrol se poori ho jaati hai.) O(n).` : `Kul ${total} < 0 → kul petrol hi kam — kahin se bhi shuru karo, nahi hoga. -1.`, legend, panels: view() });
+    t.frame({ line: 'done', caption: total >= 0 ? `Total petrol − total cost = ${total} ≥ 0 → chakkar possible, aur start = ${start}. (Jo kami pehle hissa mein thi, wo ${start} se aage ke bache petrol se poori ho jaati hai.) O(n).` : `Total ${total} < 0 → total petrol hi kam — kahin se bhi shuru karo, nahi hoga. -1.`, legend, panels: view() });
     return String(ans);
   },
 });
@@ -147,7 +147,7 @@ export const partitionTrace = tracer<{ s: string }>({
     const cuts: number[][] = [];
     let start = 0;
     let end = 0;
-    const legend = { active: 'abhi (i)', compare: 'tukda abhi yahan tak (end)', found: 'kata hua tukda' };
+    const legend = { active: 'abhi (i)', compare: 'piece abhi yahan tak (end)', found: 'kata hua piece' };
     const view = (i?: number): Panel[] => {
       const tones: Tones = {};
       cuts.forEach(([a, b]) => {
@@ -162,12 +162,12 @@ export const partitionTrace = tracer<{ s: string }>({
         { kind: 'map', label: 'last[letter] = aakhri index', keyLabel: 'letter', valueLabel: 'aakhri', entries: Object.keys(last).sort().map((k) => ({ key: k, value: last[k], tone: i !== undefined && s[i] === k ? ('active' as Tone) : undefined })) },
       ];
     };
-    t.frame({ line: 'last', caption: 'Har letter sirf EK tukde mein ho, aur tukde zyada se zyada. Pehle har letter ka aakhri index nikaalo — ek letter ka tukda kam se kam uske aakhri index tak jaana hi padega.', legend, panels: view() });
+    t.frame({ line: 'last', caption: 'Har letter sirf EK pieces mein ho, aur pieces zyada se zyada. Pehle har letter ka aakhri index nikaalo — ek letter ka piece kam se kam uske aakhri index tak jaana hi padega.', legend, panels: view() });
     for (let i = 0; i < s.length; i++) {
       const old = end;
       end = Math.max(end, last[s[i]]);
       if (i === end) {
-        t.frame({ line: 'cut', caption: `i = ${i} = end → '${s.slice(start, i + 1)}' ke saare letters ka aakhri yahin tak. Kaato! Size ${i - start + 1}. Jaldi se jaldi kaatna = zyada tukde (greedy).`, vars: { i, end }, legend, panels: view(i) });
+        t.frame({ line: 'cut', caption: `i = ${i} = end → '${s.slice(start, i + 1)}' ke saare letters ka aakhri yahin tak. Kaato! Size ${i - start + 1}. Jaldi se jaldi kaatna = zyada pieces (greedy).`, vars: { i, end }, legend, panels: view(i) });
         sizes.push(i - start + 1);
         cuts.push([start, i]);
         start = i + 1;
@@ -175,7 +175,7 @@ export const partitionTrace = tracer<{ s: string }>({
         t.frame({ line: 'extend', caption: `'${s[i]}' ka aakhri index ${last[s[i]]} → end = max(${old}, ${last[s[i]]}) = ${end}. Abhi kaat nahi sakte.`, vars: { i, end }, legend, panels: view(i) });
       }
     }
-    t.frame({ caption: `Tukde: ${listStr(sizes)}. Do pass, O(n); last ke liye sirf 26 jagah — O(1).`, legend, panels: view() });
+    t.frame({ caption: `Pieces: ${listStr(sizes)}. 2 pass, O(n); last ke liye sirf 26 jagah — O(1).`, legend, panels: view() });
     return listStr(sizes);
   },
 });

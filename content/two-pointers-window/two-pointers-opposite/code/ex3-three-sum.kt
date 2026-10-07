@@ -1,6 +1,6 @@
 // Saare UNIQUE triplets jinka sum 0 ho
 fun threeSum(nums: IntArray): List<List<Int>> {
-    val a = nums.sorted() // sort -> two pointers chal sakte hain, aur duplicates padosi ban jaate hain //@sort
+    val a = nums.sorted() // sort -> two pointers chal sakte hain, aur duplicates neighbor ban jaate hain //@sort
     val res = ArrayList<List<Int>>()
     for (i in a.indices) {
         if (i > 0 && a[i] == a[i - 1]) continue // same pehla number dobara -> wahi triplets milenge, skip //@skipI

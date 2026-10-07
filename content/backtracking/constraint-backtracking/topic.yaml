@@ -2,7 +2,7 @@ meta:
   id: constraint-backtracking
   chapter: backtracking
   title: Grid & constraint backtracking
-  subtitle: N-Queens, maze, word search, Sudoku — rakhne se pehle check, wapas jaate waqt mitao
+  subtitle: N-Queens, maze, word search, Sudoku — rakhne se pehle check, wapas jaate time hatao
   level: advanced
   minutes: 45
   prereqs: [backtracking-basics, matrix]
@@ -12,7 +12,7 @@ meta:
 what:
   body: |
     Backtracking jab **grid** ya **rules (constraints)** ke saath ho:
-    - **Grid par chalna** (maze, word search): har cell se 4 padosi; jis cell se guzre use **mark** karo (is raaste mein dobara nahi), wapas jaate waqt **unmark**.
+    - **Grid par chalna** (maze, word search): har cell se 4 neighbor; jis cell se guzre use **mark** karo (is raaste mein dobara nahi), wapas jaate time **unmark**.
     - **Constraint satisfaction** (N-Queens, Sudoku): har jagah koi value rakhne se **pehle check** karo ki koi rule na toote. Toot-ta hai to wo option hi mat lo (pruning).
 
     ```kotlin
@@ -27,14 +27,14 @@ what:
     > [!yaad]
     > Unmark karo ya nahi? **Saare raaste** chahiye (maze, word search) → unmark. Sirf **kaun-kaun pahunch sakta hai** (flood fill, islands) → unmark mat karo (DFS, har cell ek baar).
   analogy: |
-    **Exam hall seating:** 8 students, 8x8 hall — koi do ek row, column ya diagonal mein na baithein (cheating!). Ek-ek row mein ek student bithao, har baar check karo; aage jagah na bache to pichhle student ki seat badlo.
+    **Exam hall seating:** 8 students, 8x8 hall — koi do ek row, column ya diagonal mein na baithein (cheating!). Ek-ek row mein ek student place karo, har baar check karo; aage jagah na bache to pichhle student ki seat badlo.
 
 # 2. Kyun chahiye?
 why:
   body: |
     Ye puzzles ke liye koi formula nahi — search hi tareeka hai. Par search **smart** honi chahiye:
     - 8-Queens: bina pruning 64C8 ≈ 4.4 × 10⁹ arrangements. Row-wise + O(1) check ke saath sirf ~2000 nodes.
-    - Sudoku: har cell 9 options, 81 cells → 9⁸¹. Rules se har kadam par options gir jaate hain → milliseconds.
+    - Sudoku: har cell 9 options, 81 cells → 9⁸¹. Rules se har step par options gir jaate hain → milliseconds.
 
     **O(1) check** ka trick: N-Queens mein `cols[c]`, `d1[r − c]`, `d2[r + c]` boolean arrays — har bar poora board scan nahi.
 
@@ -46,18 +46,18 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Chooha (0,0) se (n−1, n−1) jaana chahta hai. █ = deewar. Har cell par D, L, R, U try; aage raasta nahi to **wapas** (backtrack) aur mark hatao.
+    Chooha (0,0) se (n−1, n−1) jaana chahta hai. █ = wall. Har cell par D, L, R, U try; aage raasta nahi to **wapas** (backtrack) aur mark hatao.
 
-    Saare raaste milte hain — kyunki wapas jaate waqt cell phir khula ho jaata hai.
+    Saare raaste milte hain — kyunki wapas jaate time cell phir khula ho jaata hai.
   viz: { tracer: mazeTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **N-Queens:** har **row** mein exactly ek queen (warna row mein do — maarenge). To faisla: row `r` ki queen kis **column** mein?
+    **N-Queens:** har **row** mein exactly ek queen (warna row mein do — maarenge). To decision: row `r` ki queen kis **column** mein?
     1. `r == n` → board poora → result.
     2. Har column `c`: `cols[c]`, `d1[r − c + n]`, `d2[r + c]` mein se koi true → skip.
-    3. Warna rakho (teeno true), `place(r + 1)`, phir uthao (teeno false).
+    3. Warna rakho (all 3 true), `place(r + 1)`, phir uthao (all 3 false).
 
     4-Queens ke 2 boards; 8-Queens ke 92.
 
@@ -69,7 +69,7 @@ how:
 # 5. Operations table
 operations:
   - op: "N-Queens (saare boards)"
-    time: "O(n!) lagbhag"
+    time: "O(n!) approx"
     space: O(n)
     why: "Row r mein ≤ n − r options; boolean arrays se O(1) check."
   - op: "Sudoku 9x9"
@@ -79,7 +79,7 @@ operations:
   - op: "Word search"
     time: O(m·n·4^L)
     space: "O(L) stack"
-    why: "Har start cell, har kadam max 4 (asal mein 3) raaste."
+    why: "Har start cell, har step max 4 (asal mein 3) raaste."
   - op: "Flood fill / islands"
     time: O(m·n)
     space: "O(m·n) stack worst"
@@ -100,7 +100,7 @@ code:
     note: |
       Visual wala code. Directions ko **D, L, R, U** (alphabetical) order mein try karne se raaste khud sorted milte hain.
 
-      `seen[r][c] = false` wapas jaate waqt — warna doosra raasta is cell se guzar hi nahi paata aur kuch raaste chhoot jaate.
+      `seen[r][c] = false` wapas jaate time — warna doosra raasta is cell se guzar hi nahi paata aur kuch raaste chhoot jaate.
 
 # 7. Examples
 examples:
@@ -109,18 +109,18 @@ examples:
     title: Flood fill — paint bucket
     source: { name: Flood Fill, platform: LeetCode, url: "https://leetcode.com/problems/flood-fill/" }
     problem: |
-      Image = rangon ki grid. Ek cell `(sr, sc)` se shuru karke, us cell ke rang wale saare **jude hue** cells (upar/neeche/baayein/daayein) naye rang se bharo — jaise Paint ka bucket tool.
+      Image = colors ki grid. Ek cell `(sr, sc)` se shuru karke, us cell ke color wale saare **jude hue** cells (upar/neeche/baayein/daayein) naye color se bharo — jaise Paint ka bucket tool.
 
-      Example: `[[1,1,1],[1,1,0],[1,0,1]]`, (1, 1), rang 2 → `[[2,2,2],[2,2,0],[2,0,1]]`
+      Example: `[[1,1,1],[1,1,0],[1,0,1]]`, (1, 1), color 2 → `[[2,2,2],[2,2,0],[2,0,1]]`
     intuition: |
       Grid DFS:
-      - Bahar ya alag rang → ruko.
-      - Rang do, chaaron padosiyon par recurse.
+      - Bahar ya alag color → ruko.
+      - Color do, all 4 neighbors par recurse.
 
-      Naya rang hi **visited ka nishaan** — dobara wahi cell purane rang wala nahi rahega. Alag `visited` nahi chahiye, aur **unmark nahi** (hum raaste nahi gin rahe, bas pahunch).
+      Naya color hi **visited ka mark** — dobara wahi cell purane color wala nahi rahega. Alag `visited` nahi chahiye, aur **unmark nahi** (hum raaste nahi count kar rahe, bas pahunch).
 
       > [!galti]
-      > Naya rang == purana rang → paint ke baad bhi cell "purane rang" wala → infinite recursion → StackOverflowError. Shuru mein check.
+      > Naya color == purana color → paint ke baad bhi cell "purane color" wala → infinite recursion → StackOverflowError. Shuru mein check.
     dryRun: |
       Start (1,1), purana 1, naya 2
 
@@ -143,21 +143,21 @@ examples:
     title: Grid mein word dhoondho
     source: { name: Word Search, platform: LeetCode, url: "https://leetcode.com/problems/word-search/" }
     problem: |
-      Letters ki grid aur ek word. Word padosi cells (upar/neeche/baayein/daayein) se banta hai? Ek cell ek word mein **ek hi baar**.
+      Letters ki grid aur ek word. Word neighbor cells (upar/neeche/baayein/daayein) se banta hai? Ek cell ek word mein **ek hi baar**.
 
       Example: `ABCE / SFCS / ADEE`, word `"ABCCED"` → **true**; `"ABCB"` → false
     intuition: |
       Har cell se shuru karke DFS, `k` = word ka kaunsa letter chahiye:
       - Bahar ya letter alag → false.
-      - Match → cell ko `#` se **mark** (dobara use na ho), 4 padosiyon mein `k + 1`.
-      - Wapas aate waqt **unmark** (asli letter wapas) — doosre start/raaste ke liye.
+      - Match → cell ko `#` se **mark** (dobara use na ho), 4 neighbors mein `k + 1`.
+      - Wapas aate time **unmark** (asli letter wapas) — doosre start/raaste ke liye.
 
       > [!tip]
-      > Pruning ideas: board mein word ke letters kaafi hain? (ginti). Word ka pehla letter board mein kam baar aata hai to word ulta karke dhoondho.
+      > Pruning ideas: board mein word ke letters kaafi hain? (count). Word ka pehla letter board mein kam baar aata hai to word ulta karke dhoondho.
     dryRun: |
       `"ABCCED"`
 
-      | Kadam | Cell | Letter |
+      | Step | Cell | Letter |
       |---|---|---|
       | 0 | (0,0) | A ✓ |
       | 1 | (0,1) | B ✓ |
@@ -170,7 +170,7 @@ examples:
     complexity:
       time: O(m·n·3^L)
       space: "O(L) stack"
-      why: "Har start; pehle kadam ke baad har cell se max 3 naye raaste (aaye hue ko chhod ke)."
+      why: "Har start; pehle step ke baad har cell se max 3 naye raaste (aaye hue ko chhod ke)."
 
   - id: sudoku
     level: tricky
@@ -185,7 +185,7 @@ examples:
       - Row, column, box mein pehle se hai → skip.
       - Rakho → **baaki puzzle recursion se solve**. Ho gaya → true (upar tak).
       - Nahi hua → hatao, agla digit.
-      - Koi digit nahi chala → **false** — matlab pichhla faisla galat tha, wo wapas jaayega.
+      - Koi digit nahi chala → **false** — matlab pichhla decision galat tha, wo wapas jaayega.
 
       > [!tip]
       > Tez banane ke tareeke: rows/cols/boxes ke boolean arrays (check O(1)); aur sabse **kam options** wala khaali cell pehle bharo (MRV heuristic) — mushkil puzzles bhi turant.
@@ -246,7 +246,7 @@ mistakes:
       Word search mein `#` lagaya par wapas letter nahi rakha → doosre start ke liye cell gayab, galat false.
     right: |
       Recursion ke baad asli value wapas.
-  - title: "Flood fill mein same rang"
+  - title: "Flood fill mein same color"
     type: logic
     wrong: |
       newColor == oldColor → infinite recursion.
@@ -282,7 +282,7 @@ interview:
         Board cell ko '#' se badal do aur wapas rakh do — extra memory nahi. Par input badalta hai (interview mein bolo).
     - q: "Flood fill mein unmark kyun nahi?"
       a: |
-        Hum sirf pahunch rahe hain (har cell ek baar paint), saare raaste nahi gin rahe. Unmark karte to exponential ho jaata.
+        Hum sirf pahunch rahe hain (har cell ek baar paint), saare raaste nahi count kar rahe. Unmark karte to exponential ho jaata.
     - q: "Sudoku solver tez kaise?"
       followUp: true
       a: |
@@ -296,7 +296,7 @@ interview:
         Har word ke liye alag search slow. Words ka Trie banao, ek DFS mein Trie ke saath chalo (Trie chapter).
     - q: "Grid DFS mein recursion depth problem?"
       a: |
-        1000x1000 grid par recursion 10⁶ gehri → StackOverflowError. Iterative stack ya BFS lo.
+        1000x1000 grid par recursion 10⁶ deep → StackOverflowError. Iterative stack ya BFS lo.
     - q: "Maze mein shortest path chahiye to?"
       a: |
         Backtracking nahi — BFS (har cell ek baar, pehli baar pahunchna = sabse chhota).
@@ -321,7 +321,7 @@ practice:
     url: "https://leetcode.com/problems/island-perimeter/"
     level: easy
     pattern: Grid neighbours
-    hint: "Har land cell ke 4 kinare; jis taraf paani ya bahar hai wo perimeter mein. DFS ki zaroorat bhi nahi."
+    hint: "Har land cell ke 4 edge; jis taraf paani ya bahar hai wo perimeter mein. DFS ki zaroorat bhi nahi."
   - name: Find Winner on a Tic Tac Toe Game
     platform: LeetCode
     num: 1275
@@ -368,11 +368,11 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "Rakhne se pehle check (pruning), wapas jaate waqt undo."
+    - "Rakhne se pehle check (pruning), wapas jaate time undo."
     - "Saare raaste → unmark; sirf pahunch (flood/islands) → unmark nahi."
     - "N-Queens: row-wise; cols, r − c + n, r + c arrays → O(1) check."
     - "Sudoku: pehla khaali cell, digits try; koi nahi chala → false (pichhla galat)."
-    - "Grid DFS: pehle bounds, phir value; gehri recursion ka dhyaan."
+    - "Grid DFS: pehle bounds, phir value; deep recursion ka dhyaan."
   cheatsheet: |
     ```kotlin
     // N-Queens
@@ -398,11 +398,11 @@ revision:
       options: ["Haan", "Nahi"]
       answer: 0
       explain: "2 + 5 = 7 = 4 + 3."
-    - q: "Flood fill mein visited ka nishaan?"
-      options: ["Alag boolean grid zaroori", "Naya rang hi kaafi", "Stack", "Kuch nahi chahiye"]
+    - q: "Flood fill mein visited ka mark?"
+      options: ["Alag boolean grid zaroori", "Naya color hi kaafi", "Stack", "Kuch nahi chahiye"]
       answer: 1
-      explain: "Rang badalne ke baad wo cell purane rang wala nahi rehta."
-    - q: "Word search mein wapas aate waqt letter kyun rakhte hain?"
+      explain: "Color badalne ke baad wo cell purane color wala nahi rehta."
+    - q: "Word search mein wapas aate time letter kyun rakhte hain?"
       options: ["Speed", "Doosre raaston/starts ke liye cell phir use ho sake", "Memory", "Zaroori nahi"]
       answer: 1
       explain: "Warna galat false."
@@ -417,7 +417,7 @@ connections:
     - id: backtracking-basics
       why: "Choose / explore / un-choose."
     - id: matrix
-      why: "Grid indexing, padosi."
+      why: "Grid indexing, neighbor."
   usedLater:
     - id: dfs
       how: "Islands, connected components — grid DFS bina unmark."

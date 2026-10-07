@@ -1,4 +1,4 @@
-// Kul petrol >= kul kharcha ho to jawab hai. Start dhoondhna: jahan tank minus hua, uske AAGE se dobara
+// Total petrol >= total cost ho to jawab hai. Start dhoondhna: jahan tank minus hua, uske AAGE se dobara
 fun canCompleteCircuit(gas: IntArray, cost: IntArray): Int {
     var total = 0 // poore chakkar ka hisaab
     var tank = 0 // abhi ke start se ab tak
@@ -12,7 +12,7 @@ fun canCompleteCircuit(gas: IntArray, cost: IntArray): Int {
             tank = 0
         }
     }
-    return if (total >= 0) start else -1 // kul petrol kam - koi start nahi chalega //@done
+    return if (total >= 0) start else -1 // total petrol kam - koi start nahi chalega //@done
 }
 
 fun main() {

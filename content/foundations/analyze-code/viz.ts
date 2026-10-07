@@ -89,7 +89,7 @@ export const analyzeParts = tracer<{ n: number }>({
   },
 });
 
-// ---------- Example 1: do alag loops = O(n + m) ----------
+// ---------- Example 1: 2 alag loops = O(n + m) ----------
 export const sumBoth = tracer<{ a: number[]; b: number[] }>({
   inputs: [
     { name: 'a', type: 'intArray', label: 'Array a', default: [1, 2, 3], minLen: 1, maxLen: 6, min: -50, max: 50 },
@@ -103,7 +103,7 @@ export const sumBoth = tracer<{ a: number[]; b: number[] }>({
       steps++;
       t.frame({
         line: 'loopA',
-        caption: `Loop A: s += a[${i}] (${x}) → s = ${s}. a ke liye kul ${a.length} chakkar lagenge.`,
+        caption: `Loop A: s += a[${i}] (${x}) → s = ${s}. a ke liye total ${a.length} chakkar lagenge.`,
         vars: { s, steps },
         panels: [array(a, { label: 'a (n items)', tones: { [i]: 'active' }, pointers: { i } }), array(b, { label: 'b (m items)' })],
       });
@@ -138,7 +138,7 @@ export const nLogN = tracer<{ n: number }>({
     let ops = 0;
     t.frame({
       line: 'outer',
-      caption: `Bahar ka loop i = 0..${n - 1} (${n} baar). Andar j = 1, 2, 4… jab tak j < ${n} — yaani ${js.length} baar. Dekho har i par kya hota hai.`,
+      caption: `Bahar ka loop i = 0..${n - 1} (${n} baar). Andar j = 1, 2, 4… jab tak j < ${n} — matlab ${js.length} baar. Dekho har i par kya hota hai.`,
       vars: { ops },
       panels: [array(outer, { label: 'i (bahar ka loop)' }), array(js, { label: 'j ki values (andar ka loop)' })],
     });
@@ -183,7 +183,7 @@ export const fibCalls = tracer<{ n: number }>({
       const repeated = seen.has(label);
       const me: CallNode = { id, parent, label, state: 'active', tone: repeated ? ('error' as Tone) : undefined };
       calls.push(me);
-      show('count', repeated ? `${label} DOBARA call hua! Iska jawab pehle hi nikal chuka hai — ye bekaar ka kaam hai (laal).` : `${label} call hua. Total calls ab tak: ${count}.`);
+      show('count', repeated ? `${label} DOBARA call hua! Iska jawab pehle hi nikal chuka hai — ye bekaar ka kaam hai (red).` : `${label} call hua. Total calls ab tak: ${count}.`);
       let r: number;
       if (k < 2) {
         r = k;
@@ -206,7 +206,7 @@ export const fibCalls = tracer<{ n: number }>({
     };
     const ans = fib(n);
     t.frame({
-      caption: `fib(${n}) = ${ans}, par ${count} calls lage! Har call do naye calls banata hai → tree har level par lagbhag double → O(2ⁿ). Laal calls repeated kaam hain; DP (memoization) se har fib(k) sirf ek baar → O(n).`,
+      caption: `fib(${n}) = ${ans}, par ${count} calls lage! Har call 2 naye calls banata hai → tree har level par approx double → O(2ⁿ). Red calls repeated kaam hain; DP (memoization) se har fib(k) sirf ek baar → O(n).`,
       vars: { calls: count },
       panels: [{ kind: 'recursion', calls }],
     });

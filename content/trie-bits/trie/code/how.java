@@ -27,7 +27,7 @@ class Trie {
         cur.isEnd = true; // poora word yahan khatam //@end
     }
 
-    // s ke saare aksharon ka raasta - mila to aakhri node, warna null
+    // s ke saare letters ka raasta - mila to aakhri node, warna null
     private TrieNode walk(String s) {
         TrieNode cur = root;
         for (char ch : s.toCharArray()) {

@@ -2,7 +2,7 @@ meta:
   id: recursion-patterns
   chapter: recursion
   title: Recursion patterns
-  subtitle: Linear, divide & conquer, multi-branch, memo, helper — recursion ke 5 dhaanche
+  subtitle: Linear, divide & conquer, multi-branch, memo, helper — recursion ke 5 structure
   level: intermediate
   minutes: 40
   prereqs: [recursion-basics]
@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Zyada tar recursive solutions **5 dhaanchon** mein se kisi ek jaise dikhte hain. Dhaancha pehchaan liya to code aur complexity dono jaldi samajh aate hain.
+    Zyada tar recursive solutions **5 structures** mein se kisi ek jaise dikhte hain. Structure pehchaan liya to code aur complexity dono jaldi samajh aate hain.
 
     | Pattern | Kaise call karta hai | Example | Time |
     |---|---|---|---|
@@ -19,17 +19,17 @@ what:
     | **Divide & conquer** | f(range) → f(left half), f(right half) | max, merge sort | O(n) / O(n log n) |
     | **Halving (ek branch)** | f(n) → f(n / 2) | fast power, binary search | O(log n) |
     | **Multi-branch** | f(n) → 2+ calls (choices) | subsets, Fibonacci, game | O(2ⁿ) |
-    | **Memo** | multi-branch + yaaddasht | climbing stairs | O(alag states) |
+    | **Memo** | multi-branch + memory | climbing stairs | O(alag states) |
 
     Upar se ek **helper pattern**: bahar ka function simple, andar ka helper extra parameters (index, range, accumulator) leke kaam karta hai.
 
     > [!yaad]
-    > Time = **kitni calls** × **har call ka kaam**. Space = **max gehraai** (stack) + memo ka size.
+    > Time = **kitni calls** × **har call ka kaam**. Space = **max depth** (stack) + memo ka size.
   analogy: |
     **Shaadi ka khaana banwana:**
     - **Linear:** ek-ek mehmaan ki plate lagao — "yeh wali, phir baaki sab".
     - **Divide & conquer:** halwai do team banata hai — aadhe mehmaan ek team, aadhe doosri; phir dono ka hisaab jodo.
-    - **Multi-branch:** menu decide karna — har dish ke liye "rakhein ya nahi?" — har faisle par do raaste.
+    - **Multi-branch:** menu decide karna — har dish ke liye "rakhein ya nahi?" — har decision par 2 raaste.
     - **Memo:** kisi ne "paneer ka rate" pooch liya, likh lo — agli baar koi pooche to dobara market mat jao.
 
 # 2. Kyun chahiye?
@@ -45,14 +45,14 @@ why:
     > [!socho]
     > `f(n) = f(n − 1) + f(n − 1)` aur `f(n) = 2 * f(n − 1)` — dono same value dete hain. Complexity bhi same?
     >
-    > **Nahi!** Pehla do calls karta hai → O(2ⁿ). Doosra ek call → O(n). Same sub-call do baar = ek baar karke variable mein rakho.
+    > **Nahi!** Pehla 2 calls karta hai → O(2ⁿ). Doosra ek call → O(n). Same sub-call 2 baar = ek baar karke variable mein rakho.
 
 # 3. Visual intro
 visual:
   body: |
-    **Multi-branch** ka ped: length `n` ki saari binary strings. Har call ke do bachche — '0' lagao ya '1'.
+    **Multi-branch** ka tree: length `n` ki saari binary strings. Har call ke 2 bachche — '0' lagao ya '1'.
 
-    Dekho calls kaise **double** hoti hain, jabki gehraai (stack) sirf `n` rehti hai. Isliye multi-branch ka time O(2ⁿ) par space O(n).
+    Dekho calls kaise **double** hoti hain, jabki depth (stack) sirf `n` rehti hai. Isliye multi-branch ka time O(2ⁿ) par space O(n).
   viz: { tracer: binaryStrings }
 
 # 4. Kaise kaam karta hai
@@ -68,7 +68,7 @@ how:
     Recurrence: `T(n) = 2T(n/2) + O(1)` → **O(n)**. Merge sort mein combine O(n) hai: `T(n) = 2T(n/2) + O(n)` → **O(n log n)**.
 
     > [!tip]
-    > D&C ke teen sawaal: kaise todun? Base kya hai? Do jawab kaise jodun? Combine ka kharcha hi complexity tay karta hai.
+    > D&C ke 3 sawaal: kaise todun? Base kya hai? Do jawab kaise jodun? Combine ka cost hi complexity decide karta hai.
   viz: { tracer: dcMaxTrace }
   code: how
 
@@ -85,7 +85,7 @@ operations:
   - op: "T(n) = 2T(n / 2) + O(1)  — D&C, sasta combine"
     time: O(n)
     space: "O(log n) stack"
-    why: "Calls 2n − 1; gehraai log n."
+    why: "Calls 2n − 1; depth log n."
   - op: "T(n) = 2T(n / 2) + O(n)  — merge sort"
     time: O(n log n)
     space: "O(n) (merge buffer)"
@@ -112,14 +112,14 @@ code:
 examples:
   - id: climbing-stairs
     level: easy
-    title: Seedhiyan chadhne ke tareeke (memo)
+    title: Stairs chadhne ke tareeke (memo)
     source: { name: Climbing Stairs, platform: LeetCode, url: "https://leetcode.com/problems/climbing-stairs/" }
     problem: |
-      `n` seedhiyan hain. Ek baar mein **1 ya 2** seedhi chadh sakte ho. Upar pahunchne ke kitne alag tareeke?
+      `n` stairs hain. Ek baar mein **1 ya 2** seedhi chadh sakte ho. Upar pahunchne ke kitne alag tareeke?
 
       Example: `n = 3` → **3** (1+1+1, 1+2, 2+1)
     intuition: |
-      **Aakhri kadam** socho: upar pahunchne se theek pehle tum ya to `n − 1` par the (1 chadhe) ya `n − 2` par (2 chadhe). Dono alag tareeke hain:
+      **Aakhri step** socho: upar pahunchne se theek pehle tum ya to `n − 1` par the (1 chadhe) ya `n − 2` par (2 chadhe). Dono alag tareeke hain:
 
       `ways(n) = ways(n − 1) + ways(n − 2)`, base `ways(0) = ways(1) = 1`.
 
@@ -128,7 +128,7 @@ examples:
       **Memo:** jo nikaala, HashMap mein likh lo. Dobara aaye to seedha lo. Ab har `ways(k)` sirf ek baar → O(n).
 
       > [!yaad]
-      > Memo lagane ki shart: (1) same input par same answer (koi bahar ka state nahi), (2) sub-calls **repeat** ho rahe hon. Dono ho to memo = DP ka top-down roop.
+      > Memo lagane ki condition: (1) same input par same answer (koi bahar ka state nahi), (2) sub-calls **repeat** ho rahe hon. Dono ho to memo = DP ka top-down form.
     dryRun: |
       n = 5
 
@@ -148,25 +148,25 @@ examples:
 
   - id: predict-winner
     level: medium
-    title: Kinaron se number uthao — Player 1 jeetega?
+    title: Edges se number uthao — Player 1 jeetega?
     source: { name: Predict the Winner, platform: LeetCode, url: "https://leetcode.com/problems/predict-the-winner/" }
     problem: |
-      Array ke numbers. Do players baari-baari **left ya right kinare** se ek number uthate hain (Player 1 pehle). Dono **best** khelte hain. Player 1 ka total ≥ Player 2 ho sakta hai?
+      Array ke numbers. 2 players baari-baari **left ya right edge** se ek number uthate hain (Player 1 pehle). Dono **best** khelte hain. Player 1 ka total ≥ Player 2 ho sakta hai?
 
       Example: `[1, 5, 2]` → **false**; `[1, 5, 233, 7]` → **true**
     intuition: |
-      "Mera score" aur "uska score" alag track karna uljhan hai. **Trick: difference** track karo.
+      "Mera score" aur "uska score" alag track karna confusion hai. **Trick: difference** track karo.
 
       `d(l, r)` = `nums[l..r]` bacha ho to **jiski baari hai** wo saamne wale se kitna aage reh sakta hai.
 
       - Left liya: mujhe `nums[l]` mila, ab baari saamne wale ki — wo `d(l+1, r)` aage rahega. Mera fayda = `nums[l] − d(l+1, r)`.
       - Right liya: `nums[r] − d(l, r−1)`.
-      - Main best chunta hoon: `max` dono ka.
+      - Main best choose karta hoon: `max` dono ka.
 
       Player 1 jeetega agar `d(0, n−1) ≥ 0`.
 
       > [!tip]
-      > Do-player games mein "**mera − uska**" wala trick (minimax) recursion ko ek hi function mein samet deta hai. Stone Game, Nim jaise problems mein bhi.
+      > Do-player games mein "**mera − uska**" wala trick (minimax) recursion ko ek hi function mein including deta hai. Stone Game, Nim jaise problems mein bhi.
 
       > [!socho]
       > `d(1, 2)` ko `d(0, 2)` ke dono raaste bulate hain (left ke baad right, right ke baad left) — **overlap**! Memo `[l][r]` se O(n²). Ye DP chapter ka interval DP hai.
@@ -196,21 +196,21 @@ examples:
     intuition: |
       Sliding window yahan seedha kaam nahi karta (window badhane se condition kabhi ban, kabhi toot jaati hai — monotonic nahi).
 
-      **Divide & conquer socho:** poori string mein jo char **k se kam** baar hai, wo kisi bhi answer mein **ho hi nahi sakta** (substring mein uski ginti aur kam hogi). To answer us char ko **cross nahi** karega.
+      **Divide & conquer socho:** poori string mein jo char **k se kam** baar hai, wo kisi bhi answer mein **ho hi nahi sakta** (substring mein uski count aur kam hogi). To answer us char ko **cross nahi** karega.
 
       - Us char par string **todo**.
-      - Har tukde ka answer recursion se.
+      - Har pieces ka answer recursion se.
       - Koi kharab char nahi → poori string hi answer.
 
       > [!tip]
-      > Har recursion level par kam se kam ek letter hamesha ke liye hat jaata hai → gehraai ≤ 26. Har level O(n) → **O(26·n)**.
+      > Har recursion level par kam se kam ek letter hamesha ke liye hat jaata hai → depth ≤ 26. Har level O(n) → **O(26·n)**.
 
       > [!galti]
-      > Tukde par dobara **nayi ginti** karo — poori string ki ginti se nahi. `"aaabb"`, k = 3: pehle 'b' kharab. Tukda `"aaa"` mein 'a' = 3 ✓.
+      > Pieces par dobara **nayi count** karo — poori string ki count se nahi. `"aaabb"`, k = 3: pehle 'b' kharab. Piece `"aaa"` mein 'a' = 3 ✓.
     dryRun: |
       `"ababbc"`, k = 2
 
-      | Call | Ginti | Kharab | Kya hua |
+      | Call | Count | Kharab | Kya hua |
       |---|---|---|---|
       | "ababbc" | a2 b3 c1 | c | c par toda → "ababb", "" |
       | "ababb" | a2 b3 | – | poora valid → 5 |
@@ -221,13 +221,13 @@ examples:
     complexity:
       time: O(26·n)
       space: "O(26) stack levels"
-      why: "Har level ek letter khatam; har level par ginti O(n)."
+      why: "Har level ek letter khatam; har level par count O(n)."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "Problem aadha-aadha karke hal ho sake aur jawab jode ja sakein → divide & conquer."
-    - "Har kadam par choices (lo/chhodo, left/right) → multi-branch."
+    - "Har step par choices (lo/chhodo, left/right) → multi-branch."
     - "Multi-branch mein same input baar-baar → memo."
     - "Koi element answer mein ho hi nahi sakta → us par todo (split D&C)."
   avoid:
@@ -235,31 +235,31 @@ when:
     - "Memo ka state bahut bada (jaise poora array) — key banana mehenga; DP table socho."
     - "Simple linear kaam — loop kaafi hai."
   signals:
-    - keyword: "number of ways, aakhri kadam"
+    - keyword: "number of ways, aakhri step"
       think: "ways(n) = sum of ways(chhote states) + memo."
     - keyword: "two players, optimal play, pick from ends"
       think: "Score difference recursion (minimax) + memo[l][r]."
     - keyword: "split / divide, combine results"
       think: "D&C: todo, recurse, jodo. Recurrence se complexity."
     - keyword: "every char at least k / constraint fails at an element"
-      think: "Kharab element par todo, tukdon par recursion."
+      think: "Kharab element par todo, pieces par recursion."
 
 # 9. Real-world
 realWorld:
   - where: "Sorting libraries"
-    how: "Java ka `Arrays.sort` (objects) merge sort ka roop (TimSort) hai — divide & conquer."
+    how: "Java ka `Arrays.sort` (objects) merge sort ka form (TimSort) hai — divide & conquer."
   - where: "Chess / game engines"
-    how: "Minimax recursion: har chaal ke baad saamne wale ki best chaal socho — Predict the Winner jaisa, bas bahut bada ped."
-  - where: "Caching (memo ka bada roop)"
+    how: "Minimax recursion: har move ke baad saamne wale ki best move socho — Predict the Winner jaisa, bas bahut bada tree."
+  - where: "Caching (memo ka bada form)"
     how: "Android image loaders (Glide/Coil) aur network cache — 'pehle nikaala hai? to dobara mat nikaalo'."
   - where: "Big data (MapReduce)"
-    how: "Data ko hazaaron machines mein baanto, har machine apna hissa hal kare, phir jodo — D&C."
+    how: "Data ko thousands machines mein divide karo, har machine apna hissa hal kare, phir jodo — D&C."
   - where: "Graphics"
     how: "Quadtree: screen ko 4 hisson mein todte jao jab tak hissa simple na ho — maps aur games mein collision check."
 
 # 10. Common galtiyan & edge cases
 mistakes:
-  - title: "Same sub-call do baar"
+  - title: "Same sub-call 2 baar"
     type: logic
     wrong: |
       `return f(n - 1) + f(n - 1)` → O(2ⁿ).
@@ -280,9 +280,9 @@ mistakes:
   - title: "Base case khaali range ka nahi"
     type: empty
     wrong: |
-      Tukda khaali (`lo == hi`) aaya aur code `s[lo]` padhne gaya → crash.
+      Piece khaali (`lo == hi`) aaya aur code `s[lo]` padhne gaya → crash.
     right: |
-      Base mein khaali / chhota range pehle sambhaalo (`hi - lo < k → 0`).
+      Base mein khaali / chhota range pehle handle karo (`hi - lo < k → 0`).
   - title: "Memo mein bahar ka state"
     type: other
     wrong: |
@@ -306,11 +306,11 @@ interview:
     - q: "Climbing Stairs ko O(1) space mein?"
       followUp: true
       a: |
-        Sirf pichhle do values chahiye: a = 1, b = 1; n baar (a, b) = (b, a + b). Bottom-up DP.
+        Sirf pichhle 2 values chahiye: a = 1, b = 1; n baar (a, b) = (b, a + b). Bottom-up DP.
     - q: "Predict the Winner mein difference kyun track karte ho?"
       a: |
-        Ek hi function do players ko sambhaal leta hai: meri chaal ka fayda = jo uthaya − saamne wale ka best diff. Alag scores track nahi karne padte.
-    - q: "Master theorem ka simple roop?"
+        Ek hi function 2 players ko handle kar leta hai: meri move ka fayda = jo uthaya − saamne wale ka best diff. Alag scores track nahi karne padte.
+    - q: "Master theorem ka simple form?"
       a: |
         T(n) = 2T(n/2) + O(n) → O(n log n). T(n) = 2T(n/2) + O(1) → O(n). T(n) = T(n/2) + O(1) → O(log n). T(n) = T(n/2) + O(n) → O(n).
     - q: "Recursion ko iterative kaise banaoge?"
@@ -319,7 +319,7 @@ interview:
     - q: "Longest Substring with K Repeats sliding window se?"
       followUp: true
       a: |
-        Haan — har target 'distinct count' u = 1..26 ke liye ek window (at most u distinct, count ≥ k wale ginte hue). Ab condition monotonic hai. O(26·n).
+        Haan — har target 'distinct count' u = 1..26 ke liye ek window (at most u distinct, count ≥ k wale count karte hue). Ab condition monotonic hai. O(26·n).
   mayAsk:
     - "Majority Element (D&C se)."
     - "Different Ways to Add Parentheses."
@@ -348,7 +348,7 @@ practice:
     url: "https://leetcode.com/problems/majority-element/"
     level: easy
     pattern: Divide & conquer
-    hint: "Dono halves ka majority nikaalo. Same → wahi. Alag → poore range mein dono gin ke jo zyada. (Boyer-Moore O(1) space bhi dekhna.)"
+    hint: "Dono halves ka majority nikaalo. Same → wahi. Alag → poore range mein dono count kar ke jo zyada. (Boyer-Moore O(1) space bhi dekhna.)"
   - name: Predict the Winner
     platform: LeetCode
     num: 486
@@ -376,21 +376,21 @@ practice:
     url: "https://leetcode.com/problems/scramble-string/"
     level: hard
     pattern: Multi-branch D&C + memo
-    hint: "Har split point i par do case: (left↔left, right↔right) ya (left↔right swapped). Memo key: (s1, s2). Letters ki ginti alag ho to turant false."
+    hint: "Har split point i par do case: (left↔left, right↔right) ya (left↔right swapped). Memo key: (s1, s2). Letters ki count alag ho to turant false."
   - name: Special Binary String
     platform: LeetCode
     num: 761
     url: "https://leetcode.com/problems/special-binary-string/"
     level: hard
     pattern: Recursive decomposition + sort
-    hint: "Count 0 hone par ek 'mountain' tukda khatam. Har tukde '1' + andar + '0' ke andar recursion, phir saare tukde descending sort karke jodo."
+    hint: "Count 0 hone par ek 'mountain' piece khatam. Har pieces '1' + andar + '0' ke andar recursion, phir saare pieces descending sort karke jodo."
 
 # 13. Quick revision
 revision:
   summary:
-    - "5 dhaanche: linear, halving, D&C, multi-branch, memo (+ helper params)."
-    - "Time = calls × per-call kaam; space = gehraai (+ memo)."
-    - "Same sub-call do baar mat karo — variable mein rakho."
+    - "5 structure: linear, halving, D&C, multi-branch, memo (+ helper params)."
+    - "Time = calls × per-call kaam; space = depth (+ memo)."
+    - "Same sub-call 2 baar mat karo — variable mein rakho."
     - "Overlap + pure function → memo (top-down DP)."
     - "Games: score difference = uthaya − saamne wale ka best."
   cheatsheet: |
@@ -423,13 +423,13 @@ revision:
       answer: 1
       explain: "ways(4) = ways(3) + ways(2) = 3 + 2 = 5."
     - q: "Memo kab galat answer de sakta hai?"
-      options: ["Jab n bada ho", "Jab function kisi bahar ke badalte state par depend kare", "Jab recursion gehri ho", "Kabhi nahi"]
+      options: ["Jab n bada ho", "Jab function kisi bahar ke badalte state par depend kare", "Jab recursion deep ho", "Kabhi nahi"]
       answer: 1
       explain: "Memo maanta hai: same parameters = same answer."
-    - q: "Binary strings of length n generate karne mein stack ki gehraai?"
+    - q: "Binary strings of length n generate karne mein stack ki depth?"
       options: ["O(1)", "O(n)", "O(2ⁿ)", "O(n²)"]
       answer: 1
-      explain: "Ek waqt par sirf ek raasta (root se leaf) stack par — n levels."
+      explain: "Ek time par sirf ek raasta (root se leaf) stack par — n levels."
     - q: "[2, 1] — Predict the Winner, d(0, 1)?"
       options: ["−1", "1", "3", "0"]
       answer: 1
@@ -441,7 +441,7 @@ connections:
     - id: recursion-basics
       why: "Base case, call stack, leap of faith."
     - id: frequency-count
-      why: "Example 3 ki ginti wala hissa."
+      why: "Example 3 ki count wala hissa."
     - id: sliding-window-variable
       why: "Example 3 window se kyun seedha nahi banta — monotonic condition."
   usedLater:

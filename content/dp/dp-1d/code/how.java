@@ -1,5 +1,5 @@
 class Main {
-    // House robber: padosi do ghar ek saath nahi. Har ghar par do hi faisle - lo ya chhodo
+    // House robber: neighbor 2 ghar ek saath nahi. Har ghar par do hi decision - lo ya chhodo
     static int rob(int[] nums) {
         int n = nums.length;
         int[] dp = new int[n + 1]; // dp[i] = pehle i gharon (0..i-1) se max paisa

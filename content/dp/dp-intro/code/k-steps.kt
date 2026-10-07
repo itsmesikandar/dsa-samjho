@@ -1,10 +1,10 @@
-// Climbing stairs ka general roop: allowed kadam ek set mein. dp[i] = sab s ke liye dp[i - s] ka jod
+// Climbing stairs ka general form: allowed step ek set mein. dp[i] = sab s ke liye dp[i - s] ka jod
 fun countWays(n: Int, steps: IntArray): Long {
     val dp = LongArray(n + 1)
     dp[0] = 1 // khaali rasta - 1 tareeka
     for (i in 1..n) {
         for (s in steps) {
-            if (s <= i) dp[i] += dp[i - s] // aakhri kadam s ka tha - pehle i - s tak pahunche the
+            if (s <= i) dp[i] += dp[i - s] // aakhri step s ka tha - pehle i - s tak pahunche the
         }
     }
     return dp[n]

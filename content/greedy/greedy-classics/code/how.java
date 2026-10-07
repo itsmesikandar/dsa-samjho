@@ -5,9 +5,9 @@ class Main {
         int best = 0;
         for (int p : prices) {
             if (p < minPrice) {
-                minPrice = p; // aur sasta din - khareedne ke liye isse behtar koi pichhla din nahi //@min
+                minPrice = p; // aur sasta din - khareedne ke liye isse better koi pichhla din nahi //@min
             } else {
-                best = Math.max(best, p - minPrice); // aaj bechein to munafa //@sell
+                best = Math.max(best, p - minPrice); // aaj bechein to profit //@sell
             }
         }
         return best; //@done

@@ -1,7 +1,7 @@
 import java.util.List;
 
 class Main {
-    // Triangle: upar se neeche, har row mein neeche ke do padosiyon mein se ek. Neeche se upar chalo - ek hi 1D array kaafi
+    // Triangle: upar se neeche, har row mein neeche ke do neighbors mein se ek. Neeche se upar chalo - ek hi 1D array kaafi
     static int minimumTotal(List<List<Integer>> triangle) {
         List<Integer> last = triangle.get(triangle.size() - 1);
         int[] dp = new int[last.size()]; // aakhri row hi shuruaat

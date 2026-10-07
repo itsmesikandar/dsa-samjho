@@ -1,4 +1,4 @@
-// Do stacks se queue (FIFO): naye items 'inbox' mein, nikaalna 'outbox' se
+// 2 stacks se queue (FIFO): naye items 'inbox' mein, nikaalna 'outbox' se
 class MyQueue {
     private val inbox = ArrayDeque<Int>() // stack: top = last
     private val outbox = ArrayDeque<Int>()

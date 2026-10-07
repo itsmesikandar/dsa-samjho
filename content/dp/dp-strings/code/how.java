@@ -1,5 +1,5 @@
 class Main {
-    // LCS: do strings ka sabse lamba common subsequence (order same, beech mein gap allowed)
+    // LCS: 2 strings ka sabse lamba common subsequence (order same, beech mein gap allowed)
     static int lcs(String a, String b) {
         int m = a.length();
         int n = b.length();
@@ -9,7 +9,7 @@ class Main {
                 if (a.charAt(i - 1) == b.charAt(j - 1)) {
                     dp[i][j] = dp[i - 1][j - 1] + 1; // dono aakhri chars same - LCS mein le lo //@match
                 } else {
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // a ka aakhri chhodo ya b ka - jo behtar //@skip
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // a ka aakhri chhodo ya b ka - jo better //@skip
                 }
             }
         }

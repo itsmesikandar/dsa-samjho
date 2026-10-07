@@ -40,7 +40,7 @@ export const ramIntro = tracer<{ age: number }>({
     cells[3] = { value: age, tag: 'copy', tone: 'new' };
     t.frame({
       caption:
-        '`val copy = age` → Int jaise primitive ko copy karne par VALUE copy hoti hai. copy ka apna alag dabba (112) hai — ek ko badlo, doosre par koi asar nahi.',
+        '`val copy = age` → Int jaise primitive ko copy karne par VALUE copy hoti hai. copy ka apna alag dabba (112) hai — ek ko badlo, doosre par koi effect nahi.',
       vars: { age, next: age + 1, copy: age },
       panels: [mem(cells)],
     });
@@ -179,7 +179,7 @@ export const referenceTrap = tracer<{ arr: number[]; v: number }>({
     });
     t.frame({ legend,
       line: 'b',
-      caption: `\`val b = a\` ne nayi array NAHI banayi — sirf address ${A} copy hua. Ab a aur b ek hi array ke do naam hain, jaise ek ghar ke do pate.`,
+      caption: `\`val b = a\` ne nayi array NAHI banayi — sirf address ${A} copy hua. Ab a aur b ek hi array ke 2 naam hain, jaise ek ghar ke do pate.`,
       panels: [vars([['a', `→ ${A}`], ['b', `→ ${A}`, 'new']]), heap(all('active'))],
     });
     a[0] = v;
@@ -235,7 +235,7 @@ export const passByValue = tracer<{ num: number; arr: number[] }>({
     });
     t.frame({
       line: 'local',
-      caption: `Naya frame bana. Arguments ki VALUE copy hui: num ki value ${num}, aur arr ki value — yaani address ${HEAP}. Phir x = num, ek aur local copy.`,
+      caption: `Naya frame bana. Arguments ki VALUE copy hui: num ki value ${num}, aur arr ki value — matlab address ${HEAP}. Phir x = num, ek aur local copy.`,
       vars: { x: num },
       panels: [stack([main, fn(num)]), heap('active')],
     });

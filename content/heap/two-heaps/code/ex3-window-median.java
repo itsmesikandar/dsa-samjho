@@ -3,14 +3,14 @@ import java.util.Collections;
 import java.util.PriorityQueue;
 
 class Main {
-    // Har kadam: naya andar, purana bahar, phir balance. Median = tops se
+    // Har step: naya andar, purana bahar, phir balance. Median = tops se
     static double[] medianSlidingWindow(int[] nums, int k) {
         PriorityQueue<Integer> left = new PriorityQueue<>(Collections.reverseOrder()); // window ka chhota aadha
         PriorityQueue<Integer> right = new PriorityQueue<>(); // window ka bada aadha
         double[] out = new double[nums.length - k + 1];
         for (int i = 0; i < nums.length; i++) {
             if (left.isEmpty() || nums[i] <= left.peek()) left.add(nums[i]); else right.add(nums[i]); // naya andar //@add
-            if (i >= k) { // window aage khiski - nums[i - k] bahar
+            if (i >= k) { // window aage shift hui - nums[i - k] bahar
                 Integer old = nums[i - k]; // Integer: remove(Object) chahiye
                 if (old <= left.peek()) left.remove(old); else right.remove(old); // jis aadhe mein hai wahin se, O(k) //@remove
             }

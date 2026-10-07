@@ -12,7 +12,7 @@ class Main {
         }
     }
 
-    // Do numbers ULTE digits mein (2 -> 4 -> 3 matlab 342). Jod ke usi format mein do.
+    // 2 numbers ULTE digits mein (2 -> 4 -> 3 matlab 342). Jod ke usi format mein do.
     static ListNode addTwoNumbers(ListNode a, ListNode b) {
         ListNode p = a, q = b, head = null, tail = null;
         int carry = 0;

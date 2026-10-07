@@ -13,7 +13,7 @@ const LEGEND = { muted: 'hata diya', compare: 'mid' };
 export const boundaryViz = tracer<{ n: number; first: number }>({
   inputs: [
     { name: 'n', type: 'int', label: 'Kitne din', default: 12, min: 2, max: 16 },
-    { name: 'first', type: 'int', label: 'Kis din se paudha 10cm+ (n + 1 = kabhi nahi)', default: 8, min: 1, max: 17 },
+    { name: 'first', type: 'int', label: 'Kis din se plant 10cm+ (n + 1 = kabhi nahi)', default: 8, min: 1, max: 17 },
   ],
   check: ({ n, first }) => (first <= n + 1 ? null : `Din 1 se ${n + 1} ke beech rakho.`),
   run({ n, first }, t) {
@@ -28,16 +28,16 @@ export const boundaryViz = tracer<{ n: number; first: number }>({
     };
     let lo = 1;
     let hi = n + 1;
-    t.frame({ caption: 'Paudha roz badhta hai — ek baar 10cm paar kiya to hamesha paar. To answer F F F … T T T jaisa hai. Pehla T dhoondhna hai, kam se kam naap ke.', vars: { lo, hi }, legend: { ...LEGEND, found: 'T', error: 'F' }, panels: row(lo, hi) });
+    t.frame({ caption: 'Plant roz badhta hai — ek baar 10cm paar kiya to hamesha paar. To answer F F F … T T T jaisa hai. Pehla T dhoondhna hai, kam se kam measure ke.', vars: { lo, hi }, legend: { ...LEGEND, found: 'T', error: 'F' }, panels: row(lo, hi) });
     while (lo < hi) {
       const mid = lo + Math.floor((hi - lo) / 2);
       probed.add(mid - 1);
       const yes = mid >= first;
-      t.frame({ caption: yes ? `Din ${mid} naapa → T. Pehla T yahi ya isse pehle → hi = ${mid} (mid ko rakho!).` : `Din ${mid} naapa → F. Pehla T iske baad → lo = ${mid + 1}.`, vars: { lo, hi, mid }, legend: { ...LEGEND, found: 'T', error: 'F' }, panels: row(lo, hi, mid) });
+      t.frame({ caption: yes ? `Din ${mid} measure kiya → T. Pehla T yahi ya isse pehle → hi = ${mid} (mid ko rakho!).` : `Din ${mid} measure kiya → F. Pehla T iske baad → lo = ${mid + 1}.`, vars: { lo, hi, mid }, legend: { ...LEGEND, found: 'T', error: 'F' }, panels: row(lo, hi, mid) });
       if (yes) hi = mid;
       else lo = mid + 1;
     }
-    t.frame({ caption: lo <= n ? `lo == hi = ${lo} → pehla T din ${lo}. Sirf ${probed.size} baar naapa. Yahi "first true" template har variation ka baap hai.` : `lo == hi = ${n + 1} → koi T nahi (paudha kabhi 10cm nahi pahuncha).`, vars: { answer: lo }, legend: { found: 'T', error: 'F' }, panels: row(lo, lo) });
+    t.frame({ caption: lo <= n ? `lo == hi = ${lo} → pehla T din ${lo}. Sirf ${probed.size} baar measure kiya. Yahi "first true" template har variation ka baap hai.` : `lo == hi = ${n + 1} → koi T nahi (plant kabhi 10cm nahi pahuncha).`, vars: { answer: lo }, legend: { found: 'T', error: 'F' }, panels: row(lo, lo) });
     return String(lo);
   },
 });
@@ -124,7 +124,7 @@ export const rangeTrace = tracer<{ nums: number[]; target: number }>({
     const up = bound(t, nums, target, true, { init: 'last', mid: 'last', yes: 'last', no: 'last' }, 'Search 2 (upper bound): ');
     const last = up - 1;
     const ranges: ArrRange[] = [{ from: first, to: last, label: `${target} × ${last - first + 1}`, tone: 'found' }];
-    t.frame({ line: 'last', caption: `upperBound = ${up} → aakhri = ${last}. Answer [${first}, ${last}]. Do binary search → O(log n), chahe ${target} hazaar baar ho.`, panels: [array(nums, { ranges })] });
+    t.frame({ line: 'last', caption: `upperBound = ${up} → aakhri = ${last}. Answer [${first}, ${last}]. 2 binary search → O(log n), chahe ${target} 1000 baar ho.`, panels: [array(nums, { ranges })] });
     return listStr([first, last]);
   },
 });
@@ -132,8 +132,8 @@ export const rangeTrace = tracer<{ nums: number[]; target: number }>({
 // ---------- Example 3: search in rotated sorted array ----------
 export const rotatedTrace = tracer<{ nums: number[]; rot: number; target: number }>({
   inputs: [
-    { name: 'nums', type: 'intArray', label: 'Sorted (distinct) — hum ghumaayenge', default: [0, 1, 2, 4, 5, 6, 7], minLen: 1, maxLen: 9, min: 0, max: 20, sorted: true, distinct: true },
-    { name: 'rot', type: 'int', label: 'Kitna ghumaayein (rotate)', default: 3, min: 0, max: 8 },
+    { name: 'nums', type: 'intArray', label: 'Sorted (distinct) — hum rotate karenge', default: [0, 1, 2, 4, 5, 6, 7], minLen: 1, maxLen: 9, min: 0, max: 20, sorted: true, distinct: true },
+    { name: 'rot', type: 'int', label: 'Kitna rotate karein (rotate)', default: 3, min: 0, max: 8 },
     { name: 'target', type: 'int', label: 'target', default: 0, min: 0, max: 20 },
   ],
   check: ({ nums, rot }) => (rot < nums.length ? null : `Rotate ${nums.length} se kam rakho.`),
@@ -148,7 +148,7 @@ export const rotatedTrace = tracer<{ nums: number[]; rot: number; target: number
       if (mid !== undefined) tones[mid] = tone;
       return [array(a, { tones, pointers: lo <= hi ? { lo, ...(mid !== undefined ? { mid } : {}), hi } : {}, ranges: sorted ? [{ from: sorted[0], to: sorted[1], label: 'sorted', tone: 'active' }] : [] })];
     };
-    t.frame({ line: 'found', caption: `Sorted array ko ${rot} jagah ghumaya → ${listStr(a)}. Poora sorted nahi, par mid se todo to KAM SE KAM EK half hamesha sorted hota hai.`, legend: LEGEND, panels: view() });
+    t.frame({ line: 'found', caption: `Sorted array ko ${rot} jagah rotate kiya → ${listStr(a)}. Poora sorted nahi, par mid se todo to KAM SE KAM EK half hamesha sorted hota hai.`, legend: LEGEND, panels: view() });
     while (lo <= hi) {
       const mid = lo + Math.floor((hi - lo) / 2);
       if (a[mid] === target) {
@@ -167,7 +167,7 @@ export const rotatedTrace = tracer<{ nums: number[]; rot: number; target: number
         else hi = mid - 1;
       }
     }
-    t.frame({ line: 'none', caption: `Range khaali → −1. Har kadam aadha hissa gaya → O(log n).`, legend: LEGEND, panels: view() });
+    t.frame({ line: 'none', caption: `Range khaali → −1. Har step aadha hissa gaya → O(log n).`, legend: LEGEND, panels: view() });
     return '-1';
   },
 });

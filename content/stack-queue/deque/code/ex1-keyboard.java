@@ -8,7 +8,7 @@ class Main {
         boolean flipped = false; // sach mein ulta karne (O(n)) ki jagah bas yaad rakho ki "ab ulta hai"
         for (char c : s.toCharArray()) {
             if (c == 'i') flipped = !flipped; //@flip
-            else if (flipped) dq.offerFirst(c); // ulti halat mein naya char asal mein AAGE judta hai //@front
+            else if (flipped) dq.offerFirst(c); // ulti state mein naya char asal mein AAGE judta hai //@front
             else dq.offerLast(c); //@back
         }
         StringBuilder out = new StringBuilder();

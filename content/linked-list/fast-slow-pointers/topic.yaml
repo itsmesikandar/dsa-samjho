@@ -2,7 +2,7 @@ meta:
   id: fast-slow-pointers
   chapter: linked-list
   title: Fast & Slow Pointers
-  subtitle: Ek 1 kadam, ek 2 kadam — beech dhoondho, circle pakdo, circle ki shuruaat nikaalo (Floyd)
+  subtitle: Ek 1 step, ek 2 step — beech dhoondho, circle pakdo, circle ki shuruaat nikaalo (Floyd)
   level: intermediate
   minutes: 35
   prereqs: [singly-linked-list, two-pointers-same]
@@ -11,9 +11,9 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Do pointers, **dono head se**, alag speed:
-    - `slow` — har baar 1 kadam
-    - `fast` — har baar 2 kadam
+    2 pointers, **dono head se**, alag speed:
+    - `slow` — har baar 1 step
+    - `fast` — har baar 2 step
 
     ```kotlin
     var slow = head; var fast = head
@@ -23,36 +23,36 @@ what:
     }
     ```
 
-    Is chhote se trick se teen bade kaam:
+    Is chhote se trick se 3 bade kaam:
     1. **Beech ka node** — fast end par, slow aadhe raaste par.
     2. **Circle (cycle) hai?** — circle mein fast peeche se aa ke slow ko pakad leta hai.
-    3. **Circle kahan se shuru** — milne ke baad ek pointer head par, dono 1-1 kadam (Floyd).
+    3. **Circle kahan se shuru** — milne ke baad ek pointer head par, dono 1-1 step (Floyd).
 
     > [!yaad]
     > Sab **O(n) time, O(1) memory**. HashSet wala tareeka bhi kaam karta hai par O(n) memory.
   analogy: |
-    **Gol race track par do dhaavak** — ek tez (2x), ek dheema. Seedhi sadak hoti to tez wala aage nikal ke finish line par pahunch jaata. Par gol track par wo **ghoom ke peeche se** dheeme ko pakad leta hai.
+    **Gol race track par do runner** — ek tez (2x), ek slow. Seedhi road hoti to tez wala aage nikal ke finish line par pahunch jaata. Par gol track par wo **ghoom ke peeche se** slow ko pakad leta hai.
 
     To agar dono kabhi mil gaye → track gol hai (circle). Tez wala finish (null) tak pahuncha → seedha track.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    Linked list mein na index hai, na length pehle se pata. "Beech wala node" ke liye pehle length gino (ek pass), phir aadhe tak chalo (doosra pass). Fast/slow **ek pass** mein.
+    Linked list mein na index hai, na length pehle se pata. "Beech wala node" ke liye pehle length count karo (ek pass), phir aadhe tak chalo (doosra pass). Fast/slow **ek pass** mein.
 
     Circle ke liye: HashSet mein har node daalo, dobara mile to circle → O(n) memory. Fast/slow → **O(1)**. Interview mein yahi poochte hain.
 
     Aur ye sirf list nahi — koi bhi "agla state" wala function: **Happy Number** (digits square ka sum), **Find the Duplicate Number** (i → nums[i]) — sab "circle hai?" ke sawaal ban jaate hain.
 
     > [!socho]
-    > Fast 2 kadam aur slow 1 — circle mein fast slow ko **kood ke** aage nikal sakta hai kya, bina milaye?
+    > Fast 2 step aur slow 1 — circle mein fast slow ko **jump kar ke** aage nikal sakta hai kya, bina milaye?
     >
-    > Nahi. Circle ke andar dono ka faasla har kadam **ek** ghatta hai (fast +2, slow +1). Faasla 3, 2, 1, 0 — beech mein koi number skip nahi hota. Isliye milna pakka. (3 kadam wala fast skip kar sakta hai!)
+    > Nahi. Circle ke andar dono ka distance har step **ek** ghatta hai (fast +2, slow +1). Distance 3, 2, 1, 0 — beech mein koi number skip nahi hota. Isliye milna pakka. (3 step wala fast skip kar sakta hai!)
 
 # 3. Visual intro
 visual:
   body: |
-    Track ko gol banao (pos = jahan aakhri node wapas jude). Neela = slow, narangi = fast.
+    Track ko gol banao (pos = jahan aakhri node wapas jude). Blue = slow, narangi = fast.
 
     pos = −1 karke dekho — seedhe track par fast null tak pahunch jaata hai.
   viz: { tracer: raceTrack }
@@ -64,14 +64,14 @@ how:
 
     `1 → 2 → 3 → 4 → 5`
 
-    | Kadam | slow | fast |
+    | Step | slow | fast |
     |---|---|---|
     | 0 | 1 | 1 |
     | 1 | 2 | 3 |
     | 2 | 3 | 5 |
     | – | fast.next = null → ruko | **3** |
 
-    Even length (`1..6`) par fast null par rukta hai aur slow **doosra** beech wala (4) deta hai. Pehla beech wala chahiye (jaise list ko do hisson mein todne ke liye)? `while (fast.next != null && fast.next.next != null)`.
+    Even length (`1..6`) par fast null par rukta hai aur slow **doosra** beech wala (4) deta hai. Pehla beech wala chahiye (jaise list ko 2 hisson mein todne ke liye)? `while (fast.next != null && fast.next.next != null)`.
 
     > [!tip]
     > Condition `fast != null && fast.next != null` — dono check zaroori, warna `fast.next.next` par NullPointerException.
@@ -83,23 +83,23 @@ operations:
   - op: "Middle node"
     time: O(n)
     space: O(1)
-    why: "Ek pass; fast dugni speed."
+    why: "Ek pass; fast double speed."
   - op: "Cycle hai? (Floyd)"
     time: O(n)
     space: O(1)
-    why: "Circle mein faasla har kadam 1 ghatta hai."
+    why: "Circle mein distance har step 1 ghatta hai."
   - op: "Cycle start"
     time: O(n)
     space: O(1)
-    why: "Milne ke baad head se dobara, 1-1 kadam."
+    why: "Milne ke baad head se dobara, 1-1 step."
   - op: "Cycle ki length"
     time: O(n)
     space: O(1)
-    why: "Milne ke baad ek pointer ghumao jab tak wapas na aaye."
+    why: "Milne ke baad ek pointer rotate karo jab tak wapas na aaye."
   - op: "Aakhir se n-th (gap pointers)"
     time: O(n)
     space: O(1)
-    why: "Same speed, par n ka faasla."
+    why: "Same speed, par n ka distance."
   - op: "HashSet se cycle"
     time: O(n)
     space: O(n)
@@ -110,7 +110,7 @@ code:
   - title: Aakhir se n-th node hatao (gap wale pointers)
     file: nth-end
     note: |
-      Isi family ka doosra roop: speed **same**, par shuru mein **faasla**. `fast` ko n + 1 kadam aage bhejo, phir dono saath. Jab fast null, slow hatane wale ke **pichhle** par.
+      Isi family ka doosra form: speed **same**, par shuru mein **distance**. `fast` ko n + 1 step aage bhejo, phir dono saath. Jab fast null, slow hatane wale ke **pichhle** par.
 
       `dummy` node (head se pehle nakli) — taaki head hatana pade (n = length) to bhi same code chale.
 
@@ -127,16 +127,16 @@ examples:
     intuition: |
       Race track wali soch: slow 1, fast 2.
       - Circle nahi → fast null tak pahunch jaayega → false.
-      - Circle hai → dono circle mein ghoomenge, fast har kadam 1 node kareeb → **milenge** → true.
+      - Circle hai → dono circle mein ghoomenge, fast har step 1 node kareeb → **milenge** → true.
 
-      Kitne kadam? Circle mein pahunchne ke baad circle ki lambai se kam → total O(n).
+      Kitne step? Circle mein pahunchne ke baad circle ki length se kam → total O(n).
 
       > [!galti]
       > `slow == fast` check loop ke **shuru** mein mat karo — shuru mein dono head par hain, turant true aa jaayega. Pehle chalo, phir check.
     dryRun: |
       `3 → 2 → 0 → −4 → 2…`
 
-      | Kadam | slow | fast |
+      | Step | slow | fast |
       |---|---|---|
       | 1 | 2 | 0 |
       | 2 | 0 | 2 |
@@ -146,7 +146,7 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Fast max ~2n kadam."
+      why: "Fast max ~2n step."
 
   - id: cycle-start
     level: medium
@@ -159,12 +159,12 @@ examples:
     intuition: |
       **Phase 1:** slow/fast se milne ki jagah dhoondho.
 
-      **Phase 2:** ek pointer `p` head par wapas. `p` aur `slow` dono **1-1 kadam**. Jahan milein = circle start.
+      **Phase 2:** ek pointer `p` head par wapas. `p` aur `slow` dono **1-1 step**. Jahan milein = circle start.
 
-      **Kyun?** Maan lo head se circle-start tak `a`, circle-start se milne ki jagah `b`, circle ki lambai `c`.
+      **Kyun?** Maan lo head se circle-start tak `a`, circle-start se milne ki jagah `b`, circle ki length `c`.
       - slow chala `a + b`, fast chala `2(a + b)`.
       - Fast ne slow se kuch poore chakkar zyada lagaye: `2(a + b) − (a + b) = k·c` → `a + b = k·c` → **`a = k·c − b`**.
-      - Matlab milne ki jagah se `a` kadam aage chalo to (circle mein) circle-start par pahunchoge. Aur head se bhi `a` kadam = circle-start. Isliye dono wahan milte hain!
+      - Matlab milne ki jagah se `a` step aage chalo to (circle mein) circle-start par pahunchoge. Aur head se bhi `a` step = circle-start. Isliye dono wahan milte hain!
 
       > [!tip]
       > Interview mein ye proof 30 second mein bolna practice karo — "a = kc − b" yaad rakho.
@@ -181,7 +181,7 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Do phase, dono O(n)."
+      why: "2 phase, dono O(n)."
 
   - id: find-duplicate
     level: tricky
@@ -217,7 +217,7 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Floyd ke do phase; array sirf padha."
+      why: "Floyd ke 2 phase; array sirf padha."
 
 # 8. Kab use karein / kab NAHI
 when:
@@ -236,7 +236,7 @@ when:
     - keyword: "cycle / loop in list, O(1) memory"
       think: "Floyd: milo to circle."
     - keyword: "where does the cycle begin"
-      think: "Mile ke baad head se 1-1 kadam."
+      think: "Mile ke baad head se 1-1 step."
     - keyword: "n + 1 numbers in 1..n, no modify, O(1) space"
       think: "i → nums[i] graph + Floyd."
 
@@ -249,7 +249,7 @@ realWorld:
   - where: "Cryptography"
     how: "Pollard's rho algorithm (factorization) andar Floyd cycle detection use karta hai."
   - where: "Media player"
-    how: "Playlist ka beech (shuffle ke liye do hisse) ek pass mein."
+    how: "Playlist ka beech (shuffle ke liye 2 hisse) ek pass mein."
   - where: "Distributed systems"
     how: "Request forwarding mein loop (A → B → C → A) pakadna — state sequence ka cycle."
 
@@ -284,31 +284,31 @@ mistakes:
     wrong: |
       head = null par `head.next` padha.
     right: |
-      Loop condition khud sambhaal leti hai — fast = null par loop chalega hi nahi.
+      Loop condition khud handle kar leti hai — fast = null par loop chalega hi nahi.
 
 # 11. Interview corner
 interview:
   questions:
     - q: "Floyd cycle detection kaise kaam karta hai?"
       a: |
-        slow 1, fast 2 kadam. Circle nahi to fast null tak. Circle mein dono andar aane ke baad faasla har kadam 1 ghatta hai → milna pakka. O(n), O(1).
+        slow 1, fast 2 step. Circle nahi to fast null tak. Circle mein dono andar aane ke baad distance har step 1 ghatta hai → milna pakka. O(n), O(1).
     - q: "Cycle start ka proof?"
       followUp: true
       a: |
-        a = head se start, b = start se meet, c = circle. 2(a + b) = a + b + kc → a = kc − b. Meet se a kadam = start; head se a kadam = start. Isliye dono 1-1 chalke start par milte hain.
+        a = head se start, b = start se meet, c = circle. 2(a + b) = a + b + kc → a = kc − b. Meet se a step = start; head se a step = start. Isliye dono 1-1 chalke start par milte hain.
     - q: "Cycle ki length kaise?"
       a: |
-        Milne ke baad ek pointer ko ghumao jab tak wapas milne wale node par na aaye — kadam = c.
-    - q: "Fast 3 kadam chale to?"
+        Milne ke baad ek pointer ko rotate karo jab tak wapas milne wale node par na aaye — step = c.
+    - q: "Fast 3 step chale to?"
       followUp: true
       a: |
-        Faasla har kadam 2 ghatega — odd faasle par skip ho sakta hai aur kuch circle lengths par milna late ya mushkil. 2 kadam sabse simple aur guaranteed.
+        Distance har step 2 ghatega — odd distance par skip ho sakta hai aur kuch circle lengths par milna late ya mushkil. 2 step sabse simple aur guaranteed.
     - q: "Palindrome linked list O(1) memory?"
       a: |
         Fast/slow se beech, second half reverse, dono halves compare, (chahe to) wapas reverse karke list theek.
     - q: "Find the Duplicate mein linked list kahan hai?"
       a: |
-        next(i) = nums[i]. Index 0 head (koi arrow nahi aata). Duplicate par do arrows aate hain = circle start. Floyd.
+        next(i) = nums[i]. Index 0 head (koi arrow nahi aata). Duplicate par 2 arrows aate hain = circle start. Floyd.
     - q: "Happy number mein circle kyun?"
       a: |
         Digits ke squares ka sum ek limited range mein rehta hai — sequence ya 1 par rukega ya kisi circle mein ghoomega. Floyd se check.
@@ -371,22 +371,22 @@ practice:
     url: "https://leetcode.com/problems/reverse-nodes-in-k-group/"
     level: hard
     pattern: Count k with a pointer, reverse sublist
-    hint: "Pehle check: aage k nodes hain? (pointer k kadam). Haan to us tukde ko reverse karke jodo. Reverse Linked List topic ke baad."
+    hint: "Pehle check: aage k nodes hain? (pointer k step). Haan to us pieces ko reverse karke jodo. Reverse Linked List topic ke baad."
   - name: Design Skiplist
     platform: LeetCode
     num: 1206
     url: "https://leetcode.com/problems/design-skiplist/"
     level: hard
     pattern: Multi-level linked lists (express lanes)
-    hint: "Upar ke levels 'fast lane' — kam nodes, lambi chhalaang. Search: upar se shuru, jab tak agla chhota ho aage, phir neeche level. Insert par random height."
+    hint: "Upar ke levels 'fast lane' — kam nodes, lambi jump. Search: upar se shuru, jab tak agla chhota ho aage, phir neeche level. Insert par random height."
 
 # 13. Quick revision
 revision:
   summary:
     - "slow 1, fast 2 — dono head se; condition fast != null && fast.next != null."
     - "Fast end par → slow beech mein."
-    - "Mil gaye → circle (faasla har kadam 1 ghatta hai)."
-    - "Circle start: milne ke baad p = head, p aur slow 1-1 kadam (a = kc − b)."
+    - "Mil gaye → circle (distance har step 1 ghatta hai)."
+    - "Circle start: milne ke baad p = head, p aur slow 1-1 step (a = kc − b)."
     - "i → nums[i] graph banao to array problems bhi cycle problems."
   cheatsheet: |
     ```kotlin
@@ -409,11 +409,11 @@ revision:
       answer: 1
       explain: "Even length mein doosra beech wala."
     - q: "Circle mein fast slow ko pakadta kyun hai?"
-      options: ["Fast tez hai", "Faasla har kadam 1 ghatta hai, skip nahi hota", "Random hai", "Hamesha nahi pakadta"]
+      options: ["Fast tez hai", "Distance har step 1 ghatta hai, skip nahi hota", "Random hai", "Hamesha nahi pakadta"]
       answer: 1
-      explain: "Faasla k, k−1, … 0."
+      explain: "Distance k, k−1, … 0."
     - q: "Cycle start dhoondhne ke liye milne ke baad kya?"
-      options: ["fast ko head par, 2-2 kadam", "Ek pointer head par, dono 1-1 kadam", "Length gino", "Reverse karo"]
+      options: ["fast ko head par, 2-2 step", "Ek pointer head par, dono 1-1 step", "Length count karo", "Reverse karo"]
       answer: 1
       explain: "a = kc − b."
     - q: "Find Duplicate [3, 1, 3, 4, 2] mein head kaun sa index?"
@@ -429,7 +429,7 @@ revision:
 connections:
   related:
     - id: two-pointers-same
-      why: "Same direction pointers ka linked list roop."
+      why: "Same direction pointers ka linked list form."
     - id: singly-linked-list
       why: "Nodes, null checks."
     - id: binary-search-on-answer
@@ -440,4 +440,4 @@ connections:
     - id: linked-list-techniques
       how: "Reorder list, sort list — middle se todna."
     - id: union-find
-      how: "Graphs mein cycle — doosra hathiyaar."
+      how: "Graphs mein cycle — doosra tool."

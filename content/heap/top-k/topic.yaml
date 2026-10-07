@@ -14,19 +14,19 @@ what:
     Do patterns. Dono mein heap ka size **k** rehta hai, poora n nahi.
 
     **1. Top-K:** n items mein se k sabse bade / chhote / paas / frequent.
-    - k **sabse bade** chahiye → **MIN-heap**, size k. Root = andar ka sabse kamzor = "gatekeeper".
+    - k **sabse bade** chahiye → **MIN-heap**, size k. Root = andar ka sabse weak = "gatekeeper".
     - k **sabse chhote** chahiye → **MAX-heap**, size k.
-    - Naya item gatekeeper se behtar → gatekeeper bahar, naya andar. Warna skip.
+    - Naya item gatekeeper se better → gatekeeper bahar, naya andar. Warna skip.
 
     **2. K-way merge:** k sorted lists ko ek sorted list banana. Har list ka sirf **head** heap mein (size ≤ k). Sabse chhota nikaalo, usi list ka agla daalo.
 
     > [!yaad]
-    > Ulta lagta hai, par yaad rakho: **bade chahiye → min-heap, chhote chahiye → max-heap.** Heap ke root par wo rakho jise sabse pehle *nikaalna* hai — yaani sabse kamzor candidate.
+    > Ulta lagta hai, par yaad rakho: **bade chahiye → min-heap, chhote chahiye → max-heap.** Heap ke root par wo rakho jise sabse pehle *nikaalna* hai — matlab sabse weak candidate.
   analogy: |
     **College ki merit list, sirf 3 seats:**
     Admission office har form aate hi dekhta hai. List mein abhi 3 naam hain; sabse kam marks wala (cut-off) sabse upar likha hai. Naya form cut-off se zyada → cut-off wala bahar, naya andar, naya cut-off. Kam → wahin reject.
 
-    Poore sheher ke forms sort karne ki zaroorat nahi — bas 3 naam aur ek cut-off yaad rakhna hai.
+    Poore city ke forms sort karne ki zaroorat nahi — bas 3 naam aur ek cut-off yaad rakhna hai.
 
 # 2. Kyun chahiye?
 why:
@@ -40,7 +40,7 @@ why:
     | **Size k ka heap** | **O(n log k)** | **O(k)** | **haan** |
     | Quickselect | O(n) average, O(n²) worst | O(1) | nahi |
 
-    k chhota (10, 100) aur n bada (crores) → log k chhota sa constant → lagbhag O(n), aur memory sirf k. Data stream mein aaye (ek ek karke, kabhi khatam nahi) → sirf heap chalega.
+    k chhota (10, 100) aur n bada (crores) → log k chhota sa constant → approx O(n), aur memory sirf k. Data stream mein aaye (ek ek karke, kabhi khatam nahi) → sirf heap chalega.
 
     K-way merge: lists ko ek ek karke jodo to O(N·k) tak; heap se **O(N log k)**.
 
@@ -60,7 +60,7 @@ how:
   body: |
     Template — k sabse **chhote** (max-heap):
     1. Heap mein k se kam items → seedha `add`.
-    2. Heap bhara hai aur naya item root se **behtar** (yahan: chhota) → `poll` root, `add` naya.
+    2. Heap bhara hai aur naya item root se **better** (yahan: chhota) → `poll` root, `add` naya.
     3. Warna skip.
     4. Aakhir mein heap ke k items = jawab (order chahiye to sort, k log k).
 
@@ -89,7 +89,7 @@ operations:
     time: "O(k log k)"
     space: O(k)
     why: "Aakhir mein k items sort (ya k baar poll)."
-  - op: "K-way merge (N kul items, k lists)"
+  - op: "K-way merge (N total items, k lists)"
     time: "O(N log k)"
     space: O(k)
     why: "Har item ek baar heap mein aata-jaata hai; heap mein max k heads."
@@ -99,7 +99,7 @@ code:
   - title: Top K Frequent — pehle count, phir heap
     file: top-k-frequent
     note: |
-      Do kadam: HashMap se count (O(n)), phir **count par** size k ka min-heap (O(m log k), m = alag numbers).
+      Do step: HashMap se count (O(n)), phir **count par** size k ka min-heap (O(m log k), m = alag numbers).
 
       Heap mein number rakho, par Comparator **count** par — priority map se poochho.
 
@@ -112,11 +112,11 @@ examples:
     title: Array ka kth sabse bada
     source: { name: Kth Largest Element in an Array, platform: LeetCode, url: "https://leetcode.com/problems/kth-largest-element-in-an-array/" }
     problem: |
-      Array aur k diya hai. Sorted order mein kth sabse bada element batao (duplicates bhi gine jaate hain — kth **distinct** nahi).
+      Array aur k diya hai. Sorted order mein kth sabse bada element batao (duplicates bhi count kiye jaate hain — kth **distinct** nahi).
 
       Example: `[3, 2, 1, 5, 6, 4]`, k = 2 → **5**
     intuition: |
-      Sort karke `a[n - k]` — O(n log n). Chalega, par interview poochhega "aur behtar?".
+      Sort karke `a[n - k]` — O(n log n). Chalega, par interview poochhega "aur better?".
 
       Size k ka **min-heap**: k sabse bade andar rakho. Root = unme sabse chhota = kth largest. Har item `add`, size > k to `poll`.
 
@@ -146,13 +146,13 @@ examples:
     title: Origin ke sabse paas k points
     source: { name: K Closest Points to Origin, platform: LeetCode, url: "https://leetcode.com/problems/k-closest-points-to-origin/" }
     problem: |
-      2D points ki list aur k diya hai. Origin (0, 0) ke sabse paas wale k points lautao (kisi bhi order mein).
+      2D points ki list aur k diya hai. Origin (0, 0) ke sabse paas wale k points return karo (kisi bhi order mein).
 
       Example: `[(1, 3), (-2, 2), (5, -1), (0, 4), (3, 3)]`, k = 2 → **[(-2, 2), (1, 3)]**
     intuition: |
       "k sabse **chhote** distance" → distance par **max-heap**, size k. Root = andar ka sabse door point; size k se zyada hua to wahi bahar.
 
-      Distance ke liye `x² + y²` kaafi — `sqrt` order nahi badalta, aur double ki precision ka jhanjhat bhi nahi.
+      Distance ke liye `x² + y²` kaafi — `sqrt` order nahi badalta, aur double ki precision ka hassle bhi nahi.
 
       > [!galti]
       > Min-heap le kar saare points daale, phir k baar poll — sahi jawab, par O(n) memory aur O(n log n). Size k ka max-heap = O(k) memory, O(n log k).
@@ -180,7 +180,7 @@ examples:
 
       Example: `[1→4→5, 1→3→4, 2→6]` → **1→1→2→3→4→4→5→6**
     intuition: |
-      Do lists merge karna aata hai (two pointers). k lists mein: agla sabse chhota hamesha **kisi list ke head** par hai. To sirf k heads compare karne hain → **heads ka min-heap**.
+      2 lists merge karna aata hai (two pointers). k lists mein: agla sabse chhota hamesha **kisi list ke head** par hai. To sirf k heads compare karne hain → **heads ka min-heap**.
 
       1. Har non-empty list ka head heap mein.
       2. `poll` → result mein jodo. Usi list ka `next` (agar hai) heap mein daalo.
@@ -204,17 +204,17 @@ examples:
     complexity:
       time: "O(N log k)"
       space: O(k)
-      why: "N kul nodes, har ek ek baar add + poll; heap mein max k heads. Purane nodes hi jode — nayi list nahi."
+      why: "N total nodes, har ek ek baar add + poll; heap mein max k heads. Purane nodes hi jode — nayi list nahi."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "'k sabse bade / chhote / paas / frequent' — n bada, k chhota."
-    - "Data stream mein aata hai aur har waqt top k / kth chahiye."
+    - "Data stream mein aata hai aur har time top k / kth chahiye."
     - "k sorted lists / arrays / files merge karne hain."
     - "Memory kam hai — poora data ek saath RAM mein nahi aa sakta."
   avoid:
-    - "k lagbhag n ke barabar (sab chahiye) → seedha sort."
+    - "k approx n ke barabar (sab chahiye) → seedha sort."
     - "Sirf ek baar kth chahiye, array badal sakte ho, average speed kaafi → quickselect O(n)."
     - "Values ki range chhoti hai (jaise frequency ≤ n) → bucket sort O(n)."
   signals:
@@ -234,7 +234,7 @@ realWorld:
   - where: "Database ORDER BY … LIMIT k"
     how: "Poora table sort nahi hota — PostgreSQL ka 'top-N heapsort' size k ka heap rakhta hai."
   - where: "External sort (RAM se badi files)"
-    how: "File ke tukde alag alag sort, phir k sorted tukdon ka K-way merge heap se."
+    how: "File ke pieces alag alag sort, phir k sorted pieces ka K-way merge heap se."
   - where: "Search / recommendation ranking"
     how: "Lakhon results ka score, user ko sirf top 20 — size 20 ka heap."
   - where: "Kai servers ke logs"
@@ -247,7 +247,7 @@ mistakes:
     wrong: |
       k largest ke liye size k ka max-heap, aur size > k par poll → sabse BADA bahar gaya.
     right: |
-      Bade chahiye → min-heap (kamzor upar, wahi bahar). Chhote chahiye → max-heap.
+      Bade chahiye → min-heap (weak upar, wahi bahar). Chhote chahiye → max-heap.
   - title: "k > n ka case"
     type: empty
     wrong: |
@@ -257,7 +257,7 @@ mistakes:
   - title: "Heap ke items ko sorted maan liya"
     type: logic
     wrong: |
-      `ArrayList(pq)` ko sorted order samajh ke lauta diya.
+      `ArrayList(pq)` ko sorted order samajh ke return kar diya.
     right: |
       Heap ka array sorted nahi. Order chahiye to sort karo, ya poll karte jao (min-heap se ulta order milega — reverse).
   - title: "Merge k mein khaali list ka null head daala"
@@ -265,7 +265,7 @@ mistakes:
     wrong: |
       `pq.add(lists[i])` bina null check → comparator mein NullPointerException.
     right: |
-      `if (h != null) pq.add(h)` — aur `next` daalte waqt bhi null check.
+      `if (h != null) pq.add(h)` — aur `next` daalte time bhi null check.
   - title: "Distance mein sqrt / overflow"
     type: overflow
     wrong: |
@@ -284,10 +284,10 @@ interview:
   questions:
     - q: "Kth largest ke liye min-heap kyun, max-heap kyun nahi?"
       a: |
-        Size k ka min-heap: root = k bade mein sabse chhota = seedha kth largest, aur naye item ka faisla ek compare mein. Max-heap mein saare n daalne padte (O(n) memory).
-    - q: "Top-k ki complexity? Sort se behtar kab?"
+        Size k ka min-heap: root = k bade mein sabse chhota = seedha kth largest, aur naye item ka decision ek compare mein. Max-heap mein saare n daalne padte (O(n) memory).
+    - q: "Top-k ki complexity? Sort se better kab?"
       a: |
-        O(n log k) time, O(k) space. k ≪ n ho ya data stream ho, tab sort (O(n log n), sab data ek saath) se behtar.
+        O(n log k) time, O(k) space. k ≪ n ho ya data stream ho, tab sort (O(n log n), sab data ek saath) se better.
     - q: "Quickselect kya hai? Heap se compare karo."
       a: |
         Partition karke sirf us taraf jao jahan kth hai. O(n) average, O(n²) worst, in-place, stream par nahi chalta. Heap: O(n log k) guaranteed, stream friendly, O(k) memory.
@@ -305,7 +305,7 @@ interview:
         File stream karo, size 100 ka min-heap. Memory O(100), time O(n log 100).
     - q: "K closest mein sqrt kyun nahi?"
       a: |
-        sqrt badhte order ko nahi badalta. x² + y² compare karo — tez, aur precision ka jhanjhat nahi.
+        sqrt badhte order ko nahi badalta. x² + y² compare karo — tez, aur precision ka hassle nahi.
     - q: "Smallest Range Covering Elements from K Lists?"
       followUp: true
       a: |
@@ -335,14 +335,14 @@ practice:
     url: "https://leetcode.com/problems/the-k-weakest-rows-in-a-matrix/"
     level: easy
     pattern: "(count, row) ka max-heap"
-    hint: "Har row ke soldiers gino. k sabse kamzor = k smallest → pair (count, index) par size k ka max-heap."
+    hint: "Har row ke soldiers count karo. k sabse weak = k smallest → pair (count, index) par size k ka max-heap."
   - name: Find Subsequence of Length K With the Largest Sum
     platform: LeetCode
     num: 2099
     url: "https://leetcode.com/problems/find-subsequence-of-length-k-with-the-largest-sum/"
     level: easy
     pattern: Top-k + index order
-    hint: "(value, index) ka size k min-heap. Bache hue ko index ke order mein sort karke values lautao."
+    hint: "(value, index) ka size k min-heap. Bache hue ko index ke order mein sort karke values return karo."
   - name: Top K Frequent Elements
     platform: LeetCode
     num: 347
@@ -400,9 +400,9 @@ revision:
     ```
   quiz:
     - q: "k sabse bade elements chahiye, size k ka heap. Kaunsa heap?"
-      options: ["Max-heap", "Min-heap", "Koi bhi", "Do heaps"]
+      options: ["Max-heap", "Min-heap", "Koi bhi", "2 heaps"]
       answer: 1
-      explain: "Root = k bade mein sabse kamzor — wahi naye bade item ke liye jagah khaali karta hai."
+      explain: "Root = k bade mein sabse weak — wahi naye bade item ke liye jagah khaali karta hai."
     - q: "n = 10 lakh, k = 10. Size k heap se top-k ka time?"
       options: ["O(n log n)", "O(n log k)", "O(k log n)", "O(n²)"]
       answer: 1
@@ -411,7 +411,7 @@ revision:
       options: ["sqrt(x² + y²)", "x² + y²", "|x| + |y|", "x + y"]
       answer: 1
       explain: "sqrt order nahi badalta; squared distance kaafi aur exact. |x| + |y| alag distance hai."
-    - q: "Merge k sorted lists (N kul nodes) heap se — time?"
+    - q: "Merge k sorted lists (N total nodes) heap se — time?"
       options: ["O(N)", "O(N log N)", "O(N log k)", "O(N·k)"]
       answer: 2
       explain: "Heap mein max k heads; har node ek baar add + poll."
@@ -429,6 +429,6 @@ connections:
       why: "Quickselect = quick sort ka partition, sirf ek taraf — kth ka O(n) average tareeka."
   usedLater:
     - id: two-heaps
-      how: "Do heaps saath — beech wala (median) bhi O(1) mein."
+      how: "2 heaps saath — beech wala (median) bhi O(1) mein."
     - id: dijkstra
       how: "Heap se baar baar 'abhi sabse paas' (top-1) nikaalna."

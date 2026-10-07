@@ -16,13 +16,13 @@ export const binaryStrings = tracer<{ n: number }>({
         t.frame({ caption: `Length ${n} ho gayi → "${s}" print. Ye patta (leaf) hai — return.`, vars: { strings: out.length }, panels: panels() });
         return;
       }
-      t.frame({ caption: `"${s}" adhoora hai. Do raaste: aage '0' lagao ya '1' — pehle '0' wala poora explore hoga.`, vars: { strings: out.length }, panels: panels() });
+      t.frame({ caption: `"${s}" adhoora hai. 2 raaste: aage '0' lagao ya '1' — pehle '0' wala poora explore hoga.`, vars: { strings: out.length }, panels: panels() });
       gen(`${s}0`, me.id);
       gen(`${s}1`, me.id);
       tree.done(me, '✓');
     };
     gen('');
-    t.frame({ caption: `${out.length} strings = 2^${n}. Har level par calls double — multi-branch recursion ka ped. Gehraai sirf ${n}, par calls ${tree.calls.length}.`, vars: { strings: out.length }, panels: panels() });
+    t.frame({ caption: `${out.length} strings = 2^${n}. Har level par calls double — multi-branch recursion ka tree. Depth sirf ${n}, par calls ${tree.calls.length}.`, vars: { strings: out.length }, panels: panels() });
     return out.join(', ');
   },
 });
@@ -50,20 +50,20 @@ export const dcMaxTrace = tracer<{ nums: number[] }>({
       return m;
     };
     const ans = go(0, nums.length - 1);
-    t.frame({ line: 'combine', caption: `Max = ${ans}. Calls = 2n − 1 = ${tree.calls.length}, gehraai ≈ log₂ n. Time O(n) (loop jitna), stack O(log n). Merge sort mein yahi dhaancha O(n log n) deta hai.`, vars: { max: ans }, panels: [array(nums), tree.panel()] });
+    t.frame({ line: 'combine', caption: `Max = ${ans}. Calls = 2n − 1 = ${tree.calls.length}, depth ≈ log₂ n. Time O(n) (loop jitna), stack O(log n). Merge sort mein yahi structure O(n log n) deta hai.`, vars: { max: ans }, panels: [array(nums), tree.panel()] });
     return String(ans);
   },
 });
 
 // ---------- Example 1: climbing stairs + memo ----------
 export const stairsTrace = tracer<{ n: number }>({
-  inputs: [{ name: 'n', type: 'int', label: 'Seedhiyan n', default: 5, min: 1, max: 7 }],
+  inputs: [{ name: 'n', type: 'int', label: 'Stairs n', default: 5, min: 1, max: 7 }],
   run({ n }, t) {
     const tree = callTree();
     const memo = new Map<number, number>();
     const memoPanel = (hot?: number): Panel => ({
       kind: 'map',
-      label: 'memo (yaaddasht)',
+      label: 'memo (memory)',
       keyLabel: 'n',
       valueLabel: 'tareeke',
       entries: [...memo.entries()].map(([k, v]) => ({ key: k, value: v, tone: k === hot ? ('found' as Tone) : undefined })),
@@ -79,10 +79,10 @@ export const stairsTrace = tracer<{ n: number }>({
       const hit = memo.get(k);
       if (hit !== undefined) {
         tree.done(me, String(hit), 'found');
-        t.frame({ line: 'memo', caption: `ways(${k}) pehle nikaal chuke (${hit}) — memo se seedha! Iske neeche ka poora ped bach gaya.`, vars: { n: k }, legend, panels: [tree.panel(), memoPanel(k)] });
+        t.frame({ line: 'memo', caption: `ways(${k}) pehle nikaal chuke (${hit}) — memo se seedha! Iske neeche ka poora tree bach gaya.`, vars: { n: k }, legend, panels: [tree.panel(), memoPanel(k)] });
         return hit;
       }
-      t.frame({ line: 'calc', caption: `ways(${k}): aakhri kadam 1 seedhi tha (to pehle ${k - 1} tak pahunche) ya 2 (pehle ${k - 2} tak). Dono gino aur jodo.`, vars: { n: k }, legend, panels: [tree.panel(), memoPanel()] });
+      t.frame({ line: 'calc', caption: `ways(${k}): aakhri step 1 seedhi tha (to pehle ${k - 1} tak pahunche) ya 2 (pehle ${k - 2} tak). Dono count karo aur jodo.`, vars: { n: k }, legend, panels: [tree.panel(), memoPanel()] });
       const r = ways(k - 1, me.id) + ways(k - 2, me.id);
       memo.set(k, r);
       tree.done(me, String(r));
@@ -90,7 +90,7 @@ export const stairsTrace = tracer<{ n: number }>({
       return r;
     };
     const ans = ways(n);
-    t.frame({ line: 'save', caption: `${n} seedhiyon ke ${ans} tareeke. Memo se har ways(k) sirf ek baar → O(n). Bina memo ke ye Fibonacci jaisa O(2ⁿ) hota.`, vars: { result: ans }, legend, panels: [tree.panel(), memoPanel()] });
+    t.frame({ line: 'save', caption: `${n} stairs ke ${ans} tareeke. Memo se har ways(k) sirf ek baar → O(n). Bina memo ke ye Fibonacci jaisa O(2ⁿ) hota.`, vars: { result: ans }, legend, panels: [tree.panel(), memoPanel()] });
     return String(ans);
   },
 });
@@ -116,7 +116,7 @@ export const winnerTrace = tracer<{ nums: number[] }>({
       t.frame({ line: 'pickR', caption: `Right (${nums[r]}) liya → saamne wala (${l}..${r - 1}) par ${dr} aage. Mera diff = ${nums[r]} − ${dr} = ${pickR}.`, vars: { l, r, pickL, pickR }, panels: view(l, r, { [r]: 'compare' }) });
       const best = Math.max(pickL, pickR);
       tree.done(me, String(best));
-      t.frame({ line: 'ret', caption: `Best = max(${pickL}, ${pickR}) = ${best} — ${pickL >= pickR ? 'left' : 'right'} lena behtar.`, vars: { l, r, best }, panels: view(l, r, { [pickL >= pickR ? l : r]: 'found' }) });
+      t.frame({ line: 'ret', caption: `Best = max(${pickL}, ${pickR}) = ${best} — ${pickL >= pickR ? 'left' : 'right'} lena better.`, vars: { l, r, best }, panels: view(l, r, { [pickL >= pickR ? l : r]: 'found' }) });
       return best;
     };
     const d = diff(0, nums.length - 1);
@@ -149,12 +149,12 @@ export const kRepeatTrace = tracer<{ s: string; k: number }>({
       const bad: ToneMap = {};
       for (let i = lo; i < hi; i++) if (cnt[c[i]] < k) bad[i] = 'error';
       const counts = Object.keys(cnt).sort().map((ch) => `${ch}:${cnt[ch]}`).join(' ');
-      t.frame({ line: 'count', caption: Object.keys(bad).length ? `Ginti: ${counts}. Laal chars ${k} se kam hain — ye KISI bhi answer mein nahi aa sakte. Inpe todo.` : `Ginti: ${counts}. Sab ≥ ${k}!`, vars: { lo, hi }, legend, panels: view(lo, hi, bad) });
+      t.frame({ line: 'count', caption: Object.keys(bad).length ? `Count: ${counts}. Red chars ${k} se kam hain — ye KISI bhi answer mein nahi aa sakte. Inpe todo.` : `Count: ${counts}. Sab ≥ ${k}!`, vars: { lo, hi }, legend, panels: view(lo, hi, bad) });
       let best = 0;
       let start = lo;
       for (let i = lo; i < hi; i++) {
         if (cnt[c[i]] < k) {
-          t.frame({ line: 'split', caption: `'${c[i]}' (index ${i}) par toda → tukda "${s.slice(start, i)}" alag se hal karo.`, vars: { lo, hi, best }, legend, panels: view(start, i, bad) });
+          t.frame({ line: 'split', caption: `'${c[i]}' (index ${i}) par toda → piece "${s.slice(start, i)}" alag se hal karo.`, vars: { lo, hi, best }, legend, panels: view(start, i, bad) });
           best = Math.max(best, solve(start, i, me.id));
           start = i + 1;
         }
@@ -167,11 +167,11 @@ export const kRepeatTrace = tracer<{ s: string; k: number }>({
       const last = solve(start, hi, me.id);
       const ans = Math.max(best, last);
       tree.done(me, String(ans));
-      t.frame({ line: 'ret', caption: `Tukdon ka best = ${ans}. Upar wapas.`, vars: { lo, hi, best: ans }, legend, panels: view(lo, hi, bad) });
+      t.frame({ line: 'ret', caption: `Pieces ka best = ${ans}. Upar wapas.`, vars: { lo, hi, best: ans }, legend, panels: view(lo, hi, bad) });
       return ans;
     };
     const ans = solve(0, c.length);
-    t.frame({ line: 'ret', caption: `Answer ${ans}. Har level par kam se kam ek letter hamesha ke liye gaya → gehraai ≤ 26, har level O(n) → O(26·n).`, vars: { answer: ans }, panels: [array(c), tree.panel()] });
+    t.frame({ line: 'ret', caption: `Answer ${ans}. Har level par kam se kam ek letter hamesha ke liye gaya → depth ≤ 26, har level O(n) → O(26·n).`, vars: { answer: ans }, panels: [array(c), tree.panel()] });
     return String(ans);
   },
 });

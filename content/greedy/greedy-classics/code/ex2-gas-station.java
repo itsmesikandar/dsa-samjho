@@ -1,5 +1,5 @@
 class Main {
-    // Kul petrol >= kul kharcha ho to jawab hai. Start dhoondhna: jahan tank minus hua, uske AAGE se dobara
+    // Total petrol >= total cost ho to jawab hai. Start dhoondhna: jahan tank minus hua, uske AAGE se dobara
     static int canCompleteCircuit(int[] gas, int[] cost) {
         int total = 0; // poore chakkar ka hisaab
         int tank = 0; // abhi ke start se ab tak
@@ -13,7 +13,7 @@ class Main {
                 tank = 0;
             }
         }
-        return total >= 0 ? start : -1; // kul petrol kam - koi start nahi chalega //@done
+        return total >= 0 ? start : -1; // total petrol kam - koi start nahi chalega //@done
     }
 
     public static void main(String[] args) {

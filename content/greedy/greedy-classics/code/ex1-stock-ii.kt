@@ -1,4 +1,4 @@
-// Jitni baar chaho khareedo-becho: har chadhaai (aaj > kal) ka munafa jodo
+// Jitni baar chaho khareedo-becho: har chadhaai (aaj > kal) ka profit jodo
 fun maxProfit2(prices: IntArray): Int {
     var profit = 0
     for (i in 1 until prices.size) { //@day

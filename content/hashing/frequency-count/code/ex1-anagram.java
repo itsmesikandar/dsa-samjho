@@ -1,5 +1,5 @@
 class Main {
-    // Anagram = same letters, same ginti, bas order alag
+    // Anagram = same letters, same count, bas order alag
     static boolean isAnagram(String s, String t) {
         if (s.length() != t.length()) return false;
         int[] count = new int[26]; //@init

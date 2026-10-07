@@ -1,20 +1,20 @@
-// Kahn's algorithm: jiska koi intezaar nahi (in-degree 0) wahi abhi ho sakta hai
+// Kahn's algorithm: jiska koi wait nahi (in-degree 0) wahi abhi ho sakta hai
 fun topoSort(n: Int, edges: Array<IntArray>): List<Int> {
     val adj = List(n) { mutableListOf<Int>() }
     val indeg = IntArray(n)
     for ((u, v) in edges) {
         adj[u].add(v) // u -> v: pehle u, phir v //@build
-        indeg[v]++ // v ko ek aur cheez ka intezaar
+        indeg[v]++ // v ko ek aur cheez ka wait
     }
     val queue = ArrayDeque<Int>()
-    for (v in 0 until n) if (indeg[v] == 0) queue.addLast(v) // koi intezaar nahi - abhi ho sakte //@ready
+    for (v in 0 until n) if (indeg[v] == 0) queue.addLast(v) // koi wait nahi - abhi ho sakte //@ready
     val order = mutableListOf<Int>()
     while (queue.isNotEmpty()) {
         val u = queue.removeFirst() //@take
         order.add(u)
         for (v in adj[u]) {
-            indeg[v]-- // u ho gaya - v ka ek intezaar kam //@dec
-            if (indeg[v] == 0) queue.addLast(v) // ab v ka koi intezaar nahi //@free
+            indeg[v]-- // u ho gaya - v ka ek wait kam //@dec
+            if (indeg[v] == 0) queue.addLast(v) // ab v ka koi wait nahi //@free
         }
     }
     return if (order.size == n) order else emptyList() // kuch nodes kabhi free nahi hue = cycle //@check

@@ -1,11 +1,11 @@
-// Unbounded knapsack: rod ko tukdon mein kaato, har length ka tukda KITNI BHI baar. Max kamai
-// price[k - 1] = length k ke tukde ka daam, rod ki length = price.size
+// Unbounded knapsack: rod ko pieces mein kaato, har length ka piece KITNI BHI baar. Max profit
+// price[k - 1] = length k ke pieces ka price, rod ki length = price.size
 fun rodCut(price: IntArray): Int {
     val n = price.size
-    val dp = Array(n + 1) { IntArray(n + 1) } // dp[i][w] = length 1..i ke tukde allowed, rod w -> max kamai
+    val dp = Array(n + 1) { IntArray(n + 1) } // dp[i][w] = length 1..i ke pieces allowed, rod w -> max profit
     for (i in 1..n) {
         for (w in 0..n) {
-            dp[i][w] = dp[i - 1][w] // length i ka tukda mat kaato //@skip
+            dp[i][w] = dp[i - 1][w] // length i ka piece mat kaato //@skip
             if (i <= w) {
                 dp[i][w] = maxOf(dp[i][w], dp[i][w - i] + price[i - 1]) // kaato: ISI row se - bachi rod mein i phir kaat sakte //@take
             }

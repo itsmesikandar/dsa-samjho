@@ -1,4 +1,4 @@
-// Sabse chhota lagatar subarray jiska sum >= k. Numbers NEGATIVE bhi ho sakte hain. Na ho to -1.
+// Sabse chhota continuous subarray jiska sum >= k. Numbers NEGATIVE bhi ho sakte hain. Na ho to -1.
 fun shortestSubarray(nums: IntArray, k: Int): Int {
     val n = nums.size
     val pre = LongArray(n + 1) // pre[j] - pre[i] = index i..j-1 ka sum
@@ -9,7 +9,7 @@ fun shortestSubarray(nums: IntArray, k: Int): Int {
         while (dq.isNotEmpty() && pre[j] - pre[dq.first()] >= k) { // sabse purana start chal gaya - usse chhota kabhi nahi milega //@found
             best = minOf(best, j - dq.removeFirst())
         }
-        while (dq.isNotEmpty() && pre[dq.last()] >= pre[j]) dq.removeLast() // j behtar start hai: pre chhota/barabar AUR baad mein //@pop
+        while (dq.isNotEmpty() && pre[dq.last()] >= pre[j]) dq.removeLast() // j better start hai: pre chhota/barabar AUR baad mein //@pop
         dq.addLast(j) //@push
     }
     return if (best == Int.MAX_VALUE) -1 else best

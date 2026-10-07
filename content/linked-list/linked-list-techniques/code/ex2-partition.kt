@@ -2,7 +2,7 @@ class ListNode(var value: Int, var next: ListNode? = null)
 
 // x se chhote sab pehle, baaki baad mein; dono hisson ka andar ka order wahi rahe
 fun partition(head: ListNode?, x: Int): ListNode? {
-    val lessDummy = ListNode(0) // do alag lists banao, dono ka nakli shuru
+    val lessDummy = ListNode(0) // 2 alag lists banao, dono ka nakli shuru
     val moreDummy = ListNode(0)
     var less = lessDummy
     var more = moreDummy

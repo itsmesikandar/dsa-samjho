@@ -1,4 +1,4 @@
-// Sabse lamba lagatar subarray jiska sum <= limit (saare numbers positive)
+// Sabse lamba continuous subarray jiska sum <= limit (saare numbers positive)
 fun longestWithSumAtMost(nums: IntArray, limit: Int): Int {
     var l = 0
     var sum = 0

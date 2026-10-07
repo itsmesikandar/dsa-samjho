@@ -22,7 +22,7 @@ fun main() {
     val wt = intArrayOf(1, 2, 3, 4, 5)
     val v = intArrayOf(2, 5, 9, 10, 12)
     println("${unbounded(wt, v, 5)} ${unboundedCapFirst(wt, v, 5)}")
-    println(unbounded(intArrayOf(2), intArrayOf(3), 6)) // 2kg wala teen baar
+    println(unbounded(intArrayOf(2), intArrayOf(3), 6)) // 2kg wala 3 baar
 }
 
 // Output:

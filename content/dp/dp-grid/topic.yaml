@@ -2,7 +2,7 @@ meta:
   id: dp-grid
   chapter: dp
   title: Grid DP
-  subtitle: Har cell ek state — upar aur baayein se jawab banao
+  subtitle: Har cell ek state — upar aur left se jawab banao
   level: intermediate
   minutes: 45
   prereqs: [dp-1d, matrix]
@@ -11,24 +11,24 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Grid DP** = state ek cell `(i, j)`: `dp[i][j]` = "is cell tak / is cell par" ka jawab. Chalna aksar sirf **neeche ya daayein** — isliye har cell sirf **upar** aur **baayein** waale par depend karta hai.
+    **Grid DP** = state ek cell `(i, j)`: `dp[i][j]` = "is cell tak / is cell par" ka jawab. Chalna often sirf **neeche ya right** — isliye har cell sirf **upar** aur **left** waale par depend karta hai.
 
     Template:
-    1. **State:** `dp[i][j]` ka matlab (raste ginna? sabse sasta? sabse bada square?).
-    2. **Transition:** upar `(i−1, j)` aur baayein `(i, j−1)` (kabhi tirchha `(i−1, j−1)` bhi) se.
-    3. **Kinaare:** pehli row / pehla column — sirf ek taraf se aa sakte. (Ya ek extra row/col 0 se bharo — `if` hat jaate hain.)
-    4. **Order:** row by row, baayein se daayein — jab `(i, j)` bharo, upar aur baayein pehle se bhare.
+    1. **State:** `dp[i][j]` ka matlab (raste count karna? sabse sasta? sabse bada square?).
+    2. **Transition:** upar `(i−1, j)` aur left `(i, j−1)` (kabhi diagonal `(i−1, j−1)` bhi) se.
+    3. **Edge:** pehli row / pehla column — sirf ek taraf se aa sakte. (Ya ek extra row/col 0 se bharo — `if` hat jaate hain.)
+    4. **Order:** row by row, left se right — jab `(i, j)` bharo, upar aur left pehle se bhare.
 
     > [!yaad]
-    > Sirf pichhli row chahiye → poora 2D table ki jagah **ek 1D array** (row) kaafi. `dp[j]` (purana = upar) aur `dp[j−1]` (naya = baayein).
+    > Sirf pichhli row chahiye → poora 2D table ki jagah **ek 1D array** (row) kaafi. `dp[j]` (purana = upar) aur `dp[j−1]` (naya = left).
   analogy: |
-    **Shehar ki grid wali sadkein (Chandigarh jaisa):**
-    Ghar se office (neeche-daayein) jaana, sirf east ya south. Har chauraahe par likh do "yahan tak kitne raste" — ye bas uske north wale aur west wale chauraahe ka jod hai. Office tak pahunchte pahunchte jawab apne aap ban jaata hai, bina har rasta ginne.
+    **City ki grid wali roads (Chandigarh jaisa):**
+    Ghar se office (neeche-daayein) jaana, sirf east ya south. Har junction par likh do "yahan tak kitne raste" — ye bas uske north wale aur west wale junction ka jod hai. Office tak pahunchte pahunchte jawab apne aap ban jaata hai, bina har rasta count karne.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    Grid ke raste ginna / sabse sasta rasta dhoondhna — har rasta try karo to exponential:
+    Grid ke raste count karna / sabse sasta rasta dhoondhna — har rasta try karo to exponential:
 
     | Grid | Raste (sirf R / D) |
     |---|---|
@@ -38,32 +38,32 @@ why:
 
     Grid DP har cell ek baar: **O(m · n)**.
 
-    Robot path planning, image processing (sabse bada blank area), game boards, aur bahut saare string DP (LCS, edit distance) bhi asal mein grid DP hain — do strings = do axes.
+    Robot path planning, image processing (sabse bada blank area), game boards, aur bahut saare string DP (LCS, edit distance) bhi asal mein grid DP hain — 2 strings = do axes.
 
     > [!socho]
-    > Agar char dishaon mein chal sakte ho (upar bhi, baayein bhi) to kya grid DP chalega?
+    > Agar char dishaon mein chal sakte ho (upar bhi, left bhi) to kya grid DP chalega?
     >
     > Nahi seedha — tab cells ek doosre par circular depend karenge (koi "pehle bharo" order nahi). Tab ye graph shortest path (BFS / Dijkstra) ban jaata hai.
 
 # 3. Visual intro
 visual:
   body: |
-    Chhota grid: pehle har rasta ek ek karke dekho (R = daayein, D = neeche). Phir DP table — har cell = upar + baayein — aur aakhri cell mein wahi ginti, bina ek ek ginne. Size badha ke dekho raste kitni tezi se badhte hain.
+    Chhota grid: pehle har rasta ek ek karke dekho (R = right, D = neeche). Phir DP table — har cell = upar + left — aur aakhri cell mein wahi count, bina ek ek count karne. Size badha ke dekho raste kitni tezi se badhte hain.
   viz: { tracer: pathsEnumTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **Unique Paths:** m × n grid, upar-baayein se neeche-daayein, sirf neeche / daayein.
+    **Unique Paths:** m × n grid, upar-baayein se neeche-daayein, sirf neeche / right.
     - `dp[i][j]` = (i, j) tak raste.
     - Pehli row aur pehla column: 1 (ek hi seedha rasta).
-    - Baaki: `dp[i][j] = dp[i−1][j] + dp[i][j−1]` — aakhri kadam neeche tha ya daayein.
+    - Baaki: `dp[i][j] = dp[i−1][j] + dp[i][j−1]` — aakhri step neeche tha ya right.
     - Jawab `dp[m−1][n−1]`.
 
-    Space: `dp[j] += dp[j − 1]` ek row mein (dp[j] purana = upar, dp[j−1] naya = baayein).
+    Space: `dp[j] += dp[j − 1]` ek row mein (dp[j] purana = upar, dp[j−1] naya = left).
 
     > [!galti]
-    > Kinaare 1 ki jagah 0 se shuru kiye → poori table 0. Pehli row/col ka matlab socho: wahan tak exactly ek rasta hai.
+    > Edge 1 ki jagah 0 se shuru kiye → poori table 0. Pehli row/col ka matlab socho: wahan tak exactly ek rasta hai.
   viz: { tracer: uniqueTrace }
   code: how
 
@@ -76,48 +76,48 @@ operations:
   - op: "Unique paths with obstacles"
     time: "O(m · n)"
     space: "O(m · n) → O(n)"
-    why: "Patthar par 0, baaki same."
+    why: "Stone par 0, baaki same."
   - op: "Minimum path sum"
     time: "O(m · n)"
     space: "O(m · n) → O(n)"
-    why: "Har cell par min(upar, baayein) + kharcha."
+    why: "Har cell par min(upar, left) + cost."
   - op: "Maximal square"
     time: "O(m · n)"
     space: "O(m · n) → O(n)"
-    why: "Teen padosi (upar, baayein, tirchha) ka min + 1."
+    why: "3 neighbor (upar, left, diagonal) ka min + 1."
   - op: "Triangle (neeche se upar)"
     time: "O(n²)"
     space: O(n)
-    why: "Har element ek baar; aakhri row ka array upar khiskao."
+    why: "Har element ek baar; aakhri row ka array upar shift karo."
 
 # 6. Code
 code:
   - title: Triangle — neeche se upar, ek 1D array
     file: triangle
     note: |
-      Triangle ki har row mein ek se zyada; upar se neeche jaate hue har kadam par neeche ke **do padosiyon** (c, c+1) mein se ek. Kam se kam jod?
+      Triangle ki har row mein ek se zyada; upar se neeche jaate hue har step par neeche ke **do neighbors** (c, c+1) mein se ek. Kam se kam jod?
 
-      Upar se neeche socho to kinaare ke case. **Neeche se upar** socho: aakhri row hi base; har upar wale element ka best = khud + `min(neeche ke do)`. Ek hi array (aakhri row ki copy) upar tak overwrite — `dp[0]` jawab. (LeetCode 120.)
+      Upar se neeche socho to edge ke case. **Neeche se upar** socho: aakhri row hi base; har upar wale element ka best = khud + `min(neeche ke do)`. Ek hi array (aakhri row ki copy) upar tak overwrite — `dp[0]` jawab. (LeetCode 120.)
 
 # 7. Examples
 examples:
   - id: obstacles
     level: easy
-    title: Patthar wale grid mein raste (Unique Paths II)
+    title: Stone wale grid mein raste (Unique Paths II)
     source: { name: Unique Paths II, platform: LeetCode, url: "https://leetcode.com/problems/unique-paths-ii/" }
     problem: |
-      Unique Paths jaisa, par grid mein kuch cells **patthar** (1) hain — wahan nahi ja sakte. Upar-baayein se neeche-daayein kitne raste?
+      Unique Paths jaisa, par grid mein kuch cells **stone** (1) hain — wahan nahi ja sakte. Upar-baayein se neeche-daayein kitne raste?
 
       Example: `[[0,0,0,0],[0,1,0,0],[0,0,0,1],[1,0,0,0]]` → **3**
     intuition: |
-      Ek hi badlaav: patthar par `dp = 0` — wahan koi khada hi nahi ho sakta, to wahan se aage koi rasta nahi jaata.
+      Ek hi change: stone par `dp = 0` — wahan koi khada hi nahi ho sakta, to wahan se aage koi rasta nahi jaata.
 
-      Kinaare ab "sab 1" nahi: pehli row mein patthar aaya to uske **baad** ke saare 0. Isliye kinaare ka special case hata do — "grid ke bahar se 0" maan ke ek hi formula: `dp = upar + baayein`.
+      Edge ab "sab 1" nahi: pehli row mein stone aaya to uske **baad** ke saare 0. Isliye edge ka special case hata do — "grid ke bahar se 0" maan ke ek hi formula: `dp = upar + baayein`.
 
-      Shuru ka cell hi patthar → 0.
+      Shuru ka cell hi stone → 0.
 
       > [!galti]
-      > Pehli row / column ko seedha 1 se bhar diya — patthar ke baad bhi 1 reh gaya.
+      > Pehli row / column ko seedha 1 se bhar diya — stone ke baad bhi 1 reh gaya.
     dryRun: |
       | Row | dp |
       |---|---|
@@ -137,20 +137,20 @@ examples:
     title: Sabse sasta rasta (Minimum Path Sum)
     source: { name: Minimum Path Sum, platform: LeetCode, url: "https://leetcode.com/problems/minimum-path-sum/" }
     problem: |
-      Har cell ka ek kharcha (≥ 0). Upar-baayein se neeche-daayein, sirf neeche / daayein. Raste ke cells ka jod kam se kam?
+      Har cell ka ek cost (≥ 0). Upar-baayein se neeche-daayein, sirf neeche / right. Raste ke cells ka jod kam se kam?
 
       Example: `[[2,1,4],[3,8,1],[5,2,6],[1,4,3]]` → **17**
     intuition: |
-      Ginti ki jagah **minimum**: `dp[i][j] = grid[i][j] + min(dp[i−1][j], dp[i][j−1])`.
+      Count ki jagah **minimum**: `dp[i][j] = grid[i][j] + min(dp[i−1][j], dp[i][j−1])`.
 
-      Kinaare: pehli row sirf baayein se, pehla column sirf upar se.
+      Edge: pehli row sirf left se, pehla column sirf upar se.
 
       Rasta bhi chahiye? Aakhri cell se peeche chalo — har baar us taraf jahan dp chhota (wahin se aaye the).
 
-      Greedy ("har kadam sasta padosi") kyun nahi? Abhi ka sasta kadam aage mehnge cells mein le ja sakta hai — poore raste ka jod dekhna padta hai.
+      Greedy ("har step sasta neighbor") kyun nahi? Abhi ka sasta step aage mehnge cells mein le ja sakta hai — poore raste ka jod dekhna padta hai.
 
       > [!galti]
-      > Chaar dishaon wala grid maan ke yahi DP — galat; chaar dishaon mein Dijkstra lagta hai (cells circular depend karte).
+      > 4 dishaon wala grid maan ke yahi DP — galat; 4 dishaon mein Dijkstra lagta hai (cells circular depend karte).
     dryRun: |
       | Row | dp |
       |---|---|
@@ -170,21 +170,21 @@ examples:
     title: Sabse bada '1' wala square (Maximal Square)
     source: { name: Maximal Square, platform: LeetCode, url: "https://leetcode.com/problems/maximal-square/" }
     problem: |
-      '0' aur '1' ki matrix. Sirf '1' wala sabse bada **square** dhoondho, uska area lautao.
+      '0' aur '1' ki matrix. Sirf '1' wala sabse bada **square** dhoondho, uska area return karo.
 
       Example: `["0111","1111","1111","0110"]` → **9** (3 × 3)
     intuition: |
-      State chunna hi trick hai: `dp[i][j]` = (i, j) jiska **neeche-daayan kona** hai, aise sabse bade square ki **side**.
+      State choose karna hi trick hai: `dp[i][j]` = (i, j) jiska **neeche-daayan kona** hai, aise sabse bade square ki **side**.
 
-      (i, j) par '1' hai. Side k ka square banne ke liye upar, baayein aur tirchhe — teeno par kam se kam side k − 1 ke square chahiye. To:
+      (i, j) par '1' hai. Side k ka square banne ke liye upar, left aur diagonal — all 3 par kam se kam side k − 1 ke square chahiye. To:
       `dp[i][j] = min(upar, baayein, tirchha) + 1`. '0' par 0.
 
-      Sabse kamzor padosi hi seema hai — isliye **min**.
+      Sabse weak neighbor hi boundary hai — isliye **min**.
 
-      Ek extra row/col (0) le lo — kinaare ke `if` hat jaate hain. Jawab = (max side)².
+      Ek extra row/col (0) le lo — edge ke `if` hat jaate hain. Jawab = (max side)².
 
       > [!galti]
-      > Sirf upar aur baayein ka min liya — tirchha bhool gaye. Upar-baayein dono 1 ho sakte hain jabki kona '0' — square nahi banta.
+      > Sirf upar aur left ka min liya — diagonal bhool gaye. Upar-baayein dono 1 ho sakte hain jabki kona '0' — square nahi banta.
     dryRun: |
       | Row | dp (side) |
       |---|---|
@@ -198,26 +198,26 @@ examples:
     complexity:
       time: "O(m · n)"
       space: "O(m · n)"
-      why: "Har cell teen padosi. (Ek row + ek 'tirchha' variable se O(n).)"
+      why: "Har cell 3 neighbor. (Ek row + ek 'diagonal' variable se O(n).)"
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Grid mein sirf neeche / daayein (ya ek fixed disha) chalna — raste ginna, min / max kharcha."
-    - "Cell ka jawab apne upar / baayein / tirchhe padosiyon se banta hai (squares, rectangles)."
-    - "Do sequences ki tulna — ek axis har sequence (LCS, edit distance)."
+    - "Grid mein sirf neeche / right (ya ek fixed disha) chalna — raste count karna, min / max cost."
+    - "Cell ka jawab apne upar / left / diagonal neighbors se banta hai (squares, rectangles)."
+    - "2 sequences ki comparison — ek axis har sequence (LCS, edit distance)."
     - "Triangle / pyramid jaisi structures — neeche se upar."
   avoid:
-    - "Chaaron dishaon mein chalna → BFS / Dijkstra (cells circular depend)."
+    - "All 4 dishaon mein chalna → BFS / Dijkstra (cells circular depend)."
     - "Ek baar ka connectivity (islands) → DFS / BFS."
     - "Grid bahut bada aur sirf kuch cells important → graph / sparse approach."
   signals:
     - keyword: "unique paths / kitne raste (right, down)"
-      think: "dp = upar + baayein."
+      think: "dp = upar + left."
     - keyword: "minimum path sum / cost (right, down)"
-      think: "dp = cell + min(upar, baayein)."
+      think: "dp = cell + min(upar, left)."
     - keyword: "largest square / rectangle of 1s"
-      think: "Square: min(teen padosi) + 1. Rectangle: har row ko histogram (stack)."
+      think: "Square: min(3 neighbor) + 1. Rectangle: har row ko histogram (stack)."
     - keyword: "triangle / pyramid"
       think: "Neeche se upar, 1D array."
 
@@ -230,28 +230,28 @@ realWorld:
   - where: "Seam carving (image resize)"
     how: "Upar se neeche sabse kam 'energy' wala rasta — min path DP; wo column hata do."
   - where: "Spreadsheets"
-    how: "Har cell pichhle cells ke formula se — upar / baayein dependency, wahi bharne ka order."
+    how: "Har cell pichhle cells ke formula se — upar / left dependency, wahi bharne ka order."
   - where: "DNA / text comparison"
-    how: "Do sequences ki grid — LCS / edit distance (agla topic)."
+    how: "2 sequences ki grid — LCS / edit distance (agla topic)."
 
 # 10. Common galtiyan & edge cases
 mistakes:
-  - title: "Kinaare ka galat base"
+  - title: "Edge ka galat base"
     type: off-by-one
     wrong: |
-      Pehli row / column 0 se bhar di (raste ginne mein) ya patthar ke baad bhi 1.
+      Pehli row / column 0 se bhar di (raste count karne mein) ya stone ke baad bhi 1.
     right: |
-      Raste: kinaare 1 (patthar ke baad 0). Ya 'bahar = 0' rule se ek formula.
+      Raste: edge 1 (stone ke baad 0). Ya 'bahar = 0' rule se ek formula.
   - title: "Index out of bounds"
     type: off-by-one
     wrong: |
       `dp[i-1][j]` jab i = 0.
     right: |
-      Kinaare alag handle karo, ya ek extra row/col (size m+1 × n+1) lo.
+      Edge alag handle karo, ya ek extra row/col (size m+1 × n+1) lo.
   - title: "Bharne ka galat order"
     type: logic
     wrong: |
-      Column by column ya ulta loop — upar / baayein abhi bhare hi nahi.
+      Column by column ya ulta loop — upar / left abhi bhare hi nahi.
     right: |
       Row 0 se m−1, har row mein col 0 se n−1. Dependency pehle bharni chahiye.
   - title: "Bada jawab overflow"
@@ -263,9 +263,9 @@ mistakes:
   - title: "Maximal square mein area vs side"
     type: logic
     wrong: |
-      max side hi lauta diya, area nahi (ya side ko 2 se guna kiya).
+      max side hi return kar diya, area nahi (ya side ko 2 se multiply kiya).
     right: |
-      dp mein side rakho, aakhir mein area = side × side lautao.
+      dp mein side rakho, aakhir mein area = side × side return karo.
   - title: "Khaali grid"
     type: empty
     wrong: |
@@ -278,33 +278,33 @@ interview:
   questions:
     - q: "Unique Paths ka recurrence aur complexity?"
       a: |
-        dp[i][j] = dp[i-1][j] + dp[i][j-1]; kinaare 1. O(m·n) time, O(n) space (ek row). Maths: C(m+n-2, m-1).
+        dp[i][j] = dp[i-1][j] + dp[i][j-1]; edge 1. O(m·n) time, O(n) space (ek row). Maths: C(m+n-2, m-1).
     - q: "Space ko O(n) kaise karoge?"
       a: |
-        Ek array dp[j]: row by row update. dp[j] (abhi tak purana = upar) + dp[j-1] (naya = baayein).
+        Ek array dp[j]: row by row update. dp[j] (abhi tak purana = upar) + dp[j-1] (naya = left).
     - q: "Obstacle wale version mein kya badla?"
       a: |
-        Patthar par dp = 0. Kinaare par bhi patthar ke baad 0 — isliye 'bahar = 0' wala ek hi formula best.
+        Stone par dp = 0. Edge par bhi stone ke baad 0 — isliye 'bahar = 0' wala ek hi formula best.
     - q: "Minimum path sum mein greedy kyun nahi?"
       a: |
-        Abhi sasta padosi aage mehnge raste mein le ja sakta hai. DP har cell ka sabse sasta poora rasta yaad rakhta hai.
+        Abhi sasta neighbor aage mehnge raste mein le ja sakta hai. DP har cell ka sabse sasta poora rasta yaad rakhta hai.
     - q: "Maximal square mein min kyun?"
       a: |
-        Side k ke liye teeno padosiyon (upar, baayein, tirchha) par kam se kam k-1 chahiye; sabse kamzor hi seema.
+        Side k ke liye all 3 neighbors (upar, left, diagonal) par kam se kam k-1 chahiye; sabse weak hi boundary.
     - q: "Maximal rectangle (sirf square nahi)?"
       a: |
         Har row tak heights banao (histogram), har row par 'largest rectangle in histogram' (monotonic stack). O(m·n).
-    - q: "Agar chaaron dishaon mein chal sakte ho?"
+    - q: "Agar all 4 dishaon mein chal sakte ho?"
       a: |
-        Grid DP fail (circular dependency). Non-negative kharche → Dijkstra; barabar → BFS.
-    - q: "Cherry Pickup jaise do log ek saath?"
+        Grid DP fail (circular dependency). Non-negative cost → Dijkstra; barabar → BFS.
+    - q: "Cherry Pickup jaise 2 log ek saath?"
       followUp: true
       a: |
-        Dono ek saath chalte maano: state (kadam, r1, r2) — c1, c2 kadam se nikal aate. 3D DP O(n³).
+        Dono ek saath chalte maano: state (step, r1, r2) — c1, c2 step se nikal aate. 3D DP O(n³).
     - q: "Dungeon Game ulta kyun bharte hain?"
       followUp: true
       a: |
-        Zaroorat 'aage ke raste' par depend karti hai (kitni health chahiye) — neeche-daayein se upar-baayein bharo: need = max(1, min(neeche, daayein) − cell).
+        Zaroorat 'aage ke raste' par depend karti hai (kitni health chahiye) — neeche-daayein se upar-baayein bharo: need = max(1, min(neeche, right) − cell).
   mayAsk:
     - "Maximal Rectangle."
     - "Dungeon Game."
@@ -318,7 +318,7 @@ practice:
     num: 62
     url: "https://leetcode.com/problems/unique-paths/"
     level: easy
-    pattern: Upar + baayein
+    pattern: Upar + left
     hint: "How wala — phir ek 1D array se. (LeetCode par medium.)"
   - name: Pascal's Triangle II
     platform: LeetCode
@@ -326,14 +326,14 @@ practice:
     url: "https://leetcode.com/problems/pascals-triangle-ii/"
     level: easy
     pattern: Ek row, peeche se update
-    hint: "row[j] += row[j-1] — j ko daayein se baayein chalao taaki purana value kharab na ho."
+    hint: "row[j] += row[j-1] — j ko right se left chalao taaki purana value kharab na ho."
   - name: Range Sum Query 2D - Immutable
     platform: LeetCode
     num: 304
     url: "https://leetcode.com/problems/range-sum-query-2d-immutable/"
     level: easy
     pattern: 2D prefix sum
-    hint: "P[i][j] = cell + upar + baayein − tirchha. Query = P[r2][c2] − P[r1][c2] − P[r2][c1] + P[r1][c1]. (LeetCode par medium.)"
+    hint: "P[i][j] = cell + upar + left − diagonal. Query = P[r2][c2] − P[r1][c2] − P[r2][c1] + P[r1][c1]. (LeetCode par medium.)"
   - name: Triangle
     platform: LeetCode
     num: 120
@@ -353,74 +353,74 @@ practice:
     num: 931
     url: "https://leetcode.com/problems/minimum-falling-path-sum/"
     level: medium
-    pattern: Upar ke teen se
-    hint: "dp[i][j] = cell + min(upar-baayein, upar, upar-daayein). Kinaare dhyaan se. Jawab aakhri row ka min."
+    pattern: Upar ke 3 se
+    hint: "dp[i][j] = cell + min(upar-baayein, upar, upar-daayein). Edge dhyaan se. Jawab aakhri row ka min."
   - name: Dungeon Game
     platform: LeetCode
     num: 174
     url: "https://leetcode.com/problems/dungeon-game/"
     level: hard
     pattern: Ulta grid DP
-    hint: "Princess se shuru: need[i][j] = max(1, min(need neeche, need daayein) − dungeon[i][j]). Jawab need[0][0]."
+    hint: "Princess se shuru: need[i][j] = max(1, min(need neeche, need right) − dungeon[i][j]). Jawab need[0][0]."
   - name: Maximal Rectangle
     platform: LeetCode
     num: 85
     url: "https://leetcode.com/problems/maximal-rectangle/"
     level: hard
     pattern: Har row = histogram
-    hint: "heights[j] = lagaataar '1' upar tak. Har row par Largest Rectangle in Histogram (monotonic stack)."
+    hint: "heights[j] = continuous '1' upar tak. Har row par Largest Rectangle in Histogram (monotonic stack)."
 
 # 13. Quick revision
 revision:
   summary:
-    - "Grid DP: dp[i][j] cell ka state; transition upar / baayein (/ tirchha) se."
-    - "Order: row by row, baayein se daayein. Kinaare alag ya extra row/col 0."
-    - "Raste: upar + baayein. Kharcha: cell + min. Square: min(teen) + 1."
+    - "Grid DP: dp[i][j] cell ka state; transition upar / left (/ diagonal) se."
+    - "Order: row by row, left se right. Edge alag ya extra row/col 0."
+    - "Raste: upar + left. Cost: cell + min. Square: min(3) + 1."
     - "Sirf pichhli row chahiye → 1D array, O(n) memory."
-    - "Chaaron dishayein → DP nahi, BFS / Dijkstra."
+    - "All 4 dishayein → DP nahi, BFS / Dijkstra."
   cheatsheet: |
     ```kotlin
     // unique paths, 1D
     val dp = IntArray(n) { 1 }
     for (i in 1 until m) for (j in 1 until n) dp[j] += dp[j - 1]
     // min path sum
-    dp[i][j] = g[i][j] + minOf(dp[i-1][j], dp[i][j-1])   // kinaare alag
+    dp[i][j] = g[i][j] + minOf(dp[i-1][j], dp[i][j-1])   // edge alag
     // maximal square (1-indexed dp)
     if (mat[i-1][j-1] == '1') dp[i][j] = minOf(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
     ```
   quiz:
-    - q: "3 × 3 grid (sirf neeche / daayein) mein kitne raste?"
+    - q: "3 × 3 grid (sirf neeche / right) mein kitne raste?"
       options: ["4", "6", "9", "8"]
       answer: 1
       explain: "C(4, 2) = 6. DP: 1 1 1 / 1 2 3 / 1 3 6."
     - q: "Unique paths 1D array mein update?"
       options: ["dp[j] = dp[j-1]", "dp[j] += dp[j-1]", "dp[j] = dp[j+1] + dp[j]", "dp[j] *= 2"]
       answer: 1
-      explain: "dp[j] purana = upar, dp[j-1] naya = baayein."
-    - q: "Maximal square: upar 2, baayein 3, tirchha 1, cell '1'. dp?"
+      explain: "dp[j] purana = upar, dp[j-1] naya = left."
+    - q: "Maximal square: upar 2, left 3, diagonal 1, cell '1'. dp?"
       options: ["4", "3", "2", "1"]
       answer: 2
       explain: "min(2, 3, 1) + 1 = 2."
-    - q: "Pehli row mein patthar index 2 par (unique paths II). dp[0][3]?"
+    - q: "Pehli row mein stone index 2 par (unique paths II). dp[0][3]?"
       options: ["1", "0", "2", "3"]
       answer: 1
-      explain: "Patthar ke baad pehli row mein rasta band — 0."
-    - q: "Chaaron dishaon mein chalna allowed, sabse sasta rasta?"
-      options: ["Grid DP upar + baayein", "Dijkstra", "Greedy", "Backtracking hamesha"]
+      explain: "Stone ke baad pehli row mein rasta band — 0."
+    - q: "All 4 dishaon mein chalna allowed, sabse sasta rasta?"
+      options: ["Grid DP upar + left", "Dijkstra", "Greedy", "Backtracking hamesha"]
       answer: 1
-      explain: "Cells circular depend — non-negative kharche par Dijkstra."
+      explain: "Cells circular depend — non-negative cost par Dijkstra."
 
 # 14. Connections
 connections:
   related:
     - id: matrix
-      why: "2D array traversal, kinaare aur index ka dhyaan."
+      why: "2D array traversal, edge aur index ka dhyaan."
     - id: dp-1d
-      why: "Same soch, ab do index; ek row rakh ke 1D jaisa."
+      why: "Same soch, ab 2 index; ek row rakh ke 1D jaisa."
     - id: prefix-sum
-      why: "2D prefix sum bhi upar + baayein − tirchha wala grid DP hai."
+      why: "2D prefix sum bhi upar + left − diagonal wala grid DP hai."
   usedLater:
     - id: dp-strings
-      how: "LCS / edit distance = do strings ki grid; har cell upar / baayein / tirchhe se."
+      how: "LCS / edit distance = 2 strings ki grid; har cell upar / left / diagonal se."
     - id: knapsack-01
       how: "Table (item × capacity) — upar wali row se bharna, 1D mein ulta loop."

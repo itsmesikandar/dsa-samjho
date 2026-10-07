@@ -1,8 +1,8 @@
-// Kitne combinations (order matter nahi: 1+2 aur 2+1 ek hi) se amount bane. Har sikka kitni bhi baar
+// Kitne combinations (order matter nahi: 1+2 aur 2+1 ek hi) se amount bane. Har coin kitni bhi baar
 fun change(amount: Int, coins: IntArray): Int {
     val dp = IntArray(amount + 1) // dp[a] = kitne combinations se amount a
     dp[0] = 1 // kuch na do - ek tareeka
-    for (c in coins) { // SIKKE BAHAR - har combination sikkon ke ek fixed order mein banta, ek hi baar gina //@coin
+    for (c in coins) { // COINS BAHAR - har combination coins ke ek fixed order mein banta, ek hi baar gina //@coin
         for (a in c..amount) { // seedha - c kitni bhi baar
             dp[a] += dp[a - c] // a - c wale har combination mein ek aur c //@add
         }

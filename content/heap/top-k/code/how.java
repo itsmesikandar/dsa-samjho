@@ -9,7 +9,7 @@ class Main {
         PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
         for (int x : nums) {
             if (pq.size() < k) pq.add(x); // jagah khaali - seedha andar //@add
-            else if (x < pq.peek()) { // andar ke sabse bade se chhota - behtar candidate //@check
+            else if (x < pq.peek()) { // andar ke sabse bade se chhota - better candidate //@check
                 pq.poll(); // sabse bada bahar, naya andar //@swap
                 pq.add(x);
             }

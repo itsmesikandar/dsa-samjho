@@ -1,7 +1,7 @@
 import java.util.function.IntPredicate;
 
 class Main {
-    // "Sabse chhota x jo chal jaaye" - shart: feasible(x) monotonic ho (x chala to x+1 bhi chalega)
+    // "Sabse chhota x jo chal jaaye" - condition: feasible(x) monotonic ho (x chala to x+1 bhi chalega)
     static int minFeasible(int lo, int hi, IntPredicate feasible) {
         // hi pakka feasible hona chahiye
         while (lo < hi) {

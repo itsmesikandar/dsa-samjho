@@ -1,13 +1,13 @@
-// Do deewarein chuno jinke beech sabse zyada paani aaye
+// Do walls choose karo jinke beech sabse zyada paani aaye
 fun maxArea(h: IntArray): Int {
     var l = 0 //@init
     var r = h.size - 1
     var best = 0
     while (l < r) {
-        val area = minOf(h[l], h[r]) * (r - l) // paani = chhoti deewar x doori //@area
+        val area = minOf(h[l], h[r]) * (r - l) // paani = chhoti wall x distance //@area
         best = maxOf(best, area)
         if (h[l] < h[r]) {
-            l++ // chhoti deewar hatao - badi ko rakhne se hi aage fayda ho sakta hai //@moveL
+            l++ // chhoti wall hatao - badi ko rakhne se hi aage fayda ho sakta hai //@moveL
         } else {
             r-- //@moveR
         }

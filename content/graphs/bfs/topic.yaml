@@ -13,44 +13,44 @@ what:
   body: |
     **BFS (Breadth-First Search)** graph ko **level by level** ghoomta hai:
     1. Start node — level 0.
-    2. Uske saare padosi — level 1 (1 kadam door).
-    3. Unke naye padosi — level 2. Aise hi aage.
+    2. Uske saare neighbor — level 1 (1 step door).
+    3. Unke naye neighbor — level 2. Aise hi aage.
 
     Engine = **queue** (FIFO). Jo pehle aaya wo pehle nikla → paas wale hamesha door walon se pehle.
 
-    Teen cheezein:
-    - `queue` — kis node ke padosi abhi dekhne baaki hain.
+    3 cheezein:
+    - `queue` — kis node ke neighbor abhi dekhne baaki hain.
     - `visited` — jo ek baar queue mein aa gaya, dobara nahi. (Graph mein cycle hote hain — tree mein ye zaroorat nahi thi.)
-    - Loop: nikalo → padosi dekho → naye ho to **mark + queue**.
+    - Loop: nikalo → neighbor dekho → naye ho to **mark + queue**.
 
     > [!yaad]
     > Unweighted graph mein BFS jis level par node ko **pehli baar** dekhta hai, wahi uska **sabse chhota rasta** hai. Isliye "minimum steps" = BFS.
   analogy: |
     **WhatsApp forward:**
-    Tumne message apne contacts ko bheja (level 1). Unhone apne contacts ko (level 2), jinke paas pehle aa chuka wo dobara forward nahi karte (visited). Kisi ko message kitne "hop" mein mila — wahi uski doori. Sabse pehle wahi log paate hain jo tumhare sabse paas hain.
+    Tumne message apne contacts ko bheja (level 1). Unhone apne contacts ko (level 2), jinke paas pehle aa chuka wo dobara forward nahi karte (visited). Kisi ko message kitne "hop" mein mila — wahi uski distance. Sabse pehle wahi log paate hain jo tumhare sabse paas hain.
 
-    Ya **taalaab mein pathar** — lehrein gol gol, paas se door, ek saath har disha mein.
+    Ya **pond mein stone** — waves gol gol, paas se door, ek saath har disha mein.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    Bahut saare sawaal asal mein "kam se kam kitne kadam?" hote hain:
+    Bahut saare sawaal asal mein "kam se kam kitne step?" hote hain:
     - Maze / grid mein exit tak minimum moves
-    - Social network mein do logon ke beech kitne "degree of separation"
-    - Word ladder: ek word se doosre tak kam se kam badlaav
-    - Ek saath kai jagah se phailti cheez (aag, infection, sadna) ka time
+    - Social network mein 2 logon ke beech kitne "degree of separation"
+    - Word ladder: ek word se doosre tak kam se kam change
+    - Ek saath kai jagah se spread hoti cheez (aag, infection, rot hona) ka time
 
     Har rasta try karna (backtracking) exponential hai. BFS har node ko **ek hi baar** dekhta hai → **O(V + E)**, aur pehli pahunch hi sabse chhoti hoti hai.
 
     > [!socho]
     > DFS se bhi saare nodes mil jaate hain. Phir shortest path ke liye DFS kyun nahi?
     >
-    > DFS ek raste mein gehraai tak chala jaata hai — kisi node tak pehli baar lamba rasta le ke bhi pahunch sakta hai. BFS doori ke order mein pahunchta hai, isliye pehli pahunch = sabse chhoti.
+    > DFS ek raste mein depth tak chala jaata hai — kisi node tak pehli baar lamba rasta le ke bhi pahunch sakta hai. BFS distance ke order mein pahunchta hai, isliye pehli pahunch = sabse chhoti.
 
 # 3. Visual intro
 visual:
   body: |
-    Har rang ek level hai. Dekho kaise lehar start se nikal kar har kadam ek ring aage badhti hai, aur rangeen edges har node tak ka pehla (sabse chhota) rasta banati hain. Start badal ke dekho.
+    Har color ek level hai. Dekho kaise wave start se nikal kar har step ek ring aage badhti hai, aur colored edges har node tak ka pehla (sabse chhota) rasta banati hain. Start badal ke dekho.
   viz: { tracer: rippleTrace }
 
 # 4. Kaise kaam karta hai
@@ -64,12 +64,12 @@ how:
             agar v visited nahi: visited[v] = true; queue.addLast(v)
     ```
 
-    Do niyam jo galtiyon se bachate hain:
-    1. **Queue mein daalte waqt mark karo**, nikalte waqt nahi. Warna ek node do padosiyon se do baar queue mein aa jaata hai.
+    Do rule jo galtiyon se bachate hain:
+    1. **Queue mein daalte time mark karo**, nikalte time nahi. Warna ek node do neighbors se 2 baar queue mein aa jaata hai.
     2. Start node bhi shuru mein hi mark.
 
     > [!galti]
-    > Kotlin mein `mutableListOf` ko queue bana ke `removeAt(0)` — har baar poori list khisakti hai, O(n). `ArrayDeque` (`addLast` / `removeFirst`) lo — dono O(1).
+    > Kotlin mein `mutableListOf` ko queue bana ke `removeAt(0)` — har baar poori list shift hoti hai, O(n). `ArrayDeque` (`addLast` / `removeFirst`) lo — dono O(1).
   viz: { tracer: bfsTrace }
   code: how
 
@@ -78,15 +78,15 @@ operations:
   - op: "BFS (adjacency list)"
     time: "O(V + E)"
     space: O(V)
-    why: "Har node ek baar queue mein; har edge do baar dekhi (undirected). Queue + visited O(V)."
+    why: "Har node ek baar queue mein; har edge 2 baar dekhi (undirected). Queue + visited O(V)."
   - op: "BFS (adjacency matrix)"
     time: "O(V²)"
     space: O(V)
-    why: "Har node ke padosi dhoondhne ke liye poori row (V cells)."
+    why: "Har node ke neighbor dhoondhne ke liye poori row (V cells)."
   - op: "Grid BFS (r × c)"
     time: "O(r × c)"
     space: "O(r × c)"
-    why: "Har cell ek node, padosi 4 (ya 8) — constant."
+    why: "Har cell ek node, neighbor 4 (ya 8) — constant."
   - op: "Shortest path (unweighted)"
     time: "O(V + E)"
     space: O(V)
@@ -103,20 +103,20 @@ code:
     note: |
       Har round ki shuruaat mein `queue.size` le lo — utne hi nodes is level ke hain. Loop ke beech jo daale gaye wo agle level ke.
 
-      Tree ka **level order** yahi tha — fark sirf `visited` ka. Jab "kitne minute / kitne kadam / kitni baar" poochha ho (Rotting Oranges, Word Ladder), yahi pattern lagao.
+      Tree ka **level order** yahi tha — fark sirf `visited` ka. Jab "kitne minute / kitne step / kitni baar" poochha ho (Rotting Oranges, Word Ladder), yahi pattern lagao.
 
 # 7. Examples
 examples:
   - id: shortest-path
     level: easy
-    title: Do nodes ke beech sabse chhota rasta (path bhi batao)
+    title: 2 nodes ke beech sabse chhota rasta (path bhi batao)
     problem: |
-      Undirected unweighted graph (n nodes, edge list), aur do nodes s aur t. s se t tak **kam se kam edges** wala rasta lautao (nodes ki list). Rasta na ho to khaali list.
+      Undirected unweighted graph (n nodes, edge list), aur 2 nodes s aur t. s se t tak **kam se kam edges** wala rasta return karo (nodes ki list). Rasta na ho to khaali list.
 
       Example: edges `[[0,1],[0,2],[1,3],[2,3],[2,4],[3,5],[4,6],[5,6]]`, s = 0, t = 6 → **[0, 2, 4, 6]**
     intuition: |
-      BFS mein node **pehli baar** jis level par mile, wahi uski sabse chhoti doori. To bas do array rakho:
-      - `dist[v]` — kitne kadam (aur -1 = abhi nahi pahunche, yahi visited bhi).
+      BFS mein node **pehli baar** jis level par mile, wahi uski sabse chhoti distance. To bas do array rakho:
+      - `dist[v]` — kitne step (aur -1 = abhi nahi pahunche, yahi visited bhi).
       - `parent[v]` — kis node se pehli baar aaye.
 
       t queue se nikle to ruk jao. Phir `t → parent[t] → …` chal ke s tak, aur list ulti kar do.
@@ -124,7 +124,7 @@ examples:
       > [!galti]
       > Har baar `dist[v] = dist[u] + 1` kar diya, bina check kiye ki v pehle se mila hai. Baad wala (lamba) rasta pehle wale ko overwrite kar dega.
     dryRun: |
-      | Nikala | Naye padosi | dist | parent |
+      | Nikala | Naye neighbor | dist | parent |
       |---|---|---|---|
       | 0 | 1, 2 | 1, 1 | 0, 0 |
       | 1 | 3 | 2 | 1 |
@@ -139,18 +139,18 @@ examples:
     complexity:
       time: "O(V + E)"
       space: O(V)
-      why: "Ek BFS (har node ek baar); rasta wapas banana O(V). dist, parent, queue — teeno O(V)."
+      why: "Ek BFS (har node ek baar); rasta wapas banana O(V). dist, parent, queue — all 3 O(V)."
 
   - id: binary-matrix
     level: medium
     title: 0/1 grid mein sabse chhota rasta (8 dishayein)
     source: { name: Shortest Path in Binary Matrix, platform: LeetCode, url: "https://leetcode.com/problems/shortest-path-in-binary-matrix/" }
     problem: |
-      Grid mein 0 = khula cell, 1 = band. Upar-baayein cell (0, 0) se neeche-daayein aakhri cell tak jaana hai. Ek kadam mein 8 mein se kisi bhi padosi cell (tirchha bhi) par ja sakte ho, sirf khule cells par. Raste mein kitne cells aaye (shuru aur aakhri dono gin ke) — minimum batao, warna -1.
+      Grid mein 0 = khula cell, 1 = band. Upar-baayein cell (0, 0) se neeche-daayein aakhri cell tak jaana hai. Ek step mein 8 mein se kisi bhi neighbor cell (diagonal bhi) par ja sakte ho, sirf khule cells par. Raste mein kitne cells aaye (shuru aur aakhri dono count kar ke) — minimum batao, warna -1.
 
       Example: `[[0,1,0,0,0],[0,1,0,1,0],[0,0,0,1,0],[1,1,0,1,0]]` → **8**
     intuition: |
-      Grid = **implicit graph**: har khula cell node, uske 8 padosi edges. Adjacency list banane ki zaroorat nahi — padosi `dx, dy ∈ {-1, 0, 1}` se nikal aate hain.
+      Grid = **implicit graph**: har khula cell node, uske 8 neighbor edges. Adjacency list banane ki zaroorat nahi — neighbor `dx, dy ∈ {-1, 0, 1}` se nikal aate hain.
 
       Minimum moves + har move barabar → **BFS**. `dist[r][c]` (0 = abhi nahi pahunche) visited ka kaam bhi karta hai.
 
@@ -168,35 +168,35 @@ examples:
       | 5 | (0,2), (0,3) |
       | 6 | (0,4), (1,4) |
       | 7 | (2,4) |
-      | 8 | (3,4) → manzil, **8** |
+      | 8 | (3,4) → destination, **8** |
     viz: { tracer: matrixTrace }
     code: ex2-binary-matrix
     complexity:
       time: "O(r × c)"
       space: "O(r × c)"
-      why: "Har cell max ek baar queue mein, har baar 8 padosi (constant). dist grid + queue."
+      why: "Har cell max ek baar queue mein, har baar 8 neighbor (constant). dist grid + queue."
 
   - id: rotting-oranges
     level: tricky
-    title: Santre kitne minute mein sad jaayenge (multi-source BFS)
+    title: Oranges kitne minute mein sad jaayenge (multi-source BFS)
     source: { name: Rotting Oranges, platform: LeetCode, url: "https://leetcode.com/problems/rotting-oranges/" }
     problem: |
-      Grid mein 0 = khaali, 1 = taaza santra, 2 = sada santra. Har minute, har sada santra apne 4 padosi (upar, neeche, daayein, baayein) taaze santron ko sada deta hai. Kitne minute mein koi taaza nahi bachega? Kabhi na ho paaye to -1.
+      Grid mein 0 = khaali, 1 = fresh orange, 2 = sada orange. Har minute, har sada orange apne 4 neighbor (upar, neeche, right, left) fresh oranges ko sada deta hai. Kitne minute mein koi fresh nahi bachega? Kabhi na ho paaye to -1.
 
       Example: `[[2,1,0,2],[1,1,0,1],[0,1,1,1]]` → **3**
     intuition: |
-      "Har minute ek kadam phailta hai" = BFS level. Par shuruaat **kai jagah** se — saare sade santre.
+      "Har minute ek step spread hota hai" = BFS level. Par shuruaat **kai jagah** se — saare rotten oranges.
 
-      Har source se alag BFS → O(k × r × c), aur minutes milana mushkil. Trick: **saare sources ek saath queue mein** daalo (multi-source BFS). Ab sab lehrein saath phailti hain; level ginti = minutes.
+      Har source se alag BFS → O(k × r × c), aur minutes milana mushkil. Trick: **saare sources ek saath queue mein** daalo (multi-source BFS). Ab sab waves saath spread hoti hain; level count = minutes.
 
-      - Shuru mein taaze gin lo (`fresh`). Sadne par `fresh--`.
+      - Shuru mein fresh count kar lo (`fresh`). Rot hone par `fresh--`.
       - Har level ke liye `queue.size` pehle le lo (code section wala pattern).
       - Aakhir mein `fresh > 0` → -1.
 
       > [!galti]
-      > Shuru mein hi koi taaza nahi → jawab 0 (loop mein ghuse bina). `while (queue.isNotEmpty() && fresh > 0)` — `fresh > 0` bhool gaye to aakhri level ke baad ek extra minute gin jaayega.
+      > Shuru mein hi koi fresh nahi → jawab 0 (loop mein ghuse bina). `while (queue.isNotEmpty() && fresh > 0)` — `fresh > 0` bhool gaye to aakhri level ke baad ek extra minute count kar jaayega.
     dryRun: |
-      | Minute | Sade (naye) | Taaze bache |
+      | Minute | Rotten (naye) | Fresh bache |
       |---|---|---|
       | 0 | sources (0,0), (0,3) | 7 |
       | 1 | (1,0), (0,1), (1,3) | 4 |
@@ -207,27 +207,27 @@ examples:
     complexity:
       time: "O(r × c)"
       space: "O(r × c)"
-      why: "Har cell max ek baar queue mein, 4 padosi. Grid hi visited (1 → 2), queue worst case saare cells."
+      why: "Har cell max ek baar queue mein, 4 neighbor. Grid hi visited (1 → 2), queue worst case saare cells."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "Unweighted graph / grid mein 'minimum steps / moves / hops'."
     - "Level by level kuch chahiye (har level ki list, sabse door node, kitne round)."
-    - "Ek saath kai jagah se phailna (aag, infection, sadna) → multi-source BFS."
+    - "Ek saath kai jagah se spread hona (aag, infection, rot hona) → multi-source BFS."
     - "State-space search: har state node, ek move edge (word ladder, lock combination)."
   avoid:
     - "Edges ke weights alag alag → BFS galat; Dijkstra lo."
     - "Saare raste / combinations chahiye → backtracking / DFS."
-    - "Graph bahut gehra aur sirf 'pahunch sakte ho?' → DFS bhi chalega (kam memory jab chauda graph ho)."
+    - "Graph bahut deep aur sirf 'pahunch sakte ho?' → DFS bhi chalega (kam memory jab wide graph ho)."
   signals:
     - keyword: "minimum moves / steps / jumps (sab barabar)"
       think: "BFS, dist array."
     - keyword: "grid mein shortest path / maze"
       think: "Grid BFS, dirs array, bounds check."
-    - keyword: "kitne minute mein sab… / ek saath phailta hai"
+    - keyword: "kitne minute mein sab… / ek saath spread hota hai"
       think: "Multi-source BFS + level count."
-    - keyword: "nearest X se doori har cell ke liye"
+    - keyword: "nearest X se distance har cell ke liye"
       think: "Saare X ko source bana ke multi-source BFS (01 Matrix)."
 
 # 9. Real-world
@@ -239,13 +239,13 @@ realWorld:
   - where: "Game AI (grid maps)"
     how: "Enemy tumhare tak kam se kam moves mein — grid BFS (weights ho to A* / Dijkstra)."
   - where: "Network broadcast / router discovery"
-    how: "Packet padosi routers ko, wo apne padosiyon ko — hop count = BFS level."
-  - where: "Epidemic / aag phailne ka simulation"
+    how: "Packet neighbor routers ko, wo apne neighbors ko — hop count = BFS level."
+  - where: "Epidemic / aag spread hone ka simulation"
     how: "Saare shuru ke cases ek saath queue mein — multi-source BFS se har jagah pahunchne ka din."
 
 # 10. Common galtiyan & edge cases
 mistakes:
-  - title: "Nikalte waqt visited mark kiya"
+  - title: "Nikalte time visited mark kiya"
     type: logic
     wrong: |
       `u = poll(); visited[u] = true` — tab tak u queue mein do-teen baar aa chuka hota hai. Time aur memory badh jaate hain, counting galat.
@@ -254,7 +254,7 @@ mistakes:
   - title: "Level count galat"
     type: off-by-one
     wrong: |
-      Har nikale node par `steps++` — ye nodes gin raha hai, levels nahi.
+      Har nikale node par `steps++` — ye nodes count kar raha hai, levels nahi.
     right: |
       `queue.size` pehle lo, utne nodes nikalo, phir `steps++`. Ya `dist[v] = dist[u] + 1`.
   - title: "Grid ke bahar chale gaye"
@@ -274,32 +274,32 @@ mistakes:
     wrong: |
       Ek hi start se BFS → doosre components ke nodes kabhi visit nahi hue.
     right: |
-      Saare nodes chahiye to `for (s in 0 until n) if (!visited[s]) bfs(s)`. Rasta na mile to -1 / khaali list lautao.
+      Saare nodes chahiye to `for (s in 0 until n) if (!visited[s]) bfs(s)`. Rasta na mile to -1 / khaali list return karo.
   - title: "Weighted graph par BFS"
     type: logic
     wrong: |
       Edges ke weights alag, phir bhi BFS ka pehla jawab maan liya.
     right: |
-      Kam edges ≠ kam kharcha. Weights ho to Dijkstra (sirf 0/1 weights ho to 0-1 BFS deque se).
+      Kam edges ≠ kam cost. Weights ho to Dijkstra (sirf 0/1 weights ho to 0-1 BFS deque se).
 
 # 11. Interview corner
 interview:
   questions:
     - q: "BFS unweighted graph mein shortest path kyun deta hai?"
       a: |
-        Queue nodes ko doori ke order mein nikalti hai: saare d-door wale, d+1-door walon se pehle. Isliye kisi node ko pehli baar dekha to usse chhota rasta pehle hi mil chuka hota.
+        Queue nodes ko distance ke order mein nikalti hai: saare d-door wale, d+1-door walon se pehle. Isliye kisi node ko pehli baar dekha to usse chhota rasta pehle hi mil chuka hota.
     - q: "Time aur space complexity?"
       a: |
         O(V + E) time (adjacency list), O(V) space (queue + visited). Matrix par O(V²).
     - q: "Visited kab mark karte ho aur kyun?"
       a: |
-        Queue mein daalte waqt. Nikalte waqt karne par ek node kai padosiyon se baar baar queue mein aa sakta hai.
+        Queue mein daalte time. Nikalte time karne par ek node kai neighbors se baar baar queue mein aa sakta hai.
     - q: "BFS vs DFS — kab kya?"
       a: |
-        Shortest path / levels / minimum steps → BFS. Saare raste, cycle, topological order, gehraai wale sawaal → DFS. Memory: BFS chaude graph par zyada (poora level queue mein), DFS gehre par (recursion stack).
+        Shortest path / levels / minimum steps → BFS. Saare raste, cycle, topological order, depth wale sawaal → DFS. Memory: BFS wide graph par zyada (poora level queue mein), DFS deep par (recursion stack).
     - q: "Multi-source BFS kya hai?"
       a: |
-        Kai start points ek saath queue mein (sab dist 0). Ek BFS mein har node ki 'sabse paas wale source' se doori mil jaati hai. Rotting Oranges, 01 Matrix, Walls and Gates.
+        Kai start points ek saath queue mein (sab dist 0). Ek BFS mein har node ki 'sabse paas wale source' se distance mil jaati hai. Rotting Oranges, 01 Matrix, Walls and Gates.
     - q: "Path kaise print karoge, sirf length nahi?"
       a: |
         parent[] rakho — pehli baar v ko u se dekha to parent[v] = u. Phir t se parent chalte hue s tak, aur list ulti.
@@ -309,11 +309,11 @@ interview:
     - q: "Bidirectional BFS kya hai?"
       followUp: true
       a: |
-        s aur t dono se ek saath BFS, beech mein milte hi ruko. Har taraf sirf aadhi gehraai → b^(d/2) + b^(d/2) ≪ b^d nodes. Word Ladder jaise bade state-space mein bahut tez.
+        s aur t dono se ek saath BFS, beech mein milte hi ruko. Har taraf sirf aadhi depth → b^(d/2) + b^(d/2) ≪ b^d nodes. Word Ladder jaise bade state-space mein bahut tez.
     - q: "Edges ke weights sirf 0 aur 1 hon to?"
       followUp: true
       a: |
-        0-1 BFS: deque lo; weight 0 wala padosi aage (addFirst), weight 1 wala peeche (addLast). O(V + E), Dijkstra ke bina.
+        0-1 BFS: deque lo; weight 0 wala neighbor aage (addFirst), weight 1 wala peeche (addLast). O(V + E), Dijkstra ke bina.
   mayAsk:
     - "Word Ladder (state-space BFS)."
     - "01 Matrix / Walls and Gates (multi-source)."
@@ -335,7 +335,7 @@ practice:
     url: "https://leetcode.com/problems/flood-fill/"
     level: easy
     pattern: Grid BFS (4 dishayein)
-    hint: "Start cell ka purana rang note karo. Naya rang same ho to kuch mat karo (warna infinite loop). Jo padosi purane rang ke hain unhe rango aur queue mein."
+    hint: "Start cell ka purana color note karo. Naya color same ho to kuch mat karo (warna infinite loop). Jo neighbor purane color ke hain unhe color karo aur queue mein."
   - name: Minimum Depth of Binary Tree
     platform: LeetCode
     num: 111
@@ -349,7 +349,7 @@ practice:
     url: "https://leetcode.com/problems/01-matrix/"
     level: medium
     pattern: Multi-source BFS
-    hint: "Saare 0 cells queue mein (dist 0), baaki -1. BFS se har 1 ki sabse paas wale 0 se doori."
+    hint: "Saare 0 cells queue mein (dist 0), baaki -1. BFS se har 1 ki sabse paas wale 0 se distance."
   - name: Nearest Exit from Entrance in Maze
     platform: LeetCode
     num: 1926
@@ -363,30 +363,30 @@ practice:
     url: "https://leetcode.com/problems/open-the-lock/"
     level: medium
     pattern: State-space BFS
-    hint: "Har 4-digit string ek node; ek wheel ko +1 / -1 ghumana = edge (8 padosi). Deadends ko shuru mein hi visited maan lo. '0000' se BFS."
+    hint: "Har 4-digit string ek node; ek wheel ko +1 / -1 rotate karna = edge (8 neighbor). Deadends ko shuru mein hi visited maan lo. '0000' se BFS."
   - name: Word Ladder
     platform: LeetCode
     num: 127
     url: "https://leetcode.com/problems/word-ladder/"
     level: hard
     pattern: State-space BFS (words)
-    hint: "Har word node. Padosi: har position par a–z badal ke dekho, wordList ke HashSet mein ho to edge. Mile word ko set se hata do (visited). Level ginti + 1."
+    hint: "Har word node. Neighbor: har position par a–z badal ke dekho, wordList ke HashSet mein ho to edge. Mile word ko set se hata do (visited). Level count + 1."
   - name: Shortest Path in a Grid with Obstacles Elimination
     platform: LeetCode
     num: 1293
     url: "https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/"
     level: hard
     pattern: BFS on (row, col, bacha k)
-    hint: "State = (r, c, kitni deewarein aur tod sakte ho). Visited 3D: visited[r][c][k]. Deewar par jao to k - 1. Pehli baar manzil = jawab."
+    hint: "State = (r, c, kitni walls aur tod sakte ho). Visited 3D: visited[r][c][k]. Wall par jao to k - 1. Pehli baar destination = jawab."
 
 # 13. Quick revision
 revision:
   summary:
     - "BFS = queue (FIFO) se level by level. O(V + E)."
-    - "Visited queue mein DAALTE waqt mark karo; start bhi."
+    - "Visited queue mein DAALTE time mark karo; start bhi."
     - "Unweighted graph / grid: pehli pahunch = sabse chhota rasta. dist[] + parent[] se path."
     - "Level count: har round queue.size pehle lo."
-    - "Kai jagah se ek saath phailna → saare sources shuru mein queue mein (multi-source)."
+    - "Kai jagah se ek saath spread hona → saare sources shuru mein queue mein (multi-source)."
   cheatsheet: |
     ```kotlin
     val dist = IntArray(n) { -1 }
@@ -405,21 +405,21 @@ revision:
       answer: 1
       explain: "FIFO queue — pehle aaye (paas wale) pehle nikalte hain, isliye level order."
     - q: "Visited kab mark karna chahiye?"
-      options: ["Queue se nikalte waqt", "Queue mein daalte waqt", "Saare padosi dekhne ke baad", "Kabhi nahi"]
+      options: ["Queue se nikalte time", "Queue mein daalte time", "Saare neighbor dekhne ke baad", "Kabhi nahi"]
       answer: 1
       explain: "Daalte hi mark — warna ek node kai baar queue mein aa sakta hai."
     - q: "Weighted graph (alag weights) mein shortest path ke liye BFS?"
       options: ["Hamesha sahi", "Galat ho sakta hai", "Sirf directed mein sahi", "Sirf tree mein galat"]
       answer: 1
-      explain: "BFS edges ginta hai, kharcha nahi. Kam edges wala rasta mehenga ho sakta hai → Dijkstra."
+      explain: "BFS edges count karta hai, cost nahi. Kam edges wala rasta mehenga ho sakta hai → Dijkstra."
     - q: "V nodes, E edges, adjacency list. BFS ka time?"
       options: ["O(V)", "O(E)", "O(V + E)", "O(V × E)"]
       answer: 2
-      explain: "Har node ek baar nikla, har edge (undirected mein do baar) dekhi."
-    - q: "Rotting oranges mein saare sade santre shuru mein queue mein kyun?"
-      options: ["Code chhota hota hai", "Sab ek saath phailte hain — ek BFS mein minutes sahi", "Memory kam lagti hai", "Zaroori nahi, ek ek se bhi same time"]
+      explain: "Har node ek baar nikla, har edge (undirected mein 2 baar) dekhi."
+    - q: "Rotting oranges mein saare rotten oranges shuru mein queue mein kyun?"
+      options: ["Code chhota hota hai", "Sab ek saath spread hote hain — ek BFS mein minutes sahi", "Memory kam lagti hai", "Zaroori nahi, ek ek se bhi same time"]
       answer: 1
-      explain: "Multi-source BFS: har level = ek minute, saari lehrein saath. Alag BFS se minutes milane padte aur time k guna."
+      explain: "Multi-source BFS: har level = ek minute, saari waves saath. Alag BFS se minutes milane padte aur time k times."
 
 # 14. Connections
 connections:
@@ -432,8 +432,8 @@ connections:
       why: "Adjacency list par chalta hai; grid ko implicit graph maana."
   usedLater:
     - id: dfs
-      how: "Same 'visited + padosi' dhaancha, queue ki jagah stack / recursion."
+      how: "Same 'visited + neighbor' structure, queue ki jagah stack / recursion."
     - id: topological-sort
       how: "Kahn's algorithm = BFS, jahan in-degree 0 wale queue mein jaate hain."
     - id: dijkstra
-      how: "Weighted BFS: queue ki jagah min-heap (sabse kam doori pehle)."
+      how: "Weighted BFS: queue ki jagah min-heap (sabse kam distance pehle)."

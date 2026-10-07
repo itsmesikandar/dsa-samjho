@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // Merge sort: aadha karo, dono halves ko sort karo (recursion), phir do sorted halves ko jodo (merge)
+    // Merge sort: aadha karo, dono halves ko sort karo (recursion), phir 2 sorted halves ko jodo (merge)
     static void mergeSort(int[] a, int l, int r, int[] tmp) {
         if (l >= r) return; // 0 ya 1 item: pehle se sorted //@base
         int mid = (l + r) / 2; //@split

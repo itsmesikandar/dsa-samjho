@@ -3,10 +3,10 @@ import type { Panel, Tone } from '@/components/viz/engine/types';
 
 type Tones = Record<number, Tone>;
 
-// ---------- 3. Visual intro: sikke — greedy kab sahi, kab galat ----------
+// ---------- 3. Visual intro: coins — greedy kab sahi, kab galat ----------
 export const coinsTrace = tracer<{ coins: number[]; amount: number }>({
   inputs: [
-    { name: 'coins', type: 'intArray', label: 'Sikke (alag alag, chhote se bade)', default: [1, 3, 4], minLen: 1, maxLen: 4, min: 1, max: 12, sorted: true, distinct: true },
+    { name: 'coins', type: 'intArray', label: 'Coins (alag alag, chhote se bade)', default: [1, 3, 4], minLen: 1, maxLen: 4, min: 1, max: 12, sorted: true, distinct: true },
     { name: 'amount', type: 'int', label: 'Amount', default: 6, min: 1, max: 30 },
   ],
   run({ coins, amount }, t) {
@@ -14,19 +14,19 @@ export const coinsTrace = tracer<{ coins: number[]; amount: number }>({
     const taken: number[] = [];
     let left = amount;
     const view = (k?: number, extra: Panel[] = []): Panel[] => [
-      array(desc, { label: 'Sikke (bade pehle)', pointers: k !== undefined ? { c: k } : {}, tones: k !== undefined ? { [k]: 'active' } : {} }),
-      array(taken, { label: `Greedy ke sikke · bacha ${left}`, tones: Object.fromEntries(taken.map((_, i) => [i, 'compare'])) }),
+      array(desc, { label: 'Coins (bade pehle)', pointers: k !== undefined ? { c: k } : {}, tones: k !== undefined ? { [k]: 'active' } : {} }),
+      array(taken, { label: `Greedy ke coins · bacha ${left}`, tones: Object.fromEntries(taken.map((_, i) => [i, 'compare'])) }),
       ...extra,
     ];
-    t.frame({ caption: `${amount} banane hain, kam se kam sikkon mein. Greedy soch: "har baar sabse BADA sikka jo fit ho". Bharat ke sikkon (1, 2, 5, 10) par ye hamesha sahi hai. Kya har set par?`, panels: view() });
+    t.frame({ caption: `${amount} banane hain, kam se kam coins mein. Greedy soch: "har baar sabse BADA coin jo fit ho". Bharat ke coins (1, 2, 5, 10) par ye hamesha sahi hai. Kya har set par?`, panels: view() });
     desc.forEach((c, k) => {
       const n = Math.floor(left / c);
       for (let i = 0; i < n; i++) taken.push(c);
       left -= n * c;
-      t.frame({ caption: n ? `${c} ka sikka ${n} baar fit → ${n} × ${c} liya, bacha ${left}.` : `${c} bada hai (bacha ${left}) → skip.`, vars: { coin: c, left }, panels: view(k) });
+      t.frame({ caption: n ? `${c} ka coin ${n} baar fit → ${n} × ${c} liya, bacha ${left}.` : `${c} bada hai (bacha ${left}) → skip.`, vars: { coin: c, left }, panels: view(k) });
     });
     const greedy = left === 0 ? taken.length : -1;
-    // DP se sabse kam (sirf tulna ke liye)
+    // DP se sabse kam (sirf comparison ke liye)
     const INF = 1e9;
     const dp: number[] = Array(amount + 1).fill(INF);
     const pick: number[] = Array(amount + 1).fill(0);
@@ -37,9 +37,9 @@ export const coinsTrace = tracer<{ coins: number[]; amount: number }>({
     const bestN = dp[amount] < INF ? dp[amount] : -1;
     const bestPanel = array(best, { label: 'Sabse kam (sab tareeke dekh ke — DP)', tones: Object.fromEntries(best.map((_, i) => [i, 'found'])) });
     if (greedy === bestN) {
-      t.frame({ caption: greedy < 0 ? `Greedy se ${amount} ban hi nahi paaya, aur kisi tareeke se bhi nahi — ye sikke kaafi nahi.` : `Greedy: ${greedy} sikke = sabse kam bhi ${bestN}. Yahan greedy jeet gaya — par ye "ittefaq" hai ya "guarantee", saabit karna padta hai.`, legend: { compare: 'greedy', found: 'best' }, panels: view(undefined, [bestPanel]) });
+      t.frame({ caption: greedy < 0 ? `Greedy se ${amount} ban hi nahi paaya, aur kisi tareeke se bhi nahi — ye coins kaafi nahi.` : `Greedy: ${greedy} coins = sabse kam bhi ${bestN}. Yahan greedy jeet gaya — par ye "coincidence" hai ya "guarantee", saabit karna padta hai.`, legend: { compare: 'greedy', found: 'best' }, panels: view(undefined, [bestPanel]) });
     } else {
-      t.frame({ caption: `Greedy: ${greedy < 0 ? `fail (${left} bacha, chhota sikka nahi)` : `${greedy} sikke`}. Par ${listStr(best)} = sirf ${bestN} sikke! Bada sikka pehle lena yahan GALAT tha. Greedy tabhi lagao jab saabit ho ki "abhi ka best" kabhi pachhtaata nahi.`, legend: { compare: 'greedy', found: 'best' }, panels: view(undefined, [bestPanel]) });
+      t.frame({ caption: `Greedy: ${greedy < 0 ? `fail (${left} bacha, chhota sikka nahi)` : `${greedy} sikke`}. Par ${listStr(best)} = sirf ${bestN} coins! Bada coin pehle lena yahan GALAT tha. Greedy tabhi lagao jab saabit ho ki "abhi ka best" kabhi pachhtaata nahi.`, legend: { compare: 'greedy', found: 'best' }, panels: view(undefined, [bestPanel]) });
     }
     return `greedy ${greedy}, best ${bestN}`;
   },
@@ -48,7 +48,7 @@ export const coinsTrace = tracer<{ coins: number[]; amount: number }>({
 // ---------- 4. How: budget mein zyada se zyada cheezein (sasti pehle) ----------
 export const itemsTrace = tracer<{ costs: number[]; budget: number }>({
   inputs: [
-    { name: 'costs', type: 'intArray', label: 'Daam', default: [6, 2, 9, 3, 1, 4], minLen: 1, maxLen: 8, min: 1, max: 20 },
+    { name: 'costs', type: 'intArray', label: 'Price', default: [6, 2, 9, 3, 1, 4], minLen: 1, maxLen: 8, min: 1, max: 20 },
     { name: 'budget', type: 'int', label: 'Budget', default: 10, min: 0, max: 40 },
   ],
   run({ costs, budget }, t) {
@@ -57,8 +57,8 @@ export const itemsTrace = tracer<{ costs: number[]; budget: number }>({
     let left = budget;
     let count = 0;
     const legend = { found: 'khareeda', active: 'abhi', error: 'paisa kam' };
-    const view = (i?: number): Panel[] => [array(sorted, { label: `Daam (sorted) · bacha ₹${left}`, tones: st, pointers: i !== undefined ? { i } : {}, ranges: count ? [{ from: 0, to: count - 1, label: `${count} liye` }] : [] })];
-    t.frame({ line: 'sort', caption: `Zyada se zyada CHEEZEIN chahiye (keemat nahi). Greedy: hamesha sabse sasti. Sort: ${listStr(sorted)}. Kyun sahi? Koi bhi jawab jisme mehngi li aur sasti chhodi — use sasti se badlo, paisa bachega, ginti utni hi.`, legend, panels: view() });
+    const view = (i?: number): Panel[] => [array(sorted, { label: `Price (sorted) · bacha ₹${left}`, tones: st, pointers: i !== undefined ? { i } : {}, ranges: count ? [{ from: 0, to: count - 1, label: `${count} liye` }] : [] })];
+    t.frame({ line: 'sort', caption: `Zyada se zyada CHEEZEIN chahiye (price nahi). Greedy: hamesha sabse sasti. Sort: ${listStr(sorted)}. Kyun sahi? Koi bhi jawab jisme mehngi li aur sasti chhodi — use sasti se badlo, paisa bachega, count utni hi.`, legend, panels: view() });
     for (let i = 0; i < sorted.length; i++) {
       const c = sorted[i];
       if (c > left) {
@@ -69,7 +69,7 @@ export const itemsTrace = tracer<{ costs: number[]; budget: number }>({
       left -= c;
       count++;
       st[i] = 'found';
-      t.frame({ line: 'take', caption: `₹${c} — abhi ki sabse sasti, li. Bacha ₹${left}, ginti ${count}.`, vars: { c, left, count }, legend, panels: view(i) });
+      t.frame({ line: 'take', caption: `₹${c} — abhi ki sabse sasti, li. Bacha ₹${left}, count ${count}.`, vars: { c, left, count }, legend, panels: view(i) });
     }
     t.frame({ line: 'done', caption: `${count} cheezein. Sort O(n log n) + ek pass O(n).`, vars: { count }, legend, panels: view() });
     return String(count);
@@ -124,37 +124,37 @@ export const lemonadeTrace = tracer<{ notes: number[] }>({
     const legend = { found: 'chhutta diya', error: 'chhutta nahi', active: 'abhi' };
     const view = (i?: number): Panel[] => [
       array(bills.map((b) => `₹${b}`), { label: 'Line mein customers (lemonade ₹5)', tones: { ...st, ...(i !== undefined ? { [i]: 'active' } : {}) }, pointers: i !== undefined ? { i } : {} }),
-      { kind: 'map', label: 'Galla', keyLabel: 'note', valueLabel: 'kitne', entries: [{ key: '₹5', value: five }, { key: '₹10', value: ten }] },
+      { kind: 'map', label: 'Cash box', keyLabel: 'note', valueLabel: 'kitne', entries: [{ key: '₹5', value: five }, { key: '₹10', value: ten }] },
     ];
-    t.frame({ caption: 'Lemonade ₹5 ka. Shuru mein galla khaali. Har customer ko sahi chhutta lautana hai — sirf usi paise se jo pehle aaya.', legend, panels: view() });
+    t.frame({ caption: 'Lemonade ₹5 ka. Shuru mein cash box khaali. Har customer ko sahi chhutta return karna hai — sirf usi paise se jo pehle aaya.', legend, panels: view() });
     for (let i = 0; i < bills.length; i++) {
       const b = bills[i];
       if (b === 5) {
         five++;
         st[i] = 'found';
-        t.frame({ line: 'five', caption: '₹5 mila → kuch nahi lautana. Galle mein ek ₹5 aur.', vars: { five, ten }, legend, panels: view(i) });
+        t.frame({ line: 'five', caption: '₹5 mila → kuch nahi return karna. Cash box mein ek ₹5 aur.', vars: { five, ten }, legend, panels: view(i) });
       } else if (b === 10) {
         if (five === 0) {
           st[i] = 'error';
-          t.frame({ line: 'ten', caption: '₹10 mila, ₹5 lautana hai — galle mein ₹5 nahi! → false.', vars: { five, ten }, legend, panels: view(i) });
+          t.frame({ line: 'ten', caption: '₹10 mila, ₹5 return karna hai — cash box mein ₹5 nahi! → false.', vars: { five, ten }, legend, panels: view(i) });
           return 'false';
         }
         five--;
         ten++;
         st[i] = 'found';
-        t.frame({ line: 'ten', caption: `₹10 mila → ek ₹5 lautaya. Galla: ${five} × ₹5, ${ten} × ₹10.`, vars: { five, ten }, legend, panels: view(i) });
+        t.frame({ line: 'ten', caption: `₹10 mila → ek ₹5 return kiya. Cash box: ${five} × ₹5, ${ten} × ₹10.`, vars: { five, ten }, legend, panels: view(i) });
       } else if (ten > 0 && five > 0) {
         ten--;
         five--;
         st[i] = 'found';
-        t.frame({ line: 'twenty', caption: `₹20 mila, ₹15 lautane. Greedy: ₹10 + ₹5 (₹10 sirf ₹20 wale ke kaam aata hai; ₹5 sabke). Galla: ${five} × ₹5, ${ten} × ₹10.`, vars: { five, ten }, legend, panels: view(i) });
+        t.frame({ line: 'twenty', caption: `₹20 mila, ₹15 return karne. Greedy: ₹10 + ₹5 (₹10 sirf ₹20 wale ke kaam aata hai; ₹5 sabke). Cash box: ${five} × ₹5, ${ten} × ₹10.`, vars: { five, ten }, legend, panels: view(i) });
       } else if (five >= 3) {
         five -= 3;
         st[i] = 'found';
-        t.frame({ line: 'twenty', caption: `₹20 mila, ₹10 ka note nahi → 3 × ₹5. Galla: ${five} × ₹5.`, vars: { five, ten }, legend, panels: view(i) });
+        t.frame({ line: 'twenty', caption: `₹20 mila, ₹10 ka note nahi → 3 × ₹5. Cash box: ${five} × ₹5.`, vars: { five, ten }, legend, panels: view(i) });
       } else {
         st[i] = 'error';
-        t.frame({ line: 'fail', caption: `₹20 mila, ₹15 lautane — na ₹10 + ₹5, na 3 × ₹5 → false.`, vars: { five, ten }, legend, panels: view(i) });
+        t.frame({ line: 'fail', caption: `₹20 mila, ₹15 return karne — na ₹10 + ₹5, na 3 × ₹5 → false.`, vars: { five, ten }, legend, panels: view(i) });
         return 'false';
       }
     }
@@ -176,10 +176,10 @@ export const jumpTrace = tracer<{ nums: number[] }>({
       if (i !== undefined) tones[i] = bad ? 'error' : 'active';
       return [array(nums, { label: 'nums', tones, pointers: i !== undefined ? { i } : {}, ranges: [{ from: 0, to: Math.min(reach, n - 1), label: `reach = ${reach}` }] })];
     };
-    t.frame({ line: 'init', caption: `Index 0 se shuru, nums[i] = wahan se max kitna kood sakte. Har rasta try karna = exponential. Greedy: bas ek number yaad rakho — reach = ab tak sabse door kahan tak pahunch sakte hain.`, legend, panels: view() });
+    t.frame({ line: 'init', caption: `Index 0 se shuru, nums[i] = wahan se max kitna jump kar sakte. Har rasta try karna = exponential. Greedy: bas ek number yaad rakho — reach = ab tak sabse door kahan tak pahunch sakte hain.`, legend, panels: view() });
     for (let i = 0; i < n; i++) {
       if (i > reach) {
-        t.frame({ line: 'stuck', caption: `i = ${i} > reach = ${reach}. Pichhla koi index yahan tak nahi kood sakta → aakhir tak nahi pahunch sakte. false.`, vars: { i, reach }, legend, panels: view(i, true) });
+        t.frame({ line: 'stuck', caption: `i = ${i} > reach = ${reach}. Pichhla koi index yahan tak nahi jump kar sakta → aakhir tak nahi pahunch sakte. false.`, vars: { i, reach }, legend, panels: view(i, true) });
         return 'false';
       }
       const old = reach;

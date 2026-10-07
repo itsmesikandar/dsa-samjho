@@ -1,6 +1,6 @@
 import java.util.PriorityQueue
 
-// Signal sab tak kab pahunchega = sabse door wale node ki shortest doori (k se)
+// Signal sab tak kab pahunchega = sabse door wale node ki shortest distance (k se)
 fun networkDelayTime(times: Array<IntArray>, n: Int, k: Int): Int {
     val adj = List(n + 1) { mutableListOf<IntArray>() } // nodes 1..n
     for ((u, v, w) in times) adj[u].add(intArrayOf(v, w))

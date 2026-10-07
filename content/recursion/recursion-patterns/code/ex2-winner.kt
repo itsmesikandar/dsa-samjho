@@ -1,4 +1,4 @@
-// Do players baari-baari array ke kisi kinare se ek number uthate hain. Player 1 jeet (ya tie) sakta hai?
+// 2 players baari-baari array ke kisi edge se ek number uthate hain. Player 1 jeet (ya tie) sakta hai?
 fun predictTheWinner(nums: IntArray): Boolean = diff(nums, 0, nums.size - 1) >= 0
 
 // nums[l..r] bacha hai: jiski baari hai wo saamne wale se KITNA aage reh sakta hai (dono best khelein to)

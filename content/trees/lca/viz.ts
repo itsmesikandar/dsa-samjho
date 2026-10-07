@@ -17,7 +17,7 @@ const pathTo = (t: T, id: string | null, x: number, path: string[] = []): string
 const treeIn = (max: number, def: (number | null)[]) => ({ name: 'levels', type: 'tree' as const, label: 'Tree', default: def, maxNodes: 11, min: 0, max });
 const SAMPLE = [3, 5, 1, 6, 2, 0, 8, null, null, 7, 4];
 
-// ---------- 3. Visual intro: do raaste, common hissa ----------
+// ---------- 3. Visual intro: 2 raaste, common hissa ----------
 export const ancestorPaths = tracer<PQ>({
   inputs: [treeIn(9, SAMPLE), { name: 'p', type: 'int', label: 'p', default: 7, min: 0, max: 9 }, { name: 'q', type: 'int', label: 'q', default: 6, min: 0, max: 9 }],
   check: present,
@@ -78,7 +78,7 @@ export const lcaTrace = tracer<PQ>({
       return up;
     };
     const ans = lca(tr.root);
-    t.frame({ line: 'both', caption: `Root tak ${val(tr, ans)} pahuncha → LCA = ${val(tr, ans)}. Badge ↑x = us call ne kya lautaya. Ek DFS, O(n).`, legend, panels: view() });
+    t.frame({ line: 'both', caption: `Root tak ${val(tr, ans)} pahuncha → LCA = ${val(tr, ans)}. Badge ↑x = us call ne kya return kiya. Ek DFS, O(n).`, legend, panels: view() });
     return String(val(tr, ans));
   },
 });
@@ -169,7 +169,7 @@ export const deepestTrace = tracer<{ levels: (number | null)[] }>({
     const tr = make(levels);
     const tones: Record<string, Tone> = {};
     const badges: Record<string, string> = {};
-    const legend = { compare: 'abhi', done: 'jawab bheja', new: 'LCA (barabar gehre)' };
+    const legend = { compare: 'abhi', done: 'jawab bheja', new: 'LCA (barabar deep)' };
     const view = (cur?: string): Panel[] => [treeView(tr.nodes, tr.root, { tones: cur ? { ...tones, [cur]: 'compare' } : tones, badges, pointers: cur ? { node: cur } : {} })];
     const deep = (id: string | null): [number, string | null] => {
       if (!id) return [0, null];
@@ -179,17 +179,17 @@ export const deepestTrace = tracer<{ levels: (number | null)[] }>({
       if (lh === rh) {
         tones[id] = 'new';
         badges[id] = `h${lh + 1}→${n.value}`;
-        t.frame({ line: 'tie', caption: lh === 0 ? `${n.value} leaf hai → height 1, apna LCA khud.` : `${n.value}: left height ${lh} = right height ${rh} → sabse gehre leaves DONO taraf. Unka LCA yahi ${n.value}.`, legend, panels: view(id) });
+        t.frame({ line: 'tie', caption: lh === 0 ? `${n.value} leaf hai → height 1, apna LCA khud.` : `${n.value}: left height ${lh} = right height ${rh} → sabse deep leaves DONO taraf. Unka LCA yahi ${n.value}.`, legend, panels: view(id) });
         return [lh + 1, id];
       }
       const [h, node] = lh > rh ? [lh, ln] : [rh, rn];
       tones[id] = 'done';
       badges[id] = `h${h + 1}→${val(tr, node)}`;
-      t.frame({ line: 'deeper', caption: `${n.value}: ${lh > rh ? 'left' : 'right'} zyada gehra (${lh} vs ${rh}) → sabse gehre leaves sirf usi taraf. Uska jawab ${val(tr, node)} hi upar bhejo.`, legend, panels: view(id) });
+      t.frame({ line: 'deeper', caption: `${n.value}: ${lh > rh ? 'left' : 'right'} zyada deep (${lh} vs ${rh}) → sabse deep leaves sirf usi taraf. Uska jawab ${val(tr, node)} hi upar bhejo.`, legend, panels: view(id) });
       return [h + 1, node];
     };
     const [, ans] = deep(tr.root);
-    t.frame({ line: 'tie', caption: `Jawab ${val(tr, ans)}. Badge h→x = (height, LCA) pair — tree-recursion wala "do cheezein return karo" pattern.`, legend, panels: view() });
+    t.frame({ line: 'tie', caption: `Jawab ${val(tr, ans)}. Badge h→x = (height, LCA) pair — tree-recursion wala "2 cheezein return karo" pattern.`, legend, panels: view() });
     return String(val(tr, ans));
   },
 });

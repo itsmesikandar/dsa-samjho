@@ -12,7 +12,7 @@ class Main {
         }
     }
 
-    // Do sorted lists ko ek sorted list mein jodo (naye nodes nahi - wahi nodes re-link)
+    // 2 sorted lists ko ek sorted list mein jodo (naye nodes nahi - wahi nodes re-link)
     static ListNode mergeTwoLists(ListNode a, ListNode b) {
         ListNode dummy = new ListNode(0, null); // nakli shuruaat: "pehla node kaun" wala special case khatam
         ListNode tail = dummy; // result ka aakhri node //@init

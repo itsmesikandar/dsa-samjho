@@ -2,7 +2,7 @@ meta:
   id: hashmap
   chapter: hashing
   title: HashMap
-  subtitle: Key se value — O(1) mein. "Pehle dekha hai?" wale har sawaal ka hathiyaar
+  subtitle: Key se value — O(1) mein. "Pehle dekha hai?" wale har sawaal ka tool
   level: beginner
   minutes: 35
   prereqs: [hashing-internals, kotlin-java-toolkit]
@@ -38,18 +38,18 @@ what:
 # 2. Kyun chahiye?
 why:
   body: |
-    Bahut saare problems ka brute force O(n²) hota hai kyunki har item ke liye poore array mein uska "jodi" ya "pehle wala" dhoondhte hain. HashMap us andar wale loop ko **O(1) lookup** se badal deta hai → **O(n)**.
+    Bahut saare problems ka brute force O(n²) hota hai kyunki har item ke liye poore array mein uska "pair" ya "pehle wala" dhoondhte hain. HashMap us andar wale loop ko **O(1) lookup** se badal deta hai → **O(n)**.
 
     HashMap ke 4 classic patterns:
     1. **Complement lookup** — "target − x pehle dekha?" (Two Sum)
     2. **Counting** — "kitni baar aaya?" (frequency)
-    3. **Mapping / rishta** — "is char ka jodi kaun?" (isomorphic, anagram groups)
+    3. **Mapping / rishta** — "is char ka pair kaun?" (isomorphic, anagram groups)
     4. **Prefix + map** — "pehle kitne prefix aise the?" (subarray sum = k)
 
     > [!socho]
     > Two Sum ka brute force O(n²) hai. HashMap kya "yaad" rakhta hai jo isko O(n) bana deta hai?
     >
-    > Ab tak dekhe gaye **numbers aur unke index**. Har naye number par sirf poochna padta hai: "mera jodi in yaad mein hai?" — O(1).
+    > Ab tak dekhe gaye **numbers aur unke index**. Har naye number par sirf poochna padta hai: "mera pair in yaad mein hai?" — O(1).
 
 # 3. Visual intro
 visual:
@@ -111,7 +111,7 @@ code:
 examples:
   - id: two-sum
     level: easy
-    title: Two Sum — jodi jiska sum target ho
+    title: Two Sum — pair jiska sum target ho
     source: { name: Two Sum, platform: LeetCode, url: "https://leetcode.com/problems/two-sum/" }
     problem: |
       Ek array aur `target` diya hai. Do **alag index** dhoondho jinke numbers ka sum `target` ho, aur un indexes ko return karo. Maan lo ek hi answer hai.
@@ -121,13 +121,13 @@ examples:
       **Brute force:** har pair → O(n²).
 
       **HashMap trick:** left se chalo. Har number x par:
-      - Jodi chahiye = `target − x`. Kya wo **pehle** aa chuka? → map mein dekho (O(1)).
+      - Pair chahiye = `target − x`. Kya wo **pehle** aa chuka? → map mein dekho (O(1)).
       - Nahi aaya → x aur uska index map mein **yaad** rakh do.
 
-      Pehle check, phir store — taaki ek hi number ko do baar use na kar lo (`[3, 3]` jaisa case bhi sahi chalta hai).
+      Pehle check, phir store — taaki ek hi number ko 2 baar use na kar lo (`[3, 3]` jaisa case bhi sahi chalta hai).
 
       > [!tip]
-      > Interview mein ye **sabse pehla** HashMap question hota hai. Brute force → "kya repeat ho raha hai? jodi dhoondhna" → HashMap — ye soch bolna zaroori hai.
+      > Interview mein ye **sabse pehla** HashMap question hota hai. Brute force → "kya repeat ho raha hai? pair dhoondhna" → HashMap — ye soch bolna zaroori hai.
     dryRun: |
       `[2, 7, 11, 15]`, target 9
 
@@ -147,13 +147,13 @@ examples:
     title: Isomorphic strings — ek-se-ek char mapping
     source: { name: Isomorphic Strings, platform: LeetCode, url: "https://leetcode.com/problems/isomorphic-strings/" }
     problem: |
-      Do strings s aur t diye hain. Kya s ke har character ko kisi aur character se **badal ke** t ban sakti hai — is shart ke saath ki ek char hamesha **ek hi** char se badle, aur do alag chars **ek hi** char par na jaayein?
+      2 strings s aur t diye hain. Kya s ke har character ko kisi aur character se **badal ke** t ban sakti hai — is condition ke saath ki ek char hamesha **ek hi** char se badle, aur 2 alag chars **ek hi** char par na jaayein?
 
       Examples: `"egg"`, `"add"` → true. `"foo"`, `"bar"` → false. `"badc"`, `"baba"` → false.
     intuition: |
       Rishta **dono taraf** se pakka hona chahiye:
       - `s → t` map: `'e' → 'a'`, `'g' → 'd'`. Agar `'g'` baad mein kisi aur se jude → false.
-      - `t → s` map: `'a' → 'e'`… Agar t ka koi char do alag s-chars se aaye → false.
+      - `t → s` map: `'a' → 'e'`… Agar t ka koi char 2 alag s-chars se aaye → false.
 
       Sirf ek map rakha to `"badc"` / `"baba"` galti se true aa jaata — `b → b` aur `d → b` dono s → t mein theek lagte hain, par t ka 'b' do chars (b, d) se aa raha hai.
 
@@ -179,7 +179,7 @@ examples:
     title: Subarray sum equals k — prefix sum + HashMap
     source: { name: Subarray Sum Equals K, platform: LeetCode, url: "https://leetcode.com/problems/subarray-sum-equals-k/" }
     problem: |
-      Ek integer array (negative bhi ho sakte hain) aur k diya hai. **Kitne lagatar subarrays** ka sum exactly k hai?
+      Ek integer array (negative bhi ho sakte hain) aur k diya hai. **Kitne continuous subarrays** ka sum exactly k hai?
 
       Examples: `[1, 2, 3]`, k = 3 → 2 (`[1, 2]` aur `[3]`). `[1, -1, 1, -1]`, k = 0 → 4.
     intuition: |
@@ -187,9 +187,9 @@ examples:
 
       Ye k ho → **`pre[i] = pre[j] − k`**.
 
-      To left se chalte hue har j par poocho: **"ab tak kitne prefix `pre − k` ke barabar the?"** — utne hi subarrays j par khatam ho rahe hain jinka sum k hai. Prefix values ki ginti HashMap mein.
+      To left se chalte hue har j par poocho: **"ab tak kitne prefix `pre − k` ke barabar the?"** — utne hi subarrays j par khatam ho rahe hain jinka sum k hai. Prefix values ki count HashMap mein.
 
-      Shuruaat mein `count[0] = 1` — "kuch nahi liya" wala prefix, taaki index 0 se shuru hone wale subarrays bhi gine jaayein.
+      Shuruaat mein `count[0] = 1` — "kuch nahi liya" wala prefix, taaki index 0 se shuru hone wale subarrays bhi count kiye jaayein.
 
       > [!galti]
       > Sliding window yahan **nahi** chalti — negative numbers hain, window badhane se sum ghat bhi sakta hai. Negative dikhe to prefix + map socho.
@@ -213,8 +213,8 @@ when:
   use:
     - "Kisi cheez se jude data ko key se turant nikaalna — id → user, word → count."
     - "Brute force mein andar ka loop sirf **dhoondh** raha hai — use HashMap lookup se hatao."
-    - "Do cheezon ka rishta (mapping) banana — isomorphic, anagram groups, graph adjacency."
-    - "Prefix sums ke saath \"kitni baar\" ginna — subarray sum k, equal 0s/1s."
+    - "2 cheezon ka rishta (mapping) banana — isomorphic, anagram groups, graph adjacency."
+    - "Prefix sums ke saath \"kitni baar\" count karna — subarray sum k, equal 0s/1s."
   avoid:
     - "Keys sorted chahiye ya \"isse just bada key\" — TreeMap."
     - "Keys chhoti fixed range (0..25, 0..1000) — IntArray tez aur halka."
@@ -225,7 +225,7 @@ when:
     - keyword: "count of subarrays with sum / xor = k"
       think: "Prefix + HashMap counts, count[0] = 1."
     - keyword: "one-to-one mapping / pattern match"
-      think: "Do maps (dono taraf)."
+      think: "2 maps (dono taraf)."
     - keyword: "first / last occurrence index"
       think: "HashMap: value → index (putIfAbsent for first)."
 
@@ -258,7 +258,7 @@ mistakes:
   - title: "Two Sum mein pehle store, phir check"
     type: logic
     wrong: |
-      x ko map mein daal ke phir `target − x` dhoondha → target = 2x par ek hi index do baar use ho gaya (jaise [3], target 6 → [0, 0]).
+      x ko map mein daal ke phir `target − x` dhoondha → target = 2x par ek hi index 2 baar use ho gaya (jaise [3], target 6 → [0, 0]).
     right: |
       Pehle check, phir store.
   - title: "Subarray-k mein `count[0] = 1` bhoolna"
@@ -298,7 +298,7 @@ interview:
         HashMap — koi order nahi, O(1). LinkedHashMap — insertion (ya access) order yaad, O(1), thodi zyada memory. TreeMap — keys sorted, O(log n), floor/ceiling queries.
     - q: "Subarray sum equals k mein sliding window kyun nahi?"
       a: |
-        Negative numbers par window ka sum monotonic nahi hota — badhane par ghat bhi sakta hai, to shrink/expand ka faisla galat ho jaata hai. Prefix + map har case chalta hai.
+        Negative numbers par window ka sum monotonic nahi hota — badhane par ghat bhi sakta hai, to shrink/expand ka decision galat ho jaata hai. Prefix + map har case chalta hai.
     - q: "`getOrDefault` aur `computeIfAbsent` mein kya fark hai?"
       a: |
         getOrDefault sirf padhta hai (map nahi badalta). computeIfAbsent key na ho to value **bana ke daal deta hai** aur return karta hai — grouping (list per key) ke liye.
@@ -311,11 +311,11 @@ interview:
         Seedha `map.remove` loop ke andar → ConcurrentModificationException. Iterator ka `remove()`, ya `entries.removeIf { }` / `keys.removeAll { }`.
     - q: "Bahut bade input par HashMap slow kyun ho sakta hai?"
       a: |
-        Har entry ek object (boxing + node) → memory aur GC; rehashing; kharab hash par collisions. Keys chhote integers hon to IntArray ya specialized maps behtar.
+        Har entry ek object (boxing + node) → memory aur GC; rehashing; kharab hash par collisions. Keys chhote integers hon to IntArray ya specialized maps better.
   mayAsk:
     - "Longest substring without repeating characters (map: char → last index)."
     - "Group anagrams."
-    - "Kisi array mein do aise indices jinke values same aur doori ≤ k (Contains Duplicate II)."
+    - "Kisi array mein do aise indices jinke values same aur distance ≤ k (Contains Duplicate II)."
     - "LRU cache design."
 
 # 12. Practice
@@ -332,7 +332,7 @@ practice:
     num: 205
     url: "https://leetcode.com/problems/isomorphic-strings/"
     level: easy
-    pattern: Do maps (dono taraf)
+    pattern: 2 maps (dono taraf)
     hint: "Example 2. Ya ek trick: dono strings mein har char ki pehli position ka index compare karo."
   - name: Subarray Sum Equals K
     platform: LeetCode
@@ -354,7 +354,7 @@ practice:
     url: "https://leetcode.com/problems/continuous-subarray-sum/"
     level: medium
     pattern: Prefix % k + first index map
-    hint: "Do prefixes ka remainder (% k) same aur doori ≥ 2 → beech ka sum k ka multiple. map[0] = -1 se shuru."
+    hint: "2 prefixes ka remainder (% k) same aur distance ≥ 2 → beech ka sum k ka multiple. map[0] = -1 se shuru."
   - name: Longest Substring Without Repeating Characters
     platform: LeetCode
     num: 3
@@ -368,14 +368,14 @@ practice:
     url: "https://leetcode.com/problems/count-of-range-sum/"
     level: hard
     pattern: Prefix sums + sorted counting
-    hint: "Subarray-k ka bada bhai — exact k ki jagah range [lower, upper]. HashMap kaafi nahi; merge sort se gino."
+    hint: "Subarray-k ka bada bhai — exact k ki jagah range [lower, upper]. HashMap kaafi nahi; merge sort se count karo."
   - name: Subarrays with K Different Integers
     platform: LeetCode
     num: 992
     url: "https://leetcode.com/problems/subarrays-with-k-different-integers/"
     level: hard
     pattern: Count map + window, exactly(K) = atMost(K) − atMost(K − 1)
-    hint: "atMost(k) sliding window + frequency map se. Phir do baar call karke ghatao."
+    hint: "atMost(k) sliding window + frequency map se. Phir 2 baar call karke ghatao."
 
 # 13. Quick revision
 revision:
@@ -406,7 +406,7 @@ revision:
       answer: 2
       explain: "HashMap complement lookup — ek pass."
     - q: "Subarray sum equals k mein `count[0] = 1` kyun?"
-      options: ["Speed ke liye", "Index 0 se shuru hone wale subarrays ginne ke liye", "Negative numbers ke liye", "Zaroori nahi"]
+      options: ["Speed ke liye", "Index 0 se shuru hone wale subarrays count karne ke liye", "Negative numbers ke liye", "Zaroori nahi"]
       answer: 1
       explain: "pre − k = 0 tab hota hai jab poora prefix hi k ho."
     - q: "Keys sorted order mein chahiye. Kaunsa?"
@@ -431,6 +431,6 @@ connections:
     - id: sliding-window-variable
       how: "Window ke andar characters ki counts map mein."
     - id: graph-basics
-      how: "Adjacency list aksar HashMap<Node, List<Node>>."
+      how: "Adjacency list often HashMap<Node, List<Node>>."
     - id: dp-intro
       how: "Memoization = HashMap mein pehle ke answers."

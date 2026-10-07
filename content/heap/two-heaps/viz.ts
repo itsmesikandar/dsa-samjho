@@ -13,8 +13,8 @@ const dbl = (n: number) => (Number.isInteger(n) ? n.toFixed(1) : String(n));
 const med = (L: Item[], R: Item[]) => (L.length > R.length ? L[0].v : (L[0].v + R[0].v) / 2);
 const medWhy = (L: Item[], R: Item[]) =>
   L.length > R.length
-    ? `Kul ${L.length + R.length} (odd) → median = left ka top ${L[0].v}`
-    : `Kul ${L.length + R.length} (even) → median = (${L[0].v} + ${R[0].v}) / 2 = ${dbl(med(L, R))}`;
+    ? `Total ${L.length + R.length} (odd) → median = left ka top ${L[0].v}`
+    : `Total ${L.length + R.length} (even) → median = (${L[0].v} + ${R[0].v}) / 2 = ${dbl(med(L, R))}`;
 
 /** dono heaps ke tree: left top 'active', right top 'compare', `hot` ids upar se */
 function halves(L: Item[], R: Item[], hot: Hot = {}, names = ['Left: chhota aadha (MAX-heap)', 'Right: bada aadha (MIN-heap)']): Panel[] {
@@ -52,7 +52,7 @@ export const halvesTrace = tracer<{ nums: number[] }>({
         ...halves(L.a, R.a, hot),
       ];
     };
-    t.frame({ caption: 'Har naye number ke baad median chahiye. Idea: numbers ko do aadhon mein baanto — chhota aadha LEFT (max-heap), bada aadha RIGHT (min-heap). Median hamesha in dono ke TOP par milega.', legend, panels: view() });
+    t.frame({ caption: 'Har naye number ke baad median chahiye. Idea: numbers ko do aadhon mein divide karo — chhota aadha LEFT (max-heap), bada aadha RIGHT (min-heap). Median hamesha in dono ke TOP par milega.', legend, panels: view() });
     nums.forEach((x, i) => {
       const id = `e${i}`;
       const toLeft = !L.a.length || x <= L.a[0].v;
@@ -68,7 +68,7 @@ export const halvesTrace = tracer<{ nums: number[] }>({
       const m = from.poll()!;
       (from === L ? R : L).add(m);
       const edge = from === L ? 'Left ka top (chhoton mein sabse bada)' : 'Right ka top (badon mein sabse chhota)';
-      t.frame({ caption: `${edge} ${m.v} ${from === L ? 'right' : 'left'} mein gaya. Order nahi toota — wo seedha seema (boundary) par tha. Sizes ${L.a.length} / ${R.a.length}. ${medWhy(L.a, R.a)}.`, vars: { x, median: dbl(med(L.a, R.a)) }, legend, panels: view({ [m.id]: 'swap' }) });
+      t.frame({ caption: `${edge} ${m.v} ${from === L ? 'right' : 'left'} mein gaya. Order nahi toota — wo seedha boundary (boundary) par tha. Sizes ${L.a.length} / ${R.a.length}. ${medWhy(L.a, R.a)}.`, vars: { x, median: dbl(med(L.a, R.a)) }, legend, panels: view({ [m.id]: 'swap' }) });
     });
     t.frame({ caption: `Har number par sirf tops dekhe aur max ek number idhar-udhar kiya → O(log n). Median padhna O(1) — beech wale hamesha tops par. Final median = ${dbl(med(L.a, R.a))}.`, legend, panels: view() });
     return dbl(med(L.a, R.a));
@@ -88,37 +88,37 @@ export const medianTrace = tracer<{ nums: number[] }>({
       array(nums, { pointers: { x: i }, label: 'nums' }),
       array(out, { label: 'Medians', tones: out.length ? { [out.length - 1]: 'found' } : {} }),
     ];
-    t.frame({ line: 'init', caption: 'Do heaps, do niyam: (1) left ka har number ≤ right ka har number. (2) left.size = right.size, ya right.size + 1. Dono sach → median tops se.', legend, panels: view(undefined) });
+    t.frame({ line: 'init', caption: '2 heaps, do rule: (1) left ka har number ≤ right ka har number. (2) left.size = right.size, ya right.size + 1. Dono sach → median tops se.', legend, panels: view(undefined) });
     nums.forEach((x, i) => {
       const id = `e${i}`;
       const sizes = () => ({ x, left: L.a.length, right: R.a.length });
       if (!L.a.length || x <= L.a[0].v) {
         const why = L.a.length ? `${x} ≤ left ka top ${L.a[0].v}` : 'Left khaali';
         L.add({ v: x, id });
-        t.frame({ line: 'toL', caption: `${why} → chhote aadhe ka → left.add(${x}). Niyam 1 bacha.`, vars: sizes(), legend, panels: view(i, { [id]: 'new' }) });
+        t.frame({ line: 'toL', caption: `${why} → chhote aadhe ka → left.add(${x}). Rule 1 bacha.`, vars: sizes(), legend, panels: view(i, { [id]: 'new' }) });
       } else {
         const lt = L.a[0].v;
         R.add({ v: x, id });
-        t.frame({ line: 'toR', caption: `${x} > left ka top ${lt} → bade aadhe ka → right.add(${x}). Niyam 1 bacha.`, vars: sizes(), legend, panels: view(i, { [id]: 'new' }) });
+        t.frame({ line: 'toR', caption: `${x} > left ka top ${lt} → bade aadhe ka → right.add(${x}). Rule 1 bacha.`, vars: sizes(), legend, panels: view(i, { [id]: 'new' }) });
       }
       if (L.a.length > R.a.length + 1) {
         const m = L.poll()!;
         R.add(m);
-        t.frame({ line: 'fixL', caption: `Left ${L.a.length + 1}, right ${R.a.length - 1} — farak 2, niyam 2 toota. Left ka top ${m.v} right mein. Wo left ka sabse bada tha, to niyam 1 phir bhi sach.`, vars: sizes(), legend, panels: view(i, { [m.id]: 'swap' }) });
+        t.frame({ line: 'fixL', caption: `Left ${L.a.length + 1}, right ${R.a.length - 1} — farak 2, rule 2 toota. Left ka top ${m.v} right mein. Wo left ka sabse bada tha, to rule 1 phir bhi sach.`, vars: sizes(), legend, panels: view(i, { [m.id]: 'swap' }) });
       } else if (R.a.length > L.a.length) {
         const m = R.poll()!;
         L.add(m);
-        t.frame({ line: 'fixR', caption: `Right ${R.a.length + 1}, left ${L.a.length - 1} — right bada, niyam 2 toota. Right ka top ${m.v} left mein. Wo right ka sabse chhota tha, to niyam 1 phir bhi sach.`, vars: sizes(), legend, panels: view(i, { [m.id]: 'swap' }) });
+        t.frame({ line: 'fixR', caption: `Right ${R.a.length + 1}, left ${L.a.length - 1} — right bada, rule 2 toota. Right ka top ${m.v} left mein. Wo right ka sabse chhota tha, to rule 1 phir bhi sach.`, vars: sizes(), legend, panels: view(i, { [m.id]: 'swap' }) });
       }
       out.push(dbl(med(L.a, R.a)));
       t.frame({ line: 'median', caption: `${medWhy(L.a, R.a)}.`, vars: { ...sizes(), median: out[out.length - 1] }, legend, panels: view(i) });
     });
-    t.frame({ caption: `Medians: ${listStr(out)}. Har number par 2-3 heap ops → O(log n); median padhna O(1). Kul O(n log n), memory O(n).`, legend, panels: view(undefined) });
+    t.frame({ caption: `Medians: ${listStr(out)}. Har number par 2-3 heap ops → O(log n); median padhna O(1). Total O(n log n), memory O(n).`, legend, panels: view(undefined) });
     return listStr(out);
   },
 });
 
-// ---------- Example 1: MedianFinder (3 kadam wala trick) ----------
+// ---------- Example 1: MedianFinder (3 step wala trick) ----------
 export const finderTrace = tracer<{ nums: number[] }>({
   inputs: [{ name: 'nums', type: 'intArray', label: 'addNum ke numbers (aakhir mein findMedian)', default: [6, 10, 2, 6, 5, 0], minLen: 1, maxLen: 8, min: -20, max: 99 }],
   run({ nums }, t) {
@@ -126,25 +126,25 @@ export const finderTrace = tracer<{ nums: number[] }>({
     const R = minHeap();
     const legend = topsLegend;
     const view = (i: number | undefined, hot: Hot = {}): Panel[] => [...halves(L.a, R.a, hot), array(nums, { pointers: { add: i }, label: 'addNum calls' })];
-    t.frame({ caption: 'Har addNum ke teen fix kadam: (1) left mein daalo. (2) left ka top right mein. (3) right bada ho gaya to uska top wapas left. "Kis heap mein jaaye?" wala if likhna hi nahi padta.', legend, panels: view(undefined) });
+    t.frame({ caption: 'Har addNum ke 3 fix step: (1) left mein daalo. (2) left ka top right mein. (3) right bada ho gaya to uska top wapas left. "Kis heap mein jaaye?" wala if likhna hi nahi padta.', legend, panels: view(undefined) });
     nums.forEach((x, i) => {
       const id = `e${i}`;
       const sizes = () => ({ num: x, left: L.a.length, right: R.a.length });
       L.add({ v: x, id });
-      t.frame({ line: 'push', caption: `addNum(${x}), kadam 1: seedha left mein. Abhi pata nahi ${x} chhote aadhe ka hai ya bade ka — kadam 2 batayega.`, vars: sizes(), legend, panels: view(i, { [id]: 'new' }) });
+      t.frame({ line: 'push', caption: `addNum(${x}), step 1: seedha left mein. Abhi pata nahi ${x} chhote aadhe ka hai ya bade ka — step 2 batayega.`, vars: sizes(), legend, panels: view(i, { [id]: 'new' }) });
       const m = L.poll()!;
       R.add(m);
       const said =
         m.id === id
           ? `Left ka top ${x} khud nikla → ${x} bade aadhe ka tha, ab right mein.`
           : `Left ka top ${m.v} right mein gaya; ${x} left mein reh gaya → chhote aadhe ka hai.`;
-      t.frame({ line: 'move', caption: `Kadam 2: ${said} Left ka sabse bada hi bheja, isliye left ≤ right pakka.`, vars: sizes(), legend, panels: view(i, { [m.id]: 'swap' }) });
+      t.frame({ line: 'move', caption: `Step 2: ${said} Left ka sabse bada hi bheja, isliye left ≤ right pakka.`, vars: sizes(), legend, panels: view(i, { [m.id]: 'swap' }) });
       if (R.a.length > L.a.length) {
         const b = R.poll()!;
         L.add(b);
-        t.frame({ line: 'balance', caption: `Kadam 3: right (${R.a.length + 1}) > left (${L.a.length - 1}) → right ka top ${b.v} wapas left. Sizes ab ${L.a.length} / ${R.a.length}.`, vars: sizes(), legend, panels: view(i, { [b.id]: 'swap' }) });
+        t.frame({ line: 'balance', caption: `Step 3: right (${R.a.length + 1}) > left (${L.a.length - 1}) → right ka top ${b.v} wapas left. Sizes ab ${L.a.length} / ${R.a.length}.`, vars: sizes(), legend, panels: view(i, { [b.id]: 'swap' }) });
       } else {
-        t.frame({ line: 'balance', caption: `Kadam 3: right (${R.a.length}) left (${L.a.length}) se bada nahi → kuch nahi karna. Har add mein 3-5 heap ops, phir bhi O(log n).`, vars: sizes(), legend, panels: view(i) });
+        t.frame({ line: 'balance', caption: `Step 3: right (${R.a.length}) left (${L.a.length}) se bada nahi → kuch nahi karna. Har add mein 3-5 heap ops, phir bhi O(log n).`, vars: sizes(), legend, panels: view(i) });
       }
     });
     const ans = dbl(med(L.a, R.a));
@@ -270,7 +270,7 @@ export const windowMedianTrace = tracer<{ nums: number[]; k: number }>({
       }
     });
     const res = listStr(out);
-    t.frame({ caption: `Medians: ${res}. Har kadam: add O(log k) + remove O(k) + balance O(log k) → kul O(n·k). TreeMap / lazy deletion se O(n log k).`, legend, panels: view(nums.length - 1) });
+    t.frame({ caption: `Medians: ${res}. Har step: add O(log k) + remove O(k) + balance O(log k) → total O(n·k). TreeMap / lazy deletion se O(n log k).`, legend, panels: view(nums.length - 1) });
     return res;
   },
 });

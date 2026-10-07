@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // String ko tukdon mein kaato ki HAR tukda palindrome ho. Saare tareeke do.
+    // String ko pieces mein kaato ki HAR piece palindrome ho. Saare tareeke do.
     static List<List<String>> partition(String s) {
         List<List<String>> res = new ArrayList<>();
         bt(s, 0, new ArrayList<>(), res);
@@ -23,7 +23,7 @@ class Main {
             res.add(new ArrayList<>(path));
             return;
         }
-        for (int end = start; end < s.length(); end++) { // agla tukda s[start..end] - har lambai try
+        for (int end = start; end < s.length(); end++) { // agla piece s[start..end] - har length try
             if (!isPal(s, start, end)) continue; // palindrome nahi: is raaste jaana hi bekaar //@prune
             path.add(s.substring(start, end + 1)); //@choose
             bt(s, end + 1, path, res); // baaki string ko kaato

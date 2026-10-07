@@ -1,9 +1,9 @@
-// Size k ki har window (lagatar k items) mein sabse bada sum
+// Size k ki har window (continuous k items) mein sabse bada sum
 fun maxSumK(nums: IntArray, k: Int): Int {
     var sum = 0
     for (i in 0 until k) sum += nums[i] // pehli window ka sum, ek baar poora jodo //@first
     var best = sum
-    for (r in k until nums.size) { // window ek kadam aage khiski
+    for (r in k until nums.size) { // window ek step aage shift hui
         sum += nums[r] - nums[r - k] // naya item andar, sabse purana bahar //@slide
         best = maxOf(best, sum) //@best
     }

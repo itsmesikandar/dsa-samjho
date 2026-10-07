@@ -4,9 +4,9 @@ fun maxProfit(prices: IntArray): Int {
     var best = 0
     for (p in prices) {
         if (p < minPrice) {
-            minPrice = p // aur sasta din - khareedne ke liye isse behtar koi pichhla din nahi //@min
+            minPrice = p // aur sasta din - khareedne ke liye isse better koi pichhla din nahi //@min
         } else {
-            best = maxOf(best, p - minPrice) // aaj bechein to munafa //@sell
+            best = maxOf(best, p - minPrice) // aaj bechein to profit //@sell
         }
     }
     return best //@done

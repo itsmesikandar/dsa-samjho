@@ -8,9 +8,9 @@ class Main {
         int best = 0;
         for (int i = 0; i <= h.length; i++) {
             int cur = (i == h.length) ? 0 : h[i]; // aakhir mein nakli 0 height: bache sab bars pop ho jaayein
-            while (!st.isEmpty() && h[st.peek()] >= cur) { // top bar ki height wala rectangle ab daayein nahi badh sakta //@pop
+            while (!st.isEmpty() && h[st.peek()] >= cur) { // top bar ki height wala rectangle ab right nahi badh sakta //@pop
                 int height = h[st.pop()];
-                int left = st.isEmpty() ? -1 : st.peek(); // isse chhota pichhla bar = left deewar
+                int left = st.isEmpty() ? -1 : st.peek(); // isse chhota pichhla bar = left wall
                 best = Math.max(best, height * (i - left - 1)); // width = left aur i ke beech ke bars //@area
             }
             st.push(i); //@push

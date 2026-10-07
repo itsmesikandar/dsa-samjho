@@ -1,6 +1,6 @@
 import java.util.PriorityQueue
 
-// Directed weighted graph: src se dst ka sabse sasta rasta - kharcha aur rasta dono
+// Directed weighted graph: src se dst ka sabse sasta rasta - cost aur rasta dono
 fun cheapestPath(n: Int, edges: Array<IntArray>, src: Int, dst: Int): String {
     val adj = List(n) { mutableListOf<IntArray>() }
     for ((u, v, w) in edges) adj[u].add(intArrayOf(v, w)) // sirf u -> v
@@ -12,7 +12,7 @@ fun cheapestPath(n: Int, edges: Array<IntArray>, src: Int, dst: Int): String {
     while (pq.isNotEmpty()) {
         val (u, d) = pq.poll()
         if (d > dist[u]) continue
-        if (u == dst) break // dst heap se nikla = uski doori pakki //@found
+        if (u == dst) break // dst heap se nikla = uski distance pakki //@found
         for ((v, w) in adj[u]) {
             if (d + w < dist[v]) {
                 dist[v] = d + w // sasta rasta mila - parent bhi badlo //@relax

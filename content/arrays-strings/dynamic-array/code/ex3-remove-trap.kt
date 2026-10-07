@@ -1,4 +1,4 @@
-// GALAT: aage badhte hue removeAt -> agla item khisak ke i par aa jaata hai, aur i++ use skip kar deta hai
+// GALAT: aage badhte hue removeAt -> agla item shift ho ke i par aa jaata hai, aur i++ use skip kar deta hai
 fun removeEvensWrong(list: MutableList<Int>) {
     var i = 0
     while (i < list.size) {
@@ -7,7 +7,7 @@ fun removeEvensWrong(list: MutableList<Int>) {
     }
 }
 
-// SAHI: peeche se chalo - hatane se aage wale items par asar nahi padta
+// SAHI: peeche se chalo - hatane se aage wale items par effect nahi padta
 fun removeEvensRight(list: MutableList<Int>) {
     for (i in list.indices.reversed()) {
         if (list[i] % 2 == 0) list.removeAt(i) //@back

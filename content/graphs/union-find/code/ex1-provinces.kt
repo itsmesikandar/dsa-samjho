@@ -1,4 +1,4 @@
-// Har seedha juda jodi ek union. Har SAFAL union do provinces ko ek karta hai
+// Har seedha juda pair ek union. Har SUCCESSFUL union do provinces ko ek karta hai
 fun find(parent: IntArray, x: Int): Int {
     if (parent[x] != x) parent[x] = find(parent, parent[x])
     return parent[x]
@@ -7,14 +7,14 @@ fun find(parent: IntArray, x: Int): Int {
 fun findCircleNum(isConnected: Array<IntArray>): Int {
     val n = isConnected.size
     val parent = IntArray(n) { it }
-    var provinces = n // shuru mein har shehar alag province //@init
+    var provinces = n // shuru mein har city alag province //@init
     for (i in 0 until n) {
         for (j in i + 1 until n) { // matrix symmetric - aadha hi kaafi
             if (isConnected[i][j] == 0) continue
             val ri = find(parent, i) //@check
             val rj = find(parent, j)
             if (ri != rj) {
-                parent[rj] = ri // do alag province jude //@merge
+                parent[rj] = ri // 2 alag province jude //@merge
                 provinces-- // ek kam
             }
         }

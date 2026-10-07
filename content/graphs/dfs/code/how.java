@@ -2,14 +2,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // DFS: ek padosi pakdo aur uski poori gehraai tak jao; raasta band ho to wapas aao (backtrack)
+    // DFS: ek neighbor pakdo aur uski poori depth tak jao; raasta band ho to wapas aao (backtrack)
     static void dfs(int u, List<List<Integer>> adj, boolean[] visited, List<Integer> order) {
         visited[u] = true; // aate hi mark //@enter
         order.add(u);
         for (int v : adj.get(u)) {
-            if (!visited[v]) dfs(v, adj, visited, order); // naya padosi - pehle uski poori gehraai //@go
+            if (!visited[v]) dfs(v, adj, visited, order); // naya neighbor - pehle uski poori depth //@go
         }
-    } // saare padosi dekh liye - wapas caller ke paas (backtrack) //@back
+    } // saare neighbor dekh liye - wapas caller ke paas (backtrack) //@back
 
     public static void main(String[] args) {
         int n = 7;

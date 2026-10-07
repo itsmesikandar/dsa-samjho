@@ -14,7 +14,7 @@ what:
     Classic binary search sirf "hai ya nahi" batata hai. Asli problems poochte hain:
     - Target ki **pehli** / **aakhri** position (duplicates ke saath)?
     - Pehla item jo **≥ x** hai (lower bound)? Pehla jo **> x** (upper bound)?
-    - Pehla **kharab** version? Ghumaye hue (rotated) array mein dhoondho?
+    - Pehla **kharab** version? Rotate kiye hue (rotated) array mein dhoondho?
 
     Sab ek hi idea: ek **yes/no sawaal** (predicate) jo array par aisa dikhe:
 
@@ -35,11 +35,11 @@ what:
     ```
 
     > [!yaad]
-    > Shart sirf itni: predicate **monotonic** ho — ek baar T hua to aage sab T. Array sorted ho, ye zaroori bhi nahi (rotated, versions, answer range…).
+    > Condition sirf itni: predicate **monotonic** ho — ek baar T hua to aage sab T. Array sorted ho, ye zaroori bhi nahi (rotated, versions, answer range…).
   analogy: |
     **Board exam ki merit list** (marks ke ulte order mein). "60% se upar kitne bachche?" Har naam padhne ki zaroorat nahi — beech ka naam dekho: 60+ hai? Haan → boundary neeche hai. Nahi → upar. Pehla "nahi" wala naam = boundary.
 
-    Ya **paudhe ki lambai**: roz badhta hai. "Kis din pehli baar 10cm paar?" — roz naapne ki jagah beech wala din naapo.
+    Ya **plants ki length**: roz badhta hai. "Kis din pehli baar 10cm paar?" — roz measure karne ki jagah beech wala din measure karo.
 
 # 2. Kyun chahiye?
 why:
@@ -60,9 +60,9 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Paudha roz badhta hai. Kis din pehli baar 10cm paar kiya? Answer `F F F … T T T` jaisa hai.
+    Plant roz badhta hai. Kis din pehli baar 10cm paar kiya? Answer `F F F … T T T` jaisa hai.
 
-    Dekho: har baar beech wala din naapo. T → boundary left mein (ya yahi), F → right mein. `?` = abhi naapa nahi — zyada tar din kabhi naapne hi nahi padte.
+    Dekho: har baar beech wala din measure karo. T → boundary left mein (ya yahi), F → right mein. `?` = abhi measure kiya nahi — zyada tar din kabhi measure karne hi nahi padte.
   viz: { tracer: boundaryViz }
 
 # 4. Kaise kaam karta hai
@@ -99,10 +99,10 @@ operations:
     time: O(log n)
     space: O(1)
     why: "First-true, pred = a[i] > x."
-  - op: "x ki ginti (sorted, duplicates)"
+  - op: "x ki count (sorted, duplicates)"
     time: O(log n)
     space: O(1)
-    why: "upper − lower, do binary search."
+    why: "upper − lower, 2 binary search."
   - op: "First / last position"
     time: O(log n)
     space: O(1)
@@ -110,7 +110,7 @@ operations:
   - op: "Rotated sorted array search"
     time: O(log n)
     space: O(1)
-    why: "Har mid par ek half sorted — usse faisla."
+    why: "Har mid par ek half sorted — usse decision."
   - op: "Linear scan for first occurrence"
     time: O(n)
     space: O(1)
@@ -118,7 +118,7 @@ operations:
 
 # 6. Code
 code:
-  - title: Lower aur upper bound — ginti aur floor
+  - title: Lower aur upper bound — count aur floor
     file: bounds
     note: |
       Do function, bas ek symbol ka fark (`>=` vs `>`). Inse:
@@ -177,7 +177,7 @@ examples:
       1. **first** = lowerBound(target) — pehla `≥ target`. Agar wahan target nahi (ya end) → target hai hi nahi.
       2. **last** = upperBound(target) − 1 — pehla `> target` ke theek pehle.
 
-      Ek mil gaya, phir dono taraf linear phailana → saare duplicates par O(n). Do binary search → hamesha O(log n).
+      Ek mil gaya, phir dono taraf linear spread karna → saare duplicates par O(n). 2 binary search → hamesha O(log n).
 
       > [!galti]
       > `lowerBound(target + 1) − 1` bhi chalta hai, par target = Int.MAX_VALUE par `+1` overflow. upperBound safe hai.
@@ -195,14 +195,14 @@ examples:
     complexity:
       time: O(log n)
       space: O(1)
-      why: "Do binary search."
+      why: "2 binary search."
 
   - id: rotated
     level: tricky
-    title: Ghumaye hue sorted array mein dhoondho
+    title: Rotate kiye hue sorted array mein dhoondho
     source: { name: Search in Rotated Sorted Array, platform: LeetCode, url: "https://leetcode.com/problems/search-in-rotated-sorted-array/" }
     problem: |
-      Sorted array (distinct) ko kisi point par **ghuma** diya: `[0, 1, 2, 4, 5, 6, 7]` → `[4, 5, 6, 7, 0, 1, 2]`. Target ka index do, na ho to −1. O(log n).
+      Sorted array (distinct) ko kisi point par **rotate kar** diya: `[0, 1, 2, 4, 5, 6, 7]` → `[4, 5, 6, 7, 0, 1, 2]`. Target ka index do, na ho to −1. O(log n).
 
       Example: `[4, 5, 6, 7, 0, 1, 2]`, target 0 → **4**
     intuition: |
@@ -212,10 +212,10 @@ examples:
 
       Sorted half ki range pata hai (`a[lo]..a[mid]` ya `a[mid]..a[hi]`):
       - Target usi range mein → wahin jao.
-      - Nahi → doosre half mein (wahan rotation hai, par wo agle kadam par phir aadha hoga).
+      - Nahi → doosre half mein (wahan rotation hai, par wo agle step par phir aadha hoga).
 
       > [!galti]
-      > `a[lo] < a[mid]` (strict) likha → lo == mid (2 items bache) par galat half chuna. `<=` lo.
+      > `a[lo] < a[mid]` (strict) likha → lo == mid (2 items bache) par galat half choose kiya. `<=` lo.
 
       > [!tip]
       > Duplicates ho (LeetCode 81) to `a[lo] == a[mid] == a[hi]` par pata nahi chalta kaun sorted hai — `lo++, hi--` karo. Worst case O(n).
@@ -232,12 +232,12 @@ examples:
     complexity:
       time: O(log n)
       space: O(1)
-      why: "Har kadam aadha hissa hata."
+      why: "Har step aadha hissa hata."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Duplicates wale sorted array mein pehla / aakhri / ginti."
+    - "Duplicates wale sorted array mein pehla / aakhri / count."
     - "\"Pehla ≥ x\", \"aakhri ≤ x\", \"kitne < x\" — bounds."
     - "Koi bhi F…F T…T jaisa sawaal (versions, din, capacity)."
     - "Rotated / mountain / bitonic array — mid se ek taraf ka structure pakka pata ho."
@@ -264,7 +264,7 @@ realWorld:
   - where: "Stock / price apps"
     how: "Price history (time se sorted) mein 'is din ke baad pehla trade' — lower bound."
   - where: "Ring buffer / circular logs"
-    how: "Ghumaya hua sorted data (rotated) — sabse purana entry dhoondhna min-in-rotated search hai."
+    how: "Rotate kiya hua sorted data (rotated) — sabse purana entry dhoondhna min-in-rotated search hai."
   - where: "Android SparseArray"
     how: "Key na mile to binary search ka insertion point (~lo) wapas deta hai — wahi lower bound."
 
@@ -291,7 +291,7 @@ mistakes:
   - title: "Rotated mein < vs <="
     type: off-by-one
     wrong: |
-      `if (a[lo] < a[mid])` → do items bache (lo == mid) to right ko sorted maan liya.
+      `if (a[lo] < a[mid])` → 2 items bache (lo == mid) to right ko sorted maan liya.
     right: |
       `a[lo] <= a[mid]` — lo == mid par ek item wala left half bhi sorted hi hai.
   - title: "Khaali array"
@@ -306,7 +306,7 @@ interview:
   questions:
     - q: "Lower bound aur upper bound mein fark?"
       a: |
-        Lower: pehla index jahan a[i] ≥ x. Upper: pehla jahan a[i] > x. x ki ginti = upper − lower.
+        Lower: pehla index jahan a[i] ≥ x. Upper: pehla jahan a[i] > x. x ki count = upper − lower.
     - q: "First-true template mein lo < hi aur hi = mid kyun?"
       a: |
         Mid T ho sakta hai pehla T — use range mein rakhna hai, isliye hi = mid. Range [lo, hi] tab tak chhoti hoti hai jab tak ek candidate na bache; lo == hi par ruko.
@@ -326,7 +326,7 @@ interview:
         Worst O(n) — a[lo] == a[mid] == a[hi] par kaunsa half sorted pata nahi, ek-ek ghatana padta hai.
     - q: "Sorted array mein x se chhote kitne?"
       a: |
-        lowerBound(x) — index hi ginti hai.
+        lowerBound(x) — index hi count hai.
     - q: "Insert ke saath bounds chahiye to?"
       a: |
         Array mein insert O(n). TreeSet / TreeMap — floor, ceiling, higher, lower O(log n).
@@ -400,7 +400,7 @@ revision:
   summary:
     - "Har variation = monotonic predicate ka pehla T."
     - "First-true: lo = 0, hi = n, lo < hi; T → hi = mid; F → lo = mid + 1; return lo."
-    - "lower = pehla ≥ x; upper = pehla > x; ginti = upper − lower."
+    - "lower = pehla ≥ x; upper = pehla > x; count = upper − lower."
     - "First/last: lower aur upper − 1 (pehle check ki target hai)."
     - "Rotated: a[lo] <= a[mid] → left sorted; target uski range mein? Wahin jao."
   cheatsheet: |
@@ -445,7 +445,7 @@ connections:
     - id: binary-search
       why: "Classic template aur 'loop ke baad lo' wali soch."
     - id: sorting-in-practice
-      why: "Sort ke baad bounds se ginti."
+      why: "Sort ke baad bounds se count."
   usedLater:
     - id: binary-search-on-answer
       how: "Same first-true — array ki jagah answer ki range."

@@ -12,7 +12,7 @@ class Matrix2DSum(g: Array<IntArray>) {
         }
     }
 
-    // (r1, c1) se (r2, c2) tak ka rectangle (dono kone shamil)
+    // (r1, c1) se (r2, c2) tak ka rectangle (dono kone include)
     fun sum(r1: Int, c1: Int, r2: Int, c2: Int): Long {
         return pre[r2 + 1][c2 + 1] - pre[r1][c2 + 1] - pre[r2 + 1][c1] + pre[r1][c1] //@query
     }

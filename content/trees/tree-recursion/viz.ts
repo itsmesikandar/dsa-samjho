@@ -4,7 +4,7 @@ import type { Panel, Tone } from '@/components/viz/engine/types';
 type T = { nodes: Map<string, TNode>; root: string | null };
 const make = (levels: (number | null)[]) => buildTree(levels) as T;
 
-// ---------- 3. Visual intro: naive balanced check — neeche wale nodes baar baar gine ----------
+// ---------- 3. Visual intro: naive balanced check — neeche wale nodes baar baar count kiye ----------
 export const naiveVisits = tracer<{ levels: (number | null)[] }>({
   inputs: [{ name: 'levels', type: 'tree', label: 'Tree (level order)', default: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], maxNodes: 12, min: 0, max: 99 }],
   run({ levels }, t) {
@@ -38,7 +38,7 @@ export const naiveVisits = tracer<{ levels: (number | null)[] }>({
       return ok && check(n.left) && check(n.right);
     };
     const ok = check(tr.root);
-    t.frame({ caption: `Jawab ${ok}. height() ne kul ${total} node visits kiye, jabki tree mein sirf ${tr.nodes.size} nodes hain. Badge ×k = node k baar gina — har ancestor ne dobara poocha. Ek hi postorder pass mein height + check saath bhejo → har node ek baar.`, vars: { visits: total, n: tr.nodes.size }, legend, panels: [treeView(tr.nodes, tr.root, { tones: tones(tr.root!), badges })] });
+    t.frame({ caption: `Jawab ${ok}. height() ne total ${total} node visits kiye, jabki tree mein sirf ${tr.nodes.size} nodes hain. Badge ×k = node k baar gina — har ancestor ne dobara poocha. Ek hi postorder pass mein height + check saath bhejo → har node ek baar.`, vars: { visits: total, n: tr.nodes.size }, legend, panels: [treeView(tr.nodes, tr.root, { tones: tones(tr.root!), badges })] });
     return String(ok);
   },
 });
@@ -164,7 +164,7 @@ export const robTrace = tracer<{ levels: (number | null)[] }>({
       mark(n.right, !took);
     };
     mark(tr.root, true);
-    t.frame({ line: 'skip', caption: `Root par max(${take}, ${skip}) = ${ans}. Har node ne do jawab (pair) upar bheje — ek number kaafi nahi tha, kyunki parent ka faisla bachche ke faisle par tika hai.`, vars: { ans }, legend, panels: view() });
+    t.frame({ line: 'skip', caption: `Root par max(${take}, ${skip}) = ${ans}. Har node ne do jawab (pair) upar bheje — ek number kaafi nahi tha, kyunki parent ka decision bachche ke decision par tika hai.`, vars: { ans }, legend, panels: view() });
     return String(ans);
   },
 });

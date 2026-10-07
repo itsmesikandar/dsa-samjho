@@ -1,5 +1,5 @@
 class Main {
-    // Letters ki grid mein word hai? Letters padosi cells (upar/neeche/baayein/daayein) se, ek cell ek hi baar.
+    // Letters ki grid mein word hai? Letters neighbor cells (upar/neeche/baayein/daayein) se, ek cell ek hi baar.
     static boolean exist(char[][] board, String word) {
         for (int r = 0; r < board.length; r++)
             for (int c = 0; c < board[0].length; c++)

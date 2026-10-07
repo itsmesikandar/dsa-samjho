@@ -1,4 +1,4 @@
-// Quick sort: pivot chuno, chhote left / bade right (partition), phir dono taraf recursion
+// Quick sort: pivot choose karo, chhote left / bade right (partition), phir dono taraf recursion
 fun quickSort(a: IntArray, l: Int, r: Int) {
     if (l >= r) return // 0 ya 1 item //@base
     val p = partition(a, l, r)

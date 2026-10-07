@@ -1,6 +1,6 @@
 // Har subset ke saare numbers ka XOR nikaalo, phir sab subsets ke XOR jodo
 fun subsetXORSum(nums: IntArray): Int {
-    fun go(i: Int, x: Int): Int { // x = abhi tak chune numbers ka XOR (parameter = apne aap undo)
+    fun go(i: Int, x: Int): Int { // x = abhi tak choose kiye numbers ka XOR (parameter = apne aap undo)
         if (i == nums.size) return x // ek subset poora: uska XOR //@leaf
         return go(i + 1, x xor nums[i]) + go(i + 1, x) // nums[i] lo + chhodo //@branch
     }

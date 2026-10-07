@@ -1,4 +1,4 @@
-// Order MATTER karta hai (1+3 aur 3+1 alag). TARGET BAHAR, numbers andar - har s par 'aakhri number kaunsa' chuno
+// Order MATTER karta hai (1+3 aur 3+1 alag). TARGET BAHAR, numbers andar - har s par 'aakhri number kaunsa' choose karo
 fun combinationSum4(nums: IntArray, target: Int): Int {
     val dp = IntArray(target + 1) // dp[s] = kitni sequences ka jod s
     dp[0] = 1 // khaali sequence

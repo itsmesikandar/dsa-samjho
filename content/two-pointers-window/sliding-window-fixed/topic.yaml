@@ -2,7 +2,7 @@ meta:
   id: sliding-window-fixed
   chapter: two-pointers-window
   title: Sliding Window (fixed size)
-  subtitle: Lagatar k items ki khidki — ek andar, ek bahar, baaki ka hisaab wahi
+  subtitle: Continuous k items ki window — ek andar, ek bahar, baaki ka hisaab wahi
   level: intermediate
   minutes: 30
   prereqs: [array, two-pointers-same, frequency-count]
@@ -11,9 +11,9 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Window** = array ka **lagatar** (contiguous) hissa. **Fixed size** = har window mein exactly `k` items.
+    **Window** = array ka **continuous** (contiguous) hissa. **Fixed size** = har window mein exactly `k` items.
 
-    Har window ka jawab (sum, count, letters…) shuru se dobara mat nikaalo. Window ek kadam aage khiskao:
+    Har window ka jawab (sum, count, letters…) shuru se dobara mat nikaalo. Window ek step aage shift karo:
     - Naya item **andar** aaya → uska hisaab jodo.
     - Sabse purana item **bahar** gaya → uska hisaab hatao.
 
@@ -33,14 +33,14 @@ what:
   analogy: |
     **Cricket commentary: "pichli 6 balls mein kitne run?"**
 
-    Har nayi ball par commentator 6 balls dobara nahi ginta. Nayi ball ke run **jodta** hai, aur 7 ball purani (jo ab window se bahar hai) ke run **ghatata** hai. Bas do kaam — chahe match 300 balls ka ho.
+    Har nayi ball par commentator 6 balls dobara nahi count karta. Nayi ball ke run **jodta** hai, aur 7 ball purani (jo ab window se bahar hai) ke run **ghatata** hai. Bas do kaam — chahe match 300 balls ka ho.
 
 # 2. Kyun chahiye?
 why:
   body: |
     Brute force: har start ke liye k items jodo → `(n − k + 1) × k` kaam = **O(n·k)**. n = 10⁵, k = 5×10⁴ → ~2.5 × 10⁹ — TLE.
 
-    Sliding window: pehli window k kaam, phir har kadam 2 kaam → **O(n)**.
+    Sliding window: pehli window k kaam, phir har step 2 kaam → **O(n)**.
 
     > [!socho]
     > Kya har cheez aise slide ho sakti hai? Window ka **maximum** socho: `[5, 1, 2]` mein max 5. 5 bahar gaya — naya max kya? Bina baaki dekhe pata nahi chalega!
@@ -52,7 +52,7 @@ visual:
   body: |
     Neeche dono tareeke saath-saath chal rahe hain. **Brute** har window poora jodta hai; **slide** sirf bahar gaye ko ghatata aur andar aaye ko jodta hai.
 
-    `k` bada karke dekho — brute ka kaam badhta hai, slide ka lagbhag wahi rehta hai.
+    `k` bada karke dekho — brute ka kaam badhta hai, slide ka approx wahi rehta hai.
   viz: { tracer: slideVsBrute }
 
 # 4. Kaise kaam karta hai
@@ -77,14 +77,14 @@ operations:
     time: O(n)
     space: O(1)
     why: "Ek jodo, ek ghatao."
-  - op: "Window mein condition wale items ginna"
+  - op: "Window mein condition wale items count karna"
     time: O(n)
     space: O(1)
     why: "Counter ++ / −−."
   - op: "Window letter frequency (anagram)"
     time: O(26·n) = O(n)
     space: O(26)
-    why: "Har kadam 2 counts badlo; compare 26 ka (constant)."
+    why: "Har step 2 counts badlo; compare 26 ka (constant)."
   - op: "Window max / min"
     time: O(n)
     space: O(k)
@@ -157,7 +157,7 @@ examples:
       Anagram ka matlab: **letter counts same**. Window size = `p.length` (fixed!).
 
       - `need[26]` = p ke counts (ek baar).
-      - `have[26]` = window ke counts — slide karte waqt sirf 2 counts badlo.
+      - `have[26]` = window ke counts — slide karte time sirf 2 counts badlo.
       - Har window par `have == need`? → start index add.
 
       Har window ko sort karke compare = O(k log k) har baar. Counts ka compare O(26) = constant.
@@ -182,27 +182,27 @@ examples:
     complexity:
       time: O(26·n) = O(n)
       space: O(26) = O(1)
-      why: "Har kadam do counts badle aur 26 ka compare; output list alag."
+      why: "Har step do counts badle aur 26 ka compare; output list alag."
 
   - id: max-card-points
     level: tricky
-    title: Kinaron se k cards — ulta socho
+    title: Edges se k cards — ulta socho
     source: { name: Maximum Points You Can Obtain from Cards, platform: LeetCode, url: "https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/" }
     problem: |
       Cards ek line mein hain, har card par points. Har baar line ke **shuru ya end** se ek card uthao. Exactly `k` cards. Zyada se zyada kitne points?
 
       Example: `[1, 2, 3, 4, 5, 6, 1]`, k = 3 → **12** (end se 1, 6, 5)
     intuition: |
-      Seedha socho to har baar "left ya right?" — choices ka ped (2ᵏ). Greedy (dono kinaron mein jo bada ho wo lo) **galat** hai: `[9, 1, 1, 1, 100, 2]`, k = 2 → greedy 9 + 2 = 11, sahi 2 + 100 = **102**.
+      Seedha socho to har baar "left ya right?" — choices ka tree (2ᵏ). Greedy (dono edges mein jo bada ho wo lo) **galat** hai: `[9, 1, 1, 1, 100, 2]`, k = 2 → greedy 9 + 2 = 11, sahi 2 + 100 = **102**.
 
-      **Ulta socho:** k cards uthaye → `n − k` cards **bachenge**. Kinaron se uthaya to bache hue hamesha **beech ka lagatar hissa** hain!
+      **Ulta socho:** k cards uthaye → `n − k` cards **bachenge**. Edges se uthaya to bache hue hamesha **beech ka continuous hissa** hain!
 
       - Uthaya = total − bacha.
       - Uthaya max ⇔ bacha **min**.
       - Bacha = size `n − k` ki window → fixed sliding window ka **minimum sum**.
 
       > [!tip]
-      > Problem "kinaron se lo" ya "prefix + suffix" bole, to complement socho: beech ki window. Ye trick bahut problems mein chalti hai.
+      > Problem "edges se lo" ya "prefix + suffix" bole, to complement socho: beech ki window. Ye trick bahut problems mein chalti hai.
     dryRun: |
       n = 7, k = 3 → window size w = 4, total = 22
 
@@ -222,13 +222,13 @@ examples:
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Problem mein **size k** ya **length k** ka lagatar subarray / substring."
+    - "Problem mein **size k** ya **length k** ka continuous subarray / substring."
     - "Har window ka sum / average / count / frequency chahiye."
     - "Anagram / permutation **substring** mein dhoondhna (size = pattern length)."
-    - "Kinaron se k items (complement = beech ki window)."
+    - "Edges se k items (complement = beech ki window)."
   avoid:
     - "Window ka size fixed nahi (\"sabse lamba / sabse chhota jismein…\") — wo variable window hai."
-    - "Lagatar nahi chahiye (subsequence) — window kaam nahi karti."
+    - "Continuous nahi chahiye (subsequence) — window kaam nahi karti."
     - "Window ka max/min — seedha slide nahi hota, monotonic deque lo."
     - "Bahut saare alag-alag (l, r) queries — prefix sum better."
   signals:
@@ -250,9 +250,9 @@ realWorld:
   - where: "Rate limiting (API servers)"
     how: "'Pichle 60 second mein kitni requests' — sliding window counter. Limit cross → 429 error."
   - where: "Fitness / health apps"
-    how: "Last 7 days ka average steps ya heart rate — har din window khiskao."
+    how: "Last 7 days ka average steps ya heart rate — har din window shift karo."
   - where: "Networking"
-    how: "TCP sliding window — ek waqt mein fixed number of packets 'udaan mein', ack aane par window aage khisakti hai."
+    how: "TCP sliding window — ek time mein fixed number of packets 'udaan mein', ack aane par window aage shift hoti hai."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -313,7 +313,7 @@ interview:
     - q: "Window ka median?"
       followUp: true
       a: |
-        Do heaps (ya TreeMap) + lazy deletion — O(n log k). Heap chapter mein Two Heaps.
+        2 heaps (ya TreeMap) + lazy deletion — O(n log k). Heap chapter mein Two Heaps.
     - q: "Character set Unicode ho to?"
       a: |
         IntArray(26) ki jagah HashMap<Char, Int>. Compare ke liye `matches` counter better.
@@ -345,7 +345,7 @@ practice:
     url: "https://leetcode.com/problems/minimum-recolors-to-get-k-consecutive-black-blocks/"
     level: easy
     pattern: Fixed window count
-    hint: "Har size-k window mein 'W' gino; sabse kam W = answer."
+    hint: "Har size-k window mein 'W' count karo; sabse kam W = answer."
   - name: Maximum Number of Vowels in a Substring of Given Length
     platform: LeetCode
     num: 1456
@@ -385,11 +385,11 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "Window = lagatar k items. Slide: add(a[r]), remove(a[r − k])."
+    - "Window = continuous k items. Slide: add(a[r]), remove(a[r − k])."
     - "Window range r − k + 1..r. O(n) time, summary jitna space."
     - "Sum/count/freq slide hote hain; max/min ke liye deque."
     - "Anagram = count array barabar; window size = |p|."
-    - "Kinaron se k uthao = beech ki n − k window ka min (complement)."
+    - "Edges se k uthao = beech ki n − k window ka min (complement)."
   cheatsheet: |
     ```kotlin
     var sum = 0
@@ -422,7 +422,7 @@ revision:
       options: ["s.length", "p.length", "26", "Variable"]
       answer: 1
       explain: "Anagram ki length p jitni hi hogi."
-    - q: "[1, 2, 3, 4, 5, 6, 1], k = 3 cards kinaron se. Kaunsi window ka min sum dhoondhte hain?"
+    - q: "[1, 2, 3, 4, 5, 6, 1], k = 3 cards edges se. Kaunsi window ka min sum dhoondhte hain?"
       options: ["Size 3", "Size 4", "Size 7", "Size 1"]
       answer: 1
       explain: "n − k = 4 cards bachenge — wahi window."
@@ -433,7 +433,7 @@ connections:
     - id: prefix-sum
       why: "Range sum ka doosra tareeka — bahut queries ho to."
     - id: two-pointers-same
-      why: "Window ke dono kinare same direction mein chalte hain."
+      why: "Window ke dono edge same direction mein chalte hain."
     - id: frequency-count
       why: "Anagram wala count array wahin se."
   usedLater:

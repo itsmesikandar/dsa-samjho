@@ -1,8 +1,8 @@
-// s ka sabse chhota substring jismein t ke saare characters (ginti ke saath) hon
+// s ka sabse chhota substring jismein t ke saare characters (count ke saath) hon
 fun minWindow(s: String, t: String): String {
     val need = IntArray(128) // har char ki kitni zaroorat baaki (negative = window mein extra)
     for (c in t) need[c.code]++
-    var missing = t.length // abhi kitne chars kam hain (ginti ke saath) //@init
+    var missing = t.length // abhi kitne chars kam hain (count ke saath) //@init
     var l = 0
     var bestL = 0
     var bestLen = Int.MAX_VALUE

@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 class Main {
-    // Saari meetings attend kar sakte ho? Start se sort - takraav hoga to sirf PADOSI meetings mein
+    // Saari meetings attend kar sakte ho? Start se sort - collision hoga to sirf NEIGHBOR meetings mein
     static boolean canAttendAll(int[][] intervals) {
         Arrays.sort(intervals, Comparator.comparingInt(iv -> iv[0])); //@sort
         for (int i = 1; i < intervals.length; i++) {

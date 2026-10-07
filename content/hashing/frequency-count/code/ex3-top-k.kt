@@ -1,7 +1,7 @@
 // Sabse zyada baar aane wale k numbers - bucket sort se O(n), bina poora sort kiye
 fun topKFrequent(nums: IntArray, k: Int): List<Int> {
     val freq = HashMap<Int, Int>()
-    for (x in nums) freq[x] = freq.getOrDefault(x, 0) + 1 // pehle ginti //@count
+    for (x in nums) freq[x] = freq.getOrDefault(x, 0) + 1 // pehle count //@count
     // bucket[f] = wo numbers jo exactly f baar aaye. f zyada se zyada n ho sakta hai.
     val bucket = Array(nums.size + 1) { mutableListOf<Int>() } //@bucket
     for ((x, f) in freq) bucket[f].add(x)

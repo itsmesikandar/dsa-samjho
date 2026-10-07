@@ -11,7 +11,7 @@ export const readerWriter = tracer<{ s: string }>({
     const c = [...s];
     let w = 0;
     t.frame({
-      caption: 'Do pointers, DONO aage hi badhte hain: r (reader) har char padhta hai, w (writer) sirf kaam ke chars likhta hai. Kaam: lagatar spaces ko ek space bana do (shuru ke spaces hata do) — usi array mein.',
+      caption: '2 pointers, DONO aage hi badhte hain: r (reader) har char padhta hai, w (writer) sirf kaam ke chars likhta hai. Kaam: continuous spaces ko ek space bana do (shuru ke spaces hata do) — usi array mein.',
       panels: [array(c.map(show), { pointers: { r: 0, w: 0 } })],
     });
     for (let r = 0; r < c.length; r++) {
@@ -52,7 +52,7 @@ export const dedupTrace = tracer<{ nums: number[] }>({
         t.frame({ line: 'write', caption: `a[${w - 1}] = ${a[w - 1]} likha, w = ${w}.`, vars: { r, w }, panels: [array(a, { tones: { ...upTo(w, 'done'), [w - 1]: 'found' }, pointers: { r, w } })] });
       }
     }
-    t.frame({ line: 'done', caption: `${w} unique: ${listStr(a.slice(0, w))}. Sorted hone se duplicates padosi the — isliye sirf pichle likhe item se compare kaafi tha.`, vars: { w }, panels: [array(a, { tones: { ...upTo(w, 'done'), ...Object.fromEntries(a.map((_, i) => [i, i >= w ? 'muted' : 'done'])) } })] });
+    t.frame({ line: 'done', caption: `${w} unique: ${listStr(a.slice(0, w))}. Sorted hone se duplicates neighbor the — isliye sirf pichle likhe item se compare kaafi tha.`, vars: { w }, panels: [array(a, { tones: { ...upTo(w, 'done'), ...Object.fromEntries(a.map((_, i) => [i, i >= w ? 'muted' : 'done'])) } })] });
     return String(w);
   },
 });

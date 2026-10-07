@@ -12,11 +12,11 @@ class Main {
         }
     }
 
-    // Aakhir se n-th node hatao - ek hi pass mein (length gine bina)
+    // Aakhir se n-th node hatao - ek hi pass mein (length count kiye bina)
     static ListNode removeNthFromEnd(ListNode head, int n) {
         ListNode dummy = new ListNode(0, head); // head hi hatana pade to bhi same code
         ListNode fast = dummy;
-        for (int i = 0; i <= n; i++) fast = fast.next; // fast ko n + 1 kadam aage: dono ke beech faasla fix
+        for (int i = 0; i <= n; i++) fast = fast.next; // fast ko n + 1 step aage: dono ke beech distance fix
         ListNode slow = dummy;
         while (fast != null) { // ab dono saath chalo; fast null par = slow hatane wale ke PICHHLE par
             fast = fast.next;

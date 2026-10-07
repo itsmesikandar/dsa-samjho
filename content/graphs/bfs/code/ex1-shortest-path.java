@@ -25,7 +25,7 @@ class Main {
             if (u == t) break; // t nikal gaya - iski dist pakki, aage dhoondhna bekaar //@found
             for (int v : adj.get(u)) {
                 if (dist[v] == -1) {
-                    dist[v] = dist[u] + 1; // ek kadam aur //@relax
+                    dist[v] = dist[u] + 1; // ek step aur //@relax
                     parent[v] = u;
                     queue.offer(v);
                 }

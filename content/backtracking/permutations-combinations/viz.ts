@@ -9,7 +9,7 @@ const usedTones = (used: boolean[]): Record<number, Tone> => Object.fromEntries(
 export const permTree = tracer<{ nums: number[] }>({
   inputs: [{ name: 'nums', type: 'intArray', label: 'Items (distinct)', default: [1, 2, 3], minLen: 1, maxLen: 3, min: 0, max: 9, distinct: true }],
   run({ nums }, t) {
-    const tree = callTree('Permutation ped');
+    const tree = callTree('Permutation tree');
     const used = nums.map(() => false);
     const path: number[] = [];
     let count = 0;
@@ -85,7 +85,7 @@ export const phoneTrace = tracer<{ digits: string }>({
       if (i === digits.length) {
         res.push(sb);
         tree.done(me, '✓', 'found');
-        t.frame({ line: 'found', caption: `Har digit ka letter chun liya → "${sb}".`, panels: [tree.panel(), keysView(i), { kind: 'text', label: 'Results', text: res.join(' ') }] });
+        t.frame({ line: 'found', caption: `Har digit ka letter choose kar liya → "${sb}".`, panels: [tree.panel(), keysView(i), { kind: 'text', label: 'Results', text: res.join(' ') }] });
         return;
       }
       for (const ch of KEYS[Number(digits[i])]) {
@@ -97,7 +97,7 @@ export const phoneTrace = tracer<{ digits: string }>({
       tree.done(me, '');
     };
     bt(0);
-    t.frame({ line: 'found', caption: `${res.length} combinations = har digit ke letters ka guna. Har level = ek digit (subsets/permutations se fark: options digit ke hisaab se badalte hain).`, panels: [tree.panel(), { kind: 'text', label: 'Results', text: res.join(' ') }] });
+    t.frame({ line: 'found', caption: `${res.length} combinations = har digit ke letters ka product. Har level = ek digit (subsets/permutations se fark: options digit ke hisaab se badalte hain).`, panels: [tree.panel(), { kind: 'text', label: 'Results', text: res.join(' ') }] });
     return listStr(res);
   },
 });
@@ -149,7 +149,7 @@ export const permUniqueTrace = tracer<{ nums: number[] }>({
     const path: number[] = [];
     const res: number[][] = [];
     const view = (hot: Record<number, Tone> = {}, ptr?: number): Panel[] => [tree.panel(), array(a, { label: 'sorted (grey = used)', tones: { ...usedTones(used), ...hot }, pointers: ptr !== undefined ? { i: ptr } : {} }), status(path, res.length)];
-    t.frame({ line: 'found', caption: `Sort kiya → ${listStr(a)}: same values paas-paas. Rule: same value ki copies hamesha BAAYEIN se DAAYEIN order mein use ho — tab har arrangement ek hi baar banega.`, panels: view() });
+    t.frame({ line: 'found', caption: `Sort kiya → ${listStr(a)}: same values paas-paas. Rule: same value ki copies hamesha LEFT se RIGHT order mein use ho — tab har arrangement ek hi baar banega.`, panels: view() });
     const bt = (parent?: string) => {
       const me = tree.push(listStr(path), parent);
       if (path.length === a.length) {
@@ -161,7 +161,7 @@ export const permUniqueTrace = tracer<{ nums: number[] }>({
       for (let i = 0; i < a.length; i++) {
         if (used[i]) continue;
         if (i > 0 && a[i] === a[i - 1] && !used[i - 1]) {
-          t.frame({ line: 'skip', caption: `a[${i}] = ${a[i]} skip: iski baayein copy (index ${i - 1}) is jagah par abhi try ho chuki (wapas aa gayi). Yahan rakha to wahi permutations dobara banenge.`, panels: view({ [i]: 'error', [i - 1]: 'compare' }, i) });
+          t.frame({ line: 'skip', caption: `a[${i}] = ${a[i]} skip: iski left copy (index ${i - 1}) is jagah par abhi try ho chuki (wapas aa gayi). Yahan rakha to wahi permutations dobara banenge.`, panels: view({ [i]: 'error', [i - 1]: 'compare' }, i) });
           continue;
         }
         used[i] = true;

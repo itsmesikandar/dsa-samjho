@@ -4,7 +4,7 @@ class Main {
         return go(nums, 0, 0);
     }
 
-    static int go(int[] nums, int i, int x) { // x = abhi tak chune numbers ka XOR (parameter = apne aap undo)
+    static int go(int[] nums, int i, int x) { // x = abhi tak choose kiye numbers ka XOR (parameter = apne aap undo)
         if (i == nums.length) return x; // ek subset poora: uska XOR //@leaf
         return go(nums, i + 1, x ^ nums[i]) + go(nums, i + 1, x); // nums[i] lo + chhodo //@branch
     }

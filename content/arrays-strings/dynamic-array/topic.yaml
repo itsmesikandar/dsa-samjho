@@ -13,10 +13,10 @@ what:
   body: |
     **Dynamic array** ek array hai jiski size **apne aap badh** sakti hai. Kotlin mein `MutableList` / `ArrayList`, Java mein `ArrayList`, Flutter/Dart mein normal `List`.
 
-    Andar ka raaz simple hai:
+    Andar ka secret simple hai:
     - Andar ek **normal fixed array** hota hai.
-    - Do numbers yaad rakhe jaate hain: **size** (kitne items sach mein hain) aur **capacity** (andar wala array kitna bada hai).
-    - Jab `size == capacity` ho jaaye aur naya item aaye → **naya bada array** (aam taur par 1.5× ya 2×) banao, purane items copy karo, purana phenk do.
+    - 2 numbers yaad rakhe jaate hain: **size** (kitne items sach mein hain) aur **capacity** (andar wala array kitna bada hai).
+    - Jab `size == capacity` ho jaaye aur naya item aaye → **naya bada array** (usually 1.5× ya 2×) banao, purane items copy karo, purana phenk do.
 
     ```kotlin
     val list = mutableListOf<Int>()   // andar chhota array
@@ -34,7 +34,7 @@ what:
 # 2. Kyun chahiye?
 why:
   body: |
-    Normal array ki size fixed hai. Par real life mein aksar **pata hi nahi hota ki kitne items aayenge**:
+    Normal array ki size fixed hai. Par real life mein often **pata hi nahi hota ki kitne items aayenge**:
     - Chat screen mein kitne messages aayenge?
     - API se kitne results milenge?
     - User kitne items cart mein daalega?
@@ -90,15 +90,15 @@ operations:
   - op: "`add(0, x)` / `add(i, x)`"
     time: O(n)
     space: O(1)
-    why: "i ke baad ke saare items right khiskte hain."
+    why: "i ke baad ke saare items right shift hote hain."
   - op: "`removeAt(i)`"
     time: O(n)
     space: O(1)
-    why: "Gap bharne ke liye baad ke items left khiskte hain."
+    why: "Gap bharne ke liye baad ke items left shift hote hain."
   - op: "`removeAt(size - 1)` (last)"
     time: O(1)
     space: O(1)
-    why: "Kuch khiskana nahi."
+    why: "Kuch shift karna nahi."
   - op: "`contains(x)` / `indexOf(x)` / `remove(value)`"
     time: O(n)
     space: O(1)
@@ -128,13 +128,13 @@ examples:
       Final list kya hogi?
     intuition: |
       Dynamic array ke andar normal array hai, to array ke hi rules lagte hain:
-      - **End** par kaam → kisi ko khiskana nahi → O(1).
-      - **Shuru/beech** mein daalna ya hatana → baaki items khiskte hain → O(n).
+      - **End** par kaam → kisi ko shift karna nahi → O(1).
+      - **Shuru/beech** mein daalna ya hatana → baaki items shift hote hain → O(n).
       - **Index** se padhna/likhna → O(1).
 
-      Animation mein boxes ko khiskte dekho — wahi O(n) ka kharcha hai.
+      Animation mein boxes ko shift hote dekho — wahi O(n) ka cost hai.
     dryRun: |
-      | Operation | List ke baad | Khiske | Cost |
+      | Operation | List ke baad | Shift hue | Cost |
       |---|---|---|---|
       | shuru | [3, 7, 9] | – | – |
       | add(5) | [3, 7, 9, 5] | 0 | O(1) |
@@ -146,7 +146,7 @@ examples:
     complexity:
       time: "O(1) end/index, O(n) shuru/beech"
       space: O(1)
-      why: "Shifting hi asli kharcha hai; extra memory koi nahi (resize ko chhod ke)."
+      why: "Shifting hi asli cost hai; extra memory koi nahi (resize ko chhod ke)."
 
   - id: remove-all
     level: medium
@@ -200,11 +200,11 @@ examples:
 
       `[1, 2, 4, 5, 6, 8]` par chalao. Kya result sahi hai? Kyun nahi?
     intuition: |
-      `removeAt(i)` ke baad **agla item khisak ke index i par aa jaata hai**. Phir `i++` ho gaya — yaani wo khiska hua item **kabhi check hi nahi hua**!
+      `removeAt(i)` ke baad **agla item shift ho ke index i par aa jaata hai**. Phir `i++` ho gaya — matlab wo shift hua hua item **kabhi check hi nahi hua**!
 
-      Do even numbers lagatar hon (2, 4) to doosra bach jaata hai.
+      Do even numbers continuous hon (2, 4) to doosra bach jaata hai.
 
-      **Fix 1:** peeche se chalo (`i` = last se 0 tak) — hatane se sirf peeche wale khiskte hain, jo hum pehle hi dekh chuke.
+      **Fix 1:** peeche se chalo (`i` = last se 0 tak) — hatane se sirf peeche wale shift hote hain, jo hum pehle hi dekh chuke.
       **Fix 2:** remove kiya to `i++` mat karo.
       **Fix 3 (best):** `removeAll { it % 2 == 0 }` — O(n) aur bug-free.
 
@@ -232,7 +232,7 @@ examples:
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Items ki ginti pehle se pata nahi, aur zyada-tar **end par add** karna hai."
+    - "Items ki count pehle se pata nahi, aur zyada-tar **end par add** karna hai."
     - "Index se baar-baar padhna hai (`get(i)` O(1))."
     - "Order maintain karna hai aur list ko iterate karna hai — RecyclerView, API results, cart."
   avoid:
@@ -254,7 +254,7 @@ realWorld:
   - where: "RecyclerView / LazyColumn ka data"
     how: "Adapter ki list `ArrayList` hai — scroll karte hue `get(position)` O(1). Naye items end mein append (pagination) — sasta."
   - where: "Chat app messages"
-    how: "Naye messages end mein add — amortized O(1). Agar har message list ke **shuru** mein daalte to har baar O(n) shifting — isliye aksar list ulti dikhate hain (reverseLayout)."
+    how: "Naye messages end mein add — amortized O(1). Agar har message list ke **shuru** mein daalte to har baar O(n) shifting — isliye often list ulti dikhate hain (reverseLayout)."
   - where: "`StringBuilder`"
     how: "Andar ek char array jo bharne par badhta hai — bilkul dynamic array. Isliye append amortized O(1)."
   - where: "Flutter / Dart `List`"
@@ -278,7 +278,7 @@ mistakes:
     wrong: |
       ```java
       List<Integer> list = new ArrayList<>(List.of(5, 9, 7));
-      list.remove(1);   // socha value 1 hategi — par INDEX 1 (yaani 9) hat gaya!
+      list.remove(1);   // socha value 1 hategi — par INDEX 1 (matlab 9) hat gaya!
       ```
     right: |
       Value hatani ho to `list.remove(Integer.valueOf(1))`. Kotlin mein `remove(value)` aur `removeAt(index)` alag naam hain.
@@ -332,7 +332,7 @@ interview:
         Nahi. Multiple threads se modify karna ho to `Collections.synchronizedList`, `CopyOnWriteArrayList`, ya locking. (Purana `Vector` synchronized tha.)
     - q: "Kotlin `List` aur `MutableList` mein kya fark hai?"
       a: |
-        `List` read-only interface hai (add/remove nahi), `MutableList` mein modify kar sakte ho. Dono andar se aksar `ArrayList` hi hote hain — read-only sirf compile-time ka pehra hai.
+        `List` read-only interface hai (add/remove nahi), `MutableList` mein modify kar sakte ho. Dono andar se often `ArrayList` hi hote hain — read-only sirf compile-time ka pehra hai.
   mayAsk:
     - "Apna dynamic array implement karo (add, get, remove)."
     - "Shrink kab karoge? (jaise size < capacity / 4)"
@@ -366,7 +366,7 @@ practice:
     platform: Custom
     level: medium
     pattern: Resize + amortized analysis
-    hint: "add, get, set, removeAt, size likho. removeAt ke baad size < capacity/4 ho to aadha karo (shrink). Copies gino."
+    hint: "add, get, set, removeAt, size likho. removeAt ke baad size < capacity/4 ho to aadha karo (shrink). Copies count karo."
   - name: Remove Duplicates from Sorted Array II
     platform: LeetCode
     num: 80
@@ -422,7 +422,7 @@ revision:
     - q: "`list.add(0, x)` ki complexity?"
       options: ["O(1)", "O(n)", "O(log n)", "O(n²)"]
       answer: 1
-      explain: "Saare items right khiskte hain."
+      explain: "Saare items right shift hote hain."
     - q: "Capacity 4, size 4 hai aur add hua. Doubling se nayi capacity?"
       options: ["5", "6", "8", "16"]
       answer: 2
@@ -434,7 +434,7 @@ revision:
     - q: "Aage se loop chala ke removeAt(i) + i++ karne mein kya bug hai?"
       options: ["Koi bug nahi", "Hatane ke baad agla item skip ho jaata hai", "List ulti ho jaati hai", "Sab items hat jaate hain"]
       answer: 1
-      explain: "Agla item khisak ke i par aata hai, aur i++ use chhod deta hai."
+      explain: "Agla item shift ho ke i par aata hai, aur i++ use chhod deta hai."
 
 # 14. Connections
 connections:
@@ -442,13 +442,13 @@ connections:
     - id: array
       why: "Dynamic array ke andar wahi fixed array hai."
     - id: kotlin-java-toolkit
-      why: "MutableList, ArrayDeque aur boxing — sahi collection chunna."
+      why: "MutableList, ArrayDeque aur boxing — sahi collection choose karna."
   usedLater:
     - id: two-pointers-same
       how: "Write pointer (r, w) wala pattern — move zeroes, remove duplicates."
     - id: stack
       how: "Stack ko array/list ke end par push/pop karke banate hain — O(1)."
     - id: heap-basics
-      how: "Heap ek dynamic array mein rehta hai — add end par, phir upar khiskao."
+      how: "Heap ek dynamic array mein rehta hai — add end par, phir upar shift karo."
     - id: hashing-internals
       how: "HashMap bhi bharne par double hota hai (rehash) — wahi amortized idea."

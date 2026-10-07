@@ -28,9 +28,9 @@ const pqPanel = (a: Entry[], name: (e: Entry) => string, hot?: string): Panel =>
 const N = 6;
 const W_DEFAULT = [[0, 1, 4], [0, 2, 1], [2, 1, 2], [1, 3, 5], [2, 3, 8], [3, 4, 3], [2, 4, 12], [4, 5, 1]];
 const W_POS: Pos = { 0: [0, 50], 1: [33, 5], 2: [33, 95], 3: [66, 5], 4: [80, 70], 5: [100, 100] };
-const wEdges = { name: 'edges', type: 'edges' as const, label: 'Sadkein u-v:km (undirected), nodes 0..5', default: W_DEFAULT, nodes: N, maxEdges: 9, weighted: true, minW: 1, maxW: 15 };
+const wEdges = { name: 'edges', type: 'edges' as const, label: 'Roads u-v:km (undirected), nodes 0..5', default: W_DEFAULT, nodes: N, maxEdges: 9, weighted: true, minW: 1, maxW: 15 };
 
-// ---------- 3. Visual intro: kam edges ≠ kam kharcha ----------
+// ---------- 3. Visual intro: kam edges ≠ kam cost ----------
 export const whyTrace = tracer<{ edges: number[][] }>({
   inputs: [wEdges],
   run({ edges }, t) {
@@ -49,10 +49,10 @@ export const whyTrace = tracer<{ edges: number[][] }>({
       for (const [v, w] of adj[u]) if (d + w < dist[v]) (dist[v] = d + w), (par[v] = u), pq.add({ u: v, d: d + w, id: 'x' });
     }
     const dst = settled.reduce((b, v) => (dist[v] >= dist[b] ? v : b), 0);
-    const g = (tones: Tones = {}, et: Record<string, Tone> = {}, badges: Record<number, string> = {}): Panel[] => [graphView(N, edges, { weighted: true, pos, tones, edgeTones: et, badges, label: 'Sadkein (number = km)' })];
-    t.frame({ caption: `Har sadak par km likha hai. 0 se ${dst} jaana hai — sabse sasta (kam km) rasta kaunsa?`, panels: g({ 0: 'active', [dst]: 'compare' }) });
+    const g = (tones: Tones = {}, et: Record<string, Tone> = {}, badges: Record<number, string> = {}): Panel[] => [graphView(N, edges, { weighted: true, pos, tones, edgeTones: et, badges, label: 'Roads (number = km)' })];
+    t.frame({ caption: `Har road par km likha hai. 0 se ${dst} jaana hai — sabse sasta (kam km) rasta kaunsa?`, panels: g({ 0: 'active', [dst]: 'compare' }) });
     if (dst === 0) {
-      t.frame({ caption: '0 se kisi aur node tak sadak hi nahi. Kuch dhoondhne ko nahi.', panels: g({ 0: 'active' }) });
+      t.frame({ caption: '0 se kisi aur node tak road hi nahi. Kuch dhoondhne ko nahi.', panels: g({ 0: 'active' }) });
       return '0';
     }
     // BFS: sabse kam edges wala rasta
@@ -77,19 +77,19 @@ export const whyTrace = tracer<{ edges: number[][] }>({
       path.forEach((x, i) => ((tn[x] = tone), i && (et[`${path[i - 1]}-${x}`] = tone)));
       return [tn, et];
     };
-    t.frame({ caption: `BFS socho (sabse kam sadkein): ${bPath.join(' → ')} — ${bPath.length - 1} sadkein, kharcha ${bCost} km.`, legend: { compare: 'BFS ka rasta' }, panels: g(...paint(bPath, 'compare')) });
+    t.frame({ caption: `BFS socho (sabse kam roads): ${bPath.join(' → ')} — ${bPath.length - 1} roads, cost ${bCost} km.`, legend: { compare: 'BFS ka rasta' }, panels: g(...paint(bPath, 'compare')) });
     const sameWay = same(bPath, dPath);
-    t.frame({ caption: sameWay ? `Yahan sabse sasta bhi wahi hai: ${dist[dst]} km. Par hamesha aisa nahi — weights alag hon to kam sadkein ≠ kam kharcha.` : `Par ${dPath.join(' → ')} — ${dPath.length - 1} sadkein, sirf ${dist[dst]} km! Zyada sadkein, kam kharcha. Weights ho to BFS fail.`, legend: { found: 'sabse sasta' }, panels: g(...paint(dPath, 'found')) });
+    t.frame({ caption: sameWay ? `Yahan sabse sasta bhi wahi hai: ${dist[dst]} km. Par hamesha aisa nahi — weights alag hon to kam roads ≠ kam cost.` : `Par ${dPath.join(' → ')} — ${dPath.length - 1} roads, sirf ${dist[dst]} km! Zyada roads, kam cost. Weights ho to BFS fail.`, legend: { found: 'sabse sasta' }, panels: g(...paint(dPath, 'found')) });
     const done: Tones = {};
     const badges: Record<number, string> = {};
     settled.forEach((u, i) => {
       badges[u] = `${dist[u]}`;
       done[u] = 'done';
-      t.frame({ caption: i === 0 ? 'Dijkstra ka idea: jo node abhi sabse PAAS hai, uski doori pakki — kyunki weights negative nahi, kisi aur raste se ghoom ke aana usse sasta nahi ho sakta. 0 khud: doori 0.' : `${u} pakka: ${dist[u]} km (${par[u]} se). Bache hue mein yahi sabse paas tha.`, legend: { active: 'abhi pakka hua', done: 'pakka' }, panels: g({ ...done, [u]: 'active' }, {}, { ...badges }) });
+      t.frame({ caption: i === 0 ? 'Dijkstra ka idea: jo node abhi sabse PAAS hai, uski distance pakki — kyunki weights negative nahi, kisi aur raste se ghoom ke aana usse sasta nahi ho sakta. 0 khud: distance 0.' : `${u} pakka: ${dist[u]} km (${par[u]} se). Bache hue mein yahi sabse paas tha.`, legend: { active: 'abhi pakka hua', done: 'pakka' }, panels: g({ ...done, [u]: 'active' }, {}, { ...badges }) });
     });
     const et: Record<string, Tone> = {};
     settled.forEach((u) => par[u] >= 0 && (et[`${par[u]}-${u}`] = 'found'));
-    t.frame({ caption: `Har node paas se door ke order mein pakka hua. Hari sadkein = har node tak sabse sasta rasta (shortest path tree). 0 → ${dst}: ${dist[dst]} km.`, legend: { done: 'pakka', found: 'sabse saste raste' }, panels: g(done, et, badges) });
+    t.frame({ caption: `Har node paas se door ke order mein pakka hua. Green roads = har node tak sabse sasta rasta (shortest path tree). 0 → ${dst}: ${dist[dst]} km.`, legend: { done: 'pakka', found: 'sabse saste raste' }, panels: g(done, et, badges) });
     return String(dist[dst]);
   },
 });
@@ -123,11 +123,11 @@ export const dijkstraTrace = tracer<{ edges: number[][]; src: number }>({
     while (pq.a.length) {
       const { u, d } = pq.poll()!;
       if (d > dist[u]) {
-        t.frame({ line: 'stale', caption: `(${u}:${d}) nikla, par dist[${u}] = ${dist[u]} pehle hi chhota → purani entry, skip. (Heap se purani entry hatana mehenga, isliye bas nikalte waqt ignore.)`, vars: { u, d }, legend, panels: view(u, undefined) });
+        t.frame({ line: 'stale', caption: `(${u}:${d}) nikla, par dist[${u}] = ${dist[u]} pehle hi chhota → purani entry, skip. (Heap se purani entry hatana mehenga, isliye bas nikalte time ignore.)`, vars: { u, d }, legend, panels: view(u, undefined) });
         continue;
       }
       done[u] = true;
-      t.frame({ line: 'poll', caption: `(${u}:${d}) nikla — PQ mein sabse chhota. ${u} ki doori ${d} ab pakki: baaki sab entries ≥ ${d}, aur weights ≥ 0, to kisi aur raste se sasta nahi ho sakta.`, vars: { u, d }, legend, panels: view(u) });
+      t.frame({ line: 'poll', caption: `(${u}:${d}) nikla — PQ mein sabse chhota. ${u} ki distance ${d} ab pakki: baaki sab entries ≥ ${d}, aur weights ≥ 0, to kisi aur raste se sasta nahi ho sakta.`, vars: { u, d }, legend, panels: view(u) });
       for (const [v, w] of adj[u]) {
         const nd = d + w;
         if (nd < dist[v]) {
@@ -153,7 +153,7 @@ const P_POS: Pos = { 0: [0, 50], 1: [25, 0], 2: [25, 100], 3: [60, 50], 4: [75, 
 
 export const pathTrace = tracer<{ edges: number[][]; src: number; dst: number }>({
   inputs: [
-    { name: 'edges', type: 'edges', label: 'Directed u-v:kharcha, nodes 0..5', default: P_DEFAULT, nodes: N, maxEdges: 10, weighted: true, minW: 1, maxW: 15 },
+    { name: 'edges', type: 'edges', label: 'Directed u-v:cost, nodes 0..5', default: P_DEFAULT, nodes: N, maxEdges: 10, weighted: true, minW: 1, maxW: 15 },
     { name: 'src', type: 'int', label: 'src', default: 0, min: 0, max: N - 1 },
     { name: 'dst', type: 'int', label: 'dst', default: 5, min: 0, max: N - 1 },
   ],
@@ -164,7 +164,7 @@ export const pathTrace = tracer<{ edges: number[][]; src: number; dst: number }>
     const parent: number[] = Array(N).fill(-1);
     const done: boolean[] = Array(N).fill(false);
     const pq = newPq();
-    const legend = { active: 'abhi pakka', done: 'pakka', new: 'sasta hua', compare: 'manzil', found: 'rasta' };
+    const legend = { active: 'abhi pakka', done: 'pakka', new: 'sasta hua', compare: 'destination', found: 'rasta' };
     const view = (u?: number, hot: number[] = [], path: number[] = []): Panel[] => {
       const tones: Tones = { [dst]: 'compare' };
       done.forEach((x, i) => x && (tones[i] = 'done'));
@@ -189,7 +189,7 @@ export const pathTrace = tracer<{ edges: number[][]; src: number; dst: number }>
       if (d > dist[u]) continue;
       done[u] = true;
       if (u === dst) {
-        t.frame({ line: 'found', caption: `${dst} heap se nikla → doori ${d} pakki. Aage dhoondhna bekaar — ruko.`, vars: { u, d }, legend, panels: view(u) });
+        t.frame({ line: 'found', caption: `${dst} heap se nikla → distance ${d} pakki. Aage dhoondhna bekaar — ruko.`, vars: { u, d }, legend, panels: view(u) });
         found = true;
         break;
       }
@@ -214,7 +214,7 @@ export const pathTrace = tracer<{ edges: number[][]; src: number; dst: number }>
     for (let x = dst; x !== -1; x = parent[x]) path.push(x);
     path.reverse();
     const res = `${dist[dst]}: ${path.join(' -> ')}`;
-    t.frame({ line: 'walk', caption: `parent pakad ke ${dst} se ${src} tak, phir ulta: ${path.join(' → ')}, kharcha ${dist[dst]}. Parent sirf "sasta hua" par badla, isliye ye sabse sasta rasta hai.`, legend, panels: view(undefined, [], path) });
+    t.frame({ line: 'walk', caption: `parent pakad ke ${dst} se ${src} tak, phir ulta: ${path.join(' → ')}, cost ${dist[dst]}. Parent sirf "sasta hua" par badla, isliye ye sabse sasta rasta hai.`, legend, panels: view(undefined, [], path) });
     return res;
   },
 });
@@ -296,12 +296,12 @@ export const effortTrace = tracer<{ h: number[][] }>({
       const labels = { rowLabels: h.map((_, i) => String(i)), colLabels: h[0].map((_, j) => String(j)) };
       return [
         { kind: 'grid', label: 'Heights', values: h.map((row) => [...row]), tones, ...labels },
-        { kind: 'grid', label: 'effort[][] (ab tak ka sabse chhota "sabse bada kadam")', values: eff.map((row) => row.map((e): Cell => show(e))), tones, ...labels },
+        { kind: 'grid', label: 'effort[][] (ab tak ka sabse chhota "sabse bada step")', values: eff.map((row) => row.map((e): Cell => show(e))), tones, ...labels },
       ];
     };
     eff[0][0] = 0;
     pq.add({ u: 0, d: 0, id: 'x', x: 0, y: 0 });
-    t.frame({ line: 'start', caption: 'Rasta jitna mushkil, utna uska SABSE BADA kadam (height ka farak). Dijkstra hi lagao, bas naya effort = max(ab tak, ye kadam) — jodo nahi.', legend, panels: view() });
+    t.frame({ line: 'start', caption: 'Rasta jitna mushkil, utna uska SABSE BADA step (height ka farak). Dijkstra hi lagao, bas naya effort = max(ab tak, ye step) — jodo nahi.', legend, panels: view() });
     const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
     while (pq.a.length) {
       const { x, y, d: e } = pq.poll()!;
@@ -313,7 +313,7 @@ export const effortTrace = tracer<{ h: number[][] }>({
       if (x === r - 1 && y === c - 1) {
         const path: string[] = [];
         for (let k: string | undefined = `${x},${y}`; k; k = par.get(k)) path.push(k);
-        t.frame({ line: 'found', caption: `Manzil (${x},${y}) heap se nikli → minimum effort = ${e} pakka. (Rasta: ${path.reverse().map((k) => `(${k})`).join(' → ')}.)`, vars: { effort: e }, legend, panels: view([x, y], [], path) });
+        t.frame({ line: 'found', caption: `Destination (${x},${y}) heap se nikli → minimum effort = ${e} pakka. (Rasta: ${path.reverse().map((k) => `(${k})`).join(' → ')}.)`, vars: { effort: e }, legend, panels: view([x, y], [], path) });
         return String(e);
       }
       const hot: string[] = [];

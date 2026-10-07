@@ -1,5 +1,5 @@
 // Har item apni sorted jagah se zyada se zyada k door hai. Sort karo.
-// Insertion sort: koi bhi item k se zyada jagah peeche nahi khiskega -> O(n*k), O(n^2) nahi
+// Insertion sort: koi bhi item k se zyada jagah peeche nahi shift hoga -> O(n*k), O(n^2) nahi
 fun sortNearlySorted(a: IntArray): Int {
     var shifts = 0
     for (i in 1 until a.size) {

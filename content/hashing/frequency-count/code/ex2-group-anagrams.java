@@ -1,7 +1,7 @@
 import java.util.*;
 
 class Main {
-    // Anagrams ko ek group mein rakho. Key = letters sort karke (anagrams ka sorted roop same hota hai)
+    // Anagrams ko ek group mein rakho. Key = letters sort karke (anagrams ka sorted form same hota hai)
     static List<List<String>> groupAnagrams(List<String> words) {
         Map<String, List<String>> groups = new HashMap<>(); //@init
         for (String w : words) {

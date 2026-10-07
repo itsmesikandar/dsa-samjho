@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 
 class Main {
-    // Do arrays ka common hissa - jo number dono mein jitni baar (kam se kam) aaye, utni baar
+    // 2 arrays ka common hissa - jo number dono mein jitni baar (kam se kam) aaye, utni baar
     static int[] intersect(int[] a, int[] b) {
         Arrays.sort(a); // dono sort -> ab merge ki tarah saath-saath chal sakte hain //@sort
         Arrays.sort(b);

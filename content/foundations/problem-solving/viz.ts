@@ -51,7 +51,7 @@ export const constraintsTable = tracer<{ n: number }>({
       });
     }
     t.frame({
-      caption: `Nateeja: n ≤ ${n} ke liye ${slowestOk} ya usse tez approach socho. Question padhte hi ye hisaab lagao — galat direction mein time barbaad nahi hoga.`,
+      caption: `Result: n ≤ ${n} ke liye ${slowestOk} ya usse tez approach socho. Question padhte hi ye hisaab lagao — galat direction mein time barbaad nahi hoga.`,
       vars: { n, 'allowed (max)': slowestOk },
       legend: { done: 'chalega', compare: 'risky', error: 'TLE' },
       panels: [panel()],
@@ -120,7 +120,7 @@ export const secondLargest = tracer<{ arr: number[] }>({
       caption:
         ans === -1
           ? 'Second largest mila hi nahi (sab same the, ya ek hi item tha) → -1. Ye edge case pehle hi interviewer se poochna chahiye tha!'
-          : `Answer: ${ans}. Sirf ek pass → O(n) time, do variables → O(1) space. Sort wala approach O(n log n) hota.`,
+          : `Answer: ${ans}. Sirf ek pass → O(n) time, 2 variables → O(1) space. Sort wala approach O(n log n) hota.`,
       vars: { first: show(first), second: show(second) },
       panels: [array(arr, { tones: tones() })],
     });
@@ -160,7 +160,7 @@ export const dupSet = tracer<{ arr: number[] }>({
     }
     t.frame({
       line: 'none',
-      caption: 'Poora array dekh liya, koi number do baar nahi aaya → false.',
+      caption: 'Poora array dekh liya, koi number 2 baar nahi aaya → false.',
       panels: [array(arr), array(seen, { label: 'seen (HashSet)' })],
     });
     return 'false';
@@ -178,7 +178,7 @@ export const pairSum = tracer<{ arr: number[]; target: number }>({
     let r = arr.length - 1;
     t.frame({
       line: 'init',
-      caption: 'Array SORTED hai — yahi hint hai! l sabse chhote par, r sabse bade par. Sum dekh ke decide karenge kaunsa pointer hilana hai.',
+      caption: 'Array SORTED hai — yahi hint hai! l sabse chhote par, r sabse bade par. Sum dekh ke decide karenge kaunsa pointer move karna hai.',
       vars: { l, r, target },
       panels: [array(arr, { pointers: { l, r } })],
     });
@@ -257,7 +257,7 @@ export const maxWindow = tracer<{ arr: number[]; k: number }>({
       }
       t.frame({
         line: better ? 'best' : 'slide',
-        caption: `Window ek kadam aage: ${arr[i]} aaya (+), ${out} gaya (−) → window = ${window}. Poora dobara nahi joda — sirf 2 kaam!${better ? ` Naya best = ${best}.` : ''}`,
+        caption: `Window ek step aage: ${arr[i]} aaya (+), ${out} gaya (−) → window = ${window}. Poora dobara nahi joda — sirf 2 kaam!${better ? ` Naya best = ${best}.` : ''}`,
         vars: { window, best },
         panels: [array(arr, { ranges: [{ from: i - k + 1, to: i, label: `window = ${window}`, tone: better ? 'found' : 'active' }], tones: { [i]: 'new', [i - k]: 'muted' } })],
       });

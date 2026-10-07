@@ -13,7 +13,7 @@ what:
   body: |
     **Return-value recursion** (bottom-up, postorder) = har node pehle dono bachchon se jawab leta hai, phir unhe mila ke **apna** jawab upar bhejta hai.
 
-    Height to dekh chuke ho: `1 + max(left, right)`. Asli khel ye sawaal hai — **har call kya return kare?** Chaar pattern:
+    Height to dekh chuke ho: `1 + max(left, right)`. Asli khel ye sawaal hai — **har call kya return kare?** 4 pattern:
 
     | Pattern | Return kya | Jawab kahaan | Example |
     |---|---|---|---|
@@ -26,14 +26,14 @@ what:
     > Return value = **parent ko kya chahiye**. Jawab = **sawaal kya pooch raha hai**. Dono alag ho sakte hain — tab jawab global mein rakho.
   analogy: |
     **Company ki monthly report:**
-    Har team lead apni team se numbers leta hai, jod ke apne manager ko bhejta hai. Manager apni teams ka jod ke director ko. Kisi ko poori company dobara ginni nahi padti — har level bas neeche se aaya summary jodta hai.
+    Har team lead apni team se numbers leta hai, jod ke apne manager ko bhejta hai. Manager apni teams ka jod ke director ko. Kisi ko poori company dobara count karni nahi padti — har level bas neeche se aaya summary jodta hai.
 
     Par HR ko "sabse acchi team" chahiye. Wo report mein upar nahi jaati (manager ko sirf total chahiye) — HR ek **alag register** (global `best`) mein har level par likh leta hai.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    Seedha tareeka aksar dobara kaam karta hai. "Tree balanced hai?" — har node par `height(left)` aur `height(right)` alag se nikaalo → neeche ke nodes har ancestor ke liye **dobara** gine jaate hain. O(n × h), bure case mein O(n²).
+    Seedha tareeka often dobara kaam karta hai. "Tree balanced hai?" — har node par `height(left)` aur `height(right)` alag se nikaalo → neeche ke nodes har ancestor ke liye **dobara** count kiye jaate hain. O(n × h), bure case mein O(n²).
 
     Fix: ek hi postorder pass mein height ke **saath** extra info bhejo (balanced hai ya nahi). Har node ek baar → **O(n)**.
 
@@ -42,12 +42,12 @@ why:
     > [!socho]
     > Diameter ke liye har node par `height(left) + height(right)` naive tareeke se nikaalo to kitna time?
     >
-    > Har node par height O(subtree size) → kul O(n × h), skewed tree mein O(n²). Height nikaalte-nikaalte hi `l + r` check kar lo → O(n).
+    > Har node par height O(subtree size) → total O(n × h), skewed tree mein O(n²). Height nikaalte-nikaalte hi `l + r` check kar lo → O(n).
 
 # 3. Visual intro
 visual:
   body: |
-    Naive balanced check chalao. Badge `×k` = height() ne node ko kitni baar gina. Laal = dobara gina — bekaar kaam.
+    Naive balanced check chalao. Badge `×k` = height() ne node ko kitni baar gina. Red = dobara gina — bekaar kaam.
   viz: { tracer: naiveVisits }
 
 # 4. Kaise kaam karta hai
@@ -74,7 +74,7 @@ operations:
   - op: "Height / size / sum"
     time: O(n)
     space: O(h)
-    why: "Har node ek baar; stack gehraai = height."
+    why: "Har node ek baar; stack depth = height."
   - op: "Balanced check (naive)"
     time: "O(n × h), worst O(n²)"
     space: O(h)
@@ -86,7 +86,7 @@ operations:
   - op: "Diameter"
     time: O(n)
     space: O(h)
-    why: "Height nikaalte waqt har node par l + r se best update."
+    why: "Height nikaalte time har node par l + r se best update."
   - op: "Max path sum"
     time: O(n)
     space: O(h)
@@ -101,7 +101,7 @@ code:
   - title: Naive balanced check — kitna dobara kaam?
     file: naive
     note: |
-      Har node par `height()` dobara poore subtree mein jaata hai. 10 nodes ke tree mein `visits = 19`. Gehra tree ho to ye gap bahut bada.
+      Har node par `height()` dobara poore subtree mein jaata hai. 10 nodes ke tree mein `visits = 19`. Deep tree ho to ye gap bahut bada.
 
       'Kaise kaam karta hai' wala `check()` same jawab **har node ek baar** dekh ke deta hai.
 
@@ -109,16 +109,16 @@ code:
 examples:
   - id: diameter
     level: easy
-    title: Tree ke do sabse door nodes
+    title: Tree ke 2 sabse door nodes
     source: { name: Diameter of Binary Tree, platform: LeetCode, url: "https://leetcode.com/problems/diameter-of-binary-tree/" }
     problem: |
-      Tree mein kinhi bhi do nodes ke beech sabse lamba raasta kitne **edges** ka hai? Raasta root se guzre, zaroori nahi.
+      Tree mein kinhi bhi 2 nodes ke beech sabse lamba raasta kitne **edges** ka hai? Raasta root se guzre, zaroori nahi.
 
       Example: `[1, 2, 3, 4, 5, #, #, 6, #, #, 7, 8, #, #, 9]` → **6** (8 → 6 → 4 → 2 → 5 → 7 → 9)
     intuition: |
       Har raasta kisi ek node par **mudta** hai (sabse upar wala node). Us node par raasta = `left height + right height` edges.
 
-      To height nikaalte waqt har node par `best = max(best, l + r)`. Return phir bhi **height** — kyunki parent ke liye raasta ek hi bachche se aa sakta hai, mud ke wapas nahi ja sakta.
+      To height nikaalte time har node par `best = max(best, l + r)`. Return phir bhi **height** — kyunki parent ke liye raasta ek hi bachche se aa sakta hai, mud ke wapas nahi ja sakta.
 
       > [!galti]
       > Sirf root par `l + r` dekha. Upar example mein root par 4 + 1 = 5, par asli jawab 6 node **2** par mudta hai.
@@ -146,18 +146,18 @@ examples:
     title: Chor aur tree jaisi colony
     source: { name: House Robber III, platform: LeetCode, url: "https://leetcode.com/problems/house-robber-iii/" }
     problem: |
-      Colony ke ghar ek binary tree jaise jude hain; har node = ghar mein kitna paisa. Agar **seedhe jude** do ghar (parent aur bachcha) ek hi raat loote to alarm. Bina alarm ke max kitna loot sakte ho?
+      Colony ke ghar ek binary tree jaise jude hain; har node = ghar mein kitna paisa. Agar **seedhe jude** 2 ghar (parent aur bachcha) ek hi raat loote to alarm. Bina alarm ke max kitna loot sakte ho?
 
       Example: `[3, 4, 5, 1, 3, #, 1]` → **9** (4 + 5)
     intuition: |
-      Har node par do raaste:
+      Har node par 2 raaste:
       - **Looto** → bachche nahi loot sakte: `value + left.skip + right.skip`.
       - **Chhodo** → har bachcha apna best de: `max(left) + max(right)`.
 
       Parent ko dono chahiye (wo khud loote to bachche ka "skip" chahiye), isliye **pair** return karo: `(take, skip)`.
 
       > [!galti]
-      > "Level chhod ke looto" (alternate levels) → galat! Ek node ka left bachcha loot sakte ho aur right ka pota — level se nahi, har node par alag faisla.
+      > "Level chhod ke looto" (alternate levels) → galat! Ek node ka left bachcha loot sakte ho aur right ka pota — level se nahi, har node par alag decision.
     dryRun: |
       | Node | take | skip | Kyun |
       |---|---|---|---|
@@ -172,7 +172,7 @@ examples:
     complexity:
       time: O(n)
       space: O(h)
-      why: "Har node ek baar, do number banata hai. Memo map nahi chahiye — pair hi memo hai."
+      why: "Har node ek baar, 2 number banata hai. Memo map nahi chahiye — pair hi memo hai."
 
   - id: max-path-sum
     level: tricky
@@ -183,7 +183,7 @@ examples:
 
       Example: `[-10, 9, 20, #, #, 15, 7]` → **42** (15 → 20 → 7)
     intuition: |
-      Diameter wala hi dhaancha — height ki jagah **gain** = is node se neeche ek taraf jaane ka sabse accha sum.
+      Diameter wala hi structure — height ki jagah **gain** = is node se neeche ek taraf jaane ka sabse accha sum.
       - Bachche ka gain negative → `max(0, gain)`: bura hissa jodo hi mat.
       - Yahan mudta raasta: `value + l + r` → `best` update.
       - Upar: `value + max(l, r)` (sirf ek taraf).
@@ -209,12 +209,12 @@ examples:
 when:
   use:
     - "Jawab subtree se banta hai (height, size, sum, balanced) → postorder return."
-    - "'Kinhi do nodes ke beech' raasta (diameter, max path) → return ek-taraf, global best."
-    - "Node lena / na lena, parent-bachche ki shart → pair return (tree DP)."
+    - "'Kinhi 2 nodes ke beech' raasta (diameter, max path) → return ek-taraf, global best."
+    - "Node lena / na lena, parent-bachche ki condition → pair return (tree DP)."
   avoid:
-    - "Jaankari upar se neeche chahiye (root se path sum, good nodes) → top-down parameter."
+    - "Information upar se neeche chahiye (root se path sum, good nodes) → top-down parameter."
     - "Level wale sawaal (right view, min depth jaldi) → BFS."
-    - "Tree bahut gehra (10^5 skewed) → recursion stack overflow; iterative postorder ya BFS order ulta."
+    - "Tree bahut deep (10^5 skewed) → recursion stack overflow; iterative postorder ya BFS order ulta."
   signals:
     - keyword: "height / depth / balanced"
       think: "1 + max; balanced → height ya -1."
@@ -232,7 +232,7 @@ realWorld:
   - where: "Database index (AVL / Red-Black tree)"
     how: "Insert ke baad neeche se upar height update; fark > 1 to rotation. Wahi 'height ya toota' check."
   - where: "Network / org latency"
-    how: "Tree network mein do sabse door machines = diameter — worst-case message delay."
+    how: "Tree network mein 2 sabse door machines = diameter — worst-case message delay."
   - where: "Compiler"
     how: "Expression tree mein har node bachchon ka type / value lekar apna banata hai (constant folding)."
   - where: "Company bonus planning"
@@ -255,7 +255,7 @@ mistakes:
   - title: "Max path sum mein best = 0"
     type: other
     wrong: |
-      Sab values negative → 0 aata hai, jabki koi node chuna hi nahi.
+      Sab values negative → 0 aata hai, jabki koi node choose kiya hi nahi.
     right: |
       `best = Int.MIN_VALUE` (Java `Integer.MIN_VALUE`).
   - title: "Negative gain jod diya"
@@ -302,17 +302,17 @@ interview:
     - q: "Tree 10^5 nodes ka skewed ho to?"
       followUp: true
       a: |
-        Recursion stack overflow. Iterative postorder (stack + visited / do stacks), ya BFS order nikaal ke ulta chalo aur bachchon ka jawab map mein rakho.
+        Recursion stack overflow. Iterative postorder (stack + visited / 2 stacks), ya BFS order nikaal ke ulta chalo aur bachchon ka jawab map mein rakho.
     - q: "Diameter n-ary tree mein?"
       followUp: true
       a: |
         Har node par bachchon ki heights mein top-2 lo; best = top1 + top2. Return 1 + top1.
     - q: "Top-down vs bottom-up kab?"
       a: |
-        Jaankari root se chahiye (path sum till here, max so far) → parameter. Bachchon se chahiye (height, size) → return. Kai baar dono saath.
+        Information root se chahiye (path sum till here, max so far) → parameter. Bachchon se chahiye (height, size) → return. Kai baar dono saath.
     - q: "Longest univalue path kaise?"
       a: |
-        Diameter jaisa; bachche ka height tabhi gino jab uski value node ke barabar ho, warna 0.
+        Diameter jaisa; bachche ka height tabhi count karo jab uski value node ke barabar ho, warna 0.
   mayAsk:
     - "Binary Tree Tilt."
     - "Longest Univalue Path."
@@ -354,7 +354,7 @@ practice:
     num: 687
     url: "https://leetcode.com/problems/longest-univalue-path/"
     level: medium
-    pattern: Diameter + shart
+    pattern: Diameter + condition
     hint: "Bachche ki arm tabhi jodo jab uski value node jaisi ho, warna 0. best = l + r, return 1 + max wali arm."
   - name: Distribute Coins in Binary Tree
     platform: LeetCode

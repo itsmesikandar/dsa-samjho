@@ -7,7 +7,7 @@ class Main {
         if (index < 0 || index > size) throw new IndexOutOfBoundsException("Galat index");
         int i = size - 1; // last bhare hue dabbe se shuru //@init
         while (i >= index) { // index tak peeche aate jao //@loop
-            arr[i + 1] = arr[i]; // har item ek kadam right copy //@shift
+            arr[i + 1] = arr[i]; // har item ek step right copy //@shift
             i--;
         }
         arr[index] = value; // ab ye jagah khaali hai, value rakh do //@place

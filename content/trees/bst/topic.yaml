@@ -15,22 +15,22 @@ what:
     - Left subtree ke **saare** nodes < node.
     - Right subtree ke **saare** nodes > node.
 
-    "Saare" zaroori hai — sirf seedha bachcha nahi, poora subtree. (Duplicates aam taur par allowed nahi.)
+    "Saare" zaroori hai — sirf seedha bachcha nahi, poora subtree. (Duplicates usually allowed nahi.)
 
     Fayda: search mein har node par ek taraf **poora subtree** chhoot jaata hai — bilkul binary search jaisa. Kaam = **O(h)**, h = height.
 
     > [!yaad]
-    > BST ka **inorder** (L N R) = **sorted** order. Ye ek line bahut sawaalon ki chaabi hai.
+    > BST ka **inorder** (L N R) = **sorted** order. Ye ek line bahut sawaalon ki key hai.
   analogy: |
     **Number guess game:**
     Dost ne 1–100 mein number socha. Tum 50 bolte ho, wo kehta "chhota". Ab 51–100 ki taraf dekhna hi bekaar. Phir 25… har jawab aadhe options khatam karta hai.
 
-    BST mein har node ek guess hai. "Chhota" = left, "bada" = right. Tree jitna santulit (balanced), utne kam guess.
+    BST mein har node ek guess hai. "Chhota" = left, "bada" = right. Tree jitna balanced (balanced), utne kam guess.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    Sorted data rakhna hai jisme search, insert, delete teeno tez hon:
+    Sorted data rakhna hai jisme search, insert, delete all 3 tez hon:
 
     | Structure | Search | Insert / Delete |
     |---|---|---|
@@ -49,7 +49,7 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Har node ki ek **range** hoti hai — upar ke saare ancestors ki shartein milkar. Badge = (lo..hi). Left mein jaate hi `hi` chhota hota hai, right mein `lo` bada.
+    Har node ki ek **range** hoti hai — upar ke saare ancestors ki conditions milkar. Badge = (lo..hi). Left mein jaate hi `hi` chhota hota hai, right mein `lo` bada.
   viz: { tracer: bstRanges }
 
 # 4. Kaise kaam karta hai
@@ -59,7 +59,7 @@ how:
 
     **Insert:** search ka hi raasta. Jahan **null** mile, wahi naya node — naya node hamesha **leaf** banta hai, koi purana node hilta nahi.
 
-    Recursion ka trick: `node.left = insert(node.left, key)` — function naye subtree ka root lautaata hai, parent use jod leta hai. Null par naya node lautaya → apne aap jud gaya.
+    Recursion ka trick: `node.left = insert(node.left, key)` — function naye subtree ka root return karta hai, parent use jod leta hai. Null par naya node return kiya → apne aap jud gaya.
 
     > [!tip]
     > Search iterative likho (code section) — O(1) space. Insert / delete recursive saaf lagte hain; interview mein dono chalenge.
@@ -109,7 +109,7 @@ examples:
     title: Range ke andar wale nodes ka sum
     source: { name: Range Sum of BST, platform: LeetCode, url: "https://leetcode.com/problems/range-sum-of-bst/" }
     problem: |
-      BST aur do numbers `low`, `high` diye hain. Jin nodes ki value `[low, high]` mein hai, unka sum batao.
+      BST aur 2 numbers `low`, `high` diye hain. Jin nodes ki value `[low, high]` mein hai, unka sum batao.
 
       Example: `[10, 5, 15, 3, 7, #, 18]`, low = 7, high = 15 → **32** (7 + 10 + 15)
     intuition: |
@@ -121,7 +121,7 @@ examples:
       > [!galti]
       > node < low par node ka right bhi skip kar diya. Right mein bade values hain — wahan range waale ho sakte hain!
     dryRun: |
-      | Node | Faisla | sum |
+      | Node | Decision | sum |
       |---|---|---|
       | 10 | range mein → jodo, dono taraf | 10 |
       | 5 | 5 < 7 → left (3) skip, right jao | 10 |
@@ -133,7 +133,7 @@ examples:
     viz: { tracer: rangeSumTrace }
     code: ex1-range-sum
     complexity:
-      time: "O(n) worst, aksar kam"
+      time: "O(n) worst, often kam"
       space: O(h)
       why: "Range bahar wale subtrees chhoot jaate hain; sab range mein ho to sab dekhne padenge."
 
@@ -148,7 +148,7 @@ examples:
     intuition: |
       Sirf "left bachcha < node < right bachcha" check karna **galat** hai — upar example mein har parent-bachcha joda theek dikhta hai (3 < 6), par 3 ko 5 se bhi bada hona tha.
 
-      Fix: har node ko ek **range** `(lo, hi)` do. Left mein jao → `hi = node`. Right mein → `lo = node`. Upar ki shartein neeche saath chalti hain.
+      Fix: har node ko ek **range** `(lo, hi)` do. Left mein jao → `hi = node`. Right mein → `lo = node`. Upar ki conditions neeche saath chalti hain.
 
       Doosra tareeka: inorder nikaalo, check karo ki strictly badhta hai (pichhla < abhi).
 
@@ -173,26 +173,26 @@ examples:
     title: BST se node hatao
     source: { name: Delete Node in a BST, platform: LeetCode, url: "https://leetcode.com/problems/delete-node-in-a-bst/" }
     problem: |
-      BST aur ek `key` diya hai. Wo node hatao (agar hai) aur tree BST hi rahe. Naya root lautao.
+      BST aur ek `key` diya hai. Wo node hatao (agar hai) aur tree BST hi rahe. Naya root return karo.
 
       Example: `[8, 3, 12, 1, 6, 10, 15, #, #, #, #, #, 11]`, key = 8 → preorder `[10, 3, 1, 6, 12, 11, 15]`
     intuition: |
-      Pehle search se node tak pahuncho. Phir teen case:
-      1. **Leaf** → bas hata do (null lautao).
+      Pehle search se node tak pahuncho. Phir 3 case:
+      1. **Leaf** → bas hata do (null return karo).
       2. **Ek bachcha** → bachcha seedha jagah le (uska poora subtree already sahi range mein hai).
-      3. **Do bachche** → right subtree ka **sabse chhota** (inorder successor) dhoondho. Uski value yahan copy karo, phir right subtree se successor ko delete karo.
+      3. **2 bachche** → right subtree ka **sabse chhota** (inorder successor) dhoondho. Uski value yahan copy karo, phir right subtree se successor ko delete karo.
 
       Successor kyun? Wo left ke sab se bada aur right ke baaki sab se chhota — jagah ke liye bilkul fit. Aur uska **left kabhi nahi** hota → uska delete case 1 ya 2 hai.
 
       > [!galti]
-      > Do bachche wale case mein left subtree ko right ke neeche chipka diya. Tree BST rehta hai par height badh jaati hai — successor wala tareeka height nahi badhata.
+      > 2 bachche wale case mein left subtree ko right ke neeche chipka diya. Tree BST rehta hai par height badh jaati hai — successor wala tareeka height nahi badhata.
     dryRun: |
       | Step | Kya hua |
       |---|---|
-      | 8 mila | do bachche (3, 12) |
+      | 8 mila | 2 bachche (3, 12) |
       | successor | 12 → left 10 → left null → **10** |
       | copy | root ki value 10 |
-      | right se 10 hatao | 12 → left → 10 mila, left null → right (11) lautao |
+      | right se 10 hatao | 12 → left → 10 mila, left null → right (11) return karo |
       | 12.left = 11 | preorder `[10, 3, 1, 6, 12, 11, 15]` |
     viz: { tracer: deleteTrace }
     code: ex3-delete
@@ -232,7 +232,7 @@ realWorld:
   - where: "Stock order book"
     how: "Price ke order mein buy / sell orders — best price = min / max node, insert / cancel O(log n)."
   - where: "Autocomplete / dictionary (sorted)"
-    how: "Shabd sorted order mein; 'ab' se shuru hone wale = ek range."
+    how: "Word sorted order mein; 'ab' se shuru hone wale = ek range."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -241,13 +241,13 @@ mistakes:
     wrong: |
       `node.left.value < node.value < node.right.value` har node par → `[5, 1, 6, #, #, 3, 7]` ko true bolega.
     right: |
-      Range `(lo, hi)` neeche bhejo — har ancestor ki shart.
-  - title: "Range bounds Int ke kinaare se"
+      Range `(lo, hi)` neeche bhejo — har ancestor ki condition.
+  - title: "Range bounds Int ke edge se"
     type: overflow
     wrong: |
       `valid(root, Int.MIN_VALUE, Int.MAX_VALUE)` → node = `Int.MAX_VALUE` hai to galat false.
     right: |
-      `Long.MIN_VALUE` / `Long.MAX_VALUE`, ya nullable `Int?` bounds (null = koi shart nahi).
+      `Long.MIN_VALUE` / `Long.MAX_VALUE`, ya nullable `Int?` bounds (null = koi condition nahi).
   - title: "Insert ka return jodna bhool gaye"
     type: "null"
     wrong: |
@@ -260,7 +260,7 @@ mistakes:
       Value copy ki, par right subtree se successor delete nahi kiya → duplicate.
     right: |
       `node.right = delete(node.right, s.value)`.
-  - title: "Duplicates ka rule tay nahi kiya"
+  - title: "Duplicates ka rule decide nahi kiya"
     type: other
     wrong: |
       Kabhi left mein, kabhi right mein barabar value → search galat taraf jaata hai.
@@ -284,13 +284,13 @@ interview:
         O(h). Balanced par O(log n), skewed (sorted insert) par O(n).
     - q: "BST validate kaise? Sirf bachchon se compare kyun nahi?"
       a: |
-        Range (lo, hi) bhejo, ya inorder strictly increasing check. Sirf bachche check karna ancestors ki shart miss karta hai.
-    - q: "Delete ke teen case?"
+        Range (lo, hi) bhejo, ya inorder strictly increasing check. Sirf bachche check karna ancestors ki condition miss karta hai.
+    - q: "Delete ke 3 case?"
       a: |
-        Leaf → hata do. Ek bachcha → bachcha jagah le. Do bachche → inorder successor (right ka min) ki value copy, phir successor delete.
+        Leaf → hata do. Ek bachcha → bachcha jagah le. 2 bachche → inorder successor (right ka min) ki value copy, phir successor delete.
     - q: "Kth smallest in BST?"
       a: |
-        Inorder mein ginte jao, k-th par ruko. O(h + k). Baar baar poochha jaaye to har node par left subtree size rakho → O(h).
+        Inorder mein count karte jao, k-th par ruko. O(h + k). Baar baar poochha jaaye to har node par left subtree size rakho → O(h).
     - q: "Sorted array se balanced BST?"
       a: |
         Beech wala element root, left aadha → left subtree, right aadha → right subtree (recursively). O(n).
@@ -305,10 +305,10 @@ interview:
     - q: "Inorder successor kisi node ka?"
       a: |
         Right subtree hai → uska leftmost. Nahi hai → root se search karo; jahan left mude wo last node = successor.
-    - q: "Do nodes galti se swap ho gaye BST mein — kaise theek karoge?"
+    - q: "2 nodes galti se swap ho gaye BST mein — kaise theek karoge?"
       followUp: true
       a: |
-        Inorder mein do jagah order toota milega (ya ek, agar bagal wale the). Pehli galti ka bada aur aakhri galti ka chhota → swap values.
+        Inorder mein 2 jagah order toota milega (ya ek, agar bagal wale the). Pehli galti ka bada aur aakhri galti ka chhota → swap values.
   mayAsk:
     - "Kth Smallest Element in a BST."
     - "Convert Sorted Array to BST."
@@ -358,7 +358,7 @@ practice:
     url: "https://leetcode.com/problems/kth-smallest-element-in-a-bst/"
     level: medium
     pattern: Inorder count
-    hint: "Iterative inorder (stack) mein ginti; k par return."
+    hint: "Iterative inorder (stack) mein count; k par return."
   - name: Recover Binary Search Tree
     platform: LeetCode
     num: 99
@@ -372,7 +372,7 @@ practice:
     url: "https://leetcode.com/problems/count-of-smaller-numbers-after-self/"
     level: hard
     pattern: BST with left-size count
-    hint: "Peeche se insert karo. Har node par left subtree ka size rakho; right mudte waqt (leftSize + 1) jodo. Skewed se bachne ke liye merge sort / BIT bhi option."
+    hint: "Peeche se insert karo. Har node par left subtree ka size rakho; right mudte time (leftSize + 1) jodo. Skewed se bachne ke liye merge sort / BIT bhi option."
 
 # 13. Quick revision
 revision:
@@ -380,7 +380,7 @@ revision:
     - "BST: har node par left subtree sab chhote, right subtree sab bade (poora subtree)."
     - "Inorder = sorted. Search / insert / delete = O(h)."
     - "Insert: search raasta, null par naya leaf; node.left = insert(node.left, key)."
-    - "Delete: leaf / ek bachcha / do bachche (successor copy + delete)."
+    - "Delete: leaf / ek bachcha / 2 bachche (successor copy + delete)."
     - "Validate: range (lo, hi) Long mein. Sorted insert = line → TreeMap (Red-Black) use karo."
   cheatsheet: |
     ```kotlin
@@ -408,7 +408,7 @@ revision:
       options: ["Haan", "Nahi — 3 right subtree mein 5 se chhota", "Nahi — 1 galat jagah", "Haan, kyunki 3 < 6"]
       answer: 1
       explain: "Poore right subtree ko 5 se bada hona chahiye."
-    - q: "Do bachchon wale node ko delete karte waqt kiski value copy karte hain?"
+    - q: "Do bachchon wale node ko delete karte time kiski value copy karte hain?"
       options: ["Left bachcha", "Right bachcha", "Inorder successor (right ka min)", "Root"]
       answer: 2
       explain: "Successor (ya predecessor) — order bana rehta hai, height nahi badhti."

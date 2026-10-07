@@ -12,7 +12,7 @@ class Main {
         }
     }
 
-    // Level ki width = sabse baayein aur sabse daayein node ke beech ki saari jagahen (beech ke khaali bhi). Max width?
+    // Level ki width = sabse left aur sabse right node ke beech ki saari jagahen (beech ke khaali bhi). Max width?
     static int widthOfBinaryTree(TreeNode root) {
         if (root == null) return 0;
         Queue<TreeNode> nodes = new ArrayDeque<>();
@@ -22,11 +22,11 @@ class Main {
         long best = 0;
         while (!nodes.isEmpty()) {
             int size = nodes.size();
-            long first = pos.peek(); // is level ka sabse baayein position //@level
+            long first = pos.peek(); // is level ka sabse left position //@level
             long last = 0;
             for (int k = 0; k < size; k++) {
                 TreeNode n = nodes.poll();
-                long i = pos.poll() - first; // har level par 0 se gino - warna gehre tree mein numbers overflow //@pos
+                long i = pos.poll() - first; // har level par 0 se count karo - warna deep tree mein numbers overflow //@pos
                 last = i;
                 if (n.left != null) { //@push
                     nodes.add(n.left);

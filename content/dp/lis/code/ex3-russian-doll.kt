@@ -1,4 +1,4 @@
-// Lifafa andar tabhi jaata jab width aur height DONO chhote. Width se sort (same width par height ULTI), phir heights par LIS
+// Envelope andar tabhi jaata jab width aur height DONO chhote. Width se sort (same width par height ULTI), phir heights par LIS
 fun maxEnvelopes(envelopes: Array<IntArray>): Int {
     envelopes.sortWith(compareBy<IntArray> { it[0] }.thenByDescending { it[1] }) // same width - bada pehle, taaki dono ek chain mein na aayen //@sort
     val tails = IntArray(envelopes.size)

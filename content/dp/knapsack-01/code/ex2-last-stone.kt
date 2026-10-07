@@ -1,8 +1,8 @@
-// Patthar do dheron mein - bacha hua = |dher1 - dher2|. Ek dher total/2 ke jitna paas ho utna kam
+// Stone do bahut saare mein - bacha hua = |dher1 - dher2|. Ek pile total/2 ke jitna paas ho utna kam
 fun lastStoneWeightII(stones: IntArray): Int {
     val total = stones.sum()
     val half = total / 2
-    val dp = BooleanArray(half + 1) // dp[s] = koi dher jiska jod s
+    val dp = BooleanArray(half + 1) // dp[s] = koi pile jiska jod s
     dp[0] = true
     for (x in stones) {
         for (s in half downTo x) {
@@ -10,7 +10,7 @@ fun lastStoneWeightII(stones: IntArray): Int {
         }
     }
     for (s in half downTo 0) {
-        if (dp[s]) return total - 2 * s // ek dher s, doosra total - s; farak total - 2s //@best
+        if (dp[s]) return total - 2 * s // ek pile s, doosra total - s; farak total - 2s //@best
     }
     return total
 }

@@ -11,10 +11,10 @@ class Main {
         }
     }
 
-    // Har node ko (lo, hi) range ke andar hona chahiye - upar ki saari shartein
+    // Har node ko (lo, hi) range ke andar hona chahiye - upar ki saari conditions
     static boolean valid(TreeNode node, long lo, long hi) {
         if (node == null) return true;
-        if (node.val <= lo || node.val >= hi) return false; // kisi ancestor ki shart tooti //@bad
+        if (node.val <= lo || node.val >= hi) return false; // kisi ancestor ki condition tooti //@bad
         return valid(node.left, lo, node.val) && valid(node.right, node.val, hi); //@go
     }
 

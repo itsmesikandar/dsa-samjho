@@ -4,12 +4,12 @@ class Main {
         int n = cards.length;
         int total = 0;
         for (int c : cards) total += c;
-        int w = n - k; // jo cards BACHENGE, wo hamesha beech ka lagatar hissa hain
+        int w = n - k; // jo cards BACHENGE, wo hamesha beech ka continuous hissa hain
         int sum = 0;
         for (int i = 0; i < w; i++) sum += cards[i]; // pehla 'bacha hua' hissa //@first
         int minSum = sum;
         for (int r = w; r < n; r++) {
-            sum += cards[r] - cards[r - w]; // size w ki window aage khiski //@slide
+            sum += cards[r] - cards[r - w]; // size w ki window aage shift hui //@slide
             minSum = Math.min(minSum, sum); // bache hue ka sum jitna kam, utha hua utna zyada //@best
         }
         return total - minSum;

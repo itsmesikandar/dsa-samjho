@@ -1,5 +1,5 @@
 class Main {
-    // Do players baari-baari array ke kisi kinare se ek number uthate hain. Player 1 jeet (ya tie) sakta hai?
+    // 2 players baari-baari array ke kisi edge se ek number uthate hain. Player 1 jeet (ya tie) sakta hai?
     static boolean predictTheWinner(int[] nums) {
         return diff(nums, 0, nums.length - 1) >= 0;
     }

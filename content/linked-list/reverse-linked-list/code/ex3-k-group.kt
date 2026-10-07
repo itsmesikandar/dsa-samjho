@@ -1,25 +1,25 @@
 class ListNode(var value: Int, var next: ListNode? = null)
 
-// k-k nodes ke tukde ulte karo; aakhir mein k se kam bache to waise hi chhodo
+// k-k nodes ke pieces ulte karo; aakhir mein k se kam bache to waise hi chhodo
 fun reverseKGroup(head: ListNode?, k: Int): ListNode? {
     val dummy = ListNode(0, head)
-    var groupPrev: ListNode = dummy // pichhle (ulte ho chuke) tukde ka aakhri node
+    var groupPrev: ListNode = dummy // pichhle (ulte ho chuke) pieces ka aakhri node
     while (true) {
         var kth: ListNode? = groupPrev
         for (i in 0 until k) kth = kth?.next // aage poore k nodes hain? //@check
         if (kth == null) break // k se kam bache: chhod do
-        val groupNext = kth.next // agle tukde ka pehla
-        var prev: ListNode? = groupNext // ulta tukda seedha agle tukde se jude, isliye prev yahan se
+        val groupNext = kth.next // agle pieces ka pehla
+        var prev: ListNode? = groupNext // ulta piece seedha agle pieces se jude, isliye prev yahan se
         var cur = groupPrev.next
-        while (cur !== groupNext) { // tukde ke arrows ulte //@flip
+        while (cur !== groupNext) { // pieces ke arrows ulte //@flip
             val c = cur!!
             val nxt = c.next
             c.next = prev
             prev = c
             cur = nxt
         }
-        val oldFirst = groupPrev.next!! // ulte hone ke baad ye tukde ka aakhri hai
-        groupPrev.next = kth // pichhla tukda ab is tukde ke naye pehle (purane k-th) se jude //@join
+        val oldFirst = groupPrev.next!! // ulte hone ke baad ye pieces ka aakhri hai
+        groupPrev.next = kth // pichhla piece ab is pieces ke naye pehle (purane k-th) se jude //@join
         groupPrev = oldFirst
     }
     return dummy.next

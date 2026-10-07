@@ -23,7 +23,7 @@ class Main {
         int[] wt = {1, 2, 3, 4, 5};
         int[] v = {2, 5, 9, 10, 12};
         System.out.println(unbounded(wt, v, 5) + " " + unboundedCapFirst(wt, v, 5));
-        System.out.println(unbounded(new int[] {2}, new int[] {3}, 6)); // 2kg wala teen baar
+        System.out.println(unbounded(new int[] {2}, new int[] {3}, 6)); // 2kg wala 3 baar
     }
 }
 

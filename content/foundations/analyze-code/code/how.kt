@@ -1,4 +1,4 @@
-// Do hisson wala function: pehle ek loop, phir nested loop. Total kaam kitna?
+// 2 hisson wala function: pehle ek loop, phir nested loop. Total kaam kitna?
 fun analyze(arr: IntArray): Int {
     var count = 0
     for (x in arr) count++ // hissa 1: n baar //@p1

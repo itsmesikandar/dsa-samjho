@@ -8,7 +8,7 @@ class Main {
         int l = 0;
         int best = 0;
         for (int r = 0; r < s.length(); r++) {
-            while (inWindow.contains(s.charAt(r))) { // s[r] pehle se andar: purani copy nikalne tak sikodo //@shrink
+            while (inWindow.contains(s.charAt(r))) { // s[r] pehle se andar: purani copy nikalne tak shrink karo //@shrink
                 inWindow.remove(s.charAt(l));
                 l++;
             }

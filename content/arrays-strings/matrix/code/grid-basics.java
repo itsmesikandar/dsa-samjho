@@ -10,7 +10,7 @@ class Main {
         System.out.println(Arrays.deepToString(grid));
         System.out.println(grid[1][2]); // row 1, column 2
 
-        // 4 padosi (upar, neeche, left, right) - direction arrays se
+        // 4 neighbor (upar, neeche, left, right) - direction arrays se
         int[] dr = {-1, 1, 0, 0};
         int[] dc = {0, 0, -1, 1};
         int r = 0, c = 0;
@@ -19,7 +19,7 @@ class Main {
             int nr = r + dr[k], nc = c + dc[k];
             if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) nbrs.add(grid[nr][nc]); // grid ke bahar? to chhodo
         }
-        System.out.println(nbrs); // corner (0,0) ke sirf 2 valid padosi
+        System.out.println(nbrs); // corner (0,0) ke sirf 2 valid neighbor
     }
 }
 

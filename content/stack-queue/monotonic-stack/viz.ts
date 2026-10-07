@@ -3,18 +3,18 @@ import type { Cell, Panel, Tone } from '@/components/viz/engine/types';
 
 const stackPanel = (items: Cell[], label: string, tones: Record<number, Tone> = {}): Panel => ({ kind: 'stack', label, items: [...items], tones });
 
-// ---------- 3. Visual intro: imaarton se aage dekhna ----------
+// ---------- 3. Visual intro: buildings se aage dekhna ----------
 export const buildingsView = tracer<{ heights: number[] }>({
-  inputs: [{ name: 'heights', type: 'intArray', label: 'Imaarton ki unchai', default: [3, 1, 2, 5, 4, 6], minLen: 2, maxLen: 8, min: 1, max: 9 }],
+  inputs: [{ name: 'heights', type: 'intArray', label: 'Buildings ki height', default: [3, 1, 2, 5, 4, 6], minLen: 2, maxLen: 8, min: 1, max: 9 }],
   run({ heights }, t) {
     const res: Cell[] = heights.map(() => '?');
     const st: number[] = [];
     const bars = (hot: Record<number, Tone> = {}): Panel[] => [
       { kind: 'bars', values: heights, tones: { ...Object.fromEntries(st.map((i) => [i, 'compare' as Tone])), ...hot } },
-      stackPanel(st.map((i) => heights[i]), 'Intezaar mein (stack)'),
-      array(res, { label: 'Daayein pehli lambi imaarat' }),
+      stackPanel(st.map((i) => heights[i]), 'Wait mein (stack)'),
+      array(res, { label: 'Right pehli lambi building' }),
     ];
-    t.frame({ caption: 'Har imaarat ki chhat se daayein dekho: pehli LAMBI imaarat kaunsi? Brute force: har ek ke liye aage scan → O(n²). Stack: jinka jawab abhi nahi mila, unhe intezaar karwao.', legend: { compare: 'intezaar mein' }, panels: bars() });
+    t.frame({ caption: 'Har building ki chhat se right dekho: pehli LAMBI building kaunsi? Brute force: har ek ke liye aage scan → O(n²). Stack: jinka jawab abhi nahi mila, unhe wait karwao.', legend: { compare: 'wait mein' }, panels: bars() });
     for (let i = 0; i < heights.length; i++) {
       const popped: number[] = [];
       while (st.length && heights[st[st.length - 1]] < heights[i]) {
@@ -22,12 +22,12 @@ export const buildingsView = tracer<{ heights: number[] }>({
         res[j] = heights[i];
         popped.push(j);
       }
-      if (popped.length) t.frame({ caption: `${heights[i]} aayi — intezaar kar rahi chhoti imaartein (${popped.map((j) => heights[j]).join(', ')}) ko jawab mil gaya: ${heights[i]}. Stack se bahar.`, legend: { found: 'jawab mila', compare: 'intezaar mein' }, panels: bars({ [i]: 'active', ...Object.fromEntries(popped.map((j) => [j, 'found' as Tone])) }) });
+      if (popped.length) t.frame({ caption: `${heights[i]} aayi — wait kar rahi chhoti buildings (${popped.map((j) => heights[j]).join(', ')}) ko jawab mil gaya: ${heights[i]}. Stack se bahar.`, legend: { found: 'jawab mila', compare: 'wait mein' }, panels: bars({ [i]: 'active', ...Object.fromEntries(popped.map((j) => [j, 'found' as Tone])) }) });
       st.push(i);
-      t.frame({ caption: `${heights[i]} khud intezaar mein (stack par). Stack mein unchaiyan hamesha neeche se upar GHATTI hain — isliye "monotonic".`, legend: { compare: 'intezaar mein' }, panels: bars({ [i]: 'new' }) });
+      t.frame({ caption: `${heights[i]} khud wait mein (stack par). Stack mein heights hamesha neeche se upar GHATTI hain — isliye "monotonic".`, legend: { compare: 'wait mein' }, panels: bars({ [i]: 'new' }) });
     }
     for (const j of st) res[j] = -1;
-    t.frame({ caption: `Jo stack mein bache, unke daayein koi lambi nahi → −1. Har imaarat ek baar push, ek baar pop → O(n).`, panels: bars() });
+    t.frame({ caption: `Jo stack mein bache, unke right koi lambi nahi → −1. Har building ek baar push, ek baar pop → O(n).`, panels: bars() });
     return listStr(res);
   },
 });
@@ -91,7 +91,7 @@ export const tempsTrace = tracer<{ temps: number[] }>({
     const st: number[] = [];
     const view = (i: number, hot: Record<number, Tone> = {}): Panel[] => [
       array(temps, { pointers: { i }, tones: hot }),
-      stackPanel(st.map((d) => `din ${d}: ${temps[d]}`), 'Intezaar mein (stack)'),
+      stackPanel(st.map((d) => `din ${d}: ${temps[d]}`), 'Wait mein (stack)'),
       array(res, { label: 'Kitne din baad garam' }),
     ];
     for (let i = 0; i < temps.length; i++) {
@@ -101,9 +101,9 @@ export const tempsTrace = tracer<{ temps: number[] }>({
         t.frame({ line: 'pop', caption: `Din ${i} (${temps[i]}) din ${d} (${temps[d]}) se garam → ${i} − ${d} = ${res[d]} din baad.`, panels: view(i, { [d]: 'found', [i]: 'active' }) });
       }
       st.push(i);
-      t.frame({ line: 'push', caption: `Din ${i} intezaar mein.`, panels: view(i, { [i]: 'new' }) });
+      t.frame({ line: 'push', caption: `Din ${i} wait mein.`, panels: view(i, { [i]: 'new' }) });
     }
-    t.frame({ line: 'pop', caption: `Bache dino ke liye garam din aaya hi nahi → 0. Next greater hi hai, bas value ki jagah doori — isliye stack mein index.`, panels: view(temps.length - 1) });
+    t.frame({ line: 'pop', caption: `Bache dino ke liye garam din aaya hi nahi → 0. Next greater hi hai, bas value ki jagah distance — isliye stack mein index.`, panels: view(temps.length - 1) });
     return listStr(res);
   },
 });
@@ -119,7 +119,7 @@ export const histTrace = tracer<{ h: number[] }>({
       { kind: 'bars', values: h, tones: { ...Object.fromEntries(st.map((i) => [i, 'compare' as Tone])), ...hot } },
       stackPanel(st.map((i) => `${i}:${h[i]}`), 'Stack (index:height), badhte'),
     ];
-    t.frame({ line: 'push', caption: 'Har bar ke liye socho: "isi bar ki height wala sabse chauda rectangle" — left mein pehla chhota bar aur right mein pehla chhota bar deewar hain. Stack dono ek pass mein deta hai.', vars: { best }, legend: { compare: 'stack mein' }, panels: view() });
+    t.frame({ line: 'push', caption: 'Har bar ke liye socho: "isi bar ki height wala sabse wide rectangle" — left mein pehla chhota bar aur right mein pehla chhota bar wall hain. Stack dono ek pass mein deta hai.', vars: { best }, legend: { compare: 'stack mein' }, panels: view() });
     for (let i = 0; i <= h.length; i++) {
       const cur = i === h.length ? 0 : h[i];
       while (st.length && h[st[st.length - 1]] >= cur) {
@@ -132,7 +132,7 @@ export const histTrace = tracer<{ h: number[] }>({
           bestSpan = [left + 1, i - 1];
         }
         const span = Object.fromEntries(Array.from({ length: i - left - 1 }, (_, q) => [left + 1 + q, 'active' as Tone]));
-        t.frame({ line: 'area', caption: `${i === h.length ? 'Aakhir (nakli 0)' : `Bar ${i} (${cur})`} ≤ top bar ${top} (${h[top]}) → ${h[top]} wala rectangle aage nahi badhega. Right deewar = ${i}, left deewar = ${left} (stack mein neeche wala). Width ${i - left - 1} × ${h[top]} = ${area}.${better ? ' Naya best!' : ''}`, vars: { best }, legend: { active: 'rectangle', compare: 'stack mein' }, panels: view({ ...span, [top]: better ? 'found' : 'active' }) });
+        t.frame({ line: 'area', caption: `${i === h.length ? 'Aakhir (nakli 0)' : `Bar ${i} (${cur})`} ≤ top bar ${top} (${h[top]}) → ${h[top]} wala rectangle aage nahi badhega. Right wall = ${i}, left wall = ${left} (stack mein neeche wala). Width ${i - left - 1} × ${h[top]} = ${area}.${better ? ' Naya best!' : ''}`, vars: { best }, legend: { active: 'rectangle', compare: 'stack mein' }, panels: view({ ...span, [top]: better ? 'found' : 'active' }) });
       }
       if (i < h.length) {
         st.push(i);

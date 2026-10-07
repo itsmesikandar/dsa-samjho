@@ -38,7 +38,7 @@ fun build(vararg xs: Int?): TreeNode? {
 
 fun main() {
     println(isBalancedNaive(build(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)))
-    println("visits = $visits") // 10 nodes, par 19 baar gine
+    println("visits = $visits") // 10 nodes, par 19 baar count kiye
 }
 
 // Output:

@@ -1,4 +1,4 @@
-// String ko tukdon mein kaato ki HAR tukda palindrome ho. Saare tareeke do.
+// String ko pieces mein kaato ki HAR piece palindrome ho. Saare tareeke do.
 fun partition(s: String): List<List<String>> {
     val res = mutableListOf<List<String>>()
     val path = mutableListOf<String>()
@@ -17,7 +17,7 @@ fun partition(s: String): List<List<String>> {
             res.add(path.toList())
             return
         }
-        for (end in start until s.length) { // agla tukda s[start..end] - har lambai try
+        for (end in start until s.length) { // agla piece s[start..end] - har length try
             if (!isPal(start, end)) continue // palindrome nahi: is raaste jaana hi bekaar //@prune
             path.add(s.substring(start, end + 1)) //@choose
             bt(end + 1) // baaki string ko kaato

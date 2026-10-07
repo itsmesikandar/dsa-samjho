@@ -12,7 +12,7 @@ const javaDouble = (v: number): string => {
   return Number.isInteger(v) ? v.toFixed(1) : String(v);
 };
 
-// ---------- 3. Visual intro: andar jaate waqt vs bahar aate waqt ----------
+// ---------- 3. Visual intro: andar jaate time vs bahar aate time ----------
 export const upDown = tracer<{ n: number }>({
   inputs: [{ name: 'n', type: 'int', label: 'n', default: 3, min: 1, max: 5 }],
   run({ n }, t) {
@@ -25,12 +25,12 @@ export const upDown = tracer<{ n: number }>({
     const show = (k: number) => {
       stack.push(`show(${k})`);
       if (k === 0) {
-        t.frame({ caption: `show(0) — base case! Kuch print nahi, seedha return. Ab calls ULTE order mein wapas lautenge.`, vars: { depth: stack.length }, panels: panels() });
+        t.frame({ caption: `show(0) — base case! Kuch print nahi, seedha return. Ab calls ULTE order mein wapas return karenge.`, vars: { depth: stack.length }, panels: panels() });
         stack.pop();
         return;
       }
       out.push(`andar ${k}`);
-      t.frame({ caption: `show(${k}) stack par aaya. Call se PEHLE wala kaam: "andar ${k}" print. Ab show(${k - 1}) call — show(${k}) yahin ruk ke intezaar karega.`, vars: { depth: stack.length }, panels: panels() });
+      t.frame({ caption: `show(${k}) stack par aaya. Call se PEHLE wala kaam: "andar ${k}" print. Ab show(${k - 1}) call — show(${k}) yahin ruk ke wait karega.`, vars: { depth: stack.length }, panels: panels() });
       show(k - 1);
       out.push(`bahar ${k}`);
       t.frame({ caption: `show(${k - 1}) khatam, control show(${k}) mein wapas — jahan ruka tha wahin se. Call ke BAAD wala kaam: "bahar ${k}".`, vars: { depth: stack.length }, panels: panels() });
@@ -38,7 +38,7 @@ export const upDown = tracer<{ n: number }>({
     };
     t.frame({ caption: `Function: print("andar k") → show(k − 1) → print("bahar k"). Dekho output ka order — andar 1, 2, 3… phir bahar ulta!`, vars: { depth: 0 }, panels: panels() });
     show(n);
-    t.frame({ caption: `Stack khaali. "andar" seedhe order mein (jaate waqt), "bahar" ulte order mein (lautte waqt). Call ke baad likha code = lautte waqt chalta hai.`, vars: { depth: 0 }, panels: panels() });
+    t.frame({ caption: `Stack khaali. "andar" seedhe order mein (jaate time), "bahar" ulte order mein (wapas aate time). Call ke baad likha code = wapas aate time chalta hai.`, vars: { depth: 0 }, panels: panels() });
     return out.join(', ');
   },
 });
@@ -52,10 +52,10 @@ export const factTrace = tracer<{ n: number }>({
       const me = tree.push(`factorial(${k})`, parent);
       if (k <= 1) {
         tree.done(me, '1');
-        t.frame({ line: 'base', caption: `factorial(${k}): n ≤ 1 → base case. Seedha 1 return — yahin se calls lautna shuru.`, vars: { n: k, depth: tree.depth(me) }, panels: [tree.panel()] });
+        t.frame({ line: 'base', caption: `factorial(${k}): n ≤ 1 → base case. Seedha 1 return — yahin se calls wapas aana shuru.`, vars: { n: k, depth: tree.depth(me) }, panels: [tree.panel()] });
         return 1;
       }
-      t.frame({ line: 'call', caption: `factorial(${k}) ko ${k - 1}! chahiye. factorial(${k - 1}) call kiya — factorial(${k}) ruk ke intezaar (waiting) karega.`, vars: { n: k, depth: tree.depth(me) }, panels: [tree.panel()] });
+      t.frame({ line: 'call', caption: `factorial(${k}) ko ${k - 1}! chahiye. factorial(${k - 1}) call kiya — factorial(${k}) ruk ke wait (waiting) karega.`, vars: { n: k, depth: tree.depth(me) }, panels: [tree.panel()] });
       const rest = fact(k - 1, me.id);
       const r = k * rest;
       tree.done(me, String(r));
@@ -63,7 +63,7 @@ export const factTrace = tracer<{ n: number }>({
       return r;
     };
     const ans = fact(n);
-    t.frame({ line: 'ret', caption: `${n}! = ${ans}. ${Math.max(n, 1)} calls, stack ki gehraai ${Math.max(n, 1)} → time O(n), space O(n) (stack frames).`, vars: { result: ans }, panels: [tree.panel()] });
+    t.frame({ line: 'ret', caption: `${n}! = ${ans}. ${Math.max(n, 1)} calls, stack ki depth ${Math.max(n, 1)} → time O(n), space O(n) (stack frames).`, vars: { result: ans }, panels: [tree.panel()] });
     return String(ans);
   },
 });
@@ -82,7 +82,7 @@ export const revTrace = tracer<{ s: string }>({
         return;
       }
       [c[l], c[r]] = [c[r], c[l]];
-      t.frame({ line: 'swap', caption: `Kinare badle: '${c[l]}' ↔ '${c[r]}'. Mera kaam bas itna.`, vars: { l, r }, panels: [array(c, { tones: { [l]: 'swap', [r]: 'swap' }, pointers: { l, r } }), tree.panel()] });
+      t.frame({ line: 'swap', caption: `Edge badle: '${c[l]}' ↔ '${c[r]}'. Mera kaam bas itna.`, vars: { l, r }, panels: [array(c, { tones: { [l]: 'swap', [r]: 'swap' }, pointers: { l, r } }), tree.panel()] });
       t.frame({ line: 'call', caption: `Baaki andar wala hissa (${l + 1}..${r - 1}) — wahi sawaal, chhota. rev(${l + 1}, ${r - 1}) ko saunpa.`, vars: { l, r }, panels: [array(c, { tones: { [l]: 'done', [r]: 'done' }, pointers: { l: l + 1, r: r - 1 } }), tree.panel()] });
       rev(l + 1, r - 1, me.id);
       tree.done(me, '✓');

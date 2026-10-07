@@ -1,5 +1,5 @@
 class Main {
-    // Java mein tailrec nahi hota. Bahut gehri recursion ki jagah loop likho.
+    // Java mein tailrec nahi hota. Bahut deep recursion ki jagah loop likho.
     // (Kotlin ka tailrec wala code andar se bilkul aisa hi loop banta hai.)
     static long sumToLoop(long n) {
         long acc = 0;

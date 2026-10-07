@@ -17,9 +17,9 @@ class Main {
     static void flatten(TreeNode root) {
         TreeNode cur = root;
         while (cur != null) {
-            if (cur.left != null) { // left subtree ko cur aur cur.right ke BEECH ghusao //@hasLeft
+            if (cur.left != null) { // left subtree ko cur aur cur.right ke BEECH insert karo //@hasLeft
                 TreeNode tail = cur.left;
-                while (tail.right != null) tail = tail.right; // left subtree ka preorder mein aakhri = sabse daayein //@tail
+                while (tail.right != null) tail = tail.right; // left subtree ka preorder mein aakhri = sabse right //@tail
                 tail.right = cur.right; // purana right subtree uske baad
                 cur.right = cur.left; // left ab right ki jagah //@move
                 cur.left = null;

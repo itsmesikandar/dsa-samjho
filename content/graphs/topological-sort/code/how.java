@@ -3,24 +3,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // Kahn's algorithm: jiska koi intezaar nahi (in-degree 0) wahi abhi ho sakta hai
+    // Kahn's algorithm: jiska koi wait nahi (in-degree 0) wahi abhi ho sakta hai
     static List<Integer> topoSort(int n, int[][] edges) {
         List<List<Integer>> adj = new ArrayList<>();
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
         int[] indeg = new int[n];
         for (int[] e : edges) {
             adj.get(e[0]).add(e[1]); // u -> v: pehle u, phir v //@build
-            indeg[e[1]]++; // v ko ek aur cheez ka intezaar
+            indeg[e[1]]++; // v ko ek aur cheez ka wait
         }
         ArrayDeque<Integer> queue = new ArrayDeque<>();
-        for (int v = 0; v < n; v++) if (indeg[v] == 0) queue.offer(v); // koi intezaar nahi - abhi ho sakte //@ready
+        for (int v = 0; v < n; v++) if (indeg[v] == 0) queue.offer(v); // koi wait nahi - abhi ho sakte //@ready
         List<Integer> order = new ArrayList<>();
         while (!queue.isEmpty()) {
             int u = queue.poll(); //@take
             order.add(u);
             for (int v : adj.get(u)) {
-                indeg[v]--; // u ho gaya - v ka ek intezaar kam //@dec
-                if (indeg[v] == 0) queue.offer(v); // ab v ka koi intezaar nahi //@free
+                indeg[v]--; // u ho gaya - v ka ek wait kam //@dec
+                if (indeg[v] == 0) queue.offer(v); // ab v ka koi wait nahi //@free
             }
         }
         return order.size() == n ? order : new ArrayList<>(); // kuch nodes kabhi free nahi hue = cycle //@check

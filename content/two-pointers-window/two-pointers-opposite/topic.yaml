@@ -1,8 +1,8 @@
 meta:
   id: two-pointers-opposite
   chapter: two-pointers-window
-  title: Two Pointers (dono kinaron se)
-  subtitle: Ek pointer shuru se, ek end se — har kadam par aadhe options khatam
+  title: Two Pointers (dono edges se)
+  subtitle: Ek pointer shuru se, ek end se — har step par aadhe options khatam
   level: intermediate
   minutes: 35
   prereqs: [array, problem-solving]
@@ -11,36 +11,36 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Two pointers (opposite ends)** = do index — `l` array ke **shuru** mein, `r` **end** mein. Har kadam par kisi ek ko **andar** ki taraf khiskao, jab tak dono mil na jaayein.
+    **Two pointers (opposite ends)** = 2 index — `l` array ke **shuru** mein, `r` **end** mein. Har step par kisi ek ko **andar** ki taraf shift karo, jab tak dono mil na jaayein.
 
     ```kotlin
     var l = 0
     var r = arr.size - 1
     while (l < r) {
-        // arr[l] aur arr[r] dekh ke faisla:
+        // arr[l] aur arr[r] dekh ke decision:
         // l++ ya r-- (ya dono)
     }
     ```
 
     Kahan kaam aata hai:
     - **Sorted array** mein pair dhoondhna (sum = target)
-    - **Reverse / palindrome** (dono kinare milaana)
+    - **Reverse / palindrome** (dono edge milaana)
     - **Container / area** jaise problems
     - **3Sum** (ek fix + baaki do par two pointers)
 
     > [!yaad]
-    > Har kadam par ek pointer hilta hai → zyada se zyada n kadam → **O(n)**, aur extra memory **O(1)**.
+    > Har step par ek pointer hilta hai → zyada se zyada n step → **O(n)**, aur extra memory **O(1)**.
   analogy: |
-    **Shaadi mein do log dulhan ke liye perfect joda dhoondh rahe hain** — ek line chhote se bade height ki. Ek dost line ke shuru se, ek end se.
+    **Shaadi mein 2 log dulhan ke liye perfect joda dhoondh rahe hain** — ek line chhote se bade height ki. Ek dost line ke shuru se, ek end se.
 
-    Jodi zyada lambi lag rahi hai? Lambe wale ko hatao (r--). Bahut chhoti? Chhote ko hatao (l++). Har baar ek insaan line se hat jaata hai — jaldi hi jawab mil jaata hai, sabko sabse milwaane ki zaroorat nahi.
+    Pair zyada lambi lag rahi hai? Lambe wale ko hatao (r--). Bahut chhoti? Chhote ko hatao (l++). Har baar ek insaan line se hat jaata hai — jaldi hi jawab mil jaata hai, sabko sabse milwaane ki zaroorat nahi.
 
 # 2. Kyun chahiye?
 why:
   body: |
     Pairs wale problems ka brute force **O(n²)** hota hai (har pair check). Two pointers usse **O(n)** bana deta hai — bina extra memory ke (HashMap O(n) memory leta).
 
-    Shart: data mein koi **order** ho (sorted), ya problem ka structure aisa ho ki ek pointer hilane se kuch options **pakka bekaar** ho jaayein.
+    Condition: data mein koi **order** ho (sorted), ya problem ka structure aisa ho ki ek pointer move karne se kuch options **pakka bekaar** ho jaayein.
 
     > [!socho]
     > Sorted array mein sum bahut bada aaya (`arr[l] + arr[r] > target`). `r--` hi kyun, `l++` kyun nahi?
@@ -52,7 +52,7 @@ visual:
   body: |
     Neeche grid mein **saare pairs** ke sums hain (row = i, column = j). Brute force sab cells dekhta hai.
 
-    Two pointers har kadam par **poori ek row ya column** hata deta hai (grey) — isliye sirf ~n kadam lagte hain. Ye "kyun sahi hai" ka asli saboot hai.
+    Two pointers har step par **poori ek row ya column** hata deta hai (grey) — isliye sirf ~n step lagte hain. Ye "kyun sahi hai" ka asli proof hai.
   viz: { tracer: pairGrid }
 
 # 4. Kaise kaam karta hai
@@ -62,13 +62,13 @@ how:
 
     `[-4, -1, 0, 3, 10]` ke squares `[16, 1, 0, 9, 100]` — order toot gaya. Sort karoge to O(n log n).
 
-    **Observation:** sabse bada square hamesha **kisi kinare** par hoga (sabse negative ya sabse positive). To:
-    1. `l` aur `r` dono kinaron par.
+    **Observation:** sabse bada square hamesha **kisi edge** par hoga (sabse negative ya sabse positive). To:
+    1. `l` aur `r` dono edges par.
     2. Jiska `|value|` bada, uska square result ke **end** mein likho, us pointer ko andar karo.
     3. Result ko peeche se bharo.
 
     > [!tip]
-    > "Sabse bada/chhota kahan milega?" ka jawab **kinare** ho to opposite two pointers socho.
+    > "Sabse bada/chhota kahan milega?" ka jawab **edge** ho to opposite two pointers socho.
   viz: { tracer: squaresTrace }
   code: how
 
@@ -77,7 +77,7 @@ operations:
   - op: "Sorted pair sum (Two Sum II)"
     time: O(n)
     space: O(1)
-    why: "Har kadam ek pointer andar; HashMap ki memory nahi."
+    why: "Har step ek pointer andar; HashMap ki memory nahi."
   - op: "Reverse / palindrome check"
     time: O(n)
     space: O(1)
@@ -85,7 +85,7 @@ operations:
   - op: "Container with most water"
     time: O(n)
     space: O(1)
-    why: "Chhoti deewar hatao — har kadam ek option khatam."
+    why: "Chhoti wall hatao — har step ek option khatam."
   - op: "3Sum"
     time: O(n²)
     space: "O(1) (sort aur output chhod ke)"
@@ -145,15 +145,15 @@ examples:
     title: Container with most water
     source: { name: Container With Most Water, platform: LeetCode, url: "https://leetcode.com/problems/container-with-most-water/" }
     problem: |
-      Deewaron ki unchaiyan di hain (har index par ek deewar). Do deewarein chuno jinke beech **sabse zyada paani** aaye. Paani = chhoti deewar × dono ki doori.
+      Walls ki heights di hain (har index par ek wall). Do walls choose karo jinke beech **sabse zyada paani** aaye. Paani = chhoti wall × dono ki distance.
 
       Example: `[1, 8, 6, 2, 5, 4, 8, 3, 7]` → **49** (index 1 aur 8: min(8, 7) × 7)
     intuition: |
       Brute force: saare pairs → O(n²).
 
-      Shuru karo sabse **chaudi** jodi se (l = 0, r = end). Ab kaunsi deewar hatayein?
+      Shuru karo sabse **wide** pair se (l = 0, r = end). Ab kaunsi wall hatayein?
 
-      **Chhoti deewar hatao.** Kyun? Area chhoti deewar se limit hai. Agar chhoti ko rakh ke doosri ko andar laao, to doori kam hogi aur unchai chhoti wali se upar ja hi nahi sakti — area kabhi nahi badhega. To chhoti deewar ke saath ab koi bhi jodi fayde ki nahi — use hata do.
+      **Chhoti wall hatao.** Kyun? Area chhoti wall se limit hai. Agar chhoti ko rakh ke doosri ko andar laao, to distance kam hogi aur height chhoti wali se upar ja hi nahi sakti — area kabhi nahi badhega. To chhoti wall ke saath ab koi bhi pair fayde ki nahi — use hata do.
 
       > [!tip]
       > Ye "greedy + two pointers" ka classic hai. Interview mein **kyun chhoti hatate hain** ye proof bolna zaroori hai — sirf code nahi.
@@ -170,18 +170,18 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Har kadam ek deewar hatti; sirf do pointers aur best."
+      why: "Har step ek wall hatti; sirf 2 pointers aur best."
 
   - id: three-sum
     level: tricky
     title: 3Sum — saare unique triplets jinka sum 0
     source: { name: 3Sum, platform: LeetCode, url: "https://leetcode.com/problems/3sum/" }
     problem: |
-      Ek array mein se saare **unique** triplets `[a, b, c]` dhoondho jinka sum 0 ho. Same triplet do baar nahi aana chahiye.
+      Ek array mein se saare **unique** triplets `[a, b, c]` dhoondho jinka sum 0 ho. Same triplet 2 baar nahi aana chahiye.
 
       Example: `[-1, 0, 1, 2, -1, -4]` → `[[-1, -1, 2], [-1, 0, 1]]`
     intuition: |
-      Brute force: teen loops → O(n³).
+      Brute force: 3 loops → O(n³).
 
       **Trick:** array **sort** karo. Phir har `i` ko pehla number fix karo — baaki do ka sum `−a[i]` chahiye. Ye ab ek **sorted Two Sum** hai → two pointers, O(n).
 
@@ -213,8 +213,8 @@ examples:
 when:
   use:
     - "Array **sorted** hai (ya sort kar sakte ho) aur pair/triplet ka sum chahiye."
-    - "Dono kinaron ko milaana hai — reverse, palindrome."
-    - "Ek pointer hilane se kuch options pakka bekaar ho jaate hain (container, trapping rain water)."
+    - "Dono edges ko milaana hai — reverse, palindrome."
+    - "Ek pointer move karne se kuch options pakka bekaar ho jaate hain (container, trapping rain water)."
   avoid:
     - "Array unsorted hai aur original indexes chahiye (Two Sum I) — sort se index kho jaate hain; HashMap lo."
     - "Contiguous subarray ka sum/length chahiye — wo sliding window (same direction) hai."
@@ -223,7 +223,7 @@ when:
     - keyword: "sorted array, pair with sum"
       think: "l = 0, r = n − 1; sum chhota → l++, bada → r--."
     - keyword: "palindrome / reverse in place"
-      think: "Dono kinaron se milao/swap."
+      think: "Dono edges se milao/swap."
     - keyword: "3Sum / 4Sum / k-sum"
       think: "Sort + (k−2) loops + two pointers; duplicates skip."
     - keyword: "max area / trapped water between bars"
@@ -234,32 +234,32 @@ realWorld:
   - where: "Photo / video editing"
     how: "Image ko mirror (flip) karna = har row ko two pointers se reverse."
   - where: "Merging sorted data"
-    how: "Do sorted lists se 'closest pair' ya target sum dhoondhna — finance mein buy/sell matching."
+    how: "2 sorted lists se 'closest pair' ya target sum dhoondhna — finance mein buy/sell matching."
   - where: "Text processing"
     how: "Palindrome / symmetric checks, string reverse — two pointers in-place, extra memory nahi."
   - where: "Gaming / physics"
-    how: "Sorted positions par 'kaunse do objects ek doori par hain' jaise checks."
+    how: "Sorted positions par 'kaunse 2 objects ek distance par hain' jaise checks."
   - where: "Database joins"
-    how: "Sort-merge join: do sorted tables par pointers chala ke matching rows — two pointers ka bada bhai."
+    how: "Sort-merge join: 2 sorted tables par pointers chala ke matching rows — two pointers ka bada bhai."
 
 # 10. Common galtiyan & edge cases
 mistakes:
   - title: "Unsorted array par opposite two pointers"
     type: logic
     wrong: |
-      `[3, 1, 4, 2]`, target 5 par seedha l/r → galat faisle (sum ka order ka koi matlab nahi).
+      `[3, 1, 4, 2]`, target 5 par seedha l/r → galat decision (sum ka order ka koi matlab nahi).
     right: |
       Pehle sort (agar original index nahi chahiye), warna HashMap.
   - title: "`while (l <= r)` jab pair chahiye"
     type: off-by-one
     wrong: |
-      `l <= r` → l == r par ek hi element ko do baar use kar liya.
+      `l <= r` → l == r par ek hi element ko 2 baar use kar liya.
     right: |
       Pair ke liye `l < r`.
   - title: "3Sum mein duplicates"
     type: logic
     wrong: |
-      `[-1, -1, 0, 1]` → `[-1, 0, 1]` do baar aaya.
+      `[-1, -1, 0, 1]` → `[-1, 0, 1]` 2 baar aaya.
     right: |
       `if (i > 0 && a[i] == a[i−1]) continue`, aur found ke baad `l` ko same values se aage badhao.
   - title: "Sum overflow"
@@ -278,15 +278,15 @@ interview:
   questions:
     - q: "Opposite two pointers kab kaam karta hai?"
       a: |
-        Jab data sorted ho ya structure aisa ho ki har kadam par ek pointer hilane se kuch options pakka bekaar ho jaayein. Tab O(n²) → O(n).
+        Jab data sorted ho ya structure aisa ho ki har step par ek pointer move karne se kuch options pakka bekaar ho jaayein. Tab O(n²) → O(n).
     - q: "Sorted Two Sum mein ye approach sahi kyun hai (proof)?"
       a: |
         Sum bada: arr[l] sabse chhota bacha hai, phir bhi zyada → arr[r] kisi ke saath target nahi bana sakta → hata do. Sum chhota: symmetric argument se arr[l] hata do. Koi valid pair kabhi nahi hata.
-    - q: "Container with most water mein chhoti deewar kyun hatate ho?"
+    - q: "Container with most water mein chhoti wall kyun hatate ho?"
       followUp: true
       a: |
-        Area = min(h) × width. Chhoti deewar rakhi to width ghategi aur min upar nahi jaayega — area kabhi nahi badhega. Isliye chhoti deewar ke saare remaining pairs bekaar — hata do.
-    - q: "3Sum ki complexity aur duplicates kaise sambhaale?"
+        Area = min(h) × width. Chhoti wall rakhi to width ghategi aur min upar nahi jaayega — area kabhi nahi badhega. Isliye chhoti wall ke saare remaining pairs bekaar — hata do.
+    - q: "3Sum ki complexity aur duplicates kaise handle kare?"
       a: |
         Sort + har i par two pointers = O(n²). Same a[i] skip, aur triplet milne par l ko same values se aage.
     - q: "Two Sum (unsorted, index chahiye) mein two pointers kyun nahi?"
@@ -295,18 +295,18 @@ interview:
     - q: "4Sum kaise karoge?"
       followUp: true
       a: |
-        Sort + do loops (i, j) + two pointers → O(n³). Duplicates har level par skip. Sum Long mein (overflow).
+        Sort + 2 loops (i, j) + two pointers → O(n³). Duplicates har level par skip. Sum Long mein (overflow).
     - q: "Trapping rain water two pointers se?"
       a: |
         leftMax, rightMax rakho; jis side ka max chhota, us side ka paani pakka = max − height; wo pointer andar. O(n), O(1).
     - q: "Opposite pointers aur same-direction pointers mein fark?"
       a: |
-        Opposite: dono kinaron se andar (pairs, palindrome). Same direction: dono aage badhte (read/write, sliding window, fast/slow).
+        Opposite: dono edges se andar (pairs, palindrome). Same direction: dono aage badhte (read/write, sliding window, fast/slow).
   mayAsk:
     - "3Sum Closest."
     - "Valid Palindrome II (ek char hata sakte ho)."
     - "Boats to Save People."
-    - "Sort Colors (Dutch flag — teen pointers)."
+    - "Sort Colors (Dutch flag — 3 pointers)."
 
 # 12. Practice
 practice:
@@ -329,7 +329,7 @@ practice:
     num: 977
     url: "https://leetcode.com/problems/squares-of-a-sorted-array/"
     level: easy
-    pattern: Bada value kinare par
+    pattern: Bada value edge par
     hint: "'Kaise kaam karta hai' wala — result ko peeche se bharo."
   - name: Reverse Vowels of a String
     platform: LeetCode
@@ -358,22 +358,22 @@ practice:
     url: "https://leetcode.com/problems/trapping-rain-water/"
     level: hard
     pattern: Two pointers with leftMax/rightMax
-    hint: "Jis side ka max chhota, us side ka paani pakka tay hai — wahi pointer andar."
+    hint: "Jis side ka max chhota, us side ka paani pakka decide hai — wahi pointer andar."
   - name: Maximum Score of a Good Subarray
     platform: LeetCode
     num: 1793
     url: "https://leetcode.com/problems/maximum-score-of-a-good-subarray/"
     level: hard
     pattern: Two pointers expanding outward (greedy)
-    hint: "l = r = k se shuru. Har kadam us taraf failao jidhar ka agla number BADA hai (min kam se kam gire). Har step score = min × width."
+    hint: "l = r = k se shuru. Har step us taraf spread karo jidhar ka agla number BADA hai (min kam se kam gire). Har step score = min × width."
 
 # 13. Quick revision
 revision:
   summary:
-    - "l shuru se, r end se; har kadam ek pointer andar; O(n), O(1)."
+    - "l shuru se, r end se; har step ek pointer andar; O(n), O(1)."
     - "Sorted pair sum: chhota → l++, bada → r--."
-    - "Proof: hilaaya gaya element kisi bache hue ke saath kaam nahi aata."
-    - "Container: chhoti deewar hatao. 3Sum: sort + fix i + two pointers, duplicates skip."
+    - "Proof: move kiya gaya element kisi bache hue ke saath kaam nahi aata."
+    - "Container: chhoti wall hatao. 3Sum: sort + fix i + two pointers, duplicates skip."
     - "Unsorted + index chahiye → HashMap; contiguous subarray → sliding window."
   cheatsheet: |
     ```kotlin
@@ -390,13 +390,13 @@ revision:
     ```
   quiz:
     - q: "Sorted [1, 3, 5, 8], target 11. Pehla step (l=0, r=3) ke baad kya?"
-      options: ["l++", "r--", "Answer mil gaya", "Dono hilao"]
+      options: ["l++", "r--", "Answer mil gaya", "Dono move karo"]
       answer: 0
       explain: "1 + 8 = 9 < 11 — sum chhota hai, badi value chahiye → l++."
-    - q: "Container with most water mein kaunsi deewar hatate hain?"
+    - q: "Container with most water mein kaunsi wall hatate hain?"
       options: ["Badi", "Chhoti", "Random", "Beech wali"]
       answer: 1
-      explain: "Chhoti deewar area ko limit karti hai."
+      explain: "Chhoti wall area ko limit karti hai."
     - q: "3Sum ki best complexity (is approach se)?"
       options: ["O(n)", "O(n log n)", "O(n²)", "O(n³)"]
       answer: 2
@@ -419,10 +419,10 @@ connections:
       why: "Sorted pair sum wahin pehli baar dekha tha."
   usedLater:
     - id: binary-search
-      how: "Sorted data ka doosra hathiyaar — O(log n)."
+      how: "Sorted data ka doosra tool — O(log n)."
     - id: reverse-linked-list
       how: "Reverse ka idea linked list mein bhi (pointers badal ke)."
     - id: intervals
-      how: "Sorted start/end par do pointers — meeting rooms, platforms."
+      how: "Sorted start/end par 2 pointers — meeting rooms, platforms."
     - id: greedy-classics
       how: "Container jaisa greedy + two pointers proof."

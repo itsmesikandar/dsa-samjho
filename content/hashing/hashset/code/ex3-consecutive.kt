@@ -1,11 +1,11 @@
-// Sabse lambi lagatar (consecutive) numbers ki sequence - O(n), bina sort
+// Sabse lambi continuous (consecutive) numbers ki sequence - O(n), bina sort
 fun longestConsecutive(nums: IntArray): Int {
     val set = nums.toHashSet() //@build
     var best = 0
     for (x in set) {
         if (x - 1 in set) continue // x se pehle wala hai -> x shuruaat nahi, skip //@skip
         var len = 1
-        while (x + len in set) len++ // shuruaat se aage ginte jao //@count
+        while (x + len in set) len++ // shuruaat se aage count karte jao //@count
         best = maxOf(best, len) //@best
     }
     return best

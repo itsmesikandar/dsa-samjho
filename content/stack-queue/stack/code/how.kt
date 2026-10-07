@@ -5,7 +5,7 @@ fun isValid(s: String): Boolean {
     for (c in s) {
         if (c !in pair) { // khulne wala: stack par rakho //@push
             st.addLast(c)
-        } else if (st.isEmpty() || st.removeLast() != pair[c]) { // band wala SABSE TAAZA khule se match hona chahiye //@match
+        } else if (st.isEmpty() || st.removeLast() != pair[c]) { // band wala SABSE FRESH khule se match hona chahiye //@match
             return false
         }
     }

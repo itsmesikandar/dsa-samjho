@@ -1,17 +1,17 @@
-// Saare jodo (i < j) ki doori |a[i] - a[j]| ko sort karo to k-th sabse chhoti doori?
+// Saare jodo (i < j) ki distance |a[i] - a[j]| ko sort karo to k-th sabse chhoti distance?
 fun smallestDistancePair(nums: IntArray, k: Int): Int {
     val a = nums.sorted().toIntArray()
     var lo = 0
-    var hi = a.last() - a.first() // doori isse zyada ho hi nahi sakti //@init
+    var hi = a.last() - a.first() // distance isse zyada ho hi nahi sakti //@init
     while (lo < hi) {
         val mid = lo + (hi - lo) / 2 //@mid
-        if (countPairs(a, mid) >= k) hi = mid // doori <= mid wale jode k ya zyada: answer <= mid //@ok
+        if (countPairs(a, mid) >= k) hi = mid // distance <= mid wale jode k ya zyada: answer <= mid //@ok
         else lo = mid + 1 //@notok
     }
     return lo //@done
 }
 
-// Kitne jodo ki doori <= d? Sorted array par two pointers - O(n)
+// Kitne jodo ki distance <= d? Sorted array par two pointers - O(n)
 fun countPairs(a: IntArray, d: Int): Int {
     var count = 0
     var l = 0

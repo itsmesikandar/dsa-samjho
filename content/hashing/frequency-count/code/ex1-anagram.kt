@@ -1,4 +1,4 @@
-// Anagram = same letters, same ginti, bas order alag
+// Anagram = same letters, same count, bas order alag
 fun isAnagram(s: String, t: String): Boolean {
     if (s.length != t.length) return false
     val count = IntArray(26) //@init

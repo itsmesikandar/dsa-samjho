@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // SORTED array mein do numbers jinka sum = target. Unke index do, na mile to [-1, -1].
+    // SORTED array mein 2 numbers jinka sum = target. Unke index do, na mile to [-1, -1].
     // Brute force O(n^2). "Sorted" ka hint use karke two pointers -> O(n).
     static int[] pairWithSum(int[] arr, int target) {
         int l = 0; //@init

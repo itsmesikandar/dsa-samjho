@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 class Main {
-    // Directed weighted graph: src se dst ka sabse sasta rasta - kharcha aur rasta dono
+    // Directed weighted graph: src se dst ka sabse sasta rasta - cost aur rasta dono
     static String cheapestPath(int n, int[][] edges, int src, int dst) {
         List<List<int[]>> adj = new ArrayList<>();
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
@@ -21,7 +21,7 @@ class Main {
             int[] top = pq.poll();
             int u = top[0], d = top[1];
             if (d > dist[u]) continue;
-            if (u == dst) break; // dst heap se nikla = uski doori pakki //@found
+            if (u == dst) break; // dst heap se nikla = uski distance pakki //@found
             for (int[] e : adj.get(u)) {
                 int v = e[0], w = e[1];
                 if (d + w < dist[v]) {

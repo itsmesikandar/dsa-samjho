@@ -8,7 +8,7 @@ fun main() {
     for ((u, v, w) in edges) mat[u][v] = w
     for (row in mat) println(row.contentToString())
 
-    // 2. Adjacency list: har node ke (padosi, weight) pairs. Memory n + m
+    // 2. Adjacency list: har node ke (neighbor, weight) pairs. Memory n + m
     val adj = List(n) { mutableListOf<Pair<Int, Int>>() }
     for ((u, v, w) in edges) adj[u].add(v to w)
     for (u in 0 until n) println("$u -> ${adj[u]}")

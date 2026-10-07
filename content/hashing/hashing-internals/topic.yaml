@@ -2,7 +2,7 @@ meta:
   id: hashing-internals
   chapter: hashing
   title: Hashing andar se kaise kaam karta hai
-  subtitle: Hash function, buckets, collisions, load factor aur rehash — HashMap ka asli raaz
+  subtitle: Hash function, buckets, collisions, load factor aur rehash — HashMap ka asli secret
   level: intermediate
   minutes: 35
   prereqs: [array, dynamic-array, memory-basics]
@@ -19,7 +19,7 @@ what:
     3. **Index** = hash ko m ke andar laao (simple version: `hash % m`).
     4. Key us bucket mein rakh do. Dhoondhna ho to wahi formula → wahi bucket → seedha mil gaya.
 
-    Do alag keys ka same bucket aa jaana = **collision**. Iske do ilaaj:
+    2 alag keys ka same bucket aa jaana = **collision**. Iske do ilaaj:
     - **Chaining** — har bucket mein ek chhoti list (Java HashMap yahi karta hai).
     - **Open addressing** — agla khaali dabba dhoondho (linear probing).
 
@@ -38,7 +38,7 @@ why:
     Isliye HashMap/HashSet DSA ka sabse zyada use hone wala tool hai:
     - "Pehle dekha hai?" → HashSet
     - "Kitni baar aaya?" → HashMap counts
-    - "Iska jodi kahan hai?" → HashMap lookup
+    - "Iska pair kahan hai?" → HashMap lookup
 
     Par andar ki samajh zaroori hai, warna ye bugs aate hain:
     - Custom class ko key banaya aur `get` mein `null` aaya (`equals`/`hashCode` nahi likhe).
@@ -55,10 +55,10 @@ visual:
   body: |
     Ek word key kaise bucket number banti hai — step by step dekho. Java ka `String.hashCode()` har character par `h = h × 31 + char` karta hai. Phir `% m` se bucket.
 
-    "Apna input try karo" mein apna naam daalo aur buckets ki ginti badal ke dekho.
+    "Apna input try karo" mein apna naam daalo aur buckets ki count badal ke dekho.
 
     > [!yaad]
-    > Asli Java HashMap `% m` ki jagah thoda alag (`(h ^ (h >>> 16)) & (m − 1)`, jahan m power of 2 hai) karta hai — bas tez aur behtar failaav ke liye. Idea same hai.
+    > Asli Java HashMap `% m` ki jagah thoda alag (`(h ^ (h >>> 16)) & (m − 1)`, jahan m power of 2 hai) karta hai — bas tez aur better spread ke liye. Idea same hai.
   viz: { tracer: hashFunction }
 
 # 4. Kaise kaam karta hai
@@ -68,7 +68,7 @@ how:
     - `put(key, value)`: bucket nikaalo → us bucket ki list mein key hai? To value update. Nahi? To list mein jodo.
     - `get(key)`: bucket nikaalo → **sirf usi bucket** ki list dekho.
 
-    Default input mein 12, 7 aur 17 teeno `% 5 = 2` dete hain — teen keys ek bucket mein (collision). Chain mein sab safe hain, bas us bucket mein thoda scan karna padta hai.
+    Default input mein 12, 7 aur 17 all 3 `% 5 = 2` dete hain — 3 keys ek bucket mein (collision). Chain mein sab safe hain, bas us bucket mein thoda scan karna padta hai.
 
     > [!tip]
     > Interview answer ka template: "Buckets ka array → hashCode se index → collision par linked list (Java 8+: 8 se zyada par red-black tree) → load factor 0.75 par capacity double aur rehash."
@@ -107,7 +107,7 @@ code:
   - title: equals() aur hashCode() — custom key ka sabse bada trap
     file: equals-hashcode
     note: |
-      **Rule:** agar do objects `equals()` mein barabar hain, to unka `hashCode()` bhi **same** hona chahiye. Warna wo alag buckets mein jaayenge aur map unhe kabhi nahi milayega.
+      **Rule:** agar 2 objects `equals()` mein barabar hain, to unka `hashCode()` bhi **same** hona chahiye. Warna wo alag buckets mein jaayenge aur map unhe kabhi nahi milayega.
 
       Kotlin `data class` aur Java `record` dono apne aap sahi `equals` + `hashCode` banate hain. Normal class key banao to dono override karo.
 
@@ -115,9 +115,9 @@ code:
 examples:
   - id: buckets
     level: easy
-    title: Keys kaunse bucket mein giri? Collisions gino
+    title: Keys kaunse bucket mein giri? Collisions count karo
     problem: |
-      Kuch integer keys aur buckets ki ginti m di hai. Har key `key % m` wale bucket mein jaati hai. Har bucket mein kitni keys aayi, aur kitne collisions hue?
+      Kuch integer keys aur buckets ki count m di hai. Har key `key % m` wale bucket mein jaati hai. Har bucket mein kitni keys aayi, aur kitne collisions hue?
 
       Example: keys `[12, 7, 19, 25, 30]`, m = 7 → counts `[1, 0, 1, 0, 1, 2, 0]`, collisions = 1.
     intuition: |
@@ -126,7 +126,7 @@ examples:
       Collision = bucket mein pehli key ke **baad** aane wali har key → har bucket ka `max(0, count − 1)` jodo.
 
       > [!tip]
-      > m prime number (7, 11, 31) rakhne se keys aksar achhe se failti hain. m = 10 lo aur saari keys 10 ke multiple hon to sab bucket 0 mein!
+      > m prime number (7, 11, 31) rakhne se keys often achhe se spread hoti hain. m = 10 lo aur saari keys 10 ke multiple hon to sab bucket 0 mein!
     dryRun: |
       m = 7
 
@@ -294,7 +294,7 @@ interview:
         equals true → hashCode same hona **zaroori**. hashCode same → equals true hona zaroori **nahi** (collision). Dono saath override karo.
     - q: "Collision kya hai aur kaise handle hota hai?"
       a: |
-        Do alag keys ka same bucket. Chaining (bucket mein list/tree) ya open addressing (linear/quadratic probing, double hashing). Java HashMap chaining use karta hai.
+        2 alag keys ka same bucket. Chaining (bucket mein list/tree) ya open addressing (linear/quadratic probing, double hashing). Java HashMap chaining use karta hai.
     - q: "Load factor kya hai? 0.75 kyun?"
       a: |
         size / capacity. 0.75 time aur memory ka balance hai — kam rakho to memory waste, zyada rakho to collisions aur slow lookup.
@@ -305,7 +305,7 @@ interview:
     - q: "Capacity hamesha 2 ki power kyun hoti hai (Java)?"
       followUp: true
       a: |
-        Taaki `hash % n` ki jagah tez `hash & (n − 1)` use ho sake. Saath mein hash ke upar ke bits ko neeche mila dete hain (`h ^ h >>> 16`) taaki saare bits index par asar daalein.
+        Taaki `hash % n` ki jagah tez `hash & (n − 1)` use ho sake. Saath mein hash ke upar ke bits ko neeche mila dete hain (`h ^ h >>> 16`) taaki saare bits index par effect daalein.
     - q: "HashMap thread-safe hai? Kya use karoge?"
       a: |
         Nahi. Multi-thread mein `ConcurrentHashMap` (fine-grained locking / CAS). `Collections.synchronizedMap` poore map par lock — slow.
@@ -373,7 +373,7 @@ practice:
     platform: Custom
     level: hard
     pattern: Hash ring + TreeMap
-    hint: "Servers ko hash karke ek ring (TreeMap) par rakho; key ka server = ring par uske baad wala pehla server (ceilingKey, na mile to firstKey). Server add/remove par kitni keys hilti hain — gino."
+    hint: "Servers ko hash karke ek ring (TreeMap) par rakho; key ka server = ring par uske baad wala pehla server (ceilingKey, na mile to firstKey). Server add/remove par kitni keys hilti hain — count karo."
 
 # 13. Quick revision
 revision:
@@ -397,7 +397,7 @@ revision:
     - q: "Keys 15, 22, 29 aur m = 7 — kitni keys bucket 1 mein?"
       options: ["0", "1", "2", "3"]
       answer: 3
-      explain: "15 % 7 = 1, 22 % 7 = 1, 29 % 7 = 1 — teeno collision."
+      explain: "15 % 7 = 1, 22 % 7 = 1, 29 % 7 = 1 — all 3 collision."
     - q: "Java HashMap ka default load factor?"
       options: ["0.5", "0.75", "1.0", "0.9"]
       answer: 1
@@ -421,7 +421,7 @@ connections:
     - id: dynamic-array
       why: "Rehash = dynamic array ki doubling jaisa — amortized O(1)."
     - id: kotlin-java-toolkit
-      why: "HashMap/HashSet ke functions aur boxing ka kharcha."
+      why: "HashMap/HashSet ke functions aur boxing ka cost."
   usedLater:
     - id: hashmap
       how: "Two Sum, isomorphic strings, subarray sum = k — sab inhi internals par chalte hain."

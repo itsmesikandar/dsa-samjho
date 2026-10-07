@@ -1,9 +1,9 @@
-// Sabse lamba LAGAATAAR (subarray) badhta hissa. dp[i] = dp[i-1] + 1 ya 1 - bas ek variable kaafi
+// Sabse lamba CONTINUOUS (subarray) badhta hissa. dp[i] = dp[i-1] + 1 ya 1 - bas ek variable kaafi
 fun findLengthOfLCIS(nums: IntArray): Int {
     var best = 0
-    var cur = 0 // i par khatam hone wala lagaataar badhta hissa
+    var cur = 0 // i par khatam hone wala continuous badhta hissa
     for (i in nums.indices) {
-        cur = if (i > 0 && nums[i - 1] < nums[i]) cur + 1 else 1 // badha to silsila aage, warna naya shuru //@step
+        cur = if (i > 0 && nums[i - 1] < nums[i]) cur + 1 else 1 // badha to chain aage, warna naya shuru //@step
         best = maxOf(best, cur)
     }
     return best //@done

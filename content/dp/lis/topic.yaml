@@ -26,7 +26,7 @@ what:
     > "**Khatam hone wala**" state — jab agla element jodna hai ya nahi, ye sirf chain ke **aakhri** element par depend kare, to aakhri element ko state mein fix kar do.
   analogy: |
     **School photo ki line:**
-    Bachche roll number ke order mein khade hain — jagah nahi badal sakte. Teacher kuch bachche chunna chahti hain jo baayein se daayein **badhti height** mein hon. Zyada se zyada kitne?
+    Bachche roll number ke order mein khade hain — jagah nahi badal sakte. Teacher kuch bachche choose karna chahti hain jo left se right **badhti height** mein hon. Zyada se zyada kitne?
 
     Har bachcha socho: "mujh par khatam hone wali sabse lambi line kitni?" — mujhse **pehle** khade aur mujhse **chhote** bachchon mein jiski line sabse lambi, uske peeche main khada ho jaaun: uski line + 1.
 
@@ -38,17 +38,17 @@ why:
     | n | 2ⁿ subsequences | O(n²) DP | O(n log n) |
     |---|---|---|---|
     | 20 | ~10 lakh | 400 | ~90 |
-    | 1,000 | asambhav | 10 lakh | ~10,000 |
-    | 1,00,000 | asambhav | 10¹⁰ (TLE) | ~17 lakh |
+    | 1,000 | impossible | 10 lakh | ~10,000 |
+    | 1,00,000 | impossible | 10¹⁰ (TLE) | ~17 lakh |
 
-    Greedy ("jo bada mile turant lo") fail hota hai — ek bada number jaldi le liya to aage ke chhote kadam band (visual dekho).
+    Greedy ("jo bada mile turant lo") fail hota hai — ek bada number jaldi le liya to aage ke chhote step band (visual dekho).
 
-    LIS chhupa hota hai: lifafe ek ke andar ek, boxes stacking, "kam se kam kitne delete karo ki array sorted ho" (`n − LIS`), git ka patience diff.
+    LIS chhupa hota hai: envelopes ek ke andar ek, boxes stacking, "kam se kam kitne delete karo ki array sorted ho" (`n − LIS`), git ka patience diff.
 
     > [!socho]
-    > Taash ke patte ek ek karke aate hain. Har patta kisi dher par rakho jiska upar wala patta isse **bada ya barabar** ho; aisa dher na mile to naya dher. Kam se kam kitne dher banenge?
+    > Cards ke patte ek ek karke aate hain. Har patta kisi pile par rakho jiska upar wala patta isse **bada ya barabar** ho; aisa pile na mile to naya pile. Kam se kam kitne pile banenge?
     >
-    > Exactly **LIS** jitne! Har dher ke upar wale patte hi `tails` array hain (example 2). Isliye O(n log n) wale tareeke ko **patience sorting** bhi kehte hain.
+    > Exactly **LIS** jitne! Har pile ke upar wale patte hi `tails` array hain (example 2). Isliye O(n log n) wale tareeke ko **patience sorting** bhi kehte hain.
 
 # 3. Visual intro
 visual:
@@ -65,7 +65,7 @@ how:
     - Har `i` par peeche ke saare `j`: agar `nums[j] < nums[i]` → `j` ki chain ke peeche `i` jod sakte → `dp[i] = max(dp[i], dp[j] + 1)`.
     - Jawab `max(dp)`.
 
-    "Khatam hone wala" kyun? Kisi chain mein `nums[i]` jod sakte ya nahi — ye sirf chain ke **aakhri** element se tay hota hai. "Pehle `i` elements ka LIS" jaisa state aakhri element nahi batata, to aage jodne ka faisla nahi ho paata.
+    "Khatam hone wala" kyun? Kisi chain mein `nums[i]` jod sakte ya nahi — ye sirf chain ke **aakhri** element se decide hota hai. "Pehle `i` elements ka LIS" jaisa state aakhri element nahi batata, to aage jodne ka decision nahi ho paata.
 
     **Strictly vs barabar:** strictly badhta → `<`. Non-decreasing (barabar allowed) → `<=`.
 
@@ -92,7 +92,7 @@ operations:
     time: "O(n log n)"
     space: "O(n)"
     why: "Har element par ek lower bound search."
-  - op: "Lagaataar badhta (subarray)"
+  - op: "Continuous badhta (subarray)"
     time: "O(n)"
     space: "O(1)"
     why: "Sirf pichhla element dekhna — ek counter."
@@ -106,7 +106,7 @@ code:
   - title: LIS ka sequence — parent se peeche chalo
     file: print-lis
     note: |
-      Length ke saath asli chain bhi chahiye? `dp[i]` badhate waqt yaad rakho **kis `j` ke peeche** juda tha: `parent[i] = j`. Shuru wala element → `parent = −1`.
+      Length ke saath asli chain bhi chahiye? `dp[i]` badhate time yaad rakho **kis `j` ke peeche** juda tha: `parent[i] = j`. Shuru wala element → `parent = −1`.
 
       Sabse bade `dp` wale index se shuru karo aur `parent` pakad ke peeche chalo. Elements ulte order mein milte hain → aakhir mein `reverse`.
 
@@ -116,16 +116,16 @@ code:
 examples:
   - id: continuous
     level: easy
-    title: Lagaataar badhta hissa (Longest Continuous Increasing Subsequence)
+    title: Continuous badhta hissa (Longest Continuous Increasing Subsequence)
     source: { name: Longest Continuous Increasing Subsequence, platform: LeetCode, url: "https://leetcode.com/problems/longest-continuous-increasing-subsequence/" }
     problem: |
-      Array mein sabse lamba **lagaataar** (subarray) strictly badhta hissa — uski length?
+      Array mein sabse lamba **continuous** (subarray) strictly badhta hissa — uski length?
 
       Example: `[2, 6, 7, 3, 5, 8, 9, 1]` → **4** (`3, 5, 8, 9`)
     intuition: |
-      Lagaataar → `dp[i]` sirf `dp[i − 1]` par depend:
-      - `nums[i − 1] < nums[i]` → silsila aage: `dp[i − 1] + 1`
-      - warna naya silsila: `1`
+      Continuous → `dp[i]` sirf `dp[i − 1]` par depend:
+      - `nums[i − 1] < nums[i]` → chain aage: `dp[i − 1] + 1`
+      - warna naya chain: `1`
 
       Sirf pichhla chahiye → ek variable `cur` kaafi, O(1) memory. Jawab = `cur` ka max.
 
@@ -193,23 +193,23 @@ examples:
 
   - id: russian-doll
     level: tricky
-    title: Lifafe ke andar lifafa (Russian Doll Envelopes)
+    title: Envelopes ke andar envelope (Russian Doll Envelopes)
     source: { name: Russian Doll Envelopes, platform: LeetCode, url: "https://leetcode.com/problems/russian-doll-envelopes/" }
     problem: |
-      Lifafe `(width, height)`. Ek lifafa doosre ke andar tabhi jaata jab width aur height **dono** strictly chhoti hon. Ghuma nahi sakte. Ek ke andar ek — zyada se zyada kitne?
+      Envelopes `(width, height)`. Ek envelope doosre ke andar tabhi jaata jab width aur height **dono** strictly chhoti hon. Rotate kar nahi sakte. Ek ke andar ek — zyada se zyada kitne?
 
       Example: `[[3,4], [5,6], [5,5], [5,7], [2,2], [6,8]]` → **4** (2×2 → 3×4 → 5×5 → 6×8)
     intuition: |
-      Do dimensions ek saath. Ek ko sort se fix karo: **width badhte order** mein. Ab heights ka LIS = jawab… lagbhag.
+      Do dimensions ek saath. Ek ko sort se fix karo: **width badhte order** mein. Ab heights ka LIS = jawab… approx.
 
-      Problem: same width wale. `5×5, 5×6, 5×7` → heights 5, 6, 7 badhte — LIS teeno gin lega, jabki same width wale ek doosre mein nahi jaa sakte.
+      Problem: same width wale. `5×5, 5×6, 5×7` → heights 5, 6, 7 badhte — LIS all 3 count kar lega, jabki same width wale ek doosre mein nahi jaa sakte.
 
-      Trick: **same width par height ULTI** sort karo (bada pehle): `5×7, 5×6, 5×5` → heights 7, 6, 5 ghatte. Ab ek strictly badhti chain mein do same-width lifafe kabhi nahi aa sakte.
+      Trick: **same width par height ULTI** sort karo (bada pehle): `5×7, 5×6, 5×5` → heights 7, 6, 5 ghatte. Ab ek strictly badhti chain mein do same-width envelopes kabhi nahi aa sakte.
 
       Phir heights par **O(n log n)** LIS (n 10⁵ tak).
 
       > [!galti]
-      > Same width par height bhi badhte order mein sort ki → isi example mein **6** aata (5×5, 5×6, 5×7 teeno gine). Galat.
+      > Same width par height bhi badhte order mein sort ki → isi example mein **6** aata (5×5, 5×6, 5×7 all 3 count kiye). Galat.
     dryRun: |
       | Step | Value |
       |---|---|
@@ -228,13 +228,13 @@ examples:
 when:
   use:
     - "Sabse lamba badhta / ghatta subsequence — order fixed, gap allowed."
-    - "Do cheezein ek saath badhni chahiye (lifafe, boxes, height-weight) → ek se sort, doosre par LIS."
+    - "2 cheezein ek saath badhni chahiye (envelopes, boxes, height-weight) → ek se sort, doosre par LIS."
     - "Kam se kam deletions ki array sorted ho jaaye → n − LIS."
     - "Chain jahan agla kisi rule se pichhle se 'bada' (divisible subset, word chain) → dp[i] = i par khatam."
   avoid:
-    - "Lagaataar (subarray) chahiye → ek pass O(n), DP table nahi."
-    - "Order badal sakte ho (sort allowed) → bas sort karke distinct gino."
-    - "Teen ya zyada dimensions → sort + LIS nahi chalega; O(n²) DP (box stacking)."
+    - "Continuous (subarray) chahiye → ek pass O(n), DP table nahi."
+    - "Order badal sakte ho (sort allowed) → bas sort karke distinct count karo."
+    - "3 ya zyada dimensions → sort + LIS nahi chalega; O(n²) DP (box stacking)."
     - "Elements ka sum / product max karna → LIS nahi, alag dp (max sum increasing subsequence)."
   signals:
     - keyword: "longest increasing subsequence"
@@ -252,14 +252,14 @@ when:
 realWorld:
   - where: "git diff --patience"
     how: "Dono files ki unique common lines ki positions par LIS — saaf alignment."
-  - where: "Taash / patience sorting"
-    how: "Patton ko dheron mein rakhna — dheron ki ginti = LIS, aur ek sorting algorithm bhi."
+  - where: "Cards / patience sorting"
+    how: "Patton ko bahut saare mein rakhna — bahut saare ki count = LIS, aur ek sorting algorithm bhi."
   - where: "Genome alignment (MUMmer)"
-    how: "DNA ke matching tukdon ko order mein chain karna — LIS se sabse lambi consistent chain."
+    how: "DNA ke matching pieces ko order mein chain karna — LIS se sabse lambi consistent chain."
   - where: "Stock / sensor data"
     how: "Sabse lamba badhta trend, beech ke din skip karke."
   - where: "Packing / nesting"
-    how: "Dibbe ek ke andar ek (2D) — kitne levels tak."
+    how: "Boxes ek ke andar ek (2D) — kitne levels tak."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -290,7 +290,7 @@ mistakes:
   - title: "Russian doll ka sort"
     type: logic
     wrong: |
-      Same width par height bhi badhte order mein — same width wale ek chain mein gine gaye.
+      Same width par height bhi badhte order mein — same width wale ek chain mein count kiye gaye.
     right: |
       Width asc, same width par height **desc**.
   - title: "Khaali array"
@@ -305,13 +305,13 @@ interview:
   questions:
     - q: "LIS O(n²) ka recurrence? State 'khatam hone wala' kyun?"
       a: |
-        dp[i] = 1 + max(dp[j]) jahan j < i, nums[j] < nums[i]. Jodna hai ya nahi ye chain ke aakhri element se tay hota — isliye aakhri fix. Jawab max(dp).
+        dp[i] = 1 + max(dp[j]) jahan j < i, nums[j] < nums[i]. Jodna hai ya nahi ye chain ke aakhri element se decide hota — isliye aakhri fix. Jawab max(dp).
     - q: "O(n log n) kaise? tails ka matlab?"
       a: |
         tails[k] = length k+1 wali chains ka sabse chhota aakhri element; sorted rehta. Har x ka lower bound: replace ya append. Length = LIS.
     - q: "tails asli LIS kyun nahi?"
       a: |
-        Replace karte waqt order toot sakta — [3, 4, 1] → [1, 4]. Sirf har length ka 'best ending' rakhta hai, ek saath ek chain nahi.
+        Replace karte time order toot sakta — [3, 4, 1] → [1, 4]. Sirf har length ka 'best ending' rakhta hai, ek saath ek chain nahi.
     - q: "LIS ka sequence kaise nikaloge?"
       a: |
         O(n²): parent[i] = jis j se dp aaya; max wale index se peeche. O(n log n): tails ke saath index rakho, parent[i] = pichhli length ka tails index.
@@ -324,7 +324,7 @@ interview:
     - q: "Kam se kam kitne elements hatao ki array strictly increasing ho?"
       a: |
         n − LIS. LIS ko rakho, baaki hatao.
-    - q: "Number of LIS kaise ginoge?"
+    - q: "Number of LIS kaise count karoge?"
       a: |
         count[i] bhi rakho: dp[j] + 1 > dp[i] → dp, count = count[j]; barabar → count[i] += count[j]. Jawab: jinka dp = max, unke count ka jod.
     - q: "Longest bitonic subsequence (pehle badhe, phir ghate)?"
@@ -432,7 +432,7 @@ revision:
       options: ["[2, 5, 8, 6]", "[2, 5, 6]", "[2, 6, 8]", "[6, 5, 8]"]
       answer: 1
       explain: "Pehla ≥ 6 hai 8 → 6 se badlo. Length 3 ki chain ab 6 par khatam."
-    - q: "Russian doll: same width wale lifafon ko height ke kis order mein sort karein?"
+    - q: "Russian doll: same width wale envelopes ko height ke kis order mein sort karein?"
       options: ["Badhte", "Ghatte (bada pehle)", "Koi bhi", "Input wala hi"]
       answer: 1
       explain: "Ghatte heights ek strictly badhti chain mein saath nahi aa sakte — same width wale ek doosre mein nahi jaate."

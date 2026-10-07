@@ -13,7 +13,7 @@ const progress = (m: number, k: number): Tones => {
   return tones;
 };
 
-// ---------- 3. Visual intro: graph ki bhasha (padosi, degree, path, cycle, component) ----------
+// ---------- 3. Visual intro: graph ki language (neighbor, degree, path, cycle, component) ----------
 const TERMS_DEFAULT = [[0, 1], [0, 2], [1, 2], [1, 3], [4, 5]];
 const TERMS_POS: Pos = { 0: [0, 20], 1: [30, 50], 2: [0, 85], 3: [60, 20], 4: [70, 85], 5: [100, 60] };
 const COMP_TONES: Tone[] = ['active', 'found', 'compare', 'new', 'swap', 'done'];
@@ -57,14 +57,14 @@ export const termsTrace = tracer<{ edges: number[][] }>({
       const nb: Tones = { [u]: 'active' };
       const ne: Record<string, Tone> = {};
       adj[u].forEach((v) => ((nb[v] = 'new'), (ne[`${u}-${v}`] = 'active')));
-      t.frame({ caption: `Node ${u} ke padosi (neighbours) = ${listStr(adj[u])}. Inki ginti = degree(${u}) = ${adj[u].length}. Undirected edge = dono taraf ka rasta.`, legend: { active: 'chuna hua node', new: 'padosi' }, panels: g({ tones: nb, edgeTones: ne }) });
+      t.frame({ caption: `Node ${u} ke neighbor (neighbours) = ${listStr(adj[u])}. Inki count = degree(${u}) = ${adj[u].length}. Undirected edge = dono taraf ka rasta.`, legend: { active: 'choose kiya hua node', new: 'neighbor' }, panels: g({ tones: nb, edgeTones: ne }) });
 
       const deg: Record<number, string> = {};
       adj.forEach((l, i) => (deg[i] = `deg ${l.length}`));
       const lonely = adj.map((l, i) => (l.length ? -1 : i)).filter((i) => i >= 0);
-      t.frame({ caption: `Har node ki degree. Jod = ${2 * m} = 2 × ${m} edges — har edge do nodes ki degree ek ek badhati hai.${lonely.length ? ` Node ${lonely.join(', ')}: degree 0 — akela (isolated).` : ''}`, panels: g({ badges: deg }) });
+      t.frame({ caption: `Har node ki degree. Jod = ${2 * m} = 2 × ${m} edges — har edge 2 nodes ki degree ek ek badhati hai.${lonely.length ? ` Node ${lonely.join(', ')}: degree 0 — akela (isolated).` : ''}`, panels: g({ badges: deg }) });
 
-      // path: u ke component mein do door ke nodes (do baar BFS) ke beech sabse chhota rasta
+      // path: u ke component mein do door ke nodes (2 baar BFS) ke beech sabse chhota rasta
       const bfs = (s: number) => {
         const dist: number[] = Array(n).fill(-1);
         const par: number[] = Array(n).fill(-1);
@@ -86,7 +86,7 @@ export const termsTrace = tracer<{ edges: number[][] }>({
       path.forEach((x, i) => ((pt[x] = 'found'), i && (pe[`${path[i - 1]}-${x}`] = 'found')));
       t.frame({ caption: `Path = edges ke sahare ek node se doosre tak ka rasta: ${path.join(' → ')}, length ${len} edge${len > 1 ? 's' : ''}. ${from} se ${to} ka isse chhota rasta nahi (kaise dhoondhte hain — BFS, agla topic).`, legend: { found: 'path' }, panels: g({ tones: pt, edgeTones: pe }) });
 
-      // cycle: DFS, padosi pehle se dekha hua aur parent nahi → ghoom ke wapas aaye
+      // cycle: DFS, neighbor pehle se dekha hua aur parent nahi → ghoom ke wapas aaye
       const vis: boolean[] = Array(n).fill(false);
       const dad: number[] = Array(n).fill(-1);
       let cyc: number[] | null = null;
@@ -111,7 +111,7 @@ export const termsTrace = tracer<{ edges: number[][] }>({
         const ct: Tones = {};
         const ce: Record<string, Tone> = {};
         c.forEach((x, i) => ((ct[x] = 'error'), (ce[`${x}-${c[(i + 1) % c.length]}`] = 'error')));
-        t.frame({ caption: `Cycle = aisa rasta jo ghoom kar wahin lauta, bina koi edge dobara liye: ${[...c, c[0]].join(' → ')}. Tree mein cycle kabhi nahi hota — isliye tree traversal mein "visited" ki zaroorat nahi thi, graph mein hai.`, legend: { error: 'cycle' }, panels: g({ tones: ct, edgeTones: ce }) });
+        t.frame({ caption: `Cycle = aisa rasta jo ghoom kar wahin return kar, bina koi edge dobara liye: ${[...c, c[0]].join(' → ')}. Tree mein cycle kabhi nahi hota — isliye tree traversal mein "visited" ki zaroorat nahi thi, graph mein hai.`, legend: { error: 'cycle' }, panels: g({ tones: ct, edgeTones: ce }) });
       } else {
         t.frame({ caption: 'Koi cycle nahi — kisi node se chalo, bina edge dobara liye wapas nahi aa sakte.', panels: g() });
       }
@@ -148,20 +148,20 @@ export const adjListTrace = tracer<{ edges: number[][] }>({
       return [
         graphView(n, edges, { pos, tones, badges, edgeTones: et, label: 'Graph' }),
         array(edges.map(eStr), { pointers: k < m ? { edge: k } : {}, tones: progress(m, k), label: 'Edge list (input)' }),
-        { kind: 'map', label: 'Adjacency list', keyLabel: 'node', valueLabel: 'adj[node] = padosi', entries: adj.map((l, u) => ({ key: u, value: listStr(l), tone: hot.includes(u) ? 'new' : undefined })) },
+        { kind: 'map', label: 'Adjacency list', keyLabel: 'node', valueLabel: 'adj[node] = neighbor', entries: adj.map((l, u) => ({ key: u, value: listStr(l), tone: hot.includes(u) ? 'new' : undefined })) },
       ];
     };
-    t.frame({ line: 'init', caption: `Input = edge list (sirf jode). Par kaam ke waqt sawaal hota hai "is node ke padosi kaun?" → har node ki apni list. ${n} khaali lists banao.`, legend, panels: view(-1) });
+    t.frame({ line: 'init', caption: `Input = edge list (sirf jode). Par kaam ke time sawaal hota hai "is node ke neighbor kaun?" → har node ki apni list. ${n} khaali lists banao.`, legend, panels: view(-1) });
     edges.forEach(([u, v], i) => {
       adj[u].push(v);
       t.frame({ line: 'uv', caption: `Edge ${u}-${v}: adj[${u}] mein ${v} → "${u} se ${v} ja sakte hain".`, vars: { u, v }, legend, panels: view(i, [u]) });
       adj[v].push(u);
-      t.frame({ line: 'vu', caption: `Undirected — rasta dono taraf: adj[${v}] mein ${u}. (Directed graph hota to ye kadam skip.)`, vars: { u, v }, legend, panels: view(i, [v]) });
+      t.frame({ line: 'vu', caption: `Undirected — rasta dono taraf: adj[${v}] mein ${u}. (Directed graph hota to ye step skip.)`, vars: { u, v }, legend, panels: view(i, [v]) });
     });
     const badges: Record<number, string> = {};
     adj.forEach((l, i) => (badges[i] = `deg ${l.length}`));
     const res = listStr(adj.map((l) => listStr(l)));
-    t.frame({ line: 'done', caption: `Tayyar. Har edge se 2 entries → kul ${2 * m} (= degrees ka jod). adj[u].size = degree. Banane mein O(n + m) time, memory O(n + m).`, legend, panels: view(m, [], badges) });
+    t.frame({ line: 'done', caption: `Tayyar. Har edge se 2 entries → total ${2 * m} (= degrees ka jod). adj[u].size = degree. Banane mein O(n + m) time, memory O(n + m).`, legend, panels: view(m, [], badges) });
     return res;
   },
 });
@@ -192,13 +192,13 @@ export const starTrace = tracer<{ n: number; center: number }>({
         array(edges.map((e) => `[${e[0]},${e[1]}]`), { pointers: k >= 0 && k < m ? { e: k } : {}, label: 'edges' }),
       ];
     };
-    t.frame({ caption: `Star graph: ek CENTER, baaki ${m} nodes sirf center se jude. Edges kisi bhi order mein, aur [leaf, center] ya [center, leaf] dono tarah aa sakti hain. Pehle seedha tareeka: degree gino.`, legend, panels: view(-1) });
+    t.frame({ caption: `Star graph: ek CENTER, baaki ${m} nodes sirf center se jude. Edges kisi bhi order mein, aur [leaf, center] ya [center, leaf] dono tarah aa sakti hain. Pehle seedha tareeka: degree count karo.`, legend, panels: view(-1) });
     edges.forEach(([u, v], i) => {
       deg[u]++;
       deg[v]++;
       t.frame({ line: 'deg', caption: `Edge [${u}, ${v}]: deg[${u}] = ${deg[u]}, deg[${v}] = ${deg[v]}.`, vars: { u, v }, legend, panels: view(i, {}, { [`${u}-${v}`]: 'active' }) });
     });
-    t.frame({ line: 'pick', caption: `Jiska degree n - 1 = ${m}: node ${center} → center. Ye tareeka kisi bhi graph par chalta hai: O(n) time, O(n) memory. Par star ki ek khaasiyat se aur tez ho sakta hai…`, legend, panels: view(-1, { [center]: 'found' }) });
+    t.frame({ line: 'pick', caption: `Jiska degree n - 1 = ${m}: node ${center} → center. Ye tareeka kisi bhi graph par chalta hai: O(n) time, O(n) memory. Par star ki ek speciality se aur tez ho sakta hai…`, legend, panels: view(-1, { [center]: 'found' }) });
     const [a, b] = edges[0];
     const [c, d] = edges[1];
     t.frame({ line: 'first', caption: `Shortcut: center HAR edge mein hai. edges[0] = [${a}, ${b}] → center ya to ${a} hai ya ${b}.`, vars: { a, b }, legend, panels: view(0, { [a]: 'compare', [b]: 'compare' }, { [`${a}-${b}`]: 'active' }, false) });
@@ -274,7 +274,7 @@ export const networkRankTrace = tracer<{ roads: number[][] }>({
         { kind: 'grid', label: 'connected[a][b] (adjacency matrix)', values: conn.map((r) => r.map((x) => (x ? 1 : 0))), rowLabels: deg.map((_, i) => String(i)), colLabels: deg.map((_, i) => String(i)), corner: 'a\\b', tones: cells },
       ];
     };
-    t.frame({ line: 'init', caption: 'Pair (a, b) ka network rank = a se judi roads + b se judi roads, par a-b ki seedhi road sirf ek baar. Do cheezein chahiye: har city ki degree, aur "a-b road hai?" ka O(1) jawab → adjacency matrix.', legend, panels: view() });
+    t.frame({ line: 'init', caption: 'Pair (a, b) ka network rank = a se judi roads + b se judi roads, par a-b ki seedhi road sirf ek baar. 2 cheezein chahiye: har city ki degree, aur "a-b road hai?" ka O(1) jawab → adjacency matrix.', legend, panels: view() });
     roads.forEach(([a, b]) => {
       deg[a]++;
       deg[b]++;
@@ -291,14 +291,14 @@ export const networkRankTrace = tracer<{ roads: number[][] }>({
         if (better) (best = rank), (bp = [a, b]);
         const tag = better ? ` Naya best = ${best}.` : '';
         if (conn[a][b]) {
-          t.frame({ line: 'minus', caption: `(${a}, ${b}): ${deg[a]} + ${deg[b]} = ${sum}, par ${a}-${b} seedhi road dono degree mein gini gayi → ${sum} - 1 = ${rank}.${tag}`, vars: { a, b, rank, best }, legend, panels: view({ [a]: 'compare', [b]: 'compare' }, { [`${a}-${b}`]: 'error' }, { [`${a},${b}`]: 'error' }) });
+          t.frame({ line: 'minus', caption: `(${a}, ${b}): ${deg[a]} + ${deg[b]} = ${sum}, par ${a}-${b} seedhi road dono degree mein count ki gayi → ${sum} - 1 = ${rank}.${tag}`, vars: { a, b, rank, best }, legend, panels: view({ [a]: 'compare', [b]: 'compare' }, { [`${a}-${b}`]: 'error' }, { [`${a},${b}`]: 'error' }) });
         } else {
           t.frame({ line: 'pair', caption: `(${a}, ${b}): ${deg[a]} + ${deg[b]} = ${rank}. Seedhi road nahi (matrix mein 0) → kuch nahi ghatana.${tag}`, vars: { a, b, rank, best }, legend, panels: view({ [a]: 'compare', [b]: 'compare' }, {}, { [`${a},${b}`]: 'compare' }) });
         }
       }
     }
     const bt: Tones = bp.length ? { [bp[0]]: 'found', [bp[1]]: 'found' } : {};
-    t.frame({ line: 'done', caption: `Max network rank = ${best}${bp.length ? ` (pehla aisa pair: ${bp[0]}, ${bp[1]})` : ''}. ${n * (n - 1) / 2} pairs, har ek O(1) — matrix ki wajah se. Kul O(n² + m).`, vars: { best }, legend, panels: view(bt) });
+    t.frame({ line: 'done', caption: `Max network rank = ${best}${bp.length ? ` (pehla aisa pair: ${bp[0]}, ${bp[1]})` : ''}. ${n * (n - 1) / 2} pairs, har ek O(1) — matrix ki wajah se. Total O(n² + m).`, vars: { best }, legend, panels: view(bt) });
     return String(best);
   },
 });

@@ -1,9 +1,9 @@
-// Insertion sort: taash ke patton jaisa - har naya item pichhle sorted hisse mein sahi jagah baithta hai
+// Insertion sort: cards ke patton jaisa - har naya item pichhle sorted hisse mein sahi jagah baithta hai
 fun insertionSort(a: IntArray) {
     for (i in 1 until a.size) {
-        val key = a[i] // ise sahi jagah bithana hai //@pick
+        val key = a[i] // ise sahi jagah place karna hai //@pick
         var j = i - 1
-        while (j >= 0 && a[j] > key) { // key se bade items ek-ek jagah daayein khiskao //@shift
+        while (j >= 0 && a[j] > key) { // key se bade items ek-ek jagah right shift karo //@shift
             a[j + 1] = a[j]
             j--
         }

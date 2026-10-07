@@ -7,7 +7,7 @@ const grid = (values: Cell[][], tones: Tones = {}, label?: string): Panel => ({ 
 
 // ---------- 3. Visual intro: maze mein chooha ----------
 export const mazeTrace = tracer<{ maze: number[][] }>({
-  inputs: [{ name: 'maze', type: 'intGrid', label: 'Maze (1 = khula, 0 = deewar)', default: [[1, 0, 0, 0], [1, 1, 0, 1], [1, 1, 0, 0], [0, 1, 1, 1]], maxRows: 4, maxCols: 4, min: 0, max: 1 }],
+  inputs: [{ name: 'maze', type: 'intGrid', label: 'Maze (1 = khula, 0 = wall)', default: [[1, 0, 0, 0], [1, 1, 0, 1], [1, 1, 0, 0], [0, 1, 1, 1]], maxRows: 4, maxCols: 4, min: 0, max: 1 }],
   check: ({ maze }) => {
     if (maze.length !== maze[0].length) return 'Square maze daalo (rows = columns).';
     const n = maze.length;
@@ -35,12 +35,12 @@ export const mazeTrace = tracer<{ maze: number[][] }>({
       if (r === n - 1 && c === n - 1) {
         seen[r][c] = true;
         paths.push(path);
-        t.frame({ caption: `Manzil! Raasta "${path}". Ab wapas jaa ke doosre raaste dhoondhenge.`, legend: { found: 'raasta', muted: 'deewar' }, panels: [grid(cells(), tones([r, c], true)), status()] });
+        t.frame({ caption: `Destination! Raasta "${path}". Ab wapas jaa ke doosre raaste dhoondhenge.`, legend: { found: 'raasta', muted: 'wall' }, panels: [grid(cells(), tones([r, c], true)), status()] });
         seen[r][c] = false;
         return;
       }
       seen[r][c] = true;
-      t.frame({ caption: `(${r}, ${c}) par. Is raaste mein ise mark kiya (dobara nahi aayenge). D, L, R, U try karte hain.`, legend: { active: 'is raaste par', compare: 'abhi', muted: 'deewar' }, panels: [grid(cells(), tones([r, c])), status()] });
+      t.frame({ caption: `(${r}, ${c}) par. Is raaste mein ise mark kiya (dobara nahi aayenge). D, L, R, U try karte hain.`, legend: { active: 'is raaste par', compare: 'abhi', muted: 'wall' }, panels: [grid(cells(), tones([r, c])), status()] });
       for (const [dr, dc, ch] of D) {
         const nr = r + dr;
         const nc = c + dc;
@@ -50,7 +50,7 @@ export const mazeTrace = tracer<{ maze: number[][] }>({
         path = path.slice(0, -1);
       }
       seen[r][c] = false;
-      t.frame({ caption: `(${r}, ${c}) se aage koi naya raasta nahi → BACKTRACK: mark hatao, pichhle cell par wapas.`, legend: { active: 'is raaste par', muted: 'deewar' }, panels: [grid(cells(), tones()), status()] });
+      t.frame({ caption: `(${r}, ${c}) se aage koi naya raasta nahi → BACKTRACK: mark hatao, pichhle cell par wapas.`, legend: { active: 'is raaste par', muted: 'wall' }, panels: [grid(cells(), tones()), status()] });
     };
     go(0, 0);
     return listStr(paths);
@@ -93,7 +93,7 @@ export const queensTrace = tracer<{ n: number }>({
         qc.pop();
         t.frame({ line: 'remove', caption: `Row ${r} ki queen (column ${c}) uthai — agla column try.`, vars: { row: r, col: c, mile: res.length }, legend, panels: [grid(board(), tones())] });
       }
-      if (!tried) t.frame({ line: 'check', caption: `Row ${r} ka har column attack mein → dead end. Pichhli row ki queen hilani padegi (backtrack).`, vars: { row: r, mile: res.length }, legend: { ...legend, error: 'dead end' }, panels: [grid(board(), { ...tones(), ...Object.fromEntries(Array.from({ length: n }, (_, c) => [key(r, c), 'error' as Tone])) })] });
+      if (!tried) t.frame({ line: 'check', caption: `Row ${r} ka har column attack mein → dead end. Pichhli row ki queen move karni padegi (backtrack).`, vars: { row: r, mile: res.length }, legend: { ...legend, error: 'dead end' }, panels: [grid(board(), { ...tones(), ...Object.fromEntries(Array.from({ length: n }, (_, c) => [key(r, c), 'error' as Tone])) })] });
     };
     place(0);
     t.frame({ line: 'found', caption: `${n}-Queens: ${res.length} boards. Har row mein ek queen (n options), par pruning se saare n^n arrangements kabhi nahi bante.`, panels: [{ kind: 'text', label: 'Boards', text: res.map((b) => b.join(' ')).join('\n') || 'koi nahi' }] });
@@ -107,7 +107,7 @@ export const floodTrace = tracer<{ image: number[][]; sr: number; sc: number; co
     { name: 'image', type: 'intGrid', label: 'Image', default: [[1, 1, 1], [1, 1, 0], [1, 0, 1]], maxRows: 5, maxCols: 5, min: 0, max: 3 },
     { name: 'sr', type: 'int', label: 'Start row', default: 1, min: 0, max: 4 },
     { name: 'sc', type: 'int', label: 'Start col', default: 1, min: 0, max: 4 },
-    { name: 'color', type: 'int', label: 'Naya rang', default: 2, min: 0, max: 3 },
+    { name: 'color', type: 'int', label: 'Naya color', default: 2, min: 0, max: 3 },
   ],
   check: ({ image, sr, sc }) => (sr < image.length && sc < image[0].length ? null : 'Start cell grid ke andar rakho.'),
   run({ image, sr, sc, color }, t) {
@@ -115,15 +115,15 @@ export const floodTrace = tracer<{ image: number[][]; sr: number; sc: number; co
     const old = img[sr][sc];
     const painted: Tones = {};
     if (old === color) {
-      t.frame({ line: 'stop', caption: `Start ka rang pehle se ${color} — kuch nahi karna (warna "same rang wale" cells baar-baar paint hote rehte, infinite recursion).`, panels: [grid(img, { [key(sr, sc)]: 'compare' })] });
+      t.frame({ line: 'stop', caption: `Start ka color pehle se ${color} — kuch nahi karna (warna "same color wale" cells baar-baar paint hote rehte, infinite recursion).`, panels: [grid(img, { [key(sr, sc)]: 'compare' })] });
       return listStr(img.map((r) => listStr(r)));
     }
-    t.frame({ line: 'stop', caption: `(${sr}, ${sc}) ka rang ${old}. Iske saath JUDE saare ${old} wale cells ko ${color} karna hai.`, panels: [grid(img, { [key(sr, sc)]: 'compare' })] });
+    t.frame({ line: 'stop', caption: `(${sr}, ${sc}) ka color ${old}. Iske saath JUDE saare ${old} wale cells ko ${color} karna hai.`, panels: [grid(img, { [key(sr, sc)]: 'compare' })] });
     const fill = (r: number, c: number) => {
       if (r < 0 || c < 0 || r >= img.length || c >= img[0].length || img[r][c] !== old) return;
       img[r][c] = color;
       painted[key(r, c)] = 'found';
-      t.frame({ line: 'paint', caption: `(${r}, ${c}) rang diya → ${color}. Naya rang hi "visited" ka nishaan — dobara nahi aayenge (alag set ki zaroorat nahi). Ab chaaron padosi.`, panels: [grid(img, { ...painted, [key(r, c)]: 'new' })] });
+      t.frame({ line: 'paint', caption: `(${r}, ${c}) color diya → ${color}. Naya color hi "visited" ka mark — dobara nahi aayenge (alag set ki zaroorat nahi). Ab all 4 neighbor.`, panels: [grid(img, { ...painted, [key(r, c)]: 'new' })] });
       fill(r + 1, c);
       fill(r - 1, c);
       fill(r, c + 1);
@@ -154,7 +154,7 @@ export const wordTrace = tracer<{ board: string[]; word: string }>({
       const ch = b[r][c];
       b[r][c] = '#';
       onPath[key(r, c)] = 'active';
-      if (frames++ < 120) t.frame({ line: 'mark', caption: `(${r}, ${c}) = '${ch}' = word[${k}] ✓ → '#' se mark (is raaste mein dobara nahi). Ab padosiyon mein '${word[k + 1] ?? ''}' dhoondho.`, legend: { active: 'is raaste par' }, panels: [grid(b, { ...onPath, [key(r, c)]: 'new' }), status(k + 1)] });
+      if (frames++ < 120) t.frame({ line: 'mark', caption: `(${r}, ${c}) = '${ch}' = word[${k}] ✓ → '#' se mark (is raaste mein dobara nahi). Ab neighbors mein '${word[k + 1] ?? ''}' dhoondho.`, legend: { active: 'is raaste par' }, panels: [grid(b, { ...onPath, [key(r, c)]: 'new' }), status(k + 1)] });
       const ok = dfs(r + 1, c, k + 1) || dfs(r - 1, c, k + 1) || dfs(r, c + 1, k + 1) || dfs(r, c - 1, k + 1);
       if (ok) return true;
       b[r][c] = ch;
@@ -165,7 +165,7 @@ export const wordTrace = tracer<{ board: string[]; word: string }>({
     for (let r = 0; r < m; r++) {
       for (let c = 0; c < n; c++) {
         if (dfs(r, c, 0)) {
-          t.frame({ line: 'found', caption: `"${word}" mil gaya! Neela raasta. Time O(m·n·4^L) worst (L = word length).`, legend: { active: 'raasta' }, panels: [grid(b, onPath), status(word.length)] });
+          t.frame({ line: 'found', caption: `"${word}" mil gaya! Blue raasta. Time O(m·n·4^L) worst (L = word length).`, legend: { active: 'raasta' }, panels: [grid(b, onPath), status(word.length)] });
           return 'true';
         }
       }
@@ -183,10 +183,10 @@ export const sudokuTrace = tracer<{ board: number[][] }>({
     for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
       const d = board[r][c];
       if (!d) continue;
-      for (let i = 0; i < 4; i++) if ((i !== c && board[r][i] === d) || (i !== r && board[i][c] === d)) return `${d} row/column mein do baar hai.`;
+      for (let i = 0; i < 4; i++) if ((i !== c && board[r][i] === d) || (i !== r && board[i][c] === d)) return `${d} row/column mein 2 baar hai.`;
       const br = r - (r % 2);
       const bc = c - (c % 2);
-      for (let i = br; i < br + 2; i++) for (let j = bc; j < bc + 2; j++) if ((i !== r || j !== c) && board[i][j] === d) return `${d} ek 2x2 box mein do baar hai.`;
+      for (let i = br; i < br + 2; i++) for (let j = bc; j < bc + 2; j++) if ((i !== r || j !== c) && board[i][j] === d) return `${d} ek 2x2 box mein 2 baar hai.`;
     }
     return null;
   },
@@ -218,7 +218,7 @@ export const sudokuTrace = tracer<{ board: number[][] }>({
           b[r][c] = 0;
           frame('undo', `(${r}, ${c}) par ${d} se aage solve nahi hua → hatao (backtrack), agla digit try.`, { [key(r, c)]: 'error' });
         }
-        frame('dead', `(${r}, ${c}) mein koi digit fit nahi → pichhla faisla galat tha. Wapas.`, { [key(r, c)]: 'error' });
+        frame('dead', `(${r}, ${c}) mein koi digit fit nahi → pichhla decision galat tha. Wapas.`, { [key(r, c)]: 'error' });
         return false;
       }
       return true;

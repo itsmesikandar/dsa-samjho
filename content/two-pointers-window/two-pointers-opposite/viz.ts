@@ -23,7 +23,7 @@ export const pairGrid = tracer<{ arr: number[]; target: number }>({
     });
     let elim = 0;
     const total = (n * (n - 1)) / 2;
-    t.frame({ caption: `Brute force saare ${total} pairs dekhta hai (grid ke saare cells). Two pointers har kadam par poori ek row ya column hata deta hai — dekho kaise.`, panels: [array(arr), grid()] });
+    t.frame({ caption: `Brute force saare ${total} pairs dekhta hai (grid ke saare cells). Two pointers har step par poori ek row ya column hata deta hai — dekho kaise.`, panels: [array(arr), grid()] });
     let l = 0;
     let r = n - 1;
     while (l < r) {
@@ -42,7 +42,7 @@ export const pairGrid = tracer<{ arr: number[]; target: number }>({
         l++;
       }
     }
-    t.frame({ caption: `l aur r mil gaye — saare pairs hat gaye, koi sum ${target} nahi. Har kadam ek row/column → max n kadam → O(n).`, panels: [array(arr), grid()] });
+    t.frame({ caption: `l aur r mil gaye — saare pairs hat gaye, koi sum ${target} nahi. Har step ek row/column → max n step → O(n).`, panels: [array(arr), grid()] });
     return listStr([-1, -1]);
   },
 });
@@ -55,7 +55,7 @@ export const squaresTrace = tracer<{ nums: number[] }>({
     const res: Cell[] = Array(n).fill(null);
     let l = 0;
     let r = n - 1;
-    t.frame({ line: 'init', caption: 'Negative numbers ke square bade ho jaate hain, isliye sorted order toot jaata hai. Par sabse bada square hamesha kisi KINARE par hoga — l ya r.', panels: [array(nums, { label: 'nums', pointers: { l, r } }), array(res, { label: 'res (peeche se bharenge)' })] });
+    t.frame({ line: 'init', caption: 'Negative numbers ke square bade ho jaate hain, isliye sorted order toot jaata hai. Par sabse bada square hamesha kisi EDGE par hoga — l ya r.', panels: [array(nums, { label: 'nums', pointers: { l, r } }), array(res, { label: 'res (peeche se bharenge)' })] });
     for (let k = n - 1; k >= 0; k--) {
       const leftBig = Math.abs(nums[l]) > Math.abs(nums[r]);
       t.frame({ line: 'compare', caption: `|${nums[l]}| vs |${nums[r]}| → ${leftBig ? 'left' : 'right'} bada (ya barabar). Uska square res[${k}] mein jaayega.`, vars: { l, r, k }, panels: [array(nums, { label: 'nums', tones: { [l]: 'compare', [r]: 'compare' }, pointers: { l, r } }), array(res, { label: 'res', pointers: { k } })] });
@@ -108,15 +108,15 @@ export const vowelsRevTrace = tracer<{ s: string }>({
 
 // ---------- Example 2: container with most water ----------
 export const containerTrace = tracer<{ h: number[] }>({
-  inputs: [{ name: 'h', type: 'intArray', label: 'Deewaron ki unchai', default: [1, 8, 6, 2, 5, 4, 8, 3, 7], minLen: 2, maxLen: 10, min: 0, max: 10 }],
+  inputs: [{ name: 'h', type: 'intArray', label: 'Walls ki height', default: [1, 8, 6, 2, 5, 4, 8, 3, 7], minLen: 2, maxLen: 10, min: 0, max: 10 }],
   run({ h }, t) {
     let l = 0;
     let r = h.length - 1;
     let best = 0;
     let bl = 0;
     let br = r;
-    const bars = (tones: ToneMap = {}) => ({ kind: 'bars' as const, label: 'deewarein', values: [...h], tones, pointers: [{ name: 'l', index: l }, { name: 'r', index: r }] });
-    t.frame({ line: 'init', caption: 'Sabse chaudi (wide) jodi se shuru: l = 0, r = end. Paani = chhoti deewar × doori.', panels: [bars()] });
+    const bars = (tones: ToneMap = {}) => ({ kind: 'bars' as const, label: 'walls', values: [...h], tones, pointers: [{ name: 'l', index: l }, { name: 'r', index: r }] });
+    t.frame({ line: 'init', caption: 'Sabse wide (wide) pair se shuru: l = 0, r = end. Paani = chhoti wall × distance.', panels: [bars()] });
     while (l < r) {
       const area = Math.min(h[l], h[r]) * (r - l);
       const better = area > best;
@@ -127,14 +127,14 @@ export const containerTrace = tracer<{ h: number[] }>({
       }
       t.frame({ line: 'area', caption: `min(${h[l]}, ${h[r]}) × (${r} − ${l}) = ${area}.${better ? ` Naya best = ${best}!` : ` best = ${best}.`}`, vars: { l, r, area, best }, panels: [bars({ [l]: 'active', [r]: 'active' })] });
       if (h[l] < h[r]) {
-        t.frame({ line: 'moveL', caption: `Left deewar (${h[l]}) chhoti hai. Use rakh ke r ko andar laane se doori kam hogi aur unchai ${h[l]} se upar nahi jaa sakti — fayda nahi. Isliye chhoti wali (l) hatao.`, vars: { l, r, best }, panels: [bars({ [l]: 'error', [r]: 'compare' })] });
+        t.frame({ line: 'moveL', caption: `Left wall (${h[l]}) chhoti hai. Use rakh ke r ko andar laane se distance kam hogi aur height ${h[l]} se upar nahi jaa sakti — fayda nahi. Isliye chhoti wali (l) hatao.`, vars: { l, r, best }, panels: [bars({ [l]: 'error', [r]: 'compare' })] });
         l++;
       } else {
-        t.frame({ line: 'moveR', caption: `Right deewar (${h[r]}) chhoti (ya barabar) hai → wahi hatao, r--.`, vars: { l, r, best }, panels: [bars({ [l]: 'compare', [r]: 'error' })] });
+        t.frame({ line: 'moveR', caption: `Right wall (${h[r]}) chhoti (ya barabar) hai → wahi hatao, r--.`, vars: { l, r, best }, panels: [bars({ [l]: 'compare', [r]: 'error' })] });
         r--;
       }
     }
-    t.frame({ line: 'done', caption: `Best paani = ${best} (deewar ${bl} aur ${br}). Har kadam ek deewar hatti → O(n). Saare pairs try karte to O(n²).`, panels: [{ kind: 'bars', label: 'deewarein', values: [...h], tones: { [bl]: 'found', [br]: 'found' } }] });
+    t.frame({ line: 'done', caption: `Best paani = ${best} (wall ${bl} aur ${br}). Har step ek wall hatti → O(n). Saare pairs try karte to O(n²).`, panels: [{ kind: 'bars', label: 'walls', values: [...h], tones: { [bl]: 'found', [br]: 'found' } }] });
     return String(best);
   },
 });
@@ -147,7 +147,7 @@ export const threeSumTrace = tracer<{ nums: number[] }>({
     const res: number[][] = [];
     const out = () => `[${res.map((x) => listStr(x)).join(', ')}]`;
     const text = () => ({ kind: 'text' as const, label: 'Triplets', text: out() });
-    t.frame({ line: 'sort', caption: `Sort: ${listStr(a)}. Ab har i ke liye baaki do numbers ka sum −a[i] chahiye — ye sorted array par two pointers (Two Sum II) hai!`, panels: [array(a), text()] });
+    t.frame({ line: 'sort', caption: `Sort: ${listStr(a)}. Ab har i ke liye baaki 2 numbers ka sum −a[i] chahiye — ye sorted array par two pointers (Two Sum II) hai!`, panels: [array(a), text()] });
     for (let i = 0; i < a.length; i++) {
       if (i > 0 && a[i] === a[i - 1]) {
         t.frame({ line: 'skipI', caption: `a[${i}] = ${a[i]} pichle jaisa — wahi triplets dobara milenge. Skip.`, vars: { i }, panels: [array(a, { tones: { [i]: 'muted' }, pointers: { i } }), text()] });

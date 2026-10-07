@@ -14,7 +14,7 @@ class Main {
         for (int i = start; i < nums.length; i++) {
             path.add(nums[i]); // choose //@choose
             bt(nums, i + 1, path, res); // explore: sirf aage ke items (peeche wale lene se same subset dobara banega)
-            path.remove(path.size() - 1); // un-choose: wapas pehle jaisi halat //@unchoose
+            path.remove(path.size() - 1); // un-choose: wapas pehle jaisi state //@unchoose
         }
     }
 

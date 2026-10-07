@@ -2,14 +2,14 @@
 fun greedyCoins(coins: IntArray, amount: Int): Int {
     var left = amount
     var count = 0
-    for (c in coins.sortedDescending()) { // hamesha sabse bada sikka jo fit ho
+    for (c in coins.sortedDescending()) { // hamesha sabse bada coin jo fit ho
         count += left / c
         left %= c
     }
     return if (left == 0) count else -1
 }
 
-fun bestCoins(coins: IntArray, amount: Int): Int { // DP: har amount ka sabse kam sikke (DP chapter mein detail)
+fun bestCoins(coins: IntArray, amount: Int): Int { // DP: har amount ka sabse kam coins (DP chapter mein detail)
     val dp = IntArray(amount + 1) { Int.MAX_VALUE }
     dp[0] = 0
     for (a in 1..amount) {

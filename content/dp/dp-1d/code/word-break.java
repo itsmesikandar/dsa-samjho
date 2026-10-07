@@ -10,7 +10,7 @@ class Main {
         dp[0] = true; // khaali string - toot gayi (kuch nahi bacha)
         for (int i = 1; i <= s.length(); i++) {
             for (int j = 0; j < i; j++) {
-                if (dp[j] && words.contains(s.substring(j, i))) { // pehle j theek + aakhri tukda s[j..i) ek word
+                if (dp[j] && words.contains(s.substring(j, i))) { // pehle j theek + aakhri piece s[j..i) ek word
                     dp[i] = true;
                     break;
                 }

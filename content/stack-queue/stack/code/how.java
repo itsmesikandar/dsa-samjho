@@ -10,7 +10,7 @@ class Main {
         for (char c : s.toCharArray()) {
             if (!pair.containsKey(c)) { // khulne wala: stack par rakho //@push
                 st.push(c);
-            } else if (st.isEmpty() || st.pop() != pair.get(c).charValue()) { // band wala SABSE TAAZA khule se match hona chahiye //@match
+            } else if (st.isEmpty() || st.pop() != pair.get(c).charValue()) { // band wala SABSE FRESH khule se match hona chahiye //@match
                 return false;
             }
         }

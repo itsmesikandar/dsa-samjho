@@ -29,12 +29,12 @@ export const raceTrack = tracer<{ values: number[]; pos: number }>({
     let slow: string | null = 'n0';
     let fast: string | null = 'n0';
     const view = () => [listView(nodes, 'n0', { pointers: { slow, fast }, tones: tonesFor(slow, fast) })];
-    t.frame({ caption: pos >= 0 ? `Circle wala track: aakhri node wapas index ${pos} par juda. slow 1 kadam chalta hai, fast 2. Seedha track hota to fast end par pahunch jaata — circle mein kya hoga?` : 'Seedha track (circle nahi). slow 1 kadam, fast 2 kadam.', legend: LEGEND, panels: view() });
+    t.frame({ caption: pos >= 0 ? `Circle wala track: aakhri node wapas index ${pos} par juda. slow 1 step chalta hai, fast 2. Seedha track hota to fast end par pahunch jaata — circle mein kya hoga?` : 'Seedha track (circle nahi). slow 1 step, fast 2 step.', legend: LEGEND, panels: view() });
     let steps = 0;
     for (;;) {
       const f1: string | null = fast ? nodes.get(fast)!.next : null;
       if (!f1) {
-        t.frame({ caption: `fast ke aage null — track khatam. Circle NAHI hai. (${steps} kadam)`, legend: LEGEND, panels: view() });
+        t.frame({ caption: `fast ke aage null — track khatam. Circle NAHI hai. (${steps} step)`, legend: LEGEND, panels: view() });
         return 'false';
       }
       slow = nodes.get(slow!)!.next;
@@ -45,10 +45,10 @@ export const raceTrack = tracer<{ values: number[]; pos: number }>({
         return 'false';
       }
       if (slow === fast) {
-        t.frame({ caption: `Dono same node par! Circle mein fast har kadam slow se 1 node kareeb aata hai — isliye pakad leta hai, kabhi "kood ke aage" nahi nikalta. ${steps} kadam.`, vars: { steps }, legend: LEGEND, panels: view() });
+        t.frame({ caption: `Dono same node par! Circle mein fast har step slow se 1 node kareeb aata hai — isliye pakad leta hai, kabhi "jump kar ke aage" nahi nikalta. ${steps} step.`, vars: { steps }, legend: LEGEND, panels: view() });
         return 'true';
       }
-      t.frame({ caption: `Kadam ${steps}: slow → ${nodes.get(slow!)!.value}, fast → ${nodes.get(fast)!.value}.`, vars: { steps }, legend: LEGEND, panels: view() });
+      t.frame({ caption: `Step ${steps}: slow → ${nodes.get(slow!)!.value}, fast → ${nodes.get(fast)!.value}.`, vars: { steps }, legend: LEGEND, panels: view() });
     }
   },
 });
@@ -60,11 +60,11 @@ export const middleTrace = tracer<{ values: number[] }>({
     const nodes = cyclic(values, -1);
     let slow: string = 'n0';
     let fast: string | null = 'n0';
-    t.frame({ line: 'init', caption: 'slow aur fast dono head par. Length gine bina beech dhoondhna hai — ek hi pass.', legend: LEGEND, panels: [listView(nodes, 'n0', { pointers: { slow, fast }, tones: tonesFor(slow, fast) })] });
+    t.frame({ line: 'init', caption: 'slow aur fast dono head par. Length count kiye bina beech dhoondhna hai — ek hi pass.', legend: LEGEND, panels: [listView(nodes, 'n0', { pointers: { slow, fast }, tones: tonesFor(slow, fast) })] });
     while (fast && nodes.get(fast)!.next) {
       slow = nodes.get(slow)!.next!;
       fast = nodes.get(nodes.get(fast)!.next!)!.next;
-      t.frame({ line: 'step', caption: `slow 1 kadam (${nodes.get(slow)!.value}), fast 2 kadam (${fast ? nodes.get(fast)!.value : 'null'}). fast hamesha slow se dugna aage.`, legend: LEGEND, panels: [listView(nodes, 'n0', { pointers: { slow, fast }, tones: tonesFor(slow, fast) })] });
+      t.frame({ line: 'step', caption: `slow 1 step (${nodes.get(slow)!.value}), fast 2 step (${fast ? nodes.get(fast)!.value : 'null'}). fast hamesha slow se double aage.`, legend: LEGEND, panels: [listView(nodes, 'n0', { pointers: { slow, fast }, tones: tonesFor(slow, fast) })] });
     }
     t.frame({ line: 'done', caption: `fast aage nahi ja sakta → slow beech mein: ${nodes.get(slow)!.value}. ${values.length % 2 === 0 ? 'Length even — do beech mein se doosra mila.' : ''} O(n), O(1).`, legend: { found: 'beech' }, panels: [listView(nodes, 'n0', { pointers: { slow }, tones: { [slow]: 'found' } })] });
     return String(nodes.get(slow)!.value);
@@ -114,7 +114,7 @@ export const cycleStartTrace = tracer<{ values: number[]; pos: number }>({
       t.frame({ line: 'step', caption: `Phase 1: slow → ${nodes.get(slow!)!.value}, fast → ${fast ? nodes.get(fast)!.value : 'null'}.`, legend: LEGEND, panels: [listView(nodes, 'n0', { pointers: { slow, fast }, tones: tonesFor(slow, fast) })] });
       if (slow === fast) {
         let p: string = 'n0';
-        t.frame({ line: 'restart', caption: `Mile (${nodes.get(slow!)!.value} par). Ab p = head. Maths: head se circle-start ki doori = milne ki jagah se circle-start ki doori (circle ke chakkar chhod ke). To dono 1-1 kadam chalao.`, legend: { ...LEGEND, new: 'p' }, panels: [listView(nodes, 'n0', { pointers: { p, slow }, tones: { [slow!]: 'compare', [p]: 'new' } })] });
+        t.frame({ line: 'restart', caption: `Mile (${nodes.get(slow!)!.value} par). Ab p = head. Maths: head se circle-start ki distance = milne ki jagah se circle-start ki distance (circle ke chakkar chhod ke). To dono 1-1 step chalao.`, legend: { ...LEGEND, new: 'p' }, panels: [listView(nodes, 'n0', { pointers: { p, slow }, tones: { [slow!]: 'compare', [p]: 'new' } })] });
         while (p !== slow) {
           p = nodes.get(p)!.next!;
           slow = nodes.get(slow!)!.next;
@@ -145,14 +145,14 @@ export const dupTrace = tracer<{ nums: number[] }>({
     const arr = (hot: Record<number, Tone> = {}) => array(nums, { label: 'nums', tones: hot });
     let slow = nums[0];
     let fast = nums[0];
-    t.frame({ line: 'step', caption: `Har index i se arrow nums[i] ki taraf. Index 0 par koi arrow nahi aata (values 1..n), to 0 "head" hai. Duplicate value par DO arrows aate hain → wahan se circle shuru. Linked list cycle wala sawaal ban gaya!`, legend: LEGEND, panels: [graph(slow, fast), arr()] });
+    t.frame({ line: 'step', caption: `Har index i se arrow nums[i] ki taraf. Index 0 par koi arrow nahi aata (values 1..n), to 0 "head" hai. Duplicate value par 2 arrows aate hain → wahan se circle shuru. Linked list cycle wala sawaal ban gaya!`, legend: LEGEND, panels: [graph(slow, fast), arr()] });
     do {
       slow = nums[slow];
       fast = nums[nums[fast]];
       t.frame({ line: 'step', caption: `slow = nums[slow] → ${slow}, fast = nums[nums[fast]] → ${fast}.`, vars: { slow, fast }, legend: LEGEND, panels: [graph(slow, fast), arr()] });
     } while (slow !== fast);
     slow = nums[0];
-    t.frame({ line: 'restart', caption: `Mile. Ab slow = nums[0] (head ke baad wala) se phir — dono 1-1 kadam (Cycle II jaisa).`, vars: { slow, fast }, legend: LEGEND, panels: [graph(slow, fast), arr()] });
+    t.frame({ line: 'restart', caption: `Mile. Ab slow = nums[0] (head ke baad wala) se phir — dono 1-1 step (Cycle II jaisa).`, vars: { slow, fast }, legend: LEGEND, panels: [graph(slow, fast), arr()] });
     while (slow !== fast) {
       slow = nums[slow];
       fast = nums[fast];

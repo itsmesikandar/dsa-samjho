@@ -8,7 +8,7 @@ const pathPanel = (path: (number | string)[], res: (number | string)[][]): Panel
 export const subsetTree = tracer<{ nums: number[] }>({
   inputs: [{ name: 'nums', type: 'intArray', label: 'Items', default: [1, 2, 3], minLen: 1, maxLen: 3, min: 0, max: 9 }],
   run({ nums }, t) {
-    const tree = callTree('Faislon ka ped');
+    const tree = callTree('Decisions ka tree');
     const path: number[] = [];
     const res: number[][] = [];
     const go = (i: number, parent?: string, edge = 'shuru') => {
@@ -16,10 +16,10 @@ export const subsetTree = tracer<{ nums: number[] }>({
       if (i === nums.length) {
         res.push([...path]);
         tree.done(me, listStr(path), 'found');
-        t.frame({ caption: `Saare items ka faisla ho gaya → subset ${listStr(path)}. Ye patta (leaf) hai.`, vars: { subsets: res.length }, panels: [tree.panel(), pathPanel(path, res)] });
+        t.frame({ caption: `Saare items ka decision ho gaya → subset ${listStr(path)}. Ye patta (leaf) hai.`, vars: { subsets: res.length }, panels: [tree.panel(), pathPanel(path, res)] });
         return;
       }
-      t.frame({ caption: `Item ${nums[i]}: do raaste — LO (+${nums[i]}) ya CHHODO (−${nums[i]}). Pehle "lo" wala raasta poora dekhenge, phir wapas aa ke "chhodo".`, vars: { subsets: res.length }, panels: [tree.panel(), pathPanel(path, res)] });
+      t.frame({ caption: `Item ${nums[i]}: 2 raaste — LO (+${nums[i]}) ya CHHODO (−${nums[i]}). Pehle "lo" wala raasta poora dekhenge, phir wapas aa ke "chhodo".`, vars: { subsets: res.length }, panels: [tree.panel(), pathPanel(path, res)] });
       path.push(nums[i]);
       go(i + 1, me.id, `+${nums[i]}`);
       path.pop();
@@ -28,12 +28,12 @@ export const subsetTree = tracer<{ nums: number[] }>({
       tree.done(me, '✓');
     };
     go(0);
-    t.frame({ caption: `${res.length} = 2^${nums.length} subsets. Backtracking = is ped ko DFS se ghoomna: aage jao (choose), dekho (explore), wapas aao aur undo karo (un-choose).`, vars: { subsets: res.length }, panels: [tree.panel(), pathPanel(path, res)] });
+    t.frame({ caption: `${res.length} = 2^${nums.length} subsets. Backtracking = is tree ko DFS se ghoomna: aage jao (choose), dekho (explore), wapas aao aur undo karo (un-choose).`, vars: { subsets: res.length }, panels: [tree.panel(), pathPanel(path, res)] });
     return String(res.length);
   },
 });
 
-// ---------- 4. How: subsets (loop wala dhaancha) ----------
+// ---------- 4. How: subsets (loop wala structure) ----------
 export const subsetsTrace = tracer<{ nums: number[] }>({
   inputs: [{ name: 'nums', type: 'intArray', label: 'nums (distinct)', default: [1, 2, 3], minLen: 1, maxLen: 4, min: 0, max: 9, distinct: true }],
   run({ nums }, t) {
@@ -105,7 +105,7 @@ export const comboTrace = tracer<{ cand: number[]; target: number }>({
       }
       for (let i = start; i < c.length; i++) {
         if (c[i] > remain) {
-          t.frame({ line: 'prune', caption: `${c[i]} > remain ${remain} — aur sorted hai, to aage wale bhi bade. Poori shaakh kaat do (pruning) → loop break.`, panels: [tree.panel(), array(c, { pointers: { i }, tones: Object.fromEntries(c.map((_, j) => [j, (j >= i ? 'error' : undefined) as Tone])) }), pathPanel(path, res)] });
+          t.frame({ line: 'prune', caption: `${c[i]} > remain ${remain} — aur sorted hai, to aage wale bhi bade. Poori branch kaat do (pruning) → loop break.`, panels: [tree.panel(), array(c, { pointers: { i }, tones: Object.fromEntries(c.map((_, j) => [j, (j >= i ? 'error' : undefined) as Tone])) }), pathPanel(path, res)] });
           break;
         }
         path.push(c[i]);
@@ -117,7 +117,7 @@ export const comboTrace = tracer<{ cand: number[]; target: number }>({
       tree.done(me, '');
     };
     bt(0, target);
-    t.frame({ line: 'found', caption: `Results ${nested(res)}. Sort + break se bekaar shaakhein jaldi kat gayi.`, panels: [tree.panel(), pathPanel(path, res)] });
+    t.frame({ line: 'found', caption: `Results ${nested(res)}. Sort + break se bekaar branches jaldi kat gayi.`, panels: [tree.panel(), pathPanel(path, res)] });
     return nested(res);
   },
 });
@@ -150,10 +150,10 @@ export const palPartTrace = tracer<{ s: string }>({
           continue;
         }
         path.push(piece);
-        t.frame({ line: 'choose', caption: `"${piece}" palindrome ✓ → tukda lo, baaki (index ${end + 1} se) kaato.`, panels: [tree.panel(), array(c, { ranges: range }), pathPanel(path, res)] });
+        t.frame({ line: 'choose', caption: `"${piece}" palindrome ✓ → piece lo, baaki (index ${end + 1} se) kaato.`, panels: [tree.panel(), array(c, { ranges: range }), pathPanel(path, res)] });
         bt(end + 1, me.id);
         path.pop();
-        t.frame({ line: 'unchoose', caption: `"${piece}" hatao — ab lamba tukda try.`, panels: [tree.panel(), array(c), pathPanel(path, res)] });
+        t.frame({ line: 'unchoose', caption: `"${piece}" hatao — ab lamba piece try.`, panels: [tree.panel(), array(c), pathPanel(path, res)] });
       }
       tree.done(me, '');
     };

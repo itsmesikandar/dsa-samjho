@@ -2,7 +2,7 @@ meta:
   id: dp-strings
   chapter: dp
   title: DP on Strings
-  subtitle: Do strings = ek grid — aakhri chars dekho, chhote prefix se jawab
+  subtitle: 2 strings = ek grid — aakhri chars dekho, chhote prefix se jawab
   level: intermediate
   minutes: 55
   prereqs: [dp-grid, strings]
@@ -11,21 +11,21 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **String DP** = state mein string ke **prefix** (ya tukde). Do strings `a`, `b` → `dp[i][j]` = "`a` ke pehle `i` chars aur `b` ke pehle `j` chars" ka jawab. Ye grid DP hi hai — ek axis har string.
+    **String DP** = state mein string ke **prefix** (ya pieces). 2 strings `a`, `b` → `dp[i][j]` = "`a` ke pehle `i` chars aur `b` ke pehle `j` chars" ka jawab. Ye grid DP hi hai — ek axis har string.
 
     Template:
     1. **State:** `dp[i][j]` prefixes par. Size `(m + 1) × (n + 1)` — row / column 0 = **khaali string**.
     2. **Transition:** aakhri chars `a[i−1]` aur `b[j−1]` dekho:
-       - same → **tirchha** `dp[i−1][j−1]` se (dono ek saath aage)
-       - alag → **upar** (`a` ka char chhodo), **baayein** (`b` ka chhodo), ya tirchha (badlo)
+       - same → **diagonal** `dp[i−1][j−1]` se (dono ek saath aage)
+       - alag → **upar** (`a` ka char chhodo), **left** (`b` ka chhodo), ya diagonal (badlo)
     3. **Base:** khaali string wali row / column.
-    4. Ek hi string ke andar ka sawaal (palindrome) → `dp[i][j]` = tukda `s[i..j]`, length badhate jao (**interval DP**).
+    4. Ek hi string ke andar ka sawaal (palindrome) → `dp[i][j]` = piece `s[i..j]`, length badhate jao (**interval DP**).
 
     Subsequence vs substring — sabse zaroori farak:
 
     | | Subsequence | Substring |
     |---|---|---|
-    | Beech mein gap? | Chalega | Nahi — lagaataar |
+    | Beech mein gap? | Chalega | Nahi — continuous |
     | "abcde" mein "ace" | ✔ | ✘ |
     | Mismatch par dp | `max(upar, baayein)` | `0` |
 
@@ -33,11 +33,11 @@ what:
     > `dp[i][j]` mein char `a[i−1]` hai, `a[i]` nahi — table ek bada hai kyunki row 0 khaali string ki hai.
   analogy: |
     **Do dosto ka din:**
-    Rahul: utha → chai → gym → naashta → office. Priya: utha → gym → chai → office.
+    Rahul: utha → chai → gym → breakfast → office. Priya: utha → gym → chai → office.
 
     Dono ne **ek hi order** mein kaunse kaam kiye? utha → gym → office (ya utha → chai → office) — 3 kaam. Beech ke extra kaam chhod sakte ho, order nahi tod sakte. Yahi **LCS** hai.
 
-    Aur "Priya ki routine ko Rahul jaisa banane mein kam se kam kitne badlaav (jodo, hatao, badlo)?" — yahi **edit distance**.
+    Aur "Priya ki routine ko Rahul jaisa banane mein kam se kam kitne change (jodo, hatao, badlo)?" — yahi **edit distance**.
 
 # 2. Kyun chahiye?
 why:
@@ -48,7 +48,7 @@ why:
     |---|---|---|
     | 10 | ~1,000 | 100 |
     | 20 | ~10 lakh | 400 |
-    | 1,000 | asambhav | 10 lakh |
+    | 1,000 | impossible | 10 lakh |
 
     Asal mein alag sawaal sirf `(i, j)` — prefixes ke jode. **O(m · n)**.
 
@@ -57,7 +57,7 @@ why:
     > [!socho]
     > Git diff kaise batata hai kaunsi lines badli?
     >
-    > Dono files ki **lines** ko do sequences maano. Unka LCS = jo lines nahi badli. Jo LCS mein nahi — wahi `−` (purani) aur `+` (nayi). (Git ka Myers algorithm isi "kam se kam badlaav" ka tez roop hai.)
+    > Dono files ki **lines** ko 2 sequences maano. Unka LCS = jo lines nahi badli. Jo LCS mein nahi — wahi `−` (purani) aur `+` (nayi). (Git ka Myers algorithm isi "kam se kam change" ka tez form hai.)
 
 # 3. Visual intro
 visual:
@@ -75,7 +75,7 @@ how:
     - Warna → `max(dp[i−1][j], dp[i][j−1])` — dono aakhri chars ek saath LCS ke end mein nahi ho sakte, kam se kam ek chhodo.
     - Jawab `dp[m][n]`.
 
-    Match par seedha tirchha + 1 kyun safe? Same aakhri chars ko jodna kabhi nuksaan nahi karta — koi bhi LCS us match par khatam karwaya ja sakta hai.
+    Match par seedha diagonal + 1 kyun safe? Same aakhri chars ko jodna kabhi nuksaan nahi karta — koi bhi LCS us match par khatam karwaya ja sakta hai.
 
     Space: sirf pichhli row chahiye → O(min(m, n)). Par LCS ki **string** chahiye to poora table rakho (code section).
 
@@ -97,15 +97,15 @@ operations:
   - op: "Longest common substring"
     time: "O(m · n)"
     space: "O(m · n) → O(n)"
-    why: "Match par tirchha + 1, warna 0; jawab table ka max."
+    why: "Match par diagonal + 1, warna 0; jawab table ka max."
   - op: "Longest palindromic subsequence"
     time: "O(n²)"
     space: "O(n²)"
-    why: "Har tukda s[i..j] ek baar, O(1) kaam."
+    why: "Har piece s[i..j] ek baar, O(1) kaam."
   - op: "Edit distance"
     time: "O(m · n)"
     space: "O(m · n) → O(n)"
-    why: "Har cell teen padosi ka min."
+    why: "Har cell 3 neighbor ka min."
   - op: "Is subsequence (sirf check)"
     time: "O(m + n)"
     space: "O(1)"
@@ -117,10 +117,10 @@ code:
     file: print-lcs
     note: |
       Length ke saath string bhi chahiye to table mat phenko. `(m, n)` se shuru karo:
-      - chars same → ye char LCS ka hai, **tirchha** jao.
-      - alag → jidhar bada value (upar ya baayein) — jawab wahin se aaya tha, udhar jao.
+      - chars same → ye char LCS ka hai, **diagonal** jao.
+      - alag → jidhar bada value (upar ya left) — jawab wahin se aaya tha, udhar jao.
 
-      Chars ulte order mein milte hain → aakhir mein `reverse`. Tie (upar = baayein) par koi bhi taraf — alag par utna hi lamba LCS mil sakta hai.
+      Chars ulte order mein milte hain → aakhir mein `reverse`. Tie (upar = left) par koi bhi taraf — alag par utna hi lamba LCS mil sakta hai.
 
 # 7. Examples
 examples:
@@ -129,15 +129,15 @@ examples:
     title: Sabse lamba common substring
     source: { name: Longest Common Substring, platform: GFG, url: "https://www.geeksforgeeks.org/problems/longest-common-substring1452/1" }
     problem: |
-      Do strings. Dono mein common sabse lamba **substring** (lagaataar chars) — uski length?
+      2 strings. Dono mein common sabse lamba **substring** (continuous chars) — uski length?
 
       Example: `a = "pakoda"`, `b = "pakora"` → **4** (`"pako"`)
     intuition: |
-      LCS jaisa lagta hai, par yahan **lagaataar** chahiye — beech mein gap nahi.
+      LCS jaisa lagta hai, par yahan **continuous** chahiye — beech mein gap nahi.
 
       State badlo: `dp[i][j]` = `a[i−1]` aur `b[j−1]` **par khatam hone wala** common substring ki length.
       - Match → `dp[i−1][j−1] + 1` (pichhla common hissa ek aur lamba).
-      - Mismatch → **0** — yahan khatam hone wala koi common hissa nahi, silsila toota.
+      - Mismatch → **0** — yahan khatam hone wala koi common hissa nahi, chain toota.
 
       Jawab sirf aakhri cell nahi — **poore table ka max**.
 
@@ -170,20 +170,20 @@ examples:
 
       Example: `"tamatar"` → **5** (`"tamat"`)
     intuition: |
-      Ek hi string hai, to state = **tukda**: `dp[i][j]` = `s[i..j]` ka sabse lamba palindromic subsequence.
+      Ek hi string hai, to state = **piece**: `dp[i][j]` = `s[i..j]` ka sabse lamba palindromic subsequence.
 
-      - Ek akshar → 1.
-      - Kinaare same (`s[i] == s[j]`) → dono palindrome ke kinaare ban jaao: `dp[i+1][j−1] + 2`.
-      - Alag → ek kinaara chhodo: `max(dp[i+1][j], dp[i][j−1])`.
+      - Ek letter → 1.
+      - Edge same (`s[i] == s[j]`) → dono palindrome ke edge ban jaao: `dp[i+1][j−1] + 2`.
+      - Alag → ek edge chhodo: `max(dp[i+1][j], dp[i][j−1])`.
 
-      **Order:** `dp[i][j]` ko andar ke chhote tukde chahiye — isliye **length 1, 2, 3, …** badhate jao (interval DP). Sirf upar wala tikona bharta hai; jawab `dp[0][n−1]`.
+      **Order:** `dp[i][j]` ko andar ke chhote pieces chahiye — isliye **length 1, 2, 3, …** badhate jao (interval DP). Sirf upar wala triangle bharta hai; jawab `dp[0][n−1]`.
 
       Doosra tareeka: palindrome aage-peeche same → `LCS(s, ulta s)`. Wahi jawab, LCS ka code reuse.
 
       > [!galti]
       > `i` ko 0 se aage aur `j` ko `i` se aage chalaya — `dp[i+1][j]` abhi bhara hi nahi. Length ka loop bahar rakho, ya `i` ko ulta (`n−1` se 0) chalao.
     dryRun: |
-      | Tukda | Kinaare | dp |
+      | Piece | Edge | dp |
       |---|---|---|
       | "m" (2..2) | — | 1 |
       | "ama" (1..3) | a = a | 1 + 2 = 3 |
@@ -195,25 +195,25 @@ examples:
     complexity:
       time: "O(n²)"
       space: "O(n²)"
-      why: "n²/2 tukde, har ek O(1)."
+      why: "n²/2 pieces, har ek O(1)."
 
   - id: edit-distance
     level: tricky
     title: Ek word ko doosra banao (Edit Distance)
     source: { name: Edit Distance, platform: LeetCode, url: "https://leetcode.com/problems/edit-distance/" }
     problem: |
-      Do strings `a` aur `b`. `a` par teen kaam kar sakte ho: ek char **daalo**, **hatao**, ya **badlo**. Kam se kam kitne kaam mein `a` → `b`?
+      2 strings `a` aur `b`. `a` par 3 kaam kar sakte ho: ek char **daalo**, **hatao**, ya **badlo**. Kam se kam kitne kaam mein `a` → `b`?
 
       Example: `"paneer"` → `"pani"` → **3** (`e` hatao, `e` hatao, `r` → `i`)
     intuition: |
-      `dp[i][j]` = `a` ke pehle `i` chars ko `b` ke pehle `j` chars banane ka kam se kam kharcha.
+      `dp[i][j]` = `a` ke pehle `i` chars ko `b` ke pehle `j` chars banane ka kam se kam cost.
 
       Aakhri chars dekho:
       - **Same** → kuch nahi karna: `dp[i−1][j−1]`.
-      - **Alag** → teen raaste, `1 + min`:
+      - **Alag** → 3 raaste, `1 + min`:
         - `a[i−1]` **hatao** → baaki `a` ke `i−1` se `b` ke `j` → `dp[i−1][j]` (upar)
-        - `b[j−1]` **daalo** (end mein) → ab wo match, baaki `dp[i][j−1]` (baayein)
-        - `a[i−1]` → `b[j−1]` **badlo** → `dp[i−1][j−1]` (tirchha)
+        - `b[j−1]` **daalo** (end mein) → ab wo match, baaki `dp[i][j−1]` (left)
+        - `a[i−1]` → `b[j−1]` **badlo** → `dp[i−1][j−1]` (diagonal)
 
       **Base** hi trick hai: `dp[i][0] = i` (sab hatao), `dp[0][j] = j` (sab daalo). 0 nahi!
 
@@ -236,25 +236,25 @@ examples:
     complexity:
       time: "O(m · n)"
       space: "O(m · n)"
-      why: "Har cell teen padosi ka min. Do rows se O(n)."
+      why: "Har cell 3 neighbor ka min. 2 rows se O(n)."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Do strings ki tulna — common hissa, kitne badlaav, ek ko doosre mein badalna."
-    - "Subsequence ke sawaal (gap allowed) — sabse lamba, kitne, distinct ginti."
-    - "Ek string ke tukde s[i..j] par sawaal — palindrome, partition (interval DP)."
+    - "2 strings ki comparison — common hissa, kitne change, ek ko doosre mein badalna."
+    - "Subsequence ke sawaal (gap allowed) — sabse lamba, kitne, distinct count."
+    - "Ek string ke pieces s[i..j] par sawaal — palindrome, partition (interval DP)."
     - "Wildcard / regex matching (?, *, .) — pattern aur text ke prefixes."
   avoid:
     - "Sirf 'kya a, b ka subsequence hai?' → two pointers, O(m + n)."
     - "Text mein exact pattern dhoondhna → KMP / Z / rolling hash, DP nahi."
-    - "Longest palindromic SUBSTRING → center se phailao, O(n²) time aur O(1) memory."
-    - "Dono strings 10⁵ lambi → m · n table nahi banegi; problem ki khaas baat dhoondo."
+    - "Longest palindromic SUBSTRING → center se spread karo, O(n²) time aur O(1) memory."
+    - "Dono strings 10⁵ lambi → m · n table nahi banegi; problem ki special baat dhoondo."
   signals:
     - keyword: "longest common subsequence / delete chars to make equal"
       think: "LCS. Deletions = m + n − 2 · LCS."
     - keyword: "longest common substring"
-      think: "Match par tirchha + 1, warna 0, jawab table ka max."
+      think: "Match par diagonal + 1, warna 0, jawab table ka max."
     - keyword: "min operations to convert (insert / delete / replace)"
       think: "Edit distance, base i aur j."
     - keyword: "longest palindromic subsequence / min insertions to make palindrome"
@@ -273,7 +273,7 @@ realWorld:
   - where: "Plagiarism / duplicate check"
     how: "Do documents ka LCS ya lamba common substring — kitna milta hai."
   - where: "Search mein 'Did you mean?'"
-    how: "Query ki edit distance popular queries se — 1-2 badlaav door wala suggest."
+    how: "Query ki edit distance popular queries se — 1-2 change door wala suggest."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -301,10 +301,10 @@ mistakes:
       `for (i in 0 until n) for (j in i until n)` — `dp[i+1][j]` abhi khaali.
     right: |
       Length bahar (2 se n), ya `i` ulta (n − 1 se 0) aur `j` seedha.
-  - title: "Space bachate hue tirchha kho diya"
+  - title: "Space bachate hue diagonal kho diya"
     type: logic
     wrong: |
-      1D array mein `dp[j - 1]` pehle hi is row ke liye overwrite — tirchha (purani row ka j − 1) chahiye tha.
+      1D array mein `dp[j - 1]` pehle hi is row ke liye overwrite — diagonal (purani row ka j − 1) chahiye tha.
     right: |
       Overwrite se pehle purana value ek variable `prev` mein rakho.
   - title: "Khaali string"
@@ -312,43 +312,43 @@ mistakes:
     wrong: |
       Palindrome mein `dp[0][n - 1]` jab n = 0 → crash.
     right: |
-      n = 0 par seedha 0. Prefix wali (m + 1) table khaali string khud sambhaal leti hai.
+      n = 0 par seedha 0. Prefix wali (m + 1) table khaali string khud handle kar leti hai.
 
 # 11. Interview corner
 interview:
   questions:
     - q: "LCS ka recurrence aur complexity?"
       a: |
-        Same aakhri char → dp[i-1][j-1] + 1, warna max(dp[i-1][j], dp[i][j-1]). O(m·n) time, do rows se O(min(m, n)) space.
+        Same aakhri char → dp[i-1][j-1] + 1, warna max(dp[i-1][j], dp[i][j-1]). O(m·n) time, 2 rows se O(min(m, n)) space.
     - q: "Subsequence aur substring DP mein farak?"
       a: |
-        Substring lagaataar — dp ka matlab 'yahan khatam hone wala', mismatch par 0, jawab table ka max. Subsequence mein mismatch par max(upar, baayein), jawab dp[m][n].
-    - q: "Edit distance mein teen operations table mein kahan se aate hain?"
+        Substring continuous — dp ka matlab 'yahan khatam hone wala', mismatch par 0, jawab table ka max. Subsequence mein mismatch par max(upar, left), jawab dp[m][n].
+    - q: "Edit distance mein 3 operations table mein kahan se aate hain?"
       a: |
-        Delete = upar (i-1, j), insert = baayein (i, j-1), replace = tirchha (i-1, j-1). Same char par tirchha free.
+        Delete = upar (i-1, j), insert = left (i, j-1), replace = diagonal (i-1, j-1). Same char par diagonal free.
     - q: "Edit distance ke base cases?"
       a: |
         dp[i][0] = i (sab delete), dp[0][j] = j (sab insert). Ye 0 nahi ho sakte.
     - q: "LCS ki string kaise nikaloge?"
       a: |
-        Poora table rakho. (m, n) se: match → char lo, tirchha. Warna bade padosi ki taraf. Aakhir mein reverse.
+        Poora table rakho. (m, n) se: match → char lo, diagonal. Warna bade neighbor ki taraf. Aakhir mein reverse.
     - q: "Longest palindromic subsequence ka doosra tareeka?"
       a: |
-        LCS(s, reverse(s)). Ya interval dp: kinaare same → andar + 2, warna max(ek kinaara chhodo).
+        LCS(s, reverse(s)). Ya interval dp: edge same → andar + 2, warna max(ek edge chhodo).
     - q: "String ko palindrome banane ke liye kam se kam kitne chars daalne padenge?"
       a: |
         n − LPS. Jo chars palindrome ka hissa nahi, har ek ka joda daalna padega.
-    - q: "Do strings barabar banane ke liye kam se kam deletions?"
+    - q: "2 strings barabar banane ke liye kam se kam deletions?"
       a: |
         m + n − 2 · LCS. LCS rakho, baaki dono taraf se hatao.
-    - q: "Teen strings ka LCS?"
+    - q: "3 strings ka LCS?"
       followUp: true
       a: |
-        3D dp[i][j][k]: teeno aakhri same → +1, warna teen 'ek chhodo' options ka max. O(m·n·k).
+        3D dp[i][j][k]: all 3 aakhri same → +1, warna 3 'ek chhodo' options ka max. O(m·n·k).
     - q: "Sirf check karna ho ki edit distance ≤ 1 hai?"
       followUp: true
       a: |
-        DP nahi chahiye. Two pointers: pehla farak milte hi teen case (replace / a skip / b skip) mein baaki ka seedha compare. O(n).
+        DP nahi chahiye. Two pointers: pehla farak milte hi 3 case (replace / a skip / b skip) mein baaki ka seedha compare. O(n).
   mayAsk:
     - "Distinct Subsequences."
     - "Wildcard Matching."
@@ -370,7 +370,7 @@ practice:
     url: "https://leetcode.com/problems/longest-common-subsequence/"
     level: easy
     pattern: Seedha LCS
-    hint: "How wala — phir do rows se space kam karo. (LeetCode par medium.)"
+    hint: "How wala — phir 2 rows se space kam karo. (LeetCode par medium.)"
   - name: Delete Operation for Two Strings
     platform: LeetCode
     num: 583
@@ -390,21 +390,21 @@ practice:
     num: 712
     url: "https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/"
     level: medium
-    pattern: Edit distance jaisa, kharcha = ASCII
-    hint: "Base: dp[i][0] = a ke pehle i chars ka ASCII jod. Match par tirchha, warna min(upar + a ka char, baayein + b ka char)."
+    pattern: Edit distance jaisa, cost = ASCII
+    hint: "Base: dp[i][0] = a ke pehle i chars ka ASCII jod. Match par diagonal, warna min(upar + a ka char, left + b ka char)."
   - name: Interleaving String
     platform: LeetCode
     num: 97
     url: "https://leetcode.com/problems/interleaving-string/"
     level: medium
-    pattern: Do prefixes se teesra
+    pattern: 2 prefixes se teesra
     hint: "dp[i][j] = a ke i aur b ke j chars se c ke pehle i + j ban sakte? c[i+j-1] ya a[i-1] se aaya ya b[j-1] se."
   - name: Distinct Subsequences
     platform: LeetCode
     num: 115
     url: "https://leetcode.com/problems/distinct-subsequences/"
     level: hard
-    pattern: Subsequences ginna
+    pattern: Subsequences count karna
     hint: "dp[i][j] = s ke pehle i mein t ke pehle j kitni baar. Match: dp[i-1][j-1] + dp[i-1][j], warna dp[i-1][j]. dp[i][0] = 1."
   - name: Shortest Common Supersequence
     platform: LeetCode
@@ -417,11 +417,11 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "Do strings → dp[i][j] prefixes par; (m+1) × (n+1), row / col 0 = khaali string."
-    - "Aakhri chars dekho: same → tirchha; alag → upar / baayein (/ tirchha) mein best."
+    - "2 strings → dp[i][j] prefixes par; (m+1) × (n+1), row / col 0 = khaali string."
+    - "Aakhri chars dekho: same → diagonal; alag → upar / left (/ diagonal) mein best."
     - "LCS: match + 1, warna max. Substring: match + 1, warna 0, jawab table ka max."
     - "Edit distance: 1 + min(delete ↑, insert ←, replace ↖); base dp[i][0] = i, dp[0][j] = j."
-    - "Ek string ke tukde (palindrome) → dp[i][j] on s[i..j], length badhate jao."
+    - "Ek string ke pieces (palindrome) → dp[i][j] on s[i..j], length badhate jao."
   cheatsheet: |
     ```kotlin
     // LCS
@@ -441,29 +441,29 @@ revision:
     - q: "LCS table mein a[i−1] ≠ b[j−1]. dp[i][j] = ?"
       options: ["dp[i−1][j−1] + 1", "max(dp[i−1][j], dp[i][j−1])", "0", "dp[i−1][j−1]"]
       answer: 1
-      explain: "Dono aakhri chars ek saath nahi chal sakte — ek chhodo, jo behtar."
+      explain: "Dono aakhri chars ek saath nahi chal sakte — ek chhodo, jo better."
     - q: "Longest common substring table mein mismatch par?"
-      options: ["max(upar, baayein)", "0", "tirchha", "upar + 1"]
+      options: ["max(upar, left)", "0", "diagonal", "upar + 1"]
       answer: 1
-      explain: "Substring lagaataar — yahan khatam hone wala common hissa nahi."
+      explain: "Substring continuous — yahan khatam hone wala common hissa nahi."
     - q: "Edit distance: \"\" se \"abc\" banane mein?"
       options: ["0", "1", "3", "6"]
       answer: 2
-      explain: "Teen insert — isliye base row dp[0][j] = j."
+      explain: "3 insert — isliye base row dp[0][j] = j."
     - q: "\"abcb\" ka longest palindromic subsequence?"
       options: ["1", "2", "3", "4"]
       answer: 2
-      explain: "\"bcb\" — kinaare b = b, andar c."
+      explain: "\"bcb\" — edge b = b, andar c."
 
 # 14. Connections
 connections:
   related:
     - id: dp-grid
-      why: "Do strings ki table = grid; upar / baayein / tirchha se bharna."
+      why: "2 strings ki table = grid; upar / left / diagonal se bharna."
     - id: strings
       why: "Substring vs subsequence, char indexing."
     - id: two-pointers-same
       why: "Is-subsequence check bina DP ke, O(m + n)."
   usedLater:
     - id: lis
-      how: "LIS = array aur uski sorted (unique) copy ka LCS — par O(n log n) wala tareeka behtar."
+      how: "LIS = array aur uski sorted (unique) copy ka LCS — par O(n log n) wala tareeka better."

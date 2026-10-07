@@ -11,32 +11,32 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Trie (prefix tree)** = strings ka tree jahan **har node ek prefix** hai. Root = khaali prefix. Har edge ek akshar. Ek word = root se neeche ek raasta, aur aakhri node par **isEnd** flag (★).
+    **Trie (prefix tree)** = strings ka tree jahan **har node ek prefix** hai. Root = khaali prefix. Har edge ek letter. Ek word = root se neeche ek raasta, aur aakhri node par **isEnd** flag (★).
 
     Har node mein:
-    - `next[26]` — har akshar (a-z) ka bachcha, nahi to `null`. (Alphabet bada ho to HashMap.)
+    - `next[26]` — har letter (a-z) ka bachcha, nahi to `null`. (Alphabet bada ho to HashMap.)
     - `isEnd` — kya koi word yahin khatam hota hai?
 
     | Operation | Kaise | Time |
     |---|---|---|
-    | `insert(w)` | Akshar akshar chalo; bachcha nahi to banao; aakhir mein `isEnd = true` | O(L) |
+    | `insert(w)` | Letter letter chalo; bachcha nahi to banao; aakhir mein `isEnd = true` | O(L) |
     | `search(w)` | Raasta mile **aur** aakhri node `isEnd` | O(L) |
     | `startsWith(p)` | Sirf raasta mil jaaye | O(L) |
 
-    L = word ki length. Dictionary mein kitne bhi words hon — kharcha sirf L.
+    L = word ki length. Dictionary mein kitne bhi words hon — cost sirf L.
 
     > [!yaad]
-    > Common prefix **ek hi baar** store hota hai — "car", "cart", "cat" teeno "ca" wala raasta share karte hain.
+    > Common prefix **ek hi baar** store hota hai — "car", "cart", "cat" all 3 "ca" wala raasta share karte hain.
   analogy: |
     **Phone ke contacts search:**
-    "R" type kiya → Rahul, Rajesh, Ravi, Rohit. "Ra" → Rahul, Rajesh, Ravi. "Rah" → sirf Rahul. Har akshar ke saath tum ek kadam neeche jaate ho aur bache hue naam us kadam ke neeche wale hi hote hain.
+    "R" type kiya → Rahul, Rajesh, Ravi, Rohit. "Ra" → Rahul, Rajesh, Ravi. "Rah" → sirf Rahul. Har letter ke saath tum ek step neeche jaate ho aur bache hue naam us step ke neeche wale hi hote hain.
 
-    Purani dictionary ke side wale A, B, C tabs bhi yahi karte the — "chai" ke liye pehle C, phir "Ch" wale panne, phir "Cha"… Har akshar ke saath dhoondhne ki jagah chhoti.
+    Purani dictionary ke side wale A, B, C tabs bhi yahi karte the — "chai" ke liye pehle C, phir "Ch" wale panne, phir "Cha"… Har letter ke saath dhoondhne ki jagah chhoti.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    Lakhon words hain. Do tarah ke sawaal: "ye word hai?" aur "is prefix se kaunse words?" (autocomplete).
+    Lakhon words hain. 2 tarah ke sawaal: "ye word hai?" aur "is prefix se kaunse words?" (autocomplete).
 
     | Tareeka | search(word) | startsWith(prefix) |
     |---|---|---|
@@ -45,7 +45,7 @@ why:
     | Sorted list + binary search | O(L · log n) | O(L · log n) |
     | **Trie** | **O(L)** | **O(L)** |
 
-    Trie prefix wale sawaalon ka raja hai. Keemat: memory — har node 26 pointers rakhta hai.
+    Trie prefix wale sawaalon ka raja hai. Price: memory — har node 26 pointers rakhta hai.
 
     > [!socho]
     > HashSet bhi O(L) mein word dhoondh leta hai. Phir trie kyun?
@@ -61,8 +61,8 @@ visual:
 # 4. Kaise kaam karta hai
 how:
   body: |
-    - **insert(w):** root se shuru. Har akshar: bachcha hai → us par chalo; nahi → naya node banao, phir chalo. Aakhri node par `isEnd = true`.
-    - **search(w):** har akshar ka bachcha mile to chalo; kahin nahi mila → `false`. Poora chal liya → `isEnd` lautao — sirf raasta kaafi **nahi**.
+    - **insert(w):** root se shuru. Har letter: bachcha hai → us par chalo; nahi → naya node banao, phir chalo. Aakhri node par `isEnd = true`.
+    - **search(w):** har letter ka bachcha mile to chalo; kahin nahi mila → `false`. Poora chal liya → `isEnd` return karo — sirf raasta kaafi **nahi**.
     - **startsWith(p):** raasta poora mil gaya → `true`.
 
     "app" aur "apple" dono daale → "app" ka aakhri `p` leaf **nahi** hai (neeche "le" hai), phir bhi wahan word khatam hota hai. Isliye alag `isEnd` flag chahiye — "leaf = word khatam" galat hai.
@@ -77,7 +77,7 @@ operations:
   - op: "insert(word)"
     time: "O(L)"
     space: "O(L) naye nodes (worst)"
-    why: "Har akshar ek kadam; naya prefix ho to naya node."
+    why: "Har letter ek step; naya prefix ho to naya node."
   - op: "search(word)"
     time: "O(L)"
     space: "O(1)"
@@ -97,19 +97,19 @@ operations:
   - op: "Poora trie banana"
     time: "O(T)"
     space: "O(T × 26)"
-    why: "T = kul akshar. Array wale node; HashMap children se memory O(T)."
+    why: "T = total letter. Array wale node; HashMap children se memory O(T)."
 
 # 6. Code
 code:
-  - title: Prefix ginti aur erase — har node par counter
+  - title: Prefix count aur erase — har node par counter
     file: count-prefix
     note: |
       Node par do counter rakho: **pass** = kitne words is prefix se guzre, **ends** = kitne yahin khatam.
-      - `countWordsStartingWith(p)` = prefix node ka `pass` — O(L), poora subtree ginna nahi padta.
-      - `countWordsEqualTo(w)` = aakhri node ka `ends` (duplicate words bhi sahi gine).
-      - `erase(w)`: raaste ki har ginti ek kam — node delete karne ki zaroorat nahi.
+      - `countWordsStartingWith(p)` = prefix node ka `pass` — O(L), poora subtree count karna nahi padta.
+      - `countWordsEqualTo(w)` = aakhri node ka `ends` (duplicate words bhi sahi count kiye).
+      - `erase(w)`: raaste ki har count ek kam — node delete karne ki zaroorat nahi.
 
-      Yahi idea har jagah: node par jo jaankari chahiye wo insert ke waqt hi likh do (top-3 suggestions, word khud, sum…).
+      Yahi idea har jagah: node par jo information chahiye wo insert ke time hi likh do (top-3 suggestions, word khud, sum…).
 
 # 7. Examples
 examples:
@@ -124,7 +124,7 @@ examples:
     intuition: |
       Har word ke saath har root compare → O(words × roots × L). Bahut.
 
-      Trie: saare roots daal do. Ab har word ke akshar trie mein chalo:
+      Trie: saare roots daal do. Ab har word ke letter trie mein chalo:
       - **Pehla ★** mila → wahi sabse chhota root (chhota pehle aata hai). Wahin ruko.
       - Raasta toot gaya → koi root iska prefix nahi, word waisa hi.
 
@@ -143,22 +143,22 @@ examples:
     complexity:
       time: "O(R + S)"
       space: "O(R)"
-      why: "R = roots ke kul akshar (trie banana), S = sentence ki length (har word root tak hi chala)."
+      why: "R = roots ke total letter (trie banana), S = sentence ki length (har word root tak hi chala)."
 
   - id: search-suggestions
     level: medium
     title: Type karte hi suggestions (Search Suggestions System)
     source: { name: Search Suggestions System, platform: LeetCode, url: "https://leetcode.com/problems/search-suggestions-system/" }
     problem: |
-      Products ki list aur ek `searchWord`. User `searchWord` akshar akshar type karta hai. Har akshar ke baad us prefix se shuru hone wale **max 3** products batao — dictionary order mein sabse pehle wale.
+      Products ki list aur ek `searchWord`. User `searchWord` letter letter type karta hai. Har letter ke baad us prefix se shuru hone wale **max 3** products batao — dictionary order mein sabse pehle wale.
 
       Example: products `[pani, paneer, papad, pakoda, paratha]`, type `"pani"` → **`[[pakoda, paneer, pani], [pakoda, paneer, pani], [paneer, pani], [pani]]`**
     intuition: |
       Products pehle **sort** karo, phir trie mein daalo. Raaste ke har node par ek `top` list — jab tak 3 na ho, product jodte jao. Sorted order mein daala tha, to har node par pehle 3 hi sabse chhote.
 
-      Typing: har akshar par ek kadam neeche, us node ki `top` hi jawab. Raasta toot gaya → us prefix ke aur aage ke sab `[]`.
+      Typing: har letter par ek step neeche, us node ki `top` hi jawab. Raasta toot gaya → us prefix ke aur aage ke sab `[]`.
 
-      Doosra tareeka: sorted array + binary search (prefix ka lower bound), wahan se agle 3 check. Kam memory, O(L · log n) per akshar. Interview mein dono batao.
+      Doosra tareeka: sorted array + binary search (prefix ka lower bound), wahan se agle 3 check. Kam memory, O(L · log n) per letter. Interview mein dono batao.
 
       > [!galti]
       > Raasta tootne ke baad bhi pichhle node ki list de di. Ya sort karna bhool gaye — `top` mein pehle aaye 3, chhote 3 nahi.
@@ -174,29 +174,29 @@ examples:
     complexity:
       time: "O(n log n · L + T)"
       space: "O(T)"
-      why: "Sort, phir T = kul akshar ek ek baar insert. Typing har akshar O(1)."
+      why: "Sort, phir T = total letter ek ek baar insert. Typing har letter O(1)."
 
   - id: wildcard
     level: tricky
     title: '"." wala search (Design Add and Search Words)'
     source: { name: Design Add and Search Words Data Structure, platform: LeetCode, url: "https://leetcode.com/problems/design-add-and-search-words-data-structure/" }
     problem: |
-      Ek dictionary banao: `addWord(word)`, aur `search(pattern)` jahan pattern mein `.` kisi bhi **ek** akshar ki jagah aa sakta hai.
+      Ek dictionary banao: `addWord(word)`, aur `search(pattern)` jahan pattern mein `.` kisi bhi **ek** letter ki jagah aa sakta hai.
 
       Example: `roti, rota, ram, rasta` daale. `search("r.t.")` → **true** (`rota`), `search("r.ti.")` → **false**
     intuition: |
-      Normal akshar → ek hi bachcha, trie jaisa. `.` → **har** bachche mein try karo (DFS). Koi bhi raasta pattern khatam hone par ★ pe pahunche → `true`. Ek branch fail → wapas aao (backtrack), agla bachcha.
+      Normal letter → ek hi bachcha, trie jaisa. `.` → **har** bachche mein try karo (DFS). Koi bhi raasta pattern khatam hone par ★ pe pahunche → `true`. Ek branch fail → wapas aao (backtrack), agla bachcha.
 
-      Galat raasta turant band hota hai (bachcha hi nahi) — har word alag se compare nahi karna padta. `"r.t."` mein `ra` ke neeche `t` hi nahi → poora `ram / rasta` hissa ek kadam mein kat gaya.
+      Galat raasta turant band hota hai (bachcha hi nahi) — har word alag se compare nahi karna padta. `"r.t."` mein `ra` ke neeche `t` hi nahi → poora `ram / rasta` hissa ek step mein kat gaya.
 
       Worst case: pattern mein sab `.` → trie ka bada hissa dekhna. Par aise sawaalon mein dots kam hote hain.
 
       > [!galti]
-      > `.` par sirf pehle bachche mein gaye aur uska jawab lauta diya — wo fail hua to `false`, jabki doosra bachcha sahi tha. Saare try karo; koi ek `true` → `true`.
+      > `.` par sirf pehle bachche mein gaye aur uska jawab return kar diya — wo fail hua to `false`, jabki doosra bachcha sahi tha. Saare try karo; koi ek `true` → `true`.
 
-      Pattern khatam hone par seedha `true` mat lautao — `isEnd` dekho (`"ro."` → `rot` par ★ nahi → false).
+      Pattern khatam hone par seedha `true` mat return karo — `isEnd` dekho (`"ro."` → `rot` par ★ nahi → false).
     dryRun: |
-      | Pattern akshar | Trie mein | Kya hua |
+      | Pattern letter | Trie mein | Kya hua |
       |---|---|---|
       | r | r | chalo |
       | . | ra | 't' ka bachcha nahi → band gali |
@@ -244,7 +244,7 @@ realWorld:
   - where: "Spell checker / dictionary app"
     how: "Word hai ya nahi O(L); galti ho to paas ke raaste (edit distance ke saath)."
   - where: "Phone contacts / T9"
-    how: "Har typed akshar par ek kadam neeche — matching naam turant."
+    how: "Har typed letter par ek step neeche — matching naam turant."
   - where: "Search engines"
     how: "Query suggestions aur prefix wale results ka index."
 
@@ -262,10 +262,10 @@ mistakes:
       Sirf bina bachche wale node ko word maana — "app" (jiske neeche "apple" hai) chhoot gaya.
     right: |
       Alag `isEnd` flag; leaf hona zaroori nahi.
-  - title: "Insert mein purana node mita diya"
+  - title: "Insert mein purana node hata diya"
     type: logic
     wrong: |
-      Har akshar par `next[k] = TrieNode()` bina null check — pehle ka subtree gayab.
+      Har letter par `next[k] = TrieNode()` bina null check — pehle ka subtree gayab.
     right: |
       `if (next[k] == null) next[k] = TrieNode()`, phir chalo.
   - title: "Index ch - 'a' galat input par"
@@ -290,12 +290,12 @@ mistakes:
 # 11. Interview corner
 interview:
   questions:
-    - q: "Trie kya hai, HashSet se kab behtar?"
+    - q: "Trie kya hai, HashSet se kab better?"
       a: |
-        Har node ek prefix, edge = akshar. Prefix sawaal (startsWith, autocomplete, shortest root) O(L) — HashSet ye nahi kar sakta. Sirf exact lookup ho to HashSet sasta.
+        Har node ek prefix, edge = letter. Prefix sawaal (startsWith, autocomplete, shortest root) O(L) — HashSet ye nahi kar sakta. Sirf exact lookup ho to HashSet sasta.
     - q: "insert / search / startsWith ki complexity?"
       a: |
-        Teeno O(L), L = word ki length — dictionary ke size n se independent. Memory O(kul akshar × 26) worst.
+        All 3 O(L), L = word ki length — dictionary ke size n se independent. Memory O(total letter × 26) worst.
     - q: "isEnd flag kyun?"
       a: |
         Ek word doosre ka prefix ho sakta (app, apple). 'app' ka node leaf nahi par word hai. Flag ke bina search('ap') bhi true ho jaata.
@@ -310,7 +310,7 @@ interview:
         Counters (pass/ends) ghata do. Ya recursive: word ke end par isEnd = false; neeche se upar jo node na word-end ho na bachche rakhe, use hata do.
     - q: "Search suggestions — trie ya sorted array?"
       a: |
-        Trie: typing par O(1) per akshar, top-3 pehle se. Sorted + binary search: kam memory, O(L log n) per akshar. Dono sahi.
+        Trie: typing par O(1) per letter, top-3 pehle se. Sorted + binary search: kam memory, O(L log n) per letter. Dono sahi.
     - q: "Wildcard '.' wale search ki complexity?"
       a: |
         Bina dots O(L). Har dot par 26 tak branches → worst O(26ᵈ · L). Galat raaste turant band hote hain, isliye practically tez.
@@ -390,10 +390,10 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "Trie: har node ek prefix; edge = akshar; word ke end par isEnd (★)."
+    - "Trie: har node ek prefix; edge = letter; word ke end par isEnd (★)."
     - "insert / search / startsWith sab O(L) — dictionary ke size se independent."
     - "search = raasta + isEnd; startsWith = sirf raasta."
-    - "Node par extra info insert ke waqt likho: pass count, top-3 suggestions, word."
+    - "Node par extra info insert ke time likho: pass count, top-3 suggestions, word."
     - "'.' wildcard → saare bachchon mein DFS. Bits par trie → maximum XOR."
   cheatsheet: |
     ```kotlin
@@ -419,15 +419,15 @@ revision:
     - q: "search(word) ka time? (L = word length, n = words)"
       options: ["O(n)", "O(L)", "O(n · L)", "O(log n)"]
       answer: 1
-      explain: "Sirf word ke akshar jitne kadam — n se farak nahi padta."
+      explain: "Sirf word ke letter jitne step — n se farak nahi padta."
     - q: "Replace words: roots [a, ab], word \"abc\". Result?"
       options: ["ab", "a", "abc", "bc"]
       answer: 1
       explain: "Pehla ★ 'a' par — sabse chhota root."
-    - q: "Kab trie ki jagah HashSet behtar?"
+    - q: "Kab trie ki jagah HashSet better?"
       options: ["Prefix search", "Sirf poora word hai ya nahi, memory kam chahiye", "Autocomplete", "Wildcard search"]
       answer: 1
-      explain: "Exact lookup HashSet bhi O(L) mein, aur 26 pointers per node ka kharcha nahi."
+      explain: "Exact lookup HashSet bhi O(L) mein, aur 26 pointers per node ka cost nahi."
 
 # 14. Connections
 connections:

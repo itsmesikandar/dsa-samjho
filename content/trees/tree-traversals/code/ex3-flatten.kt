@@ -8,9 +8,9 @@ fun flatten(root: TreeNode?) {
     var cur = root
     while (cur != null) {
         val l = cur.left
-        if (l != null) { // left subtree ko cur aur cur.right ke BEECH ghusao //@hasLeft
+        if (l != null) { // left subtree ko cur aur cur.right ke BEECH insert karo //@hasLeft
             var tail: TreeNode = l
-            while (true) tail = tail.right ?: break // left subtree ka preorder mein aakhri = sabse daayein //@tail
+            while (true) tail = tail.right ?: break // left subtree ka preorder mein aakhri = sabse right //@tail
             tail.right = cur.right // purana right subtree uske baad
             cur.right = l // left ab right ki jagah //@move
             cur.left = null

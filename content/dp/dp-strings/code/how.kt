@@ -1,4 +1,4 @@
-// LCS: do strings ka sabse lamba common subsequence (order same, beech mein gap allowed)
+// LCS: 2 strings ka sabse lamba common subsequence (order same, beech mein gap allowed)
 fun lcs(a: String, b: String): Int {
     val m = a.length
     val n = b.length
@@ -8,7 +8,7 @@ fun lcs(a: String, b: String): Int {
             if (a[i - 1] == b[j - 1]) {
                 dp[i][j] = dp[i - 1][j - 1] + 1 // dono aakhri chars same - LCS mein le lo //@match
             } else {
-                dp[i][j] = maxOf(dp[i - 1][j], dp[i][j - 1]) // a ka aakhri chhodo ya b ka - jo behtar //@skip
+                dp[i][j] = maxOf(dp[i - 1][j], dp[i][j - 1]) // a ka aakhri chhodo ya b ka - jo better //@skip
             }
         }
     }

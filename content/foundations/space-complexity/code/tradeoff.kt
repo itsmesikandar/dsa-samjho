@@ -1,4 +1,4 @@
-// Sawaal: array mein koi number do baar hai? Do tareeke.
+// Sawaal: array mein koi number 2 baar hai? 2 tareeke.
 
 // 1) O(n^2) time, O(1) extra space: har pair compare
 fun hasDupSlow(arr: IntArray): Boolean {

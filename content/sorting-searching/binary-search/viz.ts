@@ -68,7 +68,7 @@ export const bsTrace = tracer<{ nums: number[]; target: number }>({
         t.frame({ line: 'left', caption: `${nums[mid]} > ${target} → mid aur right wale sab bade. hi = ${hi}.`, vars: { lo, hi, mid }, legend: LEGEND, panels: [view(nums, lo, hi)] });
       }
     }
-    t.frame({ line: 'none', caption: `lo (${lo}) > hi (${hi}) → range khaali. ${target} array mein nahi → −1. Har kadam range aadhi → O(log n).`, vars: { lo, hi }, legend: LEGEND, panels: [view(nums, lo, hi)] });
+    t.frame({ line: 'none', caption: `lo (${lo}) > hi (${hi}) → range khaali. ${target} array mein nahi → −1. Har step range aadhi → O(log n).`, vars: { lo, hi }, legend: LEGEND, panels: [view(nums, lo, hi)] });
     return '-1';
   },
 });
@@ -174,7 +174,7 @@ export const unknownTrace = tracer<{ nums: number[]; target: number }>({
       t.frame({ line: 'grow', caption: `get(${hi / 2}) = ${get(hi / 2)} < ${target} → hi = ${hi}. get(${hi}) = ${hi < n ? get(hi) : '∞'}.`, vars: { hi }, legend: { ...LEGEND, compare: 'padha' }, panels: [v(0, Math.min(hi, width - 1), Math.min(hi, width - 1))] });
     }
     let lo = Math.floor(hi / 2);
-    t.frame({ line: 'grow', caption: `get(${hi}) ≥ ${target} → target ${lo}..${hi} ke beech (pichhla hi = ${lo}). Sirf log(index) kadam lage. Ab normal binary search.`, vars: { lo, hi }, legend: LEGEND, panels: [v(lo, Math.min(hi, width - 1))] });
+    t.frame({ line: 'grow', caption: `get(${hi}) ≥ ${target} → target ${lo}..${hi} ke beech (pichhla hi = ${lo}). Sirf log(index) step lage. Ab normal binary search.`, vars: { lo, hi }, legend: LEGEND, panels: [v(lo, Math.min(hi, width - 1))] });
     while (lo <= hi) {
       const mid = lo + Math.floor((hi - lo) / 2);
       const val = get(mid);

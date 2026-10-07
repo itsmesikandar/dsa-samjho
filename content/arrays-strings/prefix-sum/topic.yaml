@@ -27,7 +27,7 @@ what:
   analogy: |
     **Bank passbook / Paytm statement** socho. Har entry ke saath **balance** likha hota hai (running total).
 
-    "15 tareekh se 20 tareekh tak kitna kharcha hua?" — har entry jodne ki zaroorat nahi. Bas **14 tareekh ka balance − 20 tareekh ka balance** dekh lo. Wahi prefix sum hai.
+    "15 date se 20 date tak kitna cost hua?" — har entry jodne ki zaroorat nahi. Bas **14 date ka balance − 20 date ka balance** dekh lo. Wahi prefix sum hai.
 
 # 2. Kyun chahiye?
 why:
@@ -39,7 +39,7 @@ why:
 
     Ye **time-space trade-off** ka sabse famous example hai — O(n) extra memory, badle mein queries super-fast.
 
-    Aur ye sirf sum tak seemit nahi — prefix **product**, prefix **XOR**, prefix **count**, aur 2D grids mein bhi yahi idea.
+    Aur ye sirf sum tak limited nahi — prefix **product**, prefix **XOR**, prefix **count**, aur 2D grids mein bhi yahi idea.
 
     > [!socho]
     > Prefix sum se "kitne subarrays ka sum k hai?" jaisa sawaal kaise hal hoga?
@@ -51,13 +51,13 @@ visual:
   body: |
     Neeche `pre` ko **seedhi (staircase)** ki tarah dekho — har bar ab tak ka total hai.
 
-    Kisi range ka sum = **do seedhiyon ki unchai ka fark**. Range jitni bhi lambi ho, kaam sirf ek minus.
+    Kisi range ka sum = **do stairs ki height ka fark**. Range jitni bhi lambi ho, kaam sirf ek minus.
   viz: { tracer: staircase }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    Do hisse:
+    2 hisse:
     1. **Build (ek baar):** `pre[i + 1] = pre[i] + arr[i]` — O(n).
     2. **Query (baar-baar):** `sum(l, r) = pre[r + 1] − pre[l]` — O(1).
 
@@ -93,7 +93,7 @@ operations:
   - op: "Difference array: range update `[l..r] += v`"
     time: "O(1) per update, O(n) final"
     space: O(n)
-    why: "Sirf do jagah likho; aakhir mein ek prefix pass."
+    why: "Sirf 2 jagah likho; aakhir mein ek prefix pass."
 
 # 6. Code
 code:
@@ -169,7 +169,7 @@ examples:
     complexity:
       time: O(n)
       space: "O(1) (output array chhod ke)"
-      why: "Do pass; left products output mein hi, right ek variable mein."
+      why: "2 pass; left products output mein hi, right ek variable mein."
 
   - id: prefix-2d
     level: tricky
@@ -184,12 +184,12 @@ examples:
 
       `pre[r+1][c+1] = g[r][c] + pre[r][c+1] + pre[r+1][c] − pre[r][c]`
 
-      **Query (inclusion–exclusion):** bada rectangle − upar wala hissa − left wala hissa + kona (do baar ghata, ek baar wapas jodo).
+      **Query (inclusion–exclusion):** bada rectangle − upar wala hissa − left wala hissa + kona (2 baar ghata, ek baar wapas jodo).
 
       `sum = pre[r2+1][c2+1] − pre[r1][c2+1] − pre[r2+1][c1] + pre[r1][c1]`
 
       > [!tip]
-      > Kaagaz par rectangle banao aur 4 hisse colour karo — formula apne aap samajh aata hai. Interview mein bhi yahi drawing bana ke samjhao.
+      > Paper par rectangle banao aur 4 hisse colour karo — formula apne aap samajh aata hai. Interview mein bhi yahi drawing bana ke samjhao.
     dryRun: |
       Grid `[[3,0,1,4],[5,6,3,2],[1,2,0,1]]`, query (1,1)–(2,2)
 
@@ -231,9 +231,9 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Bank / UPI statement ka balance"
-    how: "Running balance = prefix sum. Kisi period ka kharcha = do balances ka fark."
+    how: "Running balance = prefix sum. Kisi period ka cost = do balances ka fark."
   - where: "Analytics dashboards"
-    how: "Daily active users ke cumulative counts store karte hain — kisi bhi date range ka total turant (do numbers ka fark)."
+    how: "Daily active users ke cumulative counts store karte hain — kisi bhi date range ka total turant (2 numbers ka fark)."
   - where: "Image processing (integral image)"
     how: "2D prefix sum ko 'integral image' kehte hain — blur aur face detection (Viola–Jones) mein kisi bhi box ka sum O(1)."
   - where: "Fitness apps"
@@ -264,7 +264,7 @@ mistakes:
   - title: "2D formula mein kona jodna bhoolna"
     type: logic
     wrong: |
-      `pre[r2+1][c2+1] − pre[r1][c2+1] − pre[r2+1][c1]` — kona do baar ghata, wapas nahi joda.
+      `pre[r2+1][c2+1] − pre[r1][c2+1] − pre[r2+1][c1]` — kona 2 baar ghata, wapas nahi joda.
     right: |
       `+ pre[r1][c1]` zaroori hai (inclusion–exclusion).
   - title: "Array badalne ke baad purana prefix use karna"
@@ -346,7 +346,7 @@ practice:
     url: "https://leetcode.com/problems/contiguous-array/"
     level: medium
     pattern: Prefix (0 → −1) + first-seen index map
-    hint: "0 ko −1 maano. Same prefix value do jagah aaya = beech ka subarray balanced. Pehli baar ka index map mein rakho."
+    hint: "0 ko −1 maano. Same prefix value 2 jagah aaya = beech ka subarray balanced. Pehli baar ka index map mein rakho."
   - name: Corporate Flight Bookings
     platform: LeetCode
     num: 1109
@@ -360,14 +360,14 @@ practice:
     url: "https://leetcode.com/problems/count-of-range-sum/"
     level: hard
     pattern: Long prefix sums + merge sort counting
-    hint: "Har j ke liye kitne i < j jinke liye lower ≤ pre[j] − pre[i] ≤ upper. Merge sort ke merge step mein do pointers se gino."
+    hint: "Har j ke liye kitne i < j jinke liye lower ≤ pre[j] − pre[i] ≤ upper. Merge sort ke merge step mein 2 pointers se count karo."
   - name: Max Sum of Rectangle No Larger Than K
     platform: LeetCode
     num: 363
     url: "https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/"
     level: hard
     pattern: 2D → 1D compression + prefix + TreeSet
-    hint: "Do rows fix karo, columns ka sum ek 1D array bana do. Ab 1D mein 'sum ≤ k' wala max subarray — prefix + TreeSet ceiling."
+    hint: "2 rows fix karo, columns ka sum ek 1D array bana do. Ab 1D mein 'sum ≤ k' wala max subarray — prefix + TreeSet ceiling."
 
 # 13. Quick revision
 revision:
@@ -418,7 +418,7 @@ connections:
     - id: space-complexity
       why: "Prefix sum time-space trade-off ka sabse famous example."
     - id: kadane
-      why: "Max subarray sum = max(pre[j] − min pre[i]) — prefix ka hi ek roop."
+      why: "Max subarray sum = max(pre[j] − min pre[i]) — prefix ka hi ek form."
   usedLater:
     - id: hashmap
       how: "Subarray sum equals k = prefix sum + HashMap."

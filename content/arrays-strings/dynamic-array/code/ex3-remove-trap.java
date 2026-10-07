@@ -1,7 +1,7 @@
 import java.util.*;
 
 class Main {
-    // GALAT: aage badhte hue remove -> agla item khisak ke i par aa jaata hai, aur i++ use skip kar deta hai
+    // GALAT: aage badhte hue remove -> agla item shift ho ke i par aa jaata hai, aur i++ use skip kar deta hai
     static void removeEvensWrong(List<Integer> list) {
         int i = 0;
         while (i < list.size()) {
@@ -10,7 +10,7 @@ class Main {
         }
     }
 
-    // SAHI: peeche se chalo - hatane se aage wale items par asar nahi padta
+    // SAHI: peeche se chalo - hatane se aage wale items par effect nahi padta
     static void removeEvensRight(List<Integer> list) {
         for (int i = list.size() - 1; i >= 0; i--) {
             if (list.get(i) % 2 == 0) list.remove(i); //@back

@@ -1,5 +1,5 @@
 class Main {
-    // Zameen ('1') ka har naya tukda = ek island. DFS se poora tukda "dooba do" ('0') taaki dobara na gine
+    // Land ('1') ka har naya piece = ek island. DFS se poora piece "dooba do" ('0') taaki dobara na count kiye
     static void sink(char[][] grid, int i, int j) {
         if (i < 0 || j < 0 || i >= grid.length || j >= grid[0].length || grid[i][j] != '1') return; // bahar / paani / pehle dooba //@stop
         grid[i][j] = '0'; // dooba diya - yahi visited ka kaam karta hai //@mark

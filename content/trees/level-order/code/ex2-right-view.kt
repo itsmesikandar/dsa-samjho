@@ -3,7 +3,7 @@ class TreeNode(var value: Int) {
     var right: TreeNode? = null
 }
 
-// Tree ko DAAYEIN se dekho: har level ka sabse daayein node dikhega. Upar se neeche woh values.
+// Tree ko RIGHT se dekho: har level ka sabse right node dikhega. Upar se neeche woh values.
 fun rightSideView(root: TreeNode?): List<Int> {
     val res = mutableListOf<Int>()
     if (root == null) return res
@@ -13,7 +13,7 @@ fun rightSideView(root: TreeNode?): List<Int> {
         val size = q.size
         for (k in 0 until size) {
             val n = q.removeFirst()
-            if (k == size - 1) res.add(n.value) // level ka AAKHRI = sabse daayein //@last
+            if (k == size - 1) res.add(n.value) // level ka AAKHRI = sabse right //@last
             n.left?.let { q.addLast(it) } //@push
             n.right?.let { q.addLast(it) }
         }

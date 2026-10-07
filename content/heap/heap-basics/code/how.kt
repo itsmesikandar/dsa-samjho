@@ -19,9 +19,9 @@ class MinHeap {
 
     fun pop(): Int {
         val top = a[0]
-        val last = a.removeAt(a.size - 1) // aakhri nikaalo - beech mein chhed nahi banta //@last
+        val last = a.removeAt(a.size - 1) // aakhri nikaalo - beech mein hole nahi banta //@last
         if (a.isNotEmpty()) {
-            a[0] = last // root par rakho, phir neeche dhakelo (sift down) //@root
+            a[0] = last // root par rakho, phir neeche push karo (sift down) //@root
             var i = 0
             while (true) {
                 val l = 2 * i + 1

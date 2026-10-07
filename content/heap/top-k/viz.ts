@@ -20,7 +20,7 @@ export const clubTrace = tracer<{ nums: number[]; k: number }>({
     const st: Tones = {};
     const legend = { found: 'club mein', muted: 'reject / bahar', new: 'abhi andar', compare: 'gatekeeper (root)' };
     const view = (i: number | undefined, tones: Tones = {}): Panel[] => [tree(pq.a, tones, `Club: min-heap (size ≤ ${k})`), array(nums, { tones: st, pointers: { x: i }, label: 'Stream' })];
-    t.frame({ caption: `Club mein sirf k = ${k} seats; hamesha ab tak ke ${k} sabse BADE score andar rakhne hain. Gatekeeper = andar ka sabse KAMZOR member → isliye MIN-heap (wo root par, O(1) mein dikhta hai).`, legend, panels: view(undefined) });
+    t.frame({ caption: `Club mein sirf k = ${k} seats; hamesha ab tak ke ${k} sabse BADE score andar rakhne hain. Gatekeeper = andar ka sabse WEAK member → isliye MIN-heap (wo root par, O(1) mein dikhta hai).`, legend, panels: view(undefined) });
     nums.forEach((x, i) => {
       const id = `e${i}`;
       if (pq.a.length < k) {
@@ -35,7 +35,7 @@ export const clubTrace = tracer<{ nums: number[]; k: number }>({
         t.frame({ caption: `${x} ≤ gatekeeper ${root.v} → andar ke sab ${k} isse bade ya barabar. Reject — sirf ek compare, O(1).`, vars: { x, root: root.v }, legend, panels: view(i, { 0: 'compare' }) });
         return;
       }
-      t.frame({ caption: `${x} > gatekeeper ${root.v} → ${x} top ${k} mein aata hai. Sabse kamzor ${root.v} bahar (poll), ${x} andar (add) — O(log k).`, vars: { x, root: root.v }, legend, panels: view(i, { 0: 'compare' }) });
+      t.frame({ caption: `${x} > gatekeeper ${root.v} → ${x} top ${k} mein aata hai. Sabse weak ${root.v} bahar (poll), ${x} andar (add) — O(log k).`, vars: { x, root: root.v }, legend, panels: view(i, { 0: 'compare' }) });
       pq.poll();
       pq.add({ v: x, id });
       st[Number(root.id.slice(1))] = 'muted';
@@ -123,7 +123,7 @@ export const kClosestTrace = tracer<{ pts: number[][]; k: number }>({
     { name: 'pts', type: 'intGrid', label: 'Points (x y; x y; …)', default: [[1, 3], [-2, 2], [5, -1], [0, 4], [3, 3]], maxRows: 7, maxCols: 2, min: -9, max: 9 },
     { name: 'k', type: 'int', label: 'k', default: 2, min: 1, max: 4 },
   ],
-  check: ({ pts, k }) => (pts.some((r) => r.length !== 2) ? 'Har row mein do numbers: x y.' : k <= pts.length ? null : `k 1 se ${pts.length} ke beech rakho.`),
+  check: ({ pts, k }) => (pts.some((r) => r.length !== 2) ? 'Har row mein 2 numbers: x y.' : k <= pts.length ? null : `k 1 se ${pts.length} ke beech rakho.`),
   run({ pts, k }, t) {
     const d = (p: number[]) => p[0] * p[0] + p[1] * p[1];
     const pq = heapSim<Pt>((x, y) => x.v > y.v);
@@ -191,7 +191,7 @@ export const mergeKTrace = tracer<{ s: string }>({
       }
     }
     const res = out.length ? out.join(' -> ') : '(khaali)';
-    t.frame({ line: 'done', caption: `Merged: ${res}. Har node ek baar heap mein aaya aur gaya → O(N log k), N = kul nodes, k = lists.`, vars: { result: listStr(out) }, legend, panels: view() });
+    t.frame({ line: 'done', caption: `Merged: ${res}. Har node ek baar heap mein aaya aur gaya → O(N log k), N = total nodes, k = lists.`, vars: { result: listStr(out) }, legend, panels: view() });
     return res;
   },
 });

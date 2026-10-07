@@ -6,14 +6,14 @@ class Main {
         int[] c = coins.clone();
         Arrays.sort(c);
         int left = amount, count = 0;
-        for (int i = c.length - 1; i >= 0; i--) { // hamesha sabse bada sikka jo fit ho
+        for (int i = c.length - 1; i >= 0; i--) { // hamesha sabse bada coin jo fit ho
             count += left / c[i];
             left %= c[i];
         }
         return left == 0 ? count : -1;
     }
 
-    static int bestCoins(int[] coins, int amount) { // DP: har amount ka sabse kam sikke (DP chapter mein detail)
+    static int bestCoins(int[] coins, int amount) { // DP: har amount ka sabse kam coins (DP chapter mein detail)
         int[] dp = new int[amount + 1];
         Arrays.fill(dp, Integer.MAX_VALUE);
         dp[0] = 0;

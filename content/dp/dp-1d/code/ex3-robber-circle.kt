@@ -1,4 +1,4 @@
-// Gol mohalla: pehla aur aakhri ghar padosi. Dono ek saath nahi - to do seedhi lines: pehla hata ke, aakhri hata ke
+// Gol mohalla: pehla aur aakhri ghar neighbor. Dono ek saath nahi - to do seedhi lines: pehla hata ke, aakhri hata ke
 fun robLine(nums: IntArray, lo: Int, hi: Int): Int { // lo..hi ek seedhi line (house robber)
     var prev2 = 0
     var prev1 = 0
@@ -11,7 +11,7 @@ fun robLine(nums: IntArray, lo: Int, hi: Int): Int { // lo..hi ek seedhi line (h
 }
 
 fun rob2(nums: IntArray): Int {
-    if (nums.size == 1) return nums[0] // ek hi ghar - koi padosi nahi //@one
+    if (nums.size == 1) return nums[0] // ek hi ghar - koi neighbor nahi //@one
     return maxOf(robLine(nums, 0, nums.size - 2), robLine(nums, 1, nums.size - 1)) // aakhri chhodo / pehla chhodo //@split
 }
 

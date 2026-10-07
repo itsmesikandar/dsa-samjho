@@ -129,7 +129,7 @@ export const bucketsTrace = tracer<{ keys: number[]; m: number }>({
     const collisions = counts.reduce((a, c) => a + Math.max(0, c - 1), 0);
     t.frame({
       line: 'done',
-      caption: `Counts ${listStr(counts)}, collisions = ${collisions}. Achha hash keys ko buckets mein BARABAR failaata hai — tab har bucket mein ~n/m keys aur lookup tez.`,
+      caption: `Counts ${listStr(counts)}, collisions = ${collisions}. Achha hash keys ko buckets mein BARABAR spread karta hai — tab har bucket mein ~n/m keys aur lookup tez.`,
       vars: { collisions },
       panels: [{ kind: 'hash', buckets: structuredClone(buckets) }, array(counts, { label: 'counts' })],
     });

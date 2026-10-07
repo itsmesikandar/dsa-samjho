@@ -1,5 +1,5 @@
 class Main {
-    // Pair (a, b) ka rank = a ki roads + b ki roads; a-b seedhi road ho to wo ek hi baar gino
+    // Pair (a, b) ka rank = a ki roads + b ki roads; a-b seedhi road ho to wo ek hi baar count karo
     static int maximalNetworkRank(int n, int[][] roads) {
         int[] deg = new int[n];
         boolean[][] connected = new boolean[n][n]; // adjacency matrix: "a-b road hai?" O(1) mein //@init
@@ -13,7 +13,7 @@ class Main {
         for (int a = 0; a < n; a++) {
             for (int b = a + 1; b < n; b++) {
                 int rank = deg[a] + deg[b]; // dono ki roads jodo //@pair
-                if (connected[a][b]) rank--; // a-b wali road dono degree mein gini gayi - ek ghatao //@minus
+                if (connected[a][b]) rank--; // a-b wali road dono degree mein count ki gayi - ek ghatao //@minus
                 best = Math.max(best, rank);
             }
         }

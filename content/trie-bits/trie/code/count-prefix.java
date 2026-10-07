@@ -9,7 +9,7 @@ class Main {
     }
 }
 
-// Har node par do ginti: pass = kitne words is prefix se guzre, ends = kitne yahin khatam
+// Har node par do count: pass = kitne words is prefix se guzre, ends = kitne yahin khatam
 class CNode {
     CNode[] next = new CNode[26];
     int pass = 0;
@@ -21,7 +21,7 @@ class CountTrie {
 
     void insert(String word) {
         CNode cur = root;
-        cur.pass++; // khaali prefix "" se har word guzarta hai
+        cur.pass++; // khaali prefix "" se har word pass hota hai
         for (char ch : word.toCharArray()) {
             int k = ch - 'a';
             if (cur.next[k] == null) cur.next[k] = new CNode();
@@ -31,7 +31,7 @@ class CountTrie {
         cur.ends++;
     }
 
-    // maan ke chalo word trie mein hai - raaste ki har ginti ek kam
+    // maan ke chalo word trie mein hai - raaste ki har count ek kam
     void erase(String word) {
         CNode cur = root;
         cur.pass--;

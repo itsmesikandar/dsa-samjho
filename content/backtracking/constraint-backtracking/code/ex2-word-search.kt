@@ -1,4 +1,4 @@
-// Letters ki grid mein word hai? Letters padosi cells (upar/neeche/baayein/daayein) se, ek cell ek hi baar.
+// Letters ki grid mein word hai? Letters neighbor cells (upar/neeche/baayein/daayein) se, ek cell ek hi baar.
 fun exist(board: Array<CharArray>, word: String): Boolean {
     val m = board.size
     val n = board[0].size

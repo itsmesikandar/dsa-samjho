@@ -25,7 +25,7 @@ const span = (s: string) => {
   return [Math.min(...codes), Math.max(...codes)] as const;
 };
 
-// ---------- 3. Visual intro: election ki ginti ----------
+// ---------- 3. Visual intro: election ki count ----------
 export const electionTally = tracer<{ votes: string }>({
   inputs: [{ name: 'votes', type: 'string', label: 'Votes (har letter ek candidate)', default: 'ABACBAA', minLen: 1, maxLen: 15, charset: 'ABCDE' }],
   run({ votes }, t) {
@@ -37,14 +37,14 @@ export const electionTally = tracer<{ votes: string }>({
       valueLabel: 'votes',
       entries: [...tally].sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([k, v]) => ({ key: k, value: v, tone: k === hl ? tone : undefined })),
     });
-    t.frame({ caption: 'Election ki ginti: har vote padho aur us candidate ki ginti +1 karo. Yahi "frequency count" hai.', panels: [array([...votes], { label: 'votes' }), view()] });
+    t.frame({ caption: 'Election ki count: har vote padho aur us candidate ki count +1 karo. Yahi "frequency count" hai.', panels: [array([...votes], { label: 'votes' }), view()] });
     [...votes].forEach((v, i) => {
       tally.set(v, (tally.get(v) ?? 0) + 1);
       t.frame({ caption: `Vote ${i + 1}: ${v} → ${v} ke ab ${tally.get(v)} votes.`, vars: { i }, panels: [array([...votes], { label: 'votes', tones: { [i]: 'active' }, pointers: { i } }), view(v)] });
     });
     const winner = [...tally].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0][0];
     t.frame({
-      caption: `Ginti poori: ${winner} jeeta (${tally.get(winner)} votes). Har vote ek baar padha → O(n). Ek baar ginti ho jaaye to "kaun sabse zyada", "kaun ek baar", "kisne kitne" — sab turant.`,
+      caption: `Count poori: ${winner} jeeta (${tally.get(winner)} votes). Har vote ek baar padha → O(n). Ek baar count ho jaaye to "kaun sabse zyada", "kaun ek baar", "kisne kitne" — sab turant.`,
       panels: [array([...votes], { label: 'votes' }), view(winner, 'found')],
     });
     return winner;
@@ -93,7 +93,7 @@ export const anagramTrace = tracer<{ s: string; t: string }>({
     }
     const bad = count.findIndex((c) => c !== 0);
     if (bad >= 0) {
-      t.frame({ line: 'check', caption: `count['${String.fromCharCode(97 + bad)}'] = ${count[bad]} ≠ 0 → letters ki ginti alag → false.`, legend: { error: 'hisaab galat' }, panels: [letterGrid(lo, hi, count, { [bad]: 'error' })] });
+      t.frame({ line: 'check', caption: `count['${String.fromCharCode(97 + bad)}'] = ${count[bad]} ≠ 0 → letters ki count alag → false.`, legend: { error: 'hisaab galat' }, panels: [letterGrid(lo, hi, count, { [bad]: 'error' })] });
       return 'false';
     }
     t.frame({ line: 'done', caption: 'Saare counts 0 → har letter dono mein barabar baar → anagram! O(n) time, O(1) space.', panels: [letterGrid(lo, hi, count, Object.fromEntries(count.map((_, ci) => [ci, 'done' as Tone])))] });
@@ -137,14 +137,14 @@ export const topKTrace = tracer<{ nums: number[]; k: number }>({
     { name: 'nums', type: 'intArray', label: 'nums', default: [1, 1, 1, 2, 2, 3], minLen: 1, maxLen: 10, min: 0, max: 9 },
     { name: 'k', type: 'int', label: 'k', default: 2, min: 1, max: 5 },
   ],
-  check: ({ nums, k }) => (k <= new Set(nums).size ? null : `k alag numbers ki ginti (${new Set(nums).size}) se zyada nahi ho sakta.`),
+  check: ({ nums, k }) => (k <= new Set(nums).size ? null : `k alag numbers ki count (${new Set(nums).size}) se zyada nahi ho sakta.`),
   run({ nums, k }, t) {
     const n = nums.length;
     const freq = new Map<number, number>();
     const fview = (hl?: number): MapPanel => ({ kind: 'map', label: 'freq', keyLabel: 'number', valueLabel: 'kitni baar', entries: [...freq].map(([x, f]) => ({ key: x, value: f, tone: x === hl ? ('new' as Tone) : undefined })) });
     nums.forEach((x, i) => {
       freq.set(x, (freq.get(x) ?? 0) + 1);
-      t.frame({ line: 'count', caption: `Ginti: ${x} → ${freq.get(x)}.`, vars: { i }, panels: [array(nums, { tones: { [i]: 'active' }, pointers: { i } }), fview(x)] });
+      t.frame({ line: 'count', caption: `Count: ${x} → ${freq.get(x)}.`, vars: { i }, panels: [array(nums, { tones: { [i]: 'active' }, pointers: { i } }), fview(x)] });
     });
     const buckets: HashEntry[][] = Array.from({ length: n + 1 }, () => []);
     for (const [x, f] of freq) buckets[f].push({ key: x, id: `b${x}` });
@@ -166,7 +166,7 @@ export const topKTrace = tracer<{ nums: number[]; k: number }>({
         panels: [{ kind: 'hash', label: 'bucket[frequency]', buckets: structuredClone(buckets), bucketTones: { [f]: 'found' } }, array(res, { label: 'result' })],
       });
     }
-    t.frame({ line: 'done', caption: `Top ${k}: ${listStr(res)}. Ginti O(n) + buckets O(n) + upar se neeche ek pass O(n) → O(n). Heap se O(n log k), sort se O(n log n).`, panels: [array(res, { label: 'result', tones: Object.fromEntries(res.map((_, i) => [i, 'found' as Tone])) })] });
+    t.frame({ line: 'done', caption: `Top ${k}: ${listStr(res)}. Count O(n) + buckets O(n) + upar se neeche ek pass O(n) → O(n). Heap se O(n log k), sort se O(n log n).`, panels: [array(res, { label: 'result', tones: Object.fromEntries(res.map((_, i) => [i, 'found' as Tone])) })] });
     return listStr(res);
   },
 });

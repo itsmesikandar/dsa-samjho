@@ -3,10 +3,10 @@ class TreeNode(var value: Int) {
     var right: TreeNode? = null
 }
 
-// Har node ko (lo, hi) range ke andar hona chahiye - upar ki saari shartein
+// Har node ko (lo, hi) range ke andar hona chahiye - upar ki saari conditions
 fun valid(node: TreeNode?, lo: Long, hi: Long): Boolean {
     if (node == null) return true
-    if (node.value <= lo || node.value >= hi) return false // kisi ancestor ki shart tooti //@bad
+    if (node.value <= lo || node.value >= hi) return false // kisi ancestor ki condition tooti //@bad
     return valid(node.left, lo, node.value.toLong()) && valid(node.right, node.value.toLong(), hi) //@go
 }
 

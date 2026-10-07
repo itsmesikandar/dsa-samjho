@@ -2,7 +2,7 @@ meta:
   id: sliding-window-variable
   chapter: two-pointers-window
   title: Sliding Window (variable size)
-  subtitle: r se failao, l se sikodo — sabse lambi ya sabse chhoti valid window
+  subtitle: r se spread karo, l se shrink karo — sabse lambi ya sabse chhoti valid window
   level: intermediate
   minutes: 40
   prereqs: [sliding-window-fixed, hashmap, hashset]
@@ -11,28 +11,28 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Fixed window mein size `k` tay tha. Yahan **size condition se tay hota hai**: "sabse lambi window jismein…" ya "sabse chhoti window jismein…".
+    Fixed window mein size `k` decide tha. Yahan **size condition se decide hota hai**: "sabse lambi window jismein…" ya "sabse chhoti window jismein…".
 
-    Do pointers, dono sirf aage:
-    - `r` — har kadam ek item **andar** lo (window failao).
-    - `l` — jab window **invalid** ho jaaye (ya valid hote hi chhoti karni ho), peeche se items **bahar** karo (sikodo).
+    2 pointers, dono sirf aage:
+    - `r` — har step ek item **andar** lo (window spread karo).
+    - `l` — jab window **invalid** ho jaaye (ya valid hote hi chhoti karni ho), peeche se items **bahar** karo (shrink karo).
 
     **Longest** wala template:
     ```kotlin
     var l = 0
     for (r in a.indices) {
-        add(a[r])                  // 1. failao
-        while (invalid()) {        // 2. jab tak galat, sikodo
+        add(a[r])                  // 1. spread karo
+        while (invalid()) {        // 2. jab tak galat, shrink karo
             remove(a[l]); l++
         }
         best = maxOf(best, r - l + 1)  // 3. valid window ka answer
     }
     ```
 
-    **Shortest** wala: `while (valid()) { best = min(...); remove(a[l]); l++ }` — valid rehte hue jitna sikod sako.
+    **Shortest** wala: `while (valid()) { best = min(...); remove(a[l]); l++ }` — valid rehte hue jitna shrink kar sako.
 
     > [!yaad]
-    > Andar `while` hai, phir bhi **O(n)**: `l` poore program mein max n baar badhta hai, `r` bhi n baar. Total kadam ≤ 2n.
+    > Andar `while` hai, phir bhi **O(n)**: `l` poore program mein max n baar badhta hai, `r` bhi n baar. Total step ≤ 2n.
   analogy: |
     **Mumbai local ka dabba.** Har station par log aage ke darwaze se chadhte hain (`r`). Jab dabba overload ho jaaye (rule toota), to **sabse pehle chadhe** log utarte hain (`l`) — tab tak jab tak dabba theek na ho.
 
@@ -45,19 +45,19 @@ why:
 
     Variable window **O(n)** mein karta hai. Kyun sahi hai? **Monotonic** property chahiye:
     - Window valid hai → usse chhoti (andar wali) bhi valid. (jaise sum ≤ limit, positive numbers)
-    - Isliye jab `r` badhne par invalid ho, to `l` ko peeche lautne ki kabhi zaroorat nahi.
+    - Isliye jab `r` badhne par invalid ho, to `l` ko peeche wapas aane ki kabhi zaroorat nahi.
 
     > [!socho]
     > `[5, −3, 4]`, "sum ≥ 6 wali sabse chhoti window" — kya sliding window chalega?
     >
-    > **Nahi.** Negative number aane par sum **ghatta** hai — failaane se invalid, sikodne se valid ho sakta hai. Monotonic property toot gayi. Negative numbers ke saath: prefix sum + HashMap (sum = k), ya monotonic deque (shortest sum ≥ k).
+    > **Nahi.** Negative number aane par sum **ghatta** hai — spread karne se invalid, shrink karne se valid ho sakta hai. Monotonic property toot gayi. Negative numbers ke saath: prefix sum + HashMap (sum = k), ya monotonic deque (shortest sum ≥ k).
 
 # 3. Visual intro
 visual:
   body: |
-    Kaam: **sabse lambi window jiska sum ≤ limit**. Dekho window rubber band ki tarah kaise khinchti aur sikudti hai.
+    Kaam: **sabse lambi window jiska sum ≤ limit**. Dekho window rubber band ki tarah kaise khinchti aur shrink hoti hai.
 
-    Laal = limit cross. Tab `l` aage badhta hai jab tak sum wapas theek na ho. `limit` badal ke try karo.
+    Red = limit cross. Tab `l` aage badhta hai jab tak sum wapas theek na ho. `limit` badal ke try karo.
   viz: { tracer: elasticWindow }
 
 # 4. Kaise kaam karta hai
@@ -68,7 +68,7 @@ how:
     `[2, 3, 1, 2, 4, 3]`, target 7 → `[4, 3]` → answer **2**.
 
     Ye **shortest** type hai:
-    1. `r` se failao, `sum += a[r]`.
+    1. `r` se spread karo, `sum += a[r]`.
     2. Jab tak `sum ≥ target` (valid): answer update karo, phir `a[l]` nikaalo, `l++` — shayad aur chhoti valid mile.
     3. Kabhi valid nahi hua → 0.
 
@@ -84,11 +84,11 @@ operations:
   - op: "Longest window with condition (sum ≤ k, at most k zeros…)"
     time: O(n)
     space: O(1)
-    why: "l aur r dono max n kadam."
+    why: "l aur r dono max n step."
   - op: "Shortest window with condition (sum ≥ target)"
     time: O(n)
     space: O(1)
-    why: "Valid rehte hue sikodo."
+    why: "Valid rehte hue shrink karo."
   - op: "Longest without repeating chars"
     time: O(n)
     space: "O(min(n, alphabet))"
@@ -100,7 +100,7 @@ operations:
   - op: "Exactly k (distinct / odd numbers…)"
     time: O(n)
     space: O(k)
-    why: "atMost(k) − atMost(k − 1) — do baar window."
+    why: "atMost(k) − atMost(k − 1) — 2 baar window."
   - op: "Brute force (saare l, r)"
     time: O(n²)
     space: O(1)
@@ -111,7 +111,7 @@ code:
   - title: Template — sabse lambi window (sum ≤ limit)
     file: longest
     note: |
-      "Longest" template ke teen kadam: **andar lo → jab tak invalid, sikodo → answer update**. Visual intro isi ka hai. Condition badlo (zeros ≤ k, distinct ≤ k, koi repeat nahi) — dhaancha wahi rahega.
+      "Longest" template ke 3 step: **andar lo → jab tak invalid, shrink karo → answer update**. Visual intro isi ka hai. Condition badlo (zeros ≤ k, distinct ≤ k, koi repeat nahi) — structure wahi rahega.
 
 # 7. Examples
 examples:
@@ -120,7 +120,7 @@ examples:
     title: k zeros flip karke sabse lambi 1s ki line
     source: { name: Max Consecutive Ones III, platform: LeetCode, url: "https://leetcode.com/problems/max-consecutive-ones-iii/" }
     problem: |
-      0/1 ka array aur number `k`. Zyada se zyada `k` zeros ko 1 bana sakte ho. Sabse lambi **lagatar 1s** ki line kitni lambi ho sakti hai?
+      0/1 ka array aur number `k`. Zyada se zyada `k` zeros ko 1 bana sakte ho. Sabse lambi **continuous 1s** ki line kitni lambi ho sakti hai?
 
       Example: `[1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0]`, k = 2 → **6**
     intuition: |
@@ -135,7 +135,7 @@ examples:
     dryRun: |
       k = 2
 
-      | r | a[r] | zeros | Sikoda? | l | Length | best |
+      | r | a[r] | zeros | Shrink kiya? | l | Length | best |
       |---|---|---|---|---|---|---|
       | 0–2 | 1 1 1 | 0 | – | 0 | 3 | 3 |
       | 3 | 0 | 1 | – | 0 | 4 | 4 |
@@ -155,7 +155,7 @@ examples:
     title: Sabse lamba substring bina repeat ke
     source: { name: Longest Substring Without Repeating Characters, platform: LeetCode, url: "https://leetcode.com/problems/longest-substring-without-repeating-characters/" }
     problem: |
-      String `s` mein sabse lamba **substring** (lagatar) jismein koi character **do baar na ho**. Length batao.
+      String `s` mein sabse lamba **substring** (continuous) jismein koi character **2 baar na ho**. Length batao.
 
       Example: `"abcabcbb"` → **3** (`"abc"`), `"pwwkew"` → **3** (`"wke"`)
     intuition: |
@@ -165,7 +165,7 @@ examples:
       - Phir `s[r]` add, length update.
 
       > [!socho]
-      > `l` ko ek-ek karke kyun badhayein? Seedha **purane `s[r]` ke agle index** par kood sakte hain!
+      > `l` ko ek-ek karke kyun badhayein? Seedha **purane `s[r]` ke agle index** par jump kar sakte hain!
       >
       > Haan — `lastIndex` HashMap rakho: `l = max(l, lastIndex[s[r]] + 1)`. `max` zaroori hai — purana index window se pehle ka bhi ho sakta hai ("abba" try karo). Ye interview follow-up hai.
     dryRun: |
@@ -191,23 +191,23 @@ examples:
     title: Sabse chhoti window jismein t ke saare characters hon
     source: { name: Minimum Window Substring, platform: LeetCode, url: "https://leetcode.com/problems/minimum-window-substring/" }
     problem: |
-      Strings `s` aur `t`. `s` ka sabse chhota substring do jismein `t` ke **saare characters** hon — **ginti ke saath** (t mein do 'A' hain to window mein bhi kam se kam do). Na mile to `""`.
+      Strings `s` aur `t`. `s` ka sabse chhota substring do jismein `t` ke **saare characters** hon — **count ke saath** (t mein do 'A' hain to window mein bhi kam se kam do). Na mile to `""`.
 
       Example: `s = "ADOBECODEBANC"`, `t = "ABC"` → **"BANC"**
     intuition: |
       Shortest template. Mushkil hissa: "window valid hai?" ko **O(1)** mein kaise jaanein?
 
-      - `need[c]` = c ki abhi kitni zaroorat baaki. Shuru mein t ki ginti.
+      - `need[c]` = c ki abhi kitni zaroorat baaki. Shuru mein t ki count.
       - `missing` = total kitne chars abhi kam hain (shuru = `t.length`).
       - `s[r]` andar: agar `need > 0` tha → kaam ka tha → `missing--`. Phir `need--` (negative = extra copy).
       - `missing == 0` → valid! Update, phir `s[l]` wapas: `need++`; agar ab `need > 0` → zaroori char gaya → `missing++`.
 
       > [!galti]
-      > Har kadam par poore `need` array ko check karna (sab ≤ 0?) bhi chalta hai, par O(alphabet) har baar. `missing` counter O(1) deta hai — interviewer yahi dekhna chahta hai.
+      > Har step par poore `need` array ko check karna (sab ≤ 0?) bhi chalta hai, par O(alphabet) har baar. `missing` counter O(1) deta hai — interviewer yahi dekhna chahta hai.
     dryRun: |
       t = ABC → missing = 3
 
-      | Kadam | Window | missing | Kya hua |
+      | Step | Window | missing | Kya hua |
       |---|---|---|---|
       | r = 5 | ADOBEC | 0 | pehli valid (len 6), best |
       | l → 1 | DOBEC | 1 | 'A' gaya → invalid |
@@ -226,14 +226,14 @@ examples:
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "**Longest / shortest** lagatar subarray ya substring jo kisi condition ko maane."
+    - "**Longest / shortest** continuous subarray ya substring jo kisi condition ko maane."
     - "\"At most k\" (zeros, distinct chars, replacements) wali condition."
     - "Condition monotonic hai: valid window ke andar ki window bhi valid (ya invalid ke bahar ki bhi invalid)."
     - "\"Exactly k\" — atMost(k) − atMost(k − 1)."
   avoid:
     - "Negative numbers ke saath sum condition — prefix sum + HashMap (ya deque)."
     - "Size fixed hai — fixed window template simple hai."
-    - "Subsequence (lagatar nahi) — DP ya greedy socho."
+    - "Subsequence (continuous nahi) — DP ya greedy socho."
     - "Count of subarrays with sum = k (negatives ho sakte) — prefix sum + HashMap."
   signals:
     - keyword: "longest substring / subarray with at most …"
@@ -250,7 +250,7 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Network (TCP congestion control)"
-    how: "Bhejne ki window badhao jab tak packet loss na ho; loss hua to window chhoti — 'failao, gadbad par sikodo'."
+    how: "Bhejne ki window badhao jab tak packet loss na ho; loss hua to window chhoti — 'spread karo, gadbad par shrink karo'."
   - where: "Login security"
     how: "'Pichle 5 minute mein 3 se zyada galat password' — timestamps ki variable window; purane attempts l se bahar."
   - where: "Video streaming"
@@ -262,7 +262,7 @@ realWorld:
 
 # 10. Common galtiyan & edge cases
 mistakes:
-  - title: "Sikodne ke liye `if`, `while` nahi"
+  - title: "Shrink karne ke liye `if`, `while` nahi"
     type: logic
     wrong: |
       `if (sum > limit) { sum -= a[l]; l++ }` — ek item nikaalne se valid hoga, zaroori nahi.
@@ -277,7 +277,7 @@ mistakes:
   - title: "Negative numbers par sum window"
     type: logic
     wrong: |
-      `[1, −1, 5]`, sum ≥ 5 ki sabse chhoti — sikodne se sum badh bhi sakta hai; window galat answer deti hai.
+      `[1, −1, 5]`, sum ≥ 5 ki sabse chhoti — shrink karne se sum badh bhi sakta hai; window galat answer deti hai.
     right: |
       Negatives ho to prefix sum + HashMap / monotonic deque.
   - title: "Length ka formula"
@@ -285,7 +285,7 @@ mistakes:
     wrong: |
       `r - l` → length ek kam aayegi (l = r par 0, jabki 1 item hai).
     right: |
-      `r - l + 1` (dono end shamil).
+      `r - l + 1` (dono end include).
   - title: "Kuch na mile tab ka answer"
     type: empty
     wrong: |
@@ -301,10 +301,10 @@ interview:
         l kabhi peeche nahi jaata aur max n tak jaata hai. Saare while iterations milaake ≤ n. r bhi n. Total ≤ 2n (amortized).
     - q: "Variable sliding window kab kaam karta hai?"
       a: |
-        Jab condition monotonic ho: valid window ke andar ki window valid (longest case), ya valid window ko failaane par valid hi rahe (shortest case). Positive numbers ka sum, counts ≤ k, distinct ≤ k — sab aise hain.
+        Jab condition monotonic ho: valid window ke andar ki window valid (longest case), ya valid window ko spread karne par valid hi rahe (shortest case). Positive numbers ka sum, counts ≤ k, distinct ≤ k — sab aise hain.
     - q: "Longest vs shortest template ka fark?"
       a: |
-        Longest: while (invalid) sikodo, phir update. Shortest: while (valid) { update; sikodo }.
+        Longest: while (invalid) shrink karo, phir update. Shortest: while (valid) { update; shrink karo }.
     - q: "Longest Substring Without Repeating — O(n) with jump?"
       followUp: true
       a: |
@@ -315,7 +315,7 @@ interview:
     - q: "Exactly k distinct wale subarrays kitne?"
       followUp: true
       a: |
-        Exactly(k) = atMost(k) − atMost(k − 1). atMost(k): har r par valid windows ki ginti r − l + 1 jodo.
+        Exactly(k) = atMost(k) − atMost(k − 1). atMost(k): har r par valid windows ki count r − l + 1 jodo.
     - q: "Negative numbers ho to Minimum Size Subarray Sum?"
       a: |
         Sliding window toot jaata hai. Prefix sums + monotonic deque (LeetCode 862) — O(n).
@@ -346,7 +346,7 @@ practice:
     url: "https://leetcode.com/problems/longest-continuous-increasing-subsequence/"
     level: easy
     pattern: Window resets when order breaks
-    hint: "a[r] <= a[r − 1] → l = r. Har kadam length update."
+    hint: "a[r] <= a[r − 1] → l = r. Har step length update."
   - name: Maximum Length Substring With Two Occurrences
     platform: LeetCode
     num: 3090
@@ -388,12 +388,12 @@ practice:
     url: "https://leetcode.com/problems/subarrays-with-k-different-integers/"
     level: hard
     pattern: "Exactly k = atMost(k) − atMost(k − 1)"
-    hint: "atMost(k) function likho: har r par (r − l + 1) windows jodo. Do baar call karo."
+    hint: "atMost(k) function likho: har r par (r − l + 1) windows jodo. 2 baar call karo."
 
 # 13. Quick revision
 revision:
   summary:
-    - "Variable window: r se failao, l se sikodo; dono sirf aage → O(n)."
+    - "Variable window: r se spread karo, l se shrink karo; dono sirf aage → O(n)."
     - "Longest: add → while (invalid) remove → update."
     - "Shortest: add → while (valid) { update; remove }."
     - "Condition monotonic honi chahiye; negatives + sum = toot jaata hai."
@@ -433,7 +433,7 @@ revision:
     - q: "Kis case mein variable sliding window kaam NAHI karta?"
       options: ["Sirf positive numbers, sum ≤ k", "Distinct chars ≤ k", "Negative numbers ke saath sum = k", "Zeros ≤ k"]
       answer: 2
-      explain: "Negative se sum failaane par ghat sakta hai — monotonic nahi."
+      explain: "Negative se sum spread karne par ghat sakta hai — monotonic nahi."
     - q: "\"pwwkew\" — longest without repeating?"
       options: ["2", "3", "4", "6"]
       answer: 1
@@ -443,7 +443,7 @@ revision:
 connections:
   related:
     - id: sliding-window-fixed
-      why: "Same idea, size tay."
+      why: "Same idea, size decide."
     - id: hashset
       why: "No-repeat window ka summary."
     - id: prefix-sum
@@ -454,4 +454,4 @@ connections:
     - id: binary-search-on-answer
       how: "Kuch window problems ka doosra tareeka: length par binary search + fixed window check."
     - id: greedy-basics
-      how: "Window ka 'sikodo jab tak valid' greedy soch hi hai."
+      how: "Window ka 'shrink karo jab tak valid' greedy soch hi hai."

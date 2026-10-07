@@ -1,14 +1,14 @@
 import java.util.Collections
 import java.util.PriorityQueue
 
-// Har kadam: naya andar, purana bahar, phir balance. Median = tops se
+// Har step: naya andar, purana bahar, phir balance. Median = tops se
 fun medianSlidingWindow(nums: IntArray, k: Int): DoubleArray {
     val left = PriorityQueue<Int>(Collections.reverseOrder()) // window ka chhota aadha
     val right = PriorityQueue<Int>() // window ka bada aadha
     val out = DoubleArray(nums.size - k + 1)
     for (i in nums.indices) {
         if (left.isEmpty() || nums[i] <= left.peek()) left.add(nums[i]) else right.add(nums[i]) // naya andar //@add
-        if (i >= k) { // window aage khiski - nums[i - k] bahar
+        if (i >= k) { // window aage shift hui - nums[i - k] bahar
             val old = nums[i - k]
             if (old <= left.peek()) left.remove(old) else right.remove(old) // jis aadhe mein hai wahin se, O(k) //@remove
         }

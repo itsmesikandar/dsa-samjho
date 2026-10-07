@@ -25,7 +25,7 @@ export const stringMemory = tracer<{ s: string }>({
       panels: [array(chars(s), { label: 's (purani — badli nahi)', tones: all(s.length, 'muted') }), array(chars(up), { label: 't (nayi string)', tones: all(up.length, 'new') })],
     });
     t.frame({
-      caption: "`s[0] = 'X'` likhna mana hai (compile error). Badalna ho to `toCharArray()` se char array lo, badlo, phir `String(chars)` — ya StringBuilder. Har badlaav = nayi copy ka kharcha.",
+      caption: "`s[0] = 'X'` likhna mana hai (compile error). Badalna ho to `toCharArray()` se char array lo, badlo, phir `String(chars)` — ya StringBuilder. Har change = nayi copy ka cost.",
       panels: [array(chars(s), { label: 's', tones: { 0: 'error' } })],
     });
     return up;
@@ -113,7 +113,7 @@ export const vowelsTrace = tracer<{ s: string }>({
         panels: [array(chars(s), { tones: { ...tones, [i]: v ? 'found' : 'compare' }, pointers: { i } })],
       });
     });
-    t.frame({ line: 'done', caption: `Kul ${count} vowels. Har char ek baar → O(n).`, vars: { count }, panels: [array(chars(s), { tones })] });
+    t.frame({ line: 'done', caption: `Total ${count} vowels. Har char ek baar → O(n).`, vars: { count }, panels: [array(chars(s), { tones })] });
     return String(count);
   },
 });
@@ -192,7 +192,7 @@ export const compressTrace = tracer<{ s: string }>({
       for (let k = i; k < j; k++) done[k] = 'done';
       t.frame({
         line: 'write',
-        caption: len > 1 ? `sb mein '${s[i]}' + ginti ${len} → "${s[i]}${len}".` : `Run sirf 1 ka — sirf '${s[i]}' likha, ginti nahi.`,
+        caption: len > 1 ? `sb mein '${s[i]}' + count ${len} → "${s[i]}${len}".` : `Run sirf 1 ka — sirf '${s[i]}' likha, count nahi.`,
         vars: { i, j },
         panels: [array(chars(s), { tones: done, pointers: { i, j } }), { kind: 'text', label: 'sb', text: out, tone: 'new' }],
       });

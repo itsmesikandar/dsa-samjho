@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 class Main {
-    // Signal sab tak kab pahunchega = sabse door wale node ki shortest doori (k se)
+    // Signal sab tak kab pahunchega = sabse door wale node ki shortest distance (k se)
     static int networkDelayTime(int[][] times, int n, int k) {
         List<List<int[]>> adj = new ArrayList<>(); // nodes 1..n
         for (int i = 0; i <= n; i++) adj.add(new ArrayList<>());

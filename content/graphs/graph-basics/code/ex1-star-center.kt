@@ -9,7 +9,7 @@ fun findCenterByDegree(edges: Array<IntArray>): Int {
     return (1..n).first { deg[it] == n - 1 } //@pick
 }
 
-// Shortcut: center HAR edge mein hai - to pehli do edges ka common node hi center. O(1)
+// Shortcut: center HAR edge mein hai - to pehli 2 edges ka common node hi center. O(1)
 fun findCenter(edges: Array<IntArray>): Int {
     val (a, b) = edges[0] //@first
     val (c, d) = edges[1] //@second

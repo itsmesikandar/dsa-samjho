@@ -11,9 +11,9 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Tree ke saare nodes visit karne ke 3 DFS orders (Depth First — pehle gehra jao):
+    Tree ke saare nodes visit karne ke 3 DFS orders (Depth First — pehle deep jao):
 
-    | Order | Kram | Yaad rakho |
+    | Order | Order | Yaad rakho |
     |---|---|---|
     | **Preorder** | Node → Left → Right | Pehle khud, phir bachche (copy / serialize) |
     | **Inorder** | Left → Node → Right | BST mein **sorted** order |
@@ -31,12 +31,12 @@ what:
     ```
 
     > [!yaad]
-    > Ek hi DFS har node par **3 baar** aata hai — aate waqt, left ke baad, jaate waqt. Jahan "likhte" ho wahi order.
+    > Ek hi DFS har node par **3 baar** aata hai — aate time, left ke baad, jaate time. Jahan "likhte" ho wahi order.
   analogy: |
     **Ghar ki safai, kamra-dar-kamra:**
     - Preorder: kamre mein ghuste hi light jalao, phir andar ke kamre.
-    - Inorder: baayein kamra saaf, phir ye kamra, phir daayein.
-    - Postorder: pehle andar ke saare kamre saaf, aakhir mein is kamre ka darwaza band (jaate waqt).
+    - Inorder: left kamra saaf, phir ye kamra, phir right.
+    - Postorder: pehle andar ke saare kamre saaf, aakhir mein is kamre ka darwaza band (jaate time).
 
 # 2. Kyun chahiye?
 why:
@@ -46,7 +46,7 @@ why:
     - **Inorder** — BST ko sorted padhna, k-th smallest, validate BST.
     - **Postorder** — jab node ko bachchon ke jawab chahiye: height, size, delete tree, expression evaluate.
 
-    **Iterative** version (stack se) interview mein poochte hain — recursion samajh aayi ya nahi, aur gehre tree par stack overflow se bachne ke liye.
+    **Iterative** version (stack se) interview mein poochte hain — recursion samajh aayi ya nahi, aur deep tree par stack overflow se bachne ke liye.
 
     > [!socho]
     > Sirf preorder se tree wapas ban sakta hai?
@@ -56,14 +56,14 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Ek DFS chakkar, teen lists. Har node par dekho kab **pre** (pehli baar), kab **in** (left ke baad), kab **post** (dono ke baad) mein likha jaata hai.
+    Ek DFS chakkar, 3 lists. Har node par dekho kab **pre** (pehli baar), kab **in** (left ke baad), kab **post** (dono ke baad) mein likha jaata hai.
   viz: { tracer: threeOrders }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
     **Iterative inorder** (apna stack):
-    1. `cur` se jitna ho sake **baayein** jao, har node stack par (inko baad mein likhna hai).
+    1. `cur` se jitna ho sake **left** jao, har node stack par (inko baad mein likhna hai).
     2. Aage left nahi → stack se pop → **likho**.
     3. `cur = node.right` → uske liye phir step 1.
     4. `cur == null` aur stack khaali → khatam.
@@ -104,10 +104,10 @@ operations:
 
 # 6. Code
 code:
-  - title: Teeno orders — recursion
+  - title: All 3 orders — recursion
     file: recursive
     note: |
-      Teeno functions mein sirf `out.add(…)` ki jagah alag hai: pehle (pre), beech (in), aakhir (post).
+      All 3 functions mein sirf `out.add(…)` ki jagah alag hai: pehle (pre), beech (in), aakhir (post).
 
       Tree `[1, 2, 3, 4, 5]`: pre `1 2 4 5 3`, in `4 2 5 1 3`, post `4 5 2 3 1`. Root pre mein **pehla**, post mein **aakhri** — construct problems isi ka fayda uthate hain.
 
@@ -155,7 +155,7 @@ examples:
       Example: pre `[3, 9, 20, 15, 7]`, in `[9, 3, 15, 20, 7]` → `[3, 9, 20, #, #, 15, 7]`
     intuition: |
       - Preorder ka **pehla** = root.
-      - Inorder mein root ke **baayein sab left subtree**, daayein right subtree.
+      - Inorder mein root ke **left sab left subtree**, right right subtree.
       - Recursion: left subtree (inorder `lo..m−1`), phir right (`m+1..hi`). Preorder mein pointer `p` aage badhta jaata hai — left wale pehle aate hain, isliye **pehle left banao**.
 
       Inorder mein root dhoondhna har baar O(n) → total O(n²). **HashMap** (value → index) se O(1) → O(n).
@@ -188,7 +188,7 @@ examples:
       Preorder list bana ke jodna → O(n) memory. **O(1) tareeka** (Morris jaisa):
 
       Har `cur` par, agar left hai:
-      - Left subtree ka **preorder mein aakhri** node = left subtree ka sabse **daayein** node (`tail`).
+      - Left subtree ka **preorder mein aakhri** node = left subtree ka sabse **right** node (`tail`).
       - `tail.right = cur.right` (purana right left subtree ke baad aayega).
       - `cur.right = cur.left`, `cur.left = null`.
 
@@ -210,7 +210,7 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "tail dhoondhne ke raaste har edge max do baar chalte hain."
+      why: "tail dhoondhne ke raaste har edge max 2 baar chalte hain."
 
 # 8. Kab use karein / kab NAHI
 when:
@@ -218,7 +218,7 @@ when:
     - "BST se sorted / k-th smallest / validate → inorder."
     - "Copy / serialize / root pehle chahiye → preorder."
     - "Node ko bachchon ke jawab chahiye (height, delete, sums) → postorder."
-    - "Gehra tree / recursion mana → iterative stack."
+    - "Deep tree / recursion mana → iterative stack."
   avoid:
     - "Level by level kaam (level averages, right view) → BFS (agla topic)."
     - "Shortest path / kareeb wala pehle → BFS."
@@ -281,12 +281,12 @@ mistakes:
 # 11. Interview corner
 interview:
   questions:
-    - q: "Teeno DFS orders aur unka use?"
+    - q: "All 3 DFS orders aur unka use?"
       a: |
         Pre (N L R): copy/serialize. In (L N R): BST sorted. Post (L R N): bachchon ke jawab chahiye (height, delete).
     - q: "Iterative inorder likho."
       a: |
-        cur = root; jab tak cur ya stack: baayein push karte jao; pop, visit; cur = right.
+        cur = root; jab tak cur ya stack: left push karte jao; pop, visit; cur = right.
     - q: "Iterative postorder?"
       followUp: true
       a: |
@@ -294,7 +294,7 @@ interview:
     - q: "Morris traversal kya hai?"
       followUp: true
       a: |
-        Inorder O(1) space: har node ke inorder predecessor ka right temporary cur par point karao (thread), wapas aate waqt hatao. Tree badalta hai par aakhir mein wapas.
+        Inorder O(1) space: har node ke inorder predecessor ka right temporary cur par point karao (thread), wapas aate time hatao. Tree badalta hai par aakhir mein wapas.
     - q: "Kaunsi do traversals se tree unique banta hai?"
       a: |
         Inorder + (preorder ya postorder). Pre + post se tabhi jab har node ke 0 ya 2 bachche (full tree).
@@ -363,7 +363,7 @@ practice:
     url: "https://leetcode.com/problems/recover-a-tree-from-preorder-traversal/"
     level: hard
     pattern: Preorder with depth markers + stack
-    hint: "Dashes gino = depth. Stack ka size depth se zyada ho to pop. Top ka left khaali → left, warna right; phir push."
+    hint: "Dashes count karo = depth. Stack ka size depth se zyada ho to pop. Top ka left khaali → left, warna right; phir push."
   - name: Vertical Order Traversal of a Binary Tree
     platform: LeetCode
     num: 987
@@ -377,7 +377,7 @@ revision:
   summary:
     - "Pre N L R, In L N R, Post L R N — likhne ki jagah ka farak."
     - "BST inorder = sorted."
-    - "Iterative inorder: baayein push → pop visit → right."
+    - "Iterative inorder: left push → pop visit → right."
     - "Pre + In (ya Post + In) se tree; HashMap se O(n)."
     - "Flatten: left subtree ka rightmost → purana right; left ko right banao."
   cheatsheet: |
@@ -408,7 +408,7 @@ revision:
     - q: "Preorder [3, 9, 20], inorder [9, 3, 20] — root ka left?"
       options: ["20", "9", "null", "3"]
       answer: 1
-      explain: "Inorder mein 3 ke baayein 9."
+      explain: "Inorder mein 3 ke left 9."
     - q: "Morris traversal ki space?"
       options: ["O(n)", "O(h)", "O(1)", "O(log n)"]
       answer: 2

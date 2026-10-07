@@ -22,14 +22,14 @@ what:
 
     **Circular linked list:** aakhri node ka `next` wapas **pehle** ko (doubly mein pehle ka `prev` aakhri ko). Koi `null` end nahi.
 
-    **Sentinel (nakli) nodes:** list ke dono kinaron par ek-ek dummy node `head` aur `tail`. Asli data inke beech. Fayda: pehla/aakhri node hatana bhi beech wale jaisa — **koi null check nahi**.
+    **Sentinel (nakli) nodes:** list ke dono edges par ek-ek dummy node `head` aur `tail`. Asli data inke beech. Fayda: pehla/aakhri node hatana bhi beech wale jaisa — **koi null check nahi**.
 
     > [!yaad]
     > Doubly ka asli fayda: **node haath mein ho to O(1) delete** — pichhla node `node.prev` mein pehle se hai. Singly mein pichhla dhoondhne ko O(n).
   analogy: |
     **Metro ke coaches:** har coach aage aur peeche wale se juda — dono taraf chal sakte ho. Beech ka coach hatana: aage-peeche wale ko seedha jod do.
 
-    **Circular:** **ghanta (clock)** — 12 ke baad phir 1. Ya **ludo ke chaal** — board ka raasta ghoom ke wapas.
+    **Circular:** **ghanta (clock)** — 12 ke baad phir 1. Ya **ludo ke move** — board ka raasta ghoom ke wapas.
 
 # 2. Kyun chahiye?
 why:
@@ -52,7 +52,7 @@ visual:
   body: |
     Solid arrow = next, dashed = prev. Pehle aage chalo, phir tail se **peeche** — singly mein ye nahi hota tha.
 
-    Aakhir mein circular roop: aakhri ka next mud ke pehle par.
+    Aakhir mein circular form: aakhri ka next mud ke pehle par.
   viz: { tracer: twoWay }
 
 # 4. Kaise kaam karta hai
@@ -87,12 +87,12 @@ operations:
   - op: "Index / value dhoondhna"
     time: O(n)
     space: O(1)
-    why: "Abhi bhi chalna padta hai (dono kinaron se → n/2)."
+    why: "Abhi bhi chalna padta hai (dono edges se → n/2)."
   - op: "Extra memory"
-    time: "lagu nahi"
+    time: "apply nahi"
     space: "O(n) pointers"
     why: "Har node ek extra reference."
-  - op: "Circular: k aage ginna"
+  - op: "Circular: k aage count karna"
     time: O(k)
     space: O(1)
     why: "Kabhi null nahi — ghoomte raho."
@@ -104,7 +104,7 @@ code:
     note: |
       n log circle mein, har k-th bahar. Circular singly list: aakhri.next = pehla. Hum **hatane wale ke pichhle** par khade rehte hain (`prev`), taaki `prev.next = gone.next` se nikaal sakein.
 
-      Circular list mein loop `while (cur != null)` kabhi khatam nahi hoga — ginti (n baar) ya "wapas start par aaye?" se roko.
+      Circular list mein loop `while (cur != null)` kabhi khatam nahi hoga — count (n baar) ya "wapas start par aaye?" se roko.
 
 # 7. Examples
 examples:
@@ -154,7 +154,7 @@ examples:
       - `visit` = naya node `cur` ke aage; `cur.next` ko seedha naye par — **purani forward history apne aap kat gayi** (koi pahunch nahi sakta).
 
       > [!tip]
-      > Doosre tareeke: do stacks (back stack, forward stack), ya ek ArrayList + index + "valid till" counter (sabse fast, O(1) back/forward). Interview mein trade-off batao.
+      > Doosre tareeke: 2 stacks (back stack, forward stack), ya ek ArrayList + index + "valid till" counter (sabse fast, O(1) back/forward). Interview mein trade-off batao.
     dryRun: |
       | Op | cur | Return |
       |---|---|---|
@@ -182,7 +182,7 @@ examples:
 
       Example: capacity 2: put(1), put(2), get(1) → 1, put(3) → key 2 nikla, get(2) → −1
     intuition: |
-      Do cheezein O(1) chahiye:
+      2 cheezein O(1) chahiye:
       1. **Key se item dhoondhna** → HashMap.
       2. **Use ka order** — kaun sabse purana, aur kisi ko "abhi use hua" banana → list jismein beech se nikaal ke aage daal sakein → **doubly list**.
 
@@ -192,7 +192,7 @@ examples:
       - `put` naya: bhara hai to `T.prev` (LRU) unlink + map se hatao; phir naya node aage.
 
       > [!galti]
-      > Evict karte waqt **map se bhi** key hatana bhool gaye → map mein kachra, size galat, aur hataye hue node ko get mil jaata hai. Isliye node mein `key` bhi rakhte hain.
+      > Evict karte time **map se bhi** key hatana bhool gaye → map mein kachra, size galat, aur hataye hue node ko get mil jaata hai. Isliye node mein `key` bhi rakhte hain.
 
       > [!tip]
       > Java mein `LinkedHashMap(cap, 0.75f, true)` + `removeEldestEntry` = ready-made LRU. Interview mein pehle khud banao, phir ye batao.
@@ -220,7 +220,7 @@ when:
   use:
     - "Node haath mein aata hai (map se) aur use beech se nikaalna/aage karna hai — LRU, LFU."
     - "Dono taraf chalna hai — back/forward, undo/redo, playlist prev/next."
-    - "Deque banana hai (dono kinaron par O(1))."
+    - "Deque banana hai (dono edges par O(1))."
     - "Circular: round-robin, baari-baari (Josephus), repeat playlist."
   avoid:
     - "Sirf aage chalna aur aage jodna — singly kaafi, kam memory."
@@ -230,7 +230,7 @@ when:
     - keyword: "LRU / recently used / evict oldest"
       think: "HashMap + doubly list with sentinels."
     - keyword: "back / forward / undo / redo"
-      think: "Doubly list (ya do stacks)."
+      think: "Doubly list (ya 2 stacks)."
     - keyword: "circle / round / every k-th removed"
       think: "Circular list (ya Josephus formula)."
     - keyword: "delete given node in O(1)"
@@ -268,7 +268,7 @@ mistakes:
     wrong: |
       `while (cur != null)` — circle mein null kabhi nahi aata.
     right: |
-      `do { … cur = cur.next } while (cur !== start)` ya ginti se roko.
+      `do { … cur = cur.next } while (cur !== start)` ya count se roko.
   - title: "LRU mein map se hatana bhool gaye"
     type: logic
     wrong: |
@@ -371,7 +371,7 @@ practice:
     url: "https://leetcode.com/problems/all-oone-data-structure/"
     level: hard
     pattern: Doubly list of count buckets
-    hint: "Har count ka ek bucket node (keys ka set), buckets sorted doubly list mein. inc/dec par key padosi bucket mein — O(1). Max = tail.prev, min = head.next."
+    hint: "Har count ka ek bucket node (keys ka set), buckets sorted doubly list mein. inc/dec par key neighbor bucket mein — O(1). Max = tail.prev, min = head.next."
 
 # 13. Quick revision
 revision:
@@ -380,7 +380,7 @@ revision:
     - "Delete: p.next = n, n.prev = p (dono!)."
     - "Sentinels (dummy head/tail) = koi null check / special case nahi."
     - "LRU = HashMap(key → node) + doubly list; evict tail.prev, map se bhi."
-    - "Circular: aakhri.next = pehla; loop ginti ya start se roko."
+    - "Circular: aakhri.next = pehla; loop count ya start se roko."
   cheatsheet: |
     ```kotlin
     // sentinels
@@ -408,7 +408,7 @@ revision:
     - q: "Josephus n = 5, k = 2 — sabse pehle kaun bahar?"
       options: ["1", "2", "5", "3"]
       answer: 1
-      explain: "1 se ginti: 1, 2 → 2 bahar."
+      explain: "1 se count: 1, 2 → 2 bahar."
     - q: "Circular list traverse mein ruke kab?"
       options: ["cur == null", "cur wapas start par aaye", "cur.value == 0", "Kabhi nahi"]
       answer: 1
@@ -423,8 +423,8 @@ connections:
       why: "LRU ka doosra aadha."
   usedLater:
     - id: deque
-      how: "Deque ka ek roop doubly list hai (Java LinkedList)."
+      how: "Deque ka ek form doubly list hai (Java LinkedList)."
     - id: circular-queue
       how: "Circular idea — array ke saath."
     - id: linked-list-techniques
-      how: "Dummy node (sentinel ka singly roop)."
+      how: "Dummy node (sentinel ka singly form)."

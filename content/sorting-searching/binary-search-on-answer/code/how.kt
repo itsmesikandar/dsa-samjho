@@ -1,8 +1,8 @@
-// Kele ke dher (piles), h ghante. Speed k = ek ghante mein ek dher se k kele.
+// Kele ke pile (piles), h ghante. Speed k = ek ghante mein ek pile se k kele.
 // Sabse kam k jisse h ghante mein sab khatam ho jaayein.
 fun minEatingSpeed(piles: IntArray, h: Int): Int {
     var lo = 1
-    var hi = piles.max() // isse tez khaane ka fayda nahi: har dher 1 ghante mein //@init
+    var hi = piles.max() // isse tez khaane ka fayda nahi: har pile 1 ghante mein //@init
     while (lo < hi) {
         val mid = lo + (hi - lo) / 2 //@mid
         if (hoursNeeded(piles, mid) <= h) hi = mid // mid chal gaya: shayad aur dheere bhi chale //@ok

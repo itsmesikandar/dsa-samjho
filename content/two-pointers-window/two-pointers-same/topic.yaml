@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Two pointers (same direction)** = do index, **dono shuru se aage** badhte hain — par alag speed se.
+    **Two pointers (same direction)** = 2 index, **dono shuru se aage** badhte hain — par alag speed se.
 
     - `r` (**reader**) — har item ek-ek karke padhta hai. Har loop mein aage.
     - `w` (**writer**) — sirf tab aage jab koi **kaam ka** item likhna ho.
@@ -20,7 +20,7 @@ what:
     var w = 0
     for (r in arr.indices) {
         if (kaamKaHai(arr[r])) {
-            arr[w] = arr[r]   // kaam ka item aage khiskao
+            arr[w] = arr[r]   // kaam ka item aage shift karo
             w++
         }
     }
@@ -30,7 +30,7 @@ what:
     Hamesha `w <= r` — writer kabhi reader se aage nahi jaata. Isliye jo jagah overwrite hoti hai, wo reader pehle hi padh chuka hota hai. **Usi array mein** kaam ho jaata hai.
 
     > [!yaad]
-    > Dono pointers sirf aage → total kadam ≤ 2n → **O(n)**. Nayi array nahi → **O(1)** extra space.
+    > Dono pointers sirf aage → total step ≤ 2n → **O(n)**. Nayi array nahi → **O(1)** extra space.
   analogy: |
     **Shaadi ke buffet ki line mein plates saaf karna.** Ek bhai (reader) har plate uthata hai aur dekhta hai. Achhi plate? Doosre bhai (writer) ko deta hai, jo use stack mein **aage se** lagata jaata hai. Tooti plate? Reader seedha aage badh jaata hai.
 
@@ -41,7 +41,7 @@ why:
   body: |
     "Array se kuch items hatao / filter karo" ka seedha tareeka:
     - **Nayi list** bana ke kaam ke items daalo → O(n) extra memory.
-    - Ya har bekaar item par `removeAt(i)` → har remove baaki sabko khiskata hai → **O(n²)**.
+    - Ya har bekaar item par `removeAt(i)` → har remove baaki sabko shift karta hai → **O(n²)**.
 
     Read/write pointers dono problems hal karte hain: **O(n) time, O(1) space**, ek hi pass.
 
@@ -50,7 +50,7 @@ why:
     > [!socho]
     > `for (i in list.indices) if (list[i] == 0) list.removeAt(i)` — isme kya gadbad hai?
     >
-    > Do gadbad: (1) har `removeAt` O(n) hai, to total O(n²). (2) Remove ke baad items khisak jaate hain aur `i++` ek item **skip** kar deta hai — `[0, 0, 1]` mein doosra 0 bach jaata hai. Read/write pointers mein ye dono problem nahi.
+    > Do gadbad: (1) har `removeAt` O(n) hai, to total O(n²). (2) Remove ke baad items shift ho jaate hain aur `i++` ek item **skip** kar deta hai — `[0, 0, 1]` mein doosra 0 bach jaata hai. Read/write pointers mein ye dono problem nahi.
 
 # 3. Visual intro
 visual:
@@ -67,7 +67,7 @@ how:
 
     `[0, 0, 1, 1, 1, 2, 2, 3, 3, 4]` → pehle 5 jagah `[0, 1, 2, 3, 4]`, return **5**.
 
-    **Observation:** sorted hai, to same numbers **padosi** hain. Naya unique tabhi aata hai jab number **pichle likhe** number se alag ho.
+    **Observation:** sorted hai, to same numbers **neighbor** hain. Naya unique tabhi aata hai jab number **pichle likhe** number se alag ho.
 
     1. `a[0]` hamesha unique → `w = 1`.
     2. `r` ko 1 se end tak chalao.
@@ -89,7 +89,7 @@ operations:
     time: O(n)
     space: O(1)
     why: "Pichle likhe item se compare."
-  - op: "Do sorted arrays merge"
+  - op: "2 sorted arrays merge"
     time: O(m + n)
     space: "O(m + n) nayi array / O(1) agar jagah pehle se ho"
     why: "Har item ek baar likha jaata hai."
@@ -100,7 +100,7 @@ operations:
   - op: "Har bekaar item par removeAt (galat tareeka)"
     time: O(n²)
     space: O(1)
-    why: "Har remove baaki items khiskata hai."
+    why: "Har remove baaki items shift karta hai."
   - op: "Nayi list mein filter (simple tareeka)"
     time: O(n)
     space: O(n)
@@ -108,10 +108,10 @@ operations:
 
 # 6. Code
 code:
-  - title: Is subsequence? (do strings, dono pointer aage)
+  - title: Is subsequence? (2 strings, dono pointer aage)
     file: subsequence
     note: |
-      Same-direction ka doosra roop: pointers **do alag sequences** par. `t` par loop chalta hai, `s` ka pointer sirf match par aage badhta hai. Kabhi peeche nahi — isliye O(|t|).
+      Same-direction ka doosra form: pointers **2 alag sequences** par. `t` par loop chalta hai, `s` ka pointer sirf match par aage badhta hai. Kabhi peeche nahi — isliye O(|t|).
 
 # 7. Examples
 examples:
@@ -154,7 +154,7 @@ examples:
 
   - id: merge-sorted
     level: medium
-    title: Do sorted arrays ko merge karo (pehli array ke andar)
+    title: 2 sorted arrays ko merge karo (pehli array ke andar)
     source: { name: Merge Sorted Array, platform: LeetCode, url: "https://leetcode.com/problems/merge-sorted-array/" }
     problem: |
       `nums1` mein `m` sorted numbers hain, aur end mein `n` khaali jagah (0). `nums2` mein `n` sorted numbers. `nums2` ko `nums1` mein merge karo — result sorted, **nayi array nahi**.
@@ -163,7 +163,7 @@ examples:
     intuition: |
       Normal merge aage se karta hai (sabse chhota pehle). Par yahan aage se likhoge to `nums1` ke numbers **overwrite** ho jaayenge — abhi padhe bhi nahi.
 
-      **Trick: peeche se bharo.** Khaali jagah end mein hai. Teen pointers:
+      **Trick: peeche se bharo.** Khaali jagah end mein hai. 3 pointers:
       - `i` = nums1 ka aakhri asli number
       - `j` = nums2 ka aakhri number
       - `k` = likhne ki jagah (end se)
@@ -189,7 +189,7 @@ examples:
     complexity:
       time: O(m + n)
       space: O(1)
-      why: "Har jagah ek baar likhi; sirf teen pointers."
+      why: "Har jagah ek baar likhi; sirf 3 pointers."
 
   - id: dups-ii
     level: tricky
@@ -234,12 +234,12 @@ examples:
 when:
   use:
     - "**In-place** filter / remove / compact karna hai (O(1) extra memory)."
-    - "Sorted array mein duplicates sambhaalne hain."
-    - "Do sorted sequences ko saath-saath chalana hai (merge, subsequence, intersection)."
+    - "Sorted array mein duplicates handle karne hain."
+    - "2 sorted sequences ko saath-saath chalana hai (merge, subsequence, intersection)."
     - "Linked list mein fast/slow (cycle, middle) — yahi family."
   avoid:
     - "Pair ka sum chahiye sorted array mein — wo opposite ends wala two pointers hai."
-    - "Contiguous subarray ka sum/length condition — wo sliding window hai (same direction ka hi khaas roop)."
+    - "Contiguous subarray ka sum/length condition — wo sliding window hai (same direction ka hi special form)."
     - "Order bachana zaroori nahi aur code simple chahiye — `filter {}` se nayi list bhi theek hai."
   signals:
     - keyword: "in-place, O(1) extra memory, remove / move"
@@ -256,13 +256,13 @@ realWorld:
   - where: "Android RecyclerView / Flutter list filtering"
     how: "Buffer ke andar hi deleted items hatana (compaction) — nayi list allocate nahi, GC kam."
   - where: "Garbage collectors"
-    how: "Mark-compact GC: zinda objects ko heap ke shuru mein khiskata hai — read/write pointers ka bada roop."
+    how: "Mark-compact GC: zinda objects ko heap ke shuru mein shift karta hai — read/write pointers ka bada form."
   - where: "Text editors"
     how: "Extra spaces / blank lines hatana (trim, collapse) — ek pass mein."
   - where: "Merge sort aur databases"
-    how: "Do sorted runs ko merge karna — merge sort, external sort, LSM-tree compaction (RocksDB, Cassandra)."
+    how: "2 sorted runs ko merge karna — merge sort, external sort, LSM-tree compaction (RocksDB, Cassandra)."
   - where: "Version control / diff"
-    how: "Do sorted file lists par saath-saath chal ke 'added / removed' nikaalna."
+    how: "2 sorted file lists par saath-saath chal ke 'added / removed' nikaalna."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -272,7 +272,7 @@ mistakes:
       ```kotlin
       for (i in list.indices) if (list[i] == 0) list.removeAt(i)
       ```
-      Items khisakte hain → kuch skip, aur index bahar (crash). Upar se O(n²).
+      Items shift hote hain → kuch skip, aur index bahar (crash). Upar se O(n²).
     right: |
       Read/write pointers, ya `list.removeAll { it == 0 }` (andar se yahi karta hai).
   - title: "Dedupe mein a[r − 1] / a[r − 2] se compare"
@@ -321,7 +321,7 @@ interview:
         `if (w < k || x != a[w − k]) a[w++] = x`. Sorted hone se a[w − k] == x ka matlab k copies pehle se likhi hain.
     - q: "Same-direction aur opposite two pointers mein fark?"
       a: |
-        Opposite: kinaron se andar, pairs/palindrome. Same direction: dono shuru se aage, filter/merge/window/fast-slow.
+        Opposite: edges se andar, pairs/palindrome. Same direction: dono shuru se aage, filter/merge/window/fast-slow.
     - q: "Is Subsequence ka follow-up: bahut saare s, ek hi t?"
       followUp: true
       a: |
@@ -334,9 +334,9 @@ interview:
         Real code mein haan. Interview mein "in-place, O(1)" bola ho to khud likh ke dikhao — aur batao library andar yahi karti hai.
   mayAsk:
     - "Remove Element (val wale sab hatao)."
-    - "Sort Colors (teen pointers)."
+    - "Sort Colors (3 pointers)."
     - "Intersection of two sorted arrays."
-    - "Backspace String Compare (peeche se do pointers)."
+    - "Backspace String Compare (peeche se 2 pointers)."
     - "Is Subsequence ka follow-up (bahut saari queries)."
 
 # 12. Practice
@@ -440,15 +440,15 @@ revision:
     - q: "Loop ke andar list.removeAt(i) ki complexity?"
       options: ["O(n)", "O(n log n)", "O(n²)", "O(1)"]
       answer: 2
-      explain: "Har remove O(n) khiskata hai, n baar."
+      explain: "Har remove O(n) shift karta hai, n baar."
 
 # 14. Connections
 connections:
   related:
     - id: two-pointers-opposite
-      why: "Doosri family — kinaron se andar."
+      why: "Doosri family — edges se andar."
     - id: sliding-window-fixed
-      why: "Window ke do kinare bhi same direction mein chalte hain."
+      why: "Window ke do edge bhi same direction mein chalte hain."
     - id: dynamic-array
       why: "removeAt kyun O(n) hai — wahin dekha."
   usedLater:
@@ -457,4 +457,4 @@ connections:
     - id: fast-slow-pointers
       how: "Linked list mein same direction, alag speed — cycle aur middle."
     - id: merge-sort
-      how: "Do sorted halves ka merge — yahi pointer-per-array idea."
+      how: "2 sorted halves ka merge — yahi pointer-per-array idea."

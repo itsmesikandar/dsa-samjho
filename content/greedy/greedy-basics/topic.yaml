@@ -2,7 +2,7 @@ meta:
   id: greedy-basics
   chapter: greedy
   title: Greedy basics
-  subtitle: Har kadam par abhi ka best — kab ye poora jawab deta hai, kab dhokha
+  subtitle: Har step par abhi ka best — kab ye poora jawab deta hai, kab dhokha
   level: intermediate
   minutes: 40
   prereqs: [sorting-in-practice, problem-solving]
@@ -11,62 +11,62 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **Greedy** = har kadam par wo choice lo jo **abhi** sabse achhi lagti hai, aur kabhi peeche mud ke mat dekho. Na saare raste try karna (backtracking), na table bharna (DP).
+    **Greedy** = har step par wo choice lo jo **abhi** sabse achhi lagti hai, aur kabhi peeche mud ke mat dekho. Na saare raste try karna (backtracking), na table bharna (DP).
 
-    Greedy tab sahi hai jab do cheezein hon:
+    Greedy tab sahi hai jab 2 cheezein hon:
     1. **Greedy choice:** abhi ka best lene se kisi optimal jawab ka rasta band nahi hota.
     2. **Optimal substructure:** ek choice ke baad bacha hua sawaal bhi wahi type ka hai.
 
-    Aksar recipe: **sort karo** (kisi niyam se) → ek pass mein lo / chhodo.
+    Often recipe: **sort karo** (kisi rule se) → ek pass mein lo / chhodo.
 
-    Par dhokha bhi deta hai: sikkon `[1, 3, 4]` se 6 banana — greedy 4 + 1 + 1 (3 sikke), sahi 3 + 3 (2 sikke).
+    Par dhokha bhi deta hai: coins `[1, 3, 4]` se 6 banana — greedy 4 + 1 + 1 (3 coins), sahi 3 + 3 (2 coins).
 
     > [!yaad]
-    > Greedy ka code chhota hota hai, **saboot** zaroori hai. Ek ulta example (counterexample) mil gaya → greedy galat; DP ya backtracking socho.
+    > Greedy ka code chhota hota hai, **proof** zaroori hai. Ek ulta example (counterexample) mil gaya → greedy galat; DP ya backtracking socho.
   analogy: |
     **Thali mein khana, pet mein jagah kam:**
     "Sabse zyada items chakhne hain" → sabse chhote portion pehle uthao. Yahan greedy sahi hai.
 
     Par "sabse zyada swaad" (har item ka alag swaad aur size) → chhota pehle uthana galat ho sakta hai; ek bada par bahut swaadisht item sab par bhaari. Ye knapsack hai — DP chahiye.
 
-    Sawaal ka niyam hi tay karta hai greedy chalega ya nahi.
+    Sawaal ka rule hi decide karta hai greedy chalega ya nahi.
 
 # 2. Kyun chahiye?
 why:
   body: |
     Jab greedy sahi ho, to sabse **tez aur aasaan**:
 
-    | Tareeka | Time (aam taur par) | Code |
+    | Tareeka | Time (usually) | Code |
     |---|---|---|
     | Saare combinations (backtracking) | O(2ⁿ) | lamba |
     | DP | O(n × kuch) | medium |
     | **Greedy** | **O(n log n)** (sort) ya O(n) | chhota |
 
-    Interview mein greedy wale sawaal aksar "trick" lagte hain — par trick hamesha ek hi: **kaunsa niyam se sort / choose karein, aur kyun wo kabhi pachhtaata nahi**.
+    Interview mein greedy wale sawaal often "trick" lagte hain — par trick hamesha ek hi: **kaunsa rule se sort / choose karein, aur kyun wo kabhi pachhtaata nahi**.
 
-    Saboot ka sabse kaam ka tareeka — **exchange argument**: maan lo koi optimal jawab greedy se alag hai. Dikhao ki uski ek choice ko greedy wali se **badal** do to jawab bura nahi hota. Baar baar badlo → greedy jawab bhi optimal.
+    Proof ka sabse kaam ka tareeka — **exchange argument**: maan lo koi optimal jawab greedy se alag hai. Dikhao ki uski ek choice ko greedy wali se **badal** do to jawab bura nahi hota. Baar baar badlo → greedy jawab bhi optimal.
 
     > [!socho]
-    > Bharat ke sikke (1, 2, 5, 10) par "bada sikka pehle" hamesha sahi kyun hai, par [1, 3, 4] par nahi?
+    > Bharat ke coins (1, 2, 5, 10) par "bada coin pehle" hamesha sahi kyun hai, par [1, 3, 4] par nahi?
     >
-    > 1, 2, 5, 10 mein har bada sikka chhoton se "behtar" banta hai (2 + 2 + 1 = 5 se kam sikke nahi). [1, 3, 4] mein 3 + 3 = 6, jabki 4 lene ke baad 2 bachta hai jo sirf 1 + 1 se banta hai. Aise sets "canonical" nahi hote.
+    > 1, 2, 5, 10 mein har bada coin chhoton se "better" banta hai (2 + 2 + 1 = 5 se kam coins nahi). [1, 3, 4] mein 3 + 3 = 6, jabki 4 lene ke baad 2 bachta hai jo sirf 1 + 1 se banta hai. Aise sets "canonical" nahi hote.
 
 # 3. Visual intro
 visual:
   body: |
-    Sikke aur amount do. Greedy hamesha sabse bada sikka uthata hai. Neeche DP wala "sabse kam" dikhta hai. Default `[1, 3, 4]`, 6 par greedy haarta hai — ab `[1, 2, 5, 10]` aur koi bhi amount try karo, greedy kabhi nahi haarega.
+    Coins aur amount do. Greedy hamesha sabse bada coin uthata hai. Neeche DP wala "sabse kam" dikhta hai. Default `[1, 3, 4]`, 6 par greedy haarta hai — ab `[1, 2, 5, 10]` aur koi bhi amount try karo, greedy kabhi nahi haarega.
   viz: { tracer: coinsTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    Greedy sawaal ka dhaancha:
-    1. **Niyam pehchano:** "har baar kya lena best hai?" (sabse sasta, sabse jaldi khatam hone wala, sabse door pahunchane wala…)
-    2. **Sort** us niyam se (ya heap, agar beech mein naye items aate hain).
-    3. **Ek pass:** lo jab tak sharton mein fit ho; na ho to chhodo / ruko.
-    4. **Saboot:** exchange argument, ya kam se kam chhote examples par brute force se milao.
+    Greedy sawaal ka structure:
+    1. **Rule pehchano:** "har baar kya lena best hai?" (sabse sasta, sabse jaldi khatam hone wala, sabse door pahunchane wala…)
+    2. **Sort** us rule se (ya heap, agar beech mein naye items aate hain).
+    3. **Ek pass:** lo jab tak conditions mein fit ho; na ho to chhodo / ruko.
+    4. **Proof:** exchange argument, ya kam se kam chhote examples par brute force se milao.
 
-    Yahan: budget mein **zyada se zyada cheezein** — sabse sasti pehle. Saboot: kisi jawab mein mehngi cheez li aur sasti chhodi → badal do, paisa bachta hai, ginti same.
+    Yahan: budget mein **zyada se zyada cheezein** — sabse sasti pehle. Proof: kisi jawab mein mehngi cheez li aur sasti chhodi → badal do, paisa bachta hai, count same.
 
     > [!galti]
     > "Lagta hai sahi hai" par greedy likh diya. Pehle 2-3 chhote ulte examples khud try karo — 2 minute bachate hain 20 minute ki galat debugging.
@@ -75,7 +75,7 @@ how:
 
 # 5. Operations table
 operations:
-  - op: "Sort + ek pass (aam greedy)"
+  - op: "Sort + ek pass (common greedy)"
     time: "O(n log n)"
     space: "O(1) – O(n)"
     why: "Sort sabse mehnga; pass O(n). Sort ki copy banao to O(n)."
@@ -91,7 +91,7 @@ operations:
     time: "O(n × W) jaisa"
     space: "O(W)"
     why: "Coin change jaise sawaal mein saare amounts ka hisaab."
-  - op: "Saboot / jaanch (brute force se milana)"
+  - op: "Proof / check (brute force se milana)"
     time: "O(2ⁿ) chhote n par"
     space: O(n)
     why: "Sirf testing ke liye — n ≤ 15 par saare combinations se greedy ka jawab milao."
@@ -101,7 +101,7 @@ code:
   - title: Greedy kab fail — coin change, greedy vs DP
     file: greedy-fails
     note: |
-      Same sawaal, do sets. `[1, 2, 5, 10]` par greedy = DP. `[1, 3, 4]` par greedy 3 sikke, DP 2.
+      Same sawaal, do sets. `[1, 2, 5, 10]` par greedy = DP. `[1, 3, 4]` par greedy 3 coins, DP 2.
 
       Ye hai **counterexample** ka power: ek example se greedy galat saabit. Interview mein greedy bolne se pehle khud se poochho: "kya koi chhota input ise tod sakta hai?"
 
@@ -111,7 +111,7 @@ code:
 examples:
   - id: cookies
     level: easy
-    title: Bachchon ko cookies baanto (Assign Cookies)
+    title: Bachchon ko cookies divide karo (Assign Cookies)
     source: { name: Assign Cookies, platform: LeetCode, url: "https://leetcode.com/problems/assign-cookies/" }
     problem: |
       Har bachche ki bhookh `g[i]`, har cookie ka size `s[j]`. Bachcha tab khush jab cookie ≥ uski bhookh. Har bachche ko max ek cookie. Zyada se zyada kitne bachche khush?
@@ -123,10 +123,10 @@ examples:
       - Sabse kam bhookh wale ko sabse **chhoti chalne wali** cookie.
       - Cookie chhoti pad gayi → wo sabse kam bhookh wale ko bhi nahi chalti, kisi ko nahi chalegi — phenk do.
 
-      Saboot (exchange): kisi optimal jawab mein sabse kam bhookh wale ko badi cookie mili → use chhoti chalne wali se badlo; badi cookie bachi, kisi aur ke kaam aa sakti hai. Jawab kam nahi hota.
+      Proof (exchange): kisi optimal jawab mein sabse kam bhookh wale ko badi cookie mili → use chhoti chalne wali se badlo; badi cookie bachi, kisi aur ke kaam aa sakti hai. Jawab kam nahi hota.
 
       > [!tip]
-      > Do sorted arrays + do pointers — greedy aur two-pointers aksar saath aate hain.
+      > 2 sorted arrays + 2 pointers — greedy aur two-pointers often saath aate hain.
     dryRun: |
       | Bhookh (g) | Cookie (s) | Kya hua | Khush |
       |---|---|---|---|
@@ -140,29 +140,29 @@ examples:
     complexity:
       time: "O(n log n + m log m)"
       space: O(1)
-      why: "Dono sort; phir do pointers ek pass. (Sort in-place.)"
+      why: "Dono sort; phir 2 pointers ek pass. (Sort in-place.)"
 
   - id: lemonade
     level: medium
     title: Lemonade stall ka chhutta (Lemonade Change)
     source: { name: Lemonade Change, platform: LeetCode, url: "https://leetcode.com/problems/lemonade-change/" }
     problem: |
-      Lemonade ₹5 ka. Customers line mein ₹5, ₹10 ya ₹20 ka note dete hain. Shuru mein galla khaali. Har customer ko sahi chhutta lauta sakte ho? (Sirf pehle mile noton se.)
+      Lemonade ₹5 ka. Customers line mein ₹5, ₹10 ya ₹20 ka note dete hain. Shuru mein cash box khaali. Har customer ko sahi chhutta return kar sakte ho? (Sirf pehle mile notes se.)
 
       Example: `[5, 5, 5, 5, 10, 20, 10]` → **true**
     intuition: |
-      ₹5 → kuch nahi lautana. ₹10 → ek ₹5 (aur koi option nahi).
+      ₹5 → kuch nahi return karna. ₹10 → ek ₹5 (aur koi option nahi).
 
-      ₹20 par ₹15 do tarah: **₹10 + ₹5** ya **₹5 + ₹5 + ₹5**. Greedy: pehle ₹10 + ₹5. Kyun? ₹10 ka note sirf ₹20 wale ke kaam aata hai, ₹5 sabke kaam aata hai — kam kaam ka note pehle kharch karo, kaam ka note bachao.
+      ₹20 par ₹15 2 tarah: **₹10 + ₹5** ya **₹5 + ₹5 + ₹5**. Greedy: pehle ₹10 + ₹5. Kyun? ₹10 ka note sirf ₹20 wale ke kaam aata hai, ₹5 sabke kaam aata hai — kam kaam ka note pehle spend karo, kaam ka note bachao.
 
-      Example mein: ₹20 aaya tab galle mein 3 × ₹5 + 1 × ₹10. 3 × ₹5 diye hote to agle ₹10 wale ko ₹5 nahi milta!
+      Example mein: ₹20 aaya tab cash box mein 3 × ₹5 + 1 × ₹10. 3 × ₹5 diye hote to agle ₹10 wale ko ₹5 nahi milta!
 
-      Sirf do counter chahiye — ₹20 ke note kabhi lautane mein kaam nahi aate.
+      Sirf do counter chahiye — ₹20 ke note kabhi return karne mein kaam nahi aate.
 
       > [!galti]
       > ₹20 par pehle 3 × ₹5 diye — chhote inputs par chal jaata hai, par ₹10 wale customer peeche hon to fail.
     dryRun: |
-      | Note | Lautaya | ₹5 | ₹10 |
+      | Note | Return kiya | ₹5 | ₹10 |
       |---|---|---|---|
       | 5, 5, 5, 5 | — | 4 | 0 |
       | 10 | 5 | 3 | 1 |
@@ -174,14 +174,14 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Ek pass, do counters."
+      why: "Ek pass, 2 counters."
 
   - id: jump-game
     level: tricky
-    title: Aakhir tak kood sakte ho? (Jump Game)
+    title: Aakhir tak jump kar sakte ho? (Jump Game)
     source: { name: Jump Game, platform: LeetCode, url: "https://leetcode.com/problems/jump-game/" }
     problem: |
-      `nums[i]` = index i se aage **max** kitne kadam kood sakte ho (kam bhi). Index 0 se shuru. Aakhri index tak pahunch sakte ho?
+      `nums[i]` = index i se aage **max** kitne step jump kar sakte ho (kam bhi). Index 0 se shuru. Aakhri index tak pahunch sakte ho?
 
       Example: `[3, 1, 0, 2, 0, 1]` → **true**; `[2, 1, 0, 3]` → **false**
     intuition: |
@@ -195,7 +195,7 @@ examples:
       0 wala index "jaal" hai sirf tab jab reach usi par atak jaaye.
 
       > [!galti]
-      > Har index par "max jump" hi liya (seedha i + nums[i] par kood gaye). `[3, 1, 0, 2, 0, 1]` mein 0 se 3 par koodna sahi, par `[2, 3, 1, 0, 4]` mein 0 se 2 par koodna (max) galat — 1 par jaana tha. Reach wala tareeka saare options ek saath dekhta hai.
+      > Har index par "max jump" hi liya (seedha i + nums[i] par jump kar gaye). `[3, 1, 0, 2, 0, 1]` mein 0 se 3 par jump karna sahi, par `[2, 3, 1, 0, 4]` mein 0 se 2 par jump karna (max) galat — 1 par jaana tha. Reach wala tareeka saare options ek saath dekhta hai.
     dryRun: |
       | i | nums[i] | i + nums[i] | reach |
       |---|---|---|---|
@@ -214,20 +214,20 @@ examples:
 when:
   use:
     - "Sort karke 'har baar sabse chhota / bada / jaldi khatam' lena saaf sahi lagta hai — aur exchange argument chalta hai."
-    - "Ek running number (reach, balance, count) se faisla ho jaata hai."
+    - "Ek running number (reach, balance, count) se decision ho jaata hai."
     - "Interval scheduling, meeting rooms, activity selection type sawaal."
     - "Constraints bade (n ~ 10⁵) aur O(n log n) chahiye — DP O(n²) nahi chalega."
   avoid:
-    - "Choices ka asar aage tak jaata hai aur kabhi pachhtaana padta hai (0/1 knapsack, coin change general sets)."
+    - "Choices ka effect aage tak jaata hai aur kabhi pachhtaana padta hai (0/1 knapsack, coin change general sets)."
     - "Ek bhi counterexample mil gaya — DP / backtracking."
-    - "'Saare tareeke gino' / 'kitne raste' — greedy ek hi rasta chunta hai, ginta nahi."
+    - "'Saare tareeke count karo' / 'kitne raste' — greedy ek hi rasta choose karta hai, count karta nahi."
   signals:
     - keyword: "maximum number of … / minimum number of … (items, meetings, arrows)"
       think: "Sort + greedy; exchange argument se pakka karo."
     - keyword: "can you reach / pahunch sakte ho (jumps)"
       think: "Running reach — O(n)."
-    - keyword: "chhutta / change / do tarah se de sakte ho"
-      think: "Kam kaam ka resource pehle kharch karo."
+    - keyword: "chhutta / change / 2 tarah se de sakte ho"
+      think: "Kam kaam ka resource pehle spend karo."
     - keyword: "coin change (minimum coins), arbitrary coins"
       think: "Greedy NAHI — DP."
 
@@ -236,20 +236,20 @@ realWorld:
   - where: "ATM / cashier ka chhutta"
     how: "Indian notes canonical hain — sabse bada note pehle, minimum notes."
   - where: "CPU scheduling (Shortest Job First)"
-    how: "Sabse chhota kaam pehle → average waiting time sabse kam (exchange argument wala hi saboot)."
+    how: "Sabse chhota kaam pehle → average waiting time sabse kam (exchange argument wala hi proof)."
   - where: "Huffman coding (zip files)"
-    how: "Har baar do sabse kam frequency wale jodo — greedy se sabse chhota code."
+    how: "Har baar 2 sabse kam frequency wale jodo — greedy se sabse chhota code."
   - where: "Delivery / cab dispatch"
-    how: "Sabse paas wala driver — tez aur aksar kaafi achha (hamesha optimal nahi; isliye bade systems aur smart hain)."
+    how: "Sabse paas wala driver — tez aur often kaafi achha (hamesha optimal nahi; isliye bade systems aur smart hain)."
   - where: "Dijkstra, Kruskal, Prim"
-    how: "Graph ke famous algorithms greedy hi hain — har kadam 'abhi ka sabse sasta'."
+    how: "Graph ke famous algorithms greedy hi hain — har step 'abhi ka sabse sasta'."
 
 # 10. Common galtiyan & edge cases
 mistakes:
-  - title: "Bina saboot ke greedy"
+  - title: "Bina proof ke greedy"
     type: logic
     wrong: |
-      Coin change [1, 3, 4] par "bada sikka pehle" — 6 ke liye 3 sikke, jabki 2 kaafi.
+      Coin change [1, 3, 4] par "bada coin pehle" — 6 ke liye 3 coins, jabki 2 kaafi.
     right: |
       Chhote ulte examples try karo; brute force se milao. Fail ho to DP.
   - title: "Galat cheez par sort"
@@ -257,7 +257,7 @@ mistakes:
     wrong: |
       Intervals ko start se sort kiya jab "zyada se zyada non-overlapping" chahiye the.
     right: |
-      Niyam pehle socho: "kaunsa pehle khatam hota hai" → end se sort. Galat key = galat greedy.
+      Rule pehle socho: "kaunsa pehle khatam hota hai" → end se sort. Galat key = galat greedy.
   - title: "Input array badal diya"
     type: other
     wrong: |
@@ -273,7 +273,7 @@ mistakes:
   - title: "Running sum overflow"
     type: overflow
     wrong: |
-      Bade daam / bade n par `Int` mein jod — overflow, galat 'fit' faisla.
+      Bade price / bade n par `Int` mein jod — overflow, galat 'fit' decision.
     right: |
       Jod `Long` mein, ya ghatate jao (budget - cost) jaise how mein.
   - title: "Lemonade mein ₹20 ka galat chhutta"
@@ -288,13 +288,13 @@ interview:
   questions:
     - q: "Greedy algorithm kya hai? Kab sahi hota hai?"
       a: |
-        Har kadam abhi ka best choice, bina peeche dekhe. Sahi tab jab greedy choice property (abhi ka best kisi optimal jawab ka hissa) aur optimal substructure ho.
+        Har step abhi ka best choice, bina peeche dekhe. Sahi tab jab greedy choice property (abhi ka best kisi optimal jawab ka hissa) aur optimal substructure ho.
     - q: "Greedy sahi hai ye kaise saabit karoge?"
       a: |
-        Exchange argument: koi optimal jawab lo jo greedy se alag hai; uski pehli alag choice ko greedy wali se badlo, jawab bura nahi hota. Ya 'greedy stays ahead': har kadam par greedy ka partial jawab kisi bhi aur se peeche nahi.
+        Exchange argument: koi optimal jawab lo jo greedy se alag hai; uski pehli alag choice ko greedy wali se badlo, jawab bura nahi hota. Ya 'greedy stays ahead': har step par greedy ka partial jawab kisi bhi aur se peeche nahi.
     - q: "Greedy vs DP?"
       a: |
-        Greedy ek choice lock karta hai; DP saari choices ke sub-results yaad rakh ke best chunta hai. Greedy tez par sirf khaas sawaalon par sahi; DP general par mehnga.
+        Greedy ek choice lock karta hai; DP saari choices ke sub-results yaad rakh ke best choose karta hai. Greedy tez par sirf special sawaalon par sahi; DP general par mehnga.
     - q: "Coin change mein greedy kab sahi?"
       a: |
         Canonical coin systems (jaise 1, 2, 5, 10, 20…) par. Arbitrary set par nahi — [1, 3, 4] aur 6 counterexample. General ke liye DP.
@@ -314,12 +314,12 @@ interview:
     - q: "Fractional knapsack vs 0/1 knapsack?"
       followUp: true
       a: |
-        Fractional (cheez ka tukda le sakte ho): value/weight ratio se sort, greedy sahi. 0/1 (poori ya kuch nahi): greedy galat, DP.
+        Fractional (cheez ka piece le sakte ho): value/weight ratio se sort, greedy sahi. 0/1 (poori ya kuch nahi): greedy galat, DP.
   mayAsk:
     - "Jump Game II."
     - "Boats to Save People."
     - "Minimum Number of Arrows to Burst Balloons."
-    - "Candy (do pass greedy)."
+    - "Candy (2 pass greedy)."
 
 # 12. Practice
 practice:
@@ -329,7 +329,7 @@ practice:
     url: "https://leetcode.com/problems/maximum-ice-cream-bars/"
     level: easy
     pattern: Sasta pehle
-    hint: "How wala hi. Bonus: daam chhote hain (≤ 10⁵) to counting sort se O(n + max)."
+    hint: "How wala hi. Bonus: price chhote hain (≤ 10⁵) to counting sort se O(n + max)."
   - name: Maximum Units on a Truck
     platform: LeetCode
     num: 1710
@@ -343,7 +343,7 @@ practice:
     url: "https://leetcode.com/problems/minimum-sum-of-four-digit-number-after-splitting-digits/"
     level: easy
     pattern: Chhote digits tens place par
-    hint: "Digits sort: d0 ≤ d1 ≤ d2 ≤ d3. Do numbers: (d0, d2) aur (d1, d3) → 10 × (d0 + d1) + d2 + d3."
+    hint: "Digits sort: d0 ≤ d1 ≤ d2 ≤ d3. 2 numbers: (d0, d2) aur (d1, d3) → 10 × (d0 + d1) + d2 + d3."
   - name: Boats to Save People
     platform: LeetCode
     num: 881
@@ -370,8 +370,8 @@ practice:
     num: 135
     url: "https://leetcode.com/problems/candy/"
     level: hard
-    pattern: Do pass greedy
-    hint: "Sabko 1. Baayein se: rating bada ho pichhle se → candy = pichhle + 1. Daayein se: bada ho agle se → max(apna, agle + 1). Jod."
+    pattern: 2 pass greedy
+    hint: "Sabko 1. Left se: rating bada ho pichhle se → candy = pichhle + 1. Right se: bada ho agle se → max(apna, agle + 1). Jod."
   - name: Minimum Number of Taps to Open to Water a Garden
     platform: LeetCode
     num: 1326
@@ -383,9 +383,9 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "Greedy = har kadam abhi ka best, wapas nahi mudna. Chhota code, saboot zaroori."
-    - "Recipe: niyam pehchano → us niyam se sort → ek pass mein lo/chhodo."
-    - "Saboot: exchange argument — optimal ki choice ko greedy wali se badlo, bura nahi hota."
+    - "Greedy = har step abhi ka best, wapas nahi mudna. Chhota code, proof zaroori."
+    - "Recipe: rule pehchano → us rule se sort → ek pass mein lo/chhodo."
+    - "Proof: exchange argument — optimal ki choice ko greedy wali se badlo, bura nahi hota."
     - "Ek counterexample = greedy galat (coin [1, 3, 4], 6). Phir DP."
     - "Running number tricks: jump game (reach), lemonade (counters) — O(n), O(1)."
   cheatsheet: |
@@ -396,29 +396,29 @@ revision:
     // running reach
     var reach = 0
     for (i in nums.indices) { if (i > reach) return false; reach = maxOf(reach, i + nums[i]) }
-    // jaanch: chhote inputs par brute force == greedy ?
+    // check: chhote inputs par brute force == greedy ?
     ```
   quiz:
     - q: "Greedy galat hai — ye saabit karne ke liye kya kaafi?"
       options: ["Bade input par TLE", "Ek counterexample", "Code lamba hona", "Sort na karna"]
       answer: 1
       explain: "Ek input jahan greedy ka jawab optimal se bura ho — bas."
-    - q: "Coins [1, 3, 4], amount 6. Greedy (bada pehle) kitne sikke?"
+    - q: "Coins [1, 3, 4], amount 6. Greedy (bada pehle) kitne coins?"
       options: ["2", "3", "4", "Ban nahi sakta"]
       answer: 1
-      explain: "4 + 1 + 1 = 3 sikke. Sahi jawab 3 + 3 = 2."
+      explain: "4 + 1 + 1 = 3 coins. Sahi jawab 3 + 3 = 2."
     - q: "Jump Game mein reach ka matlab?"
       options: ["Ab tak ke jumps", "Sabse door index jahan tak pahunch sakte", "Aakhri index", "Max nums[i]"]
       answer: 1
       explain: "0..reach saare pahunch mein; i > reach hua to atak gaye."
-    - q: "Lemonade: ₹20 aaya, galle mein 3 × ₹5 aur 1 × ₹10. Greedy kya lautaye?"
+    - q: "Lemonade: ₹20 aaya, cash box mein 3 × ₹5 aur 1 × ₹10. Greedy kya return kiye?"
       options: ["3 × ₹5", "₹10 + ₹5", "Kuch bhi", "₹20 wapas"]
       answer: 1
       explain: "₹5 zyada kaam ke hain (₹10 wale customers ko bhi chahiye) — bachao."
     - q: "Budget mein zyada se zyada items: kis order mein lena?"
       options: ["Mehnga pehle", "Sasta pehle", "Input order", "Random"]
       answer: 1
-      explain: "Sasta pehle — exchange argument: mehnga hata ke sasta lo, paisa bachta hai, ginti same."
+      explain: "Sasta pehle — exchange argument: mehnga hata ke sasta lo, paisa bachta hai, count same."
 
 # 14. Connections
 connections:
@@ -426,7 +426,7 @@ connections:
     - id: sorting-in-practice
       why: "Zyada tar greedy = sahi key par sort + ek pass."
     - id: two-pointers-opposite
-      why: "Assign Cookies, Boats — sorted arrays par do pointers ke saath greedy."
+      why: "Assign Cookies, Boats — sorted arrays par 2 pointers ke saath greedy."
     - id: dijkstra
       why: "Graph ka greedy: har baar sabse paas wala pakka."
   usedLater:

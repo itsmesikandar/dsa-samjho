@@ -1,4 +1,4 @@
-// index wala item hatao; uske baad ke saare items ek kadam left khisakenge
+// index wala item hatao; uske baad ke saare items ek step left shift honge
 fun deleteAt(arr: IntArray, size: Int, index: Int): Int {
     require(index in 0 until size) { "Index 0..size-1 ke beech hona chahiye" }
     for (i in index until size - 1) {

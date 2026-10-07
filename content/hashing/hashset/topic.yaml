@@ -22,7 +22,7 @@ what:
 
     HashSet andar se **HashMap hi hai** — set ke items keys hain, value ek dummy. Isliye complexity bhi same.
 
-    Teen tarah ke sets:
+    3 tarah ke sets:
     | Set | Order | Speed |
     |---|---|---|
     | `HashSet` | koi fixed order nahi | O(1) avg |
@@ -32,7 +32,7 @@ what:
     > [!yaad]
     > `add()` boolean return karta hai — **true = naya tha, false = pehle se tha**. Duplicate check ek hi line mein: `if (!set.add(x)) // duplicate!`
   analogy: |
-    **Shaadi ke gate par guest register** socho. Har guest ka naam ek baar likha jaata hai. Koi dobara aaye to guard turant bol deta hai "aap to andar ho chuke" — poori list padhe bina (kyunki register naam ke pehle akshar se baanta hua hai).
+    **Shaadi ke gate par guest register** socho. Har guest ka naam ek baar likha jaata hai. Koi dobara aaye to guard turant bol deta hai "aap to andar ho chuke" — poori list padhe bina (kyunki register naam ke pehle letter se divide kiya hua hai).
 
     Set bilkul yahi hai: duplicates allowed nahi, aur "hai ya nahi" ka jawab turant.
 
@@ -41,7 +41,7 @@ why:
   body: |
     Bahut saare problems mein value nahi, sirf ye jaanna hota hai ki **"ye pehle aaya hai ya nahi?"**:
     - Duplicate hai?
-    - Do lists mein common kya hai?
+    - 2 lists mein common kya hai?
     - Cycle hai? (koi state dobara aayi?)
     - Visited nodes (graph BFS/DFS)
 
@@ -145,10 +145,10 @@ examples:
 
   - id: intersection
     level: medium
-    title: Do arrays ka intersection (unique)
+    title: 2 arrays ka intersection (unique)
     source: { name: Intersection of Two Arrays, platform: LeetCode, url: "https://leetcode.com/problems/intersection-of-two-arrays/" }
     problem: |
-      Do arrays diye hain. Wo numbers return karo jo **dono** mein hain — har number sirf ek baar.
+      2 arrays diye hain. Wo numbers return karo jo **dono** mein hain — har number sirf ek baar.
 
       Example: `[4, 9, 5]` aur `[9, 4, 9, 8, 4]` → `[4, 9]`
     intuition: |
@@ -157,7 +157,7 @@ examples:
       **Set se:** a ko set bana do (O(n)). Phir b ke har item par `in setA` (O(1)). Result bhi set mein daalo — duplicates apne aap ruk jaayenge.
 
       > [!tip]
-      > Agar dono arrays **sorted** hon to set ki zaroorat nahi — do pointers se O(n + m) aur O(1) space.
+      > Agar dono arrays **sorted** hon to set ki zaroorat nahi — 2 pointers se O(n + m) aur O(1) space.
     dryRun: |
       setA = {4, 9, 5}
 
@@ -182,20 +182,20 @@ examples:
     title: Longest consecutive sequence — O(n) bina sort
     source: { name: Longest Consecutive Sequence, platform: LeetCode, url: "https://leetcode.com/problems/longest-consecutive-sequence/" }
     problem: |
-      Ek unsorted array diya hai. Sabse lambi aisi sequence ki length batao jisme numbers **lagatar** hon (jaise 1, 2, 3, 4) — array mein kisi bhi jagah ho sakte hain. **O(n)** time chahiye.
+      Ek unsorted array diya hai. Sabse lambi aisi sequence ki length batao jisme numbers **continuous** hon (jaise 1, 2, 3, 4) — array mein kisi bhi jagah ho sakte hain. **O(n)** time chahiye.
 
       Example: `[100, 4, 200, 1, 3, 2]` → **4** (1, 2, 3, 4)
     intuition: |
-      Sort karke gin sakte ho — O(n log n). O(n) ke liye **set**:
+      Sort karke count kar sakte ho — O(n log n). O(n) ke liye **set**:
 
-      Har number x par seedha aage ginna shuru kiya (x+1, x+2…) to same sequence baar-baar gini jaayegi → O(n²).
+      Har number x par seedha aage count karna shuru kiya (x+1, x+2…) to same sequence baar-baar count ki jaayegi → O(n²).
 
-      **Trick:** sirf **sequence ki shuruaat** se gino — yaani jab `x − 1` set mein **nahi** hai. Baaki (beech wale) skip.
+      **Trick:** sirf **sequence ki shuruaat** se count karo — matlab jab `x − 1` set mein **nahi** hai. Baaki (beech wale) skip.
 
-      Ab har number zyada se zyada ek baar "aage ginti" mein aata hai → total **O(n)**.
+      Ab har number zyada se zyada ek baar "aage count" mein aata hai → total **O(n)**.
 
       > [!galti]
-      > Duplicates (jaise do baar 0) se length na badhe — isliye set par loop karo, original array par nahi.
+      > Duplicates (jaise 2 baar 0) se length na badhe — isliye set par loop karo, original array par nahi.
     dryRun: |
       set = {100, 4, 200, 1, 3, 2}
 
@@ -212,7 +212,7 @@ examples:
     complexity:
       time: O(n)
       space: O(n)
-      why: "Har number ek baar set mein, aur ek hi baar kisi sequence ki ginti mein; set ki memory."
+      why: "Har number ek baar set mein, aur ek hi baar kisi sequence ki count mein; set ki memory."
 
 # 8. Kab use karein / kab NAHI
 when:
@@ -231,7 +231,7 @@ when:
     - keyword: "detect cycle in a sequence of states"
       think: "Set of seen states (ya fast-slow pointer)."
     - keyword: "consecutive sequence, O(n)"
-      think: "Set + sirf shuruaat se ginti."
+      think: "Set + sirf shuruaat se count."
     - keyword: "nearest greater / smaller value seen so far"
       think: "TreeSet ceiling/floor (O(log n))."
 
@@ -279,7 +279,7 @@ mistakes:
   - title: "Khaali input"
     type: empty
     right: |
-      Khaali array ka longest consecutive = 0, intersection = []. Loop se pehle edge case socho — code aksar apne aap sahi hota hai, par confirm karo.
+      Khaali array ka longest consecutive = 0, intersection = []. Loop se pehle edge case socho — code often apne aap sahi hota hai, par confirm karo.
 
 # 11. Interview corner
 interview:
@@ -296,11 +296,11 @@ interview:
     - q: "Longest consecutive sequence O(n) kaise?"
       followUp: true
       a: |
-        Saare numbers set mein; sirf un x se ginti shuru karo jinke liye x − 1 set mein nahi. Har number ek hi baar gina jaata hai.
-    - q: "Do sorted arrays ka intersection — set ke bina?"
+        Saare numbers set mein; sirf un x se count shuru karo jinke liye x − 1 set mein nahi. Har number ek hi baar gina jaata hai.
+    - q: "2 sorted arrays ka intersection — set ke bina?"
       followUp: true
       a: |
-        Do pointers: chhota wala aage badhao, barabar mile to result mein daalo. O(n + m), O(1) extra.
+        2 pointers: chhota wala aage badhao, barabar mile to result mein daalo. O(n + m), O(1) extra.
     - q: "Bahut bade data (memory mein na aaye) mein \"pehle dekha?\" kaise?"
       a: |
         Bloom filter — chhoti memory mein probabilistic set (false positive ho sakta hai, false negative nahi). Ya disk-based / external sort.
@@ -311,7 +311,7 @@ interview:
       a: |
         Values 0..n (chhoti, dense) → BooleanArray: tez, kam memory, koi hashing nahi. Values bade/sparse range mein (jaise 10⁹ tak) → HashSet.
   mayAsk:
-    - "Contains Duplicate III (doori aur value dono ki limit) — TreeSet."
+    - "Contains Duplicate III (distance aur value dono ki limit) — TreeSet."
     - "Valid Sudoku (rows, cols, boxes ke sets)."
     - "Jewels and Stones."
     - "First missing positive (O(1) space mein)."
@@ -352,7 +352,7 @@ practice:
     url: "https://leetcode.com/problems/longest-consecutive-sequence/"
     level: medium
     pattern: Set + sequence start
-    hint: "Example 3 — sirf shuruaat (x − 1 nahi) se gino."
+    hint: "Example 3 — sirf shuruaat (x − 1 nahi) se count karo."
   - name: Find the Duplicate Number
     platform: LeetCode
     num: 287
@@ -373,7 +373,7 @@ practice:
     url: "https://leetcode.com/problems/first-missing-positive/"
     level: hard
     pattern: Set → O(1) space index marking
-    hint: "Set se aasaan (1 se ginti jab tak set mein ho). O(1) space ke liye array ko hi set bana do — value v ko index v−1 par bhejo."
+    hint: "Set se aasaan (1 se count jab tak set mein ho). O(1) space ke liye array ko hi set bana do — value v ko index v−1 par bhejo."
 
 # 13. Quick revision
 revision:
@@ -405,7 +405,7 @@ revision:
       options: ["HashSet", "LinkedHashSet", "TreeSet", "ArrayList"]
       answer: 2
       explain: "TreeSet ceiling/higher."
-    - q: "Longest consecutive mein ginti kab shuru karte hain?"
+    - q: "Longest consecutive mein count kab shuru karte hain?"
       options: ["Har number se", "Jab x + 1 set mein na ho", "Jab x − 1 set mein na ho", "Sirf sabse chhote se"]
       answer: 2
       explain: "x − 1 nahi = x sequence ki shuruaat."

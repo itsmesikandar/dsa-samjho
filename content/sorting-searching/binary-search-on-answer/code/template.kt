@@ -1,4 +1,4 @@
-// "Sabse chhota x jo chal jaaye" - shart: feasible(x) monotonic ho (x chala to x+1 bhi chalega)
+// "Sabse chhota x jo chal jaaye" - condition: feasible(x) monotonic ho (x chala to x+1 bhi chalega)
 fun minFeasible(lo0: Int, hi0: Int, feasible: (Int) -> Boolean): Int {
     var lo = lo0
     var hi = hi0 // hi0 pakka feasible hona chahiye

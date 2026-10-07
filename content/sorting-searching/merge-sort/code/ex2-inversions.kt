@@ -1,4 +1,4 @@
-// Inversions gino: i < j aur a[i] > a[j]. Merge sort ke merge mein O(n log n)
+// Inversions count karo: i < j aur a[i] > a[j]. Merge sort ke merge mein O(n log n)
 fun countInversions(arr: IntArray): Long = sortCount(arr.copyOf(), 0, arr.size - 1, IntArray(arr.size))
 
 fun sortCount(a: IntArray, l: Int, r: Int, tmp: IntArray): Long {

@@ -1,4 +1,4 @@
-// Sirf letters/digits dekho, case ignore karo. Dono kinaron se milao.
+// Sirf letters/digits dekho, case ignore karo. Dono edges se milao.
 fun isPalindrome(s: String): Boolean {
     var l = 0 //@init
     var r = s.length - 1

@@ -6,7 +6,7 @@ fun maxSubArrayRange(nums: IntArray): IntArray {
     var bestL = 0
     var bestR = 0
     for (i in 1 until nums.size) {
-        if (cur < 0) { // purana sum bojh hai (negative) -> chhodo, yahin se naya shuru //@restart
+        if (cur < 0) { // purana sum load hai (negative) -> chhodo, yahin se naya shuru //@restart
             cur = nums[i]
             curStart = i
         } else { // purana sum faydemand -> jodte raho //@extend

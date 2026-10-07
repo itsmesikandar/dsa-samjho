@@ -1,11 +1,11 @@
 import java.util.PriorityQueue
 
-// Dijkstra: jo abhi sabse paas hai (heap ka top) uski doori pakki; wahan se padosiyon ko sasta karo
+// Dijkstra: jo abhi sabse paas hai (heap ka top) uski distance pakki; wahan se neighbors ko sasta karo
 fun dijkstra(n: Int, edges: Array<IntArray>, src: Int): IntArray {
-    val adj = List(n) { mutableListOf<IntArray>() } // (padosi, weight)
+    val adj = List(n) { mutableListOf<IntArray>() } // (neighbor, weight)
     for ((u, v, w) in edges) {
         adj[u].add(intArrayOf(v, w))
-        adj[v].add(intArrayOf(u, w)) // undirected sadak
+        adj[v].add(intArrayOf(u, w)) // undirected road
     }
     val dist = IntArray(n) { Int.MAX_VALUE }
     val pq = PriorityQueue<IntArray>(compareBy { it[1] }) // (node, dist) - kam dist pehle

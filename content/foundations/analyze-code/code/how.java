@@ -1,5 +1,5 @@
 class Main {
-    // Do hisson wala function: pehle ek loop, phir nested loop. Total kaam kitna?
+    // 2 hisson wala function: pehle ek loop, phir nested loop. Total kaam kitna?
     static int analyze(int[] arr) {
         int count = 0;
         for (int x : arr) count++; // hissa 1: n baar //@p1

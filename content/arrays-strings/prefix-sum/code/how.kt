@@ -6,7 +6,7 @@ class RangeSum(arr: IntArray) {
         for (i in arr.indices) pre[i + 1] = pre[i] + arr[i] // ab tak ka total + agla item //@build
     }
 
-    // arr[l..r] (dono shamil) ka sum
+    // arr[l..r] (dono include) ka sum
     fun sum(l: Int, r: Int): Long = pre[r + 1] - pre[l] //@query
 }
 

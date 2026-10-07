@@ -1,10 +1,10 @@
 class Main {
-    // Patthar do dheron mein - bacha hua = |dher1 - dher2|. Ek dher total/2 ke jitna paas ho utna kam
+    // Stone do bahut saare mein - bacha hua = |dher1 - dher2|. Ek pile total/2 ke jitna paas ho utna kam
     static int lastStoneWeightII(int[] stones) {
         int total = 0;
         for (int x : stones) total += x;
         int half = total / 2;
-        boolean[] dp = new boolean[half + 1]; // dp[s] = koi dher jiska jod s
+        boolean[] dp = new boolean[half + 1]; // dp[s] = koi pile jiska jod s
         dp[0] = true;
         for (int x : stones) {
             for (int s = half; s >= x; s--) {
@@ -12,7 +12,7 @@ class Main {
             }
         }
         for (int s = half; s >= 0; s--) {
-            if (dp[s]) return total - 2 * s; // ek dher s, doosra total - s; farak total - 2s //@best
+            if (dp[s]) return total - 2 * s; // ek pile s, doosra total - s; farak total - 2s //@best
         }
         return total;
     }

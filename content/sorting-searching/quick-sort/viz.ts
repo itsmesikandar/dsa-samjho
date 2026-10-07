@@ -35,7 +35,7 @@ export const partitionBars = tracer<{ arr: number[] }>({
     const a = [...arr];
     const id = ids(a.length);
     const bars = (tones: ToneMap): Panel[] => [{ kind: 'bars', values: [...a], ids: [...id], tones }];
-    t.frame({ caption: 'Quick sort ka dil = PARTITION: ek pivot chuno, chhote items uske left, bade right. Bas ek pass.', panels: bars({}) });
+    t.frame({ caption: 'Quick sort ka dil = PARTITION: ek pivot choose karo, chhote items uske left, bade right. Bas ek pass.', panels: bars({}) });
     const p = partition(t, a, id, 0, a.length - 1, (tones) => bars(tones), false);
     t.frame({ caption: `Partition khatam. Pivot index ${p} par pakka. Ab left (${p} items) aur right (${a.length - 1 - p} items) ko alag-alag isi tarah sort karo — recursion.`, panels: bars({ [p]: 'done' }) });
     return listStr(a);
@@ -104,7 +104,7 @@ export const colorsTrace = tracer<{ nums: number[] }>({
     const view = (extra: ToneMap = {}): Panel[] => [
       array(a, { ids: id, tones: { ...span(0, low - 1, 'new'), ...span(low, mid - 1, 'compare'), ...span(high + 1, a.length - 1, 'done'), ...extra }, pointers: { low, mid, ...(high >= 0 ? { high } : {}) } }),
     ];
-    t.frame({ line: 'one', caption: 'Teen pointers: [0, low) = 0s, [low, mid) = 1s, [mid, high] = abhi dekhe nahi, (high, end] = 2s. mid ko dekhte jao.', vars: { low, mid, high }, legend, panels: view() });
+    t.frame({ line: 'one', caption: '3 pointers: [0, low) = 0s, [low, mid) = 1s, [mid, high] = abhi dekhe nahi, (high, end] = 2s. mid ko dekhte jao.', vars: { low, mid, high }, legend, panels: view() });
     while (mid <= high) {
       const v = a[mid];
       if (v === 0) {

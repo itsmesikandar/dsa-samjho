@@ -61,13 +61,13 @@ export const reverseTrace = tracer<{ values: number[] }>({
     while (cur) {
       const nd: LNode = nodes.get(cur)!;
       const nxt: string | null = nd.next;
-      t.frame({ line: 'save', caption: `nxt = cur.next (${nxt ? nodes.get(nxt)!.value : 'null'}). Ise bachaana zaroori — agle kadam mein cur.next badal jaayega aur aage ki list ka raasta kho jaayega.`, legend: { compare: 'cur', done: 'ulta ho gaya' }, panels: [fixed(nodes, ids, { prev, cur, nxt }, { ...done, [cur]: 'compare' })] });
+      t.frame({ line: 'save', caption: `nxt = cur.next (${nxt ? nodes.get(nxt)!.value : 'null'}). Ise bachaana zaroori — agle step mein cur.next badal jaayega aur aage ki list ka raasta kho jaayega.`, legend: { compare: 'cur', done: 'ulta ho gaya' }, panels: [fixed(nodes, ids, { prev, cur, nxt }, { ...done, [cur]: 'compare' })] });
       nd.next = prev;
       done[cur] = 'done';
       t.frame({ line: 'flip', caption: `cur.next = prev → ${nd.value} ab ${prev ? nodes.get(prev)!.value : 'null'} ki taraf (ulta).`, legend: { compare: 'cur', done: 'ulta ho gaya' }, panels: [fixed(nodes, ids, { prev, cur, nxt }, { ...done })] });
       prev = cur;
       cur = nxt;
-      t.frame({ line: 'move', caption: `prev = cur, cur = nxt — dono ek kadam aage.`, legend: { compare: 'cur', done: 'ulta ho gaya' }, panels: [fixed(nodes, ids, { prev, cur }, { ...done, ...(cur ? { [cur]: 'compare' as Tone } : {}) })] });
+      t.frame({ line: 'move', caption: `prev = cur, cur = nxt — dono ek step aage.`, legend: { compare: 'cur', done: 'ulta ho gaya' }, panels: [fixed(nodes, ids, { prev, cur }, { ...done, ...(cur ? { [cur]: 'compare' as Tone } : {}) })] });
     }
     const s = showFrom(nodes, prev);
     t.frame({ line: 'done', caption: `cur = null → ho gaya. prev (purana aakhri) naya head: ${s}. O(n), O(1).`, panels: [listView(nodes, prev, { pointers: { head: prev } })] });
@@ -129,7 +129,7 @@ export const betweenTrace = tracer<{ values: number[]; left: number; right: numb
     let before = 'D';
     for (let i = 1; i < left; i++) before = nodes.get(before)!.next!;
     const start = nodes.get(before)!.next!;
-    t.frame({ line: 'walk', caption: `D = dummy (head se pehle nakli node). before = tukde se theek pehle wala (${nodes.get(before)!.value}). Tukda: position ${left}..${right}.`, legend: { active: 'tukda', muted: 'dummy' }, panels: [fixed(nodes, all, { before, start }, { ...seg, D: 'muted' })] });
+    t.frame({ line: 'walk', caption: `D = dummy (head se pehle nakli node). before = pieces se theek pehle wala (${nodes.get(before)!.value}). Piece: position ${left}..${right}.`, legend: { active: 'piece', muted: 'dummy' }, panels: [fixed(nodes, all, { before, start }, { ...seg, D: 'muted' })] });
     let prev: string | null = null;
     let cur: string | null = start;
     for (let i = left; i <= right; i++) {
@@ -137,11 +137,11 @@ export const betweenTrace = tracer<{ values: number[]; left: number; right: numb
       nodes.get(cur!)!.next = prev;
       prev = cur;
       cur = nxt;
-      t.frame({ line: 'flip', caption: `${nodes.get(prev!)!.value} ka arrow ulta. (Tukde ke andar normal reverse.)`, legend: { active: 'tukda', muted: 'dummy' }, panels: [fixed(nodes, all, { before, prev, cur }, { ...seg, D: 'muted' })] });
+      t.frame({ line: 'flip', caption: `${nodes.get(prev!)!.value} ka arrow ulta. (Pieces ke andar normal reverse.)`, legend: { active: 'piece', muted: 'dummy' }, panels: [fixed(nodes, all, { before, prev, cur }, { ...seg, D: 'muted' })] });
     }
     nodes.get(before)!.next = prev;
     nodes.get(start)!.next = cur;
-    t.frame({ line: 'join', caption: `Jodo: before → ${nodes.get(prev!)!.value} (tukde ka naya shuru), aur ${nodes.get(start)!.value} (ab tukde ka aakhri) → ${cur ? nodes.get(cur)!.value : 'null'}.`, legend: { active: 'tukda', muted: 'dummy' }, panels: [listView(nodes, 'D', { tones: { ...seg, D: 'muted' }, pointers: { before } })] });
+    t.frame({ line: 'join', caption: `Jodo: before → ${nodes.get(prev!)!.value} (pieces ka naya shuru), aur ${nodes.get(start)!.value} (ab pieces ka aakhri) → ${cur ? nodes.get(cur)!.value : 'null'}.`, legend: { active: 'piece', muted: 'dummy' }, panels: [listView(nodes, 'D', { tones: { ...seg, D: 'muted' }, pointers: { before } })] });
     const s = showFrom(nodes, nodes.get('D')!.next);
     t.frame({ line: 'join', caption: `Result ${s}. Ek pass, O(n), O(1).`, panels: [listView(nodes, nodes.get('D')!.next, { tones: seg })] });
     return s;
@@ -169,7 +169,7 @@ export const kGroupTrace = tracer<{ values: number[]; k: number }>({
         break;
       }
       const groupNext = nodes.get(kth)!.next;
-      t.frame({ line: 'check', caption: `Tukda ${g + 1}: ${nodes.get(nodes.get(groupPrev)!.next!)!.value}..${nodes.get(kth)!.value} (${k} nodes hain ✓). groupNext = ${groupNext ? nodes.get(groupNext)!.value : 'null'}.`, panels: view({ groupPrev, kth, groupNext }) });
+      t.frame({ line: 'check', caption: `Piece ${g + 1}: ${nodes.get(nodes.get(groupPrev)!.next!)!.value}..${nodes.get(kth)!.value} (${k} nodes hain ✓). groupNext = ${groupNext ? nodes.get(groupNext)!.value : 'null'}.`, panels: view({ groupPrev, kth, groupNext }) });
       let prev: string | null = groupNext;
       let cur: string | null = nodes.get(groupPrev)!.next;
       while (cur !== groupNext) {
@@ -180,9 +180,9 @@ export const kGroupTrace = tracer<{ values: number[]; k: number }>({
         cur = nxt;
       }
       const oldFirst = nodes.get(groupPrev)!.next!;
-      t.frame({ line: 'flip', caption: `Tukde ke arrows ulte — prev ko groupNext se shuru kiya tha, isliye tukde ka purana pehla (${nodes.get(oldFirst)!.value}) ab seedha agle tukde ko point karta hai.`, panels: [listView(nodes, kth, { pointers: { groupPrev, kth }, tones, extra: ['D'] })] });
+      t.frame({ line: 'flip', caption: `Pieces ke arrows ulte — prev ko groupNext se shuru kiya tha, isliye pieces ka purana pehla (${nodes.get(oldFirst)!.value}) ab seedha agle pieces ko point karta hai.`, panels: [listView(nodes, kth, { pointers: { groupPrev, kth }, tones, extra: ['D'] })] });
       nodes.get(groupPrev)!.next = kth;
-      t.frame({ line: 'join', caption: `groupPrev.next = kth (${nodes.get(kth)!.value}) → tukda list mein juda. Agla groupPrev = ${nodes.get(oldFirst)!.value}.`, panels: view({ groupPrev: oldFirst }) });
+      t.frame({ line: 'join', caption: `groupPrev.next = kth (${nodes.get(kth)!.value}) → piece list mein juda. Agla groupPrev = ${nodes.get(oldFirst)!.value}.`, panels: view({ groupPrev: oldFirst }) });
       groupPrev = oldFirst;
       g++;
     }

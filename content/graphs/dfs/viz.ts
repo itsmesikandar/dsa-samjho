@@ -58,10 +58,10 @@ export const versusTrace = tracer<{ edges: number[][]; start: number }>({
       const why =
         k === 0
           ? `Dono ${start} se shuru.`
-          : `DFS → ${d} (${dPar[d]} ka padosi — jahan tha wahin se aur gehre). BFS → ${b} (level ${level[b]} — pehle paas wale sab).`;
-      t.frame({ caption: `#${k + 1}: ${why}`, legend, panels: [panel(dOrder, k, 'DFS — gehraai pehle', dPar), panel(bOrder, k, 'BFS — chaudai pehle')] });
+          : `DFS → ${d} (${dPar[d]} ka neighbor — jahan tha wahin se aur deep). BFS → ${b} (level ${level[b]} — pehle paas wale sab).`;
+      t.frame({ caption: `#${k + 1}: ${why}`, legend, panels: [panel(dOrder, k, 'DFS — depth pehle', dPar), panel(bOrder, k, 'BFS — width pehle')] });
     }
-    t.frame({ caption: `DFS ${listStr(dOrder)} — ek raste par jitna ho sake andar, phir wapas. BFS ${listStr(bOrder)} — lehar ki tarah ring by ring. Nodes same, order alag; dono O(V + E). Neeli edges = DFS jis raaste se gaya (DFS tree).`, legend, panels: [panel(dOrder, dOrder.length - 1, 'DFS — gehraai pehle', dPar), panel(bOrder, bOrder.length - 1, 'BFS — chaudai pehle')] });
+    t.frame({ caption: `DFS ${listStr(dOrder)} — ek raste par jitna ho sake andar, phir wapas. BFS ${listStr(bOrder)} — wave ki tarah ring by ring. Nodes same, order alag; dono O(V + E). Blue edges = DFS jis raaste se gaya (DFS tree).`, legend, panels: [panel(dOrder, dOrder.length - 1, 'DFS — depth pehle', dPar), panel(bOrder, bOrder.length - 1, 'BFS — width pehle')] });
     return listStr(dOrder);
   },
 });
@@ -75,7 +75,7 @@ export const dfsTrace = tracer<{ edges: number[][]; start: number }>({
     const visited: boolean[] = Array(N).fill(false);
     const order: number[] = [];
     const stack: number[] = [];
-    const legend = { active: 'abhi yahan (stack ka top)', new: 'call stack mein (rasta)', done: 'poora (backtrack ho gaya)', compare: 'padosi check' };
+    const legend = { active: 'abhi yahan (stack ka top)', new: 'call stack mein (rasta)', done: 'poora (backtrack ho gaya)', compare: 'neighbor check' };
     const view = (v?: number): Panel[] => {
       const tones: Tones = {};
       visited.forEach((x, i) => x && (tones[i] = 'done'));
@@ -101,24 +101,24 @@ export const dfsTrace = tracer<{ edges: number[][]; start: number }>({
       t.frame({ line: 'enter', caption: `dfs(${u}): aate hi visited + order mein. Stack = ${stack.join(' → ')} — yahi abhi ka rasta hai.`, vars: { u }, legend, panels: view() });
       for (const v of adj[u]) {
         if (!visited[v]) {
-          t.frame({ line: 'go', caption: `${u} ka padosi ${v} naya → dfs(${v}) call. ${u} yahin ruk ke intezaar karega; baaki padosi baad mein.`, vars: { u, v }, legend, panels: view(v) });
+          t.frame({ line: 'go', caption: `${u} ka neighbor ${v} naya → dfs(${v}) call. ${u} yahin ruk ke wait karega; baaki neighbor baad mein.`, vars: { u, v }, legend, panels: view(v) });
           go(v);
         } else {
-          t.frame({ line: 'go', caption: `${u} ka padosi ${v} pehle se visited → skip. (Ye check na ho to cycle mein hamesha ghoomte rehte.)`, vars: { u, v }, legend, panels: view(v) });
+          t.frame({ line: 'go', caption: `${u} ka neighbor ${v} pehle se visited → skip. (Ye check na ho to cycle mein hamesha ghoomte rehte.)`, vars: { u, v }, legend, panels: view(v) });
         }
       }
       stack.pop();
       const back = stack[stack.length - 1];
-      t.frame({ line: 'back', caption: `${u} ke saare padosi ho gaye → return. ${back !== undefined ? `Wapas ${back} par, wahan agla padosi dekhenge (backtrack).` : 'Stack khaali — DFS khatam.'}`, vars: { u }, legend, panels: view() });
+      t.frame({ line: 'back', caption: `${u} ke saare neighbor ho gaye → return. ${back !== undefined ? `Wapas ${back} par, wahan agla padosi dekhenge (backtrack).` : 'Stack khaali — DFS khatam.'}`, vars: { u }, legend, panels: view() });
     };
     go(start);
     const lost = visited.map((x, i) => (x ? -1 : i)).filter((i) => i >= 0);
-    t.frame({ caption: `DFS order = ${listStr(order)}.${lost.length ? ` ${lost.join(', ')} tak rasta nahi — doosra component.` : ''} Har node ek baar enter, har edge do baar check → O(V + E). Stack ki gehraai = sabse lamba DFS rasta (worst O(V)).`, legend, panels: view() });
+    t.frame({ caption: `DFS order = ${listStr(order)}.${lost.length ? ` ${lost.join(', ')} tak rasta nahi — doosra component.` : ''} Har node ek baar enter, har edge 2 baar check → O(V + E). Stack ki depth = sabse lamba DFS rasta (worst O(V)).`, legend, panels: view() });
     return listStr(order);
   },
 });
 
-// ---------- Example 1: Connected components ginna ----------
+// ---------- Example 1: Connected components count karna ----------
 const COMP_DEFAULT = [[0, 1], [1, 2], [0, 2], [3, 4], [5, 3]];
 const COMP_POS: Pos = { 0: [0, 20], 1: [30, 0], 2: [20, 60], 3: [65, 15], 4: [100, 0], 5: [85, 55], 6: [45, 100] };
 
@@ -140,7 +140,7 @@ export const componentsTrace = tracer<{ edges: number[][] }>({
       ];
     };
     const legendNow = () => Object.fromEntries(Array.from({ length: Math.min(count, COMP_TONES.length) }, (_, c) => [COMP_TONES[c], `component C${c + 1}`]));
-    t.frame({ caption: `${N} nodes. Plan: 0 se ${N - 1} tak har node dekho. Jo abhi tak visited nahi — wahan tak kisi pichhle DFS ka rasta nahi pahuncha → naya component. Wahan se ek DFS poora component rang dega.`, panels: view() });
+    t.frame({ caption: `${N} nodes. Plan: 0 se ${N - 1} tak har node dekho. Jo abhi tak visited nahi — wahan tak kisi pichhle DFS ka rasta nahi pahuncha → naya component. Wahan se ek DFS poora component color dega.`, panels: view() });
     for (let s = 0; s < N; s++) {
       if (comp[s] >= 0) {
         t.frame({ line: 'skip', caption: `Node ${s} pehle se visited (C${comp[s] + 1} mein) → skip.`, vars: { s, count }, legend: legendNow(), panels: view(s) });
@@ -155,7 +155,7 @@ export const componentsTrace = tracer<{ edges: number[][] }>({
         for (const v of adj[u]) if (comp[v] < 0) fill(v);
       };
       fill(s);
-      t.frame({ line: 'fill', caption: `DFS(${s}) ne C${count} ke saare nodes visited kiye: ${got.join(', ')}. Ab inme se koi naya component nahi ginega.`, vars: { s, count }, legend: legendNow(), panels: view() });
+      t.frame({ line: 'fill', caption: `DFS(${s}) ne C${count} ke saare nodes visited kiye: ${got.join(', ')}. Ab inme se koi naya component nahi count karega.`, vars: { s, count }, legend: legendNow(), panels: view() });
     }
     t.frame({ line: 'done', caption: `${count} component${count > 1 ? 's' : ''}. Har node ek DFS mein ek hi baar → O(V + E). (Union-find se bhi ho sakta hai — aage ka topic.)`, legend: legendNow(), panels: view() });
     return String(count);
@@ -164,7 +164,7 @@ export const componentsTrace = tracer<{ edges: number[][] }>({
 
 // ---------- Example 2: Number of islands (grid DFS) ----------
 export const islandsTrace = tracer<{ grid: string[] }>({
-  inputs: [{ name: 'grid', type: 'charGrid', label: 'Grid (1 = zameen, 0 = paani)', default: ['11000', '11010', '00100', '00011'], maxRows: 5, maxCols: 5, charset: '01' }],
+  inputs: [{ name: 'grid', type: 'charGrid', label: 'Grid (1 = land, 0 = paani)', default: ['11000', '11010', '00100', '00011'], maxRows: 5, maxCols: 5, charset: '01' }],
   run({ grid: rows }, t) {
     const g = rows.map((r) => [...r]);
     const R = g.length;
@@ -180,12 +180,12 @@ export const islandsTrace = tracer<{ grid: string[] }>({
         { kind: 'grid', label: `Grid · islands = ${count}${scan ? ` · scan (${scan[0]},${scan[1]})` : ''}`, values: g.map((r) => [...r]), tones, rowLabels: g.map((_, i) => String(i)), colLabels: g[0].map((_, j) => String(j)) },
       ];
     };
-    t.frame({ caption: 'Grid ko upar se neeche, baayein se daayein scan karo. 1 mila = abhi tak kisi DFS ne nahi dubaya = naya island. Wahan se DFS chala ke poora tukda 0 kar do (dooba do) — 4 dishayein (tirchha nahi).', legend: legendNow(), panels: view() });
+    t.frame({ caption: 'Grid ko upar se neeche, left se right scan karo. 1 mila = abhi tak kisi DFS ne nahi dubaya = naya island. Wahan se DFS chala ke poora piece 0 kar do (dooba do) — 4 dishayein (diagonal nahi).', legend: legendNow(), panels: view() });
     const sink = (i: number, j: number) => {
       if (i < 0 || j < 0 || i >= R || j >= C || g[i][j] !== '1') return;
       g[i][j] = '0';
       island[i][j] = count - 1;
-      t.frame({ line: 'mark', caption: `(${i},${j}) zameen → '0' kar diya (island ${count}). Ab iske 4 padosi: neeche, upar, daayein, baayein. Paani / bahar / dooba hua → wahin return.`, vars: { count, cell: `${i},${j}` }, legend: legendNow({ swap: 'abhi doob raha' }), panels: view([i, j]) });
+      t.frame({ line: 'mark', caption: `(${i},${j}) land → '0' kar diya (island ${count}). Ab iske 4 neighbor: neeche, upar, right, left. Paani / bahar / dooba hua → wahin return.`, vars: { count, cell: `${i},${j}` }, legend: legendNow({ swap: 'abhi doob raha' }), panels: view([i, j]) });
       sink(i + 1, j);
       sink(i - 1, j);
       sink(i, j + 1);
@@ -195,11 +195,11 @@ export const islandsTrace = tracer<{ grid: string[] }>({
       for (let j = 0; j < C; j++) {
         if (g[i][j] !== '1') continue;
         count++;
-        t.frame({ line: 'found', caption: `Scan (${i},${j}) par '1' mila → island #${count}. Ab sink(${i},${j}) se poora tukda doobega.`, vars: { count, cell: `${i},${j}` }, legend: legendNow({ swap: 'naya island yahan' }), panels: view([i, j], [i, j]) });
+        t.frame({ line: 'found', caption: `Scan (${i},${j}) par '1' mila → island #${count}. Ab sink(${i},${j}) se poora piece doobega.`, vars: { count, cell: `${i},${j}` }, legend: legendNow({ swap: 'naya island yahan' }), panels: view([i, j], [i, j]) });
         sink(i, j);
       }
     }
-    t.frame({ line: 'done', caption: `${count} island${count === 1 ? '' : 's'}. Har cell max ek baar dooba, har ek ke 4 padosi → O(R × C). Grid khud visited bana — extra memory sirf recursion stack (worst R × C).`, legend: legendNow(), panels: view() });
+    t.frame({ line: 'done', caption: `${count} island${count === 1 ? '' : 's'}. Har cell max ek baar dooba, har ek ke 4 neighbor → O(R × C). Grid khud visited bana — extra memory sirf recursion stack (worst R × C).`, legend: legendNow(), panels: view() });
     return String(count);
   },
 });
@@ -216,7 +216,7 @@ export const cycleTrace = tracer<{ edges: number[][] }>({
     const visited: boolean[] = Array(N).fill(false);
     const par: number[] = Array(N).fill(-1);
     const stack: number[] = [];
-    const legend = { active: 'abhi yahan', new: 'stack mein (rasta)', done: 'poora ho gaya', compare: 'padosi check', muted: 'parent (skip)', error: 'cycle' };
+    const legend = { active: 'abhi yahan', new: 'stack mein (rasta)', done: 'poora ho gaya', compare: 'neighbor check', muted: 'parent (skip)', error: 'cycle' };
     const view = (v?: number, vt: Tone = 'compare', cyc: number[] = []): Panel[] => {
       const tones: Tones = {};
       visited.forEach((x, i) => x && (tones[i] = 'done'));
@@ -263,7 +263,7 @@ export const cycleTrace = tracer<{ edges: number[][] }>({
         if (go(v, u)) return true;
       }
       stack.pop();
-      t.frame({ line: 'back', caption: `${u} ke padosiyon mein cycle nahi → return false, wapas ${stack.length ? stack[stack.length - 1] : 'loop'} par.`, vars: { u }, legend, panels: view() });
+      t.frame({ line: 'back', caption: `${u} ke neighbors mein cycle nahi → return false, wapas ${stack.length ? stack[stack.length - 1] : 'loop'} par.`, vars: { u }, legend, panels: view() });
       return false;
     };
     for (let s = 0; s < N && !found; s++) {
@@ -272,10 +272,10 @@ export const cycleTrace = tracer<{ edges: number[][] }>({
       go(s, -1);
     }
     if (found) {
-      t.frame({ caption: 'Cycle mila → true. Har node ek baar, har edge max do baar → O(V + E).', legend, panels: view() });
+      t.frame({ caption: 'Cycle mila → true. Har node ek baar, har edge max 2 baar → O(V + E).', legend, panels: view() });
       return 'true';
     }
-    t.frame({ line: 'none', caption: 'Saare components dekhe, kahin "visited + parent nahi" wala padosi nahi mila → koi cycle nahi, false. (Har component ek tree hai — forest.)', legend, panels: view() });
+    t.frame({ line: 'none', caption: 'Saare components dekhe, kahin "visited + parent nahi" wala neighbor nahi mila → koi cycle nahi, false. (Har component ek tree hai — forest.)', legend, panels: view() });
     return 'false';
   },
 });

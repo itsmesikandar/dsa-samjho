@@ -1,4 +1,4 @@
-// Pair (a, b) ka rank = a ki roads + b ki roads; a-b seedhi road ho to wo ek hi baar gino
+// Pair (a, b) ka rank = a ki roads + b ki roads; a-b seedhi road ho to wo ek hi baar count karo
 fun maximalNetworkRank(n: Int, roads: Array<IntArray>): Int {
     val deg = IntArray(n)
     val connected = Array(n) { BooleanArray(n) } // adjacency matrix: "a-b road hai?" O(1) mein //@init
@@ -12,7 +12,7 @@ fun maximalNetworkRank(n: Int, roads: Array<IntArray>): Int {
     for (a in 0 until n) {
         for (b in a + 1 until n) {
             var rank = deg[a] + deg[b] // dono ki roads jodo //@pair
-            if (connected[a][b]) rank-- // a-b wali road dono degree mein gini gayi - ek ghatao //@minus
+            if (connected[a][b]) rank-- // a-b wali road dono degree mein count ki gayi - ek ghatao //@minus
             best = maxOf(best, rank)
         }
     }

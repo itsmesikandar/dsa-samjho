@@ -59,7 +59,7 @@ export const twoStacksTrace = tracer<{ ops: string }>({
       }
       t.frame({ line: 'move', caption: `outbox khaali tha → inbox ke saare items ulte karke outbox mein. Ab sabse purana outbox ke TOP par.`, vars: { moves }, panels: view(undefined, outbox.length - 1) });
     };
-    t.frame({ line: 'push', caption: 'Queue (FIFO) chahiye par sirf stacks (LIFO) hain. Trick: do stacks — ek mein daalo, doosre se nikaalo. Ulta-ulta = seedha!', panels: view() });
+    t.frame({ line: 'push', caption: 'Queue (FIFO) chahiye par sirf stacks (LIFO) hain. Trick: 2 stacks — ek mein daalo, doosre se nikaalo. Ulta-ulta = seedha!', panels: view() });
     for (const c of ops) {
       if (c === 'k' || c === 'o') {
         move();
@@ -71,7 +71,7 @@ export const twoStacksTrace = tracer<{ ops: string }>({
         t.frame({ line: 'push', caption: `push(${c}) → inbox par. O(1).`, vars: { moves }, panels: view(inbox.length - 1) });
       }
     }
-    t.frame({ line: 'pop', caption: `Har item max ek baar inbox → outbox shift hua (kul ${moves} shifts). Isliye har operation amortized O(1).`, vars: { moves }, panels: view() });
+    t.frame({ line: 'pop', caption: `Har item max ek baar inbox → outbox shift hua (total ${moves} shifts). Isliye har operation amortized O(1).`, vars: { moves }, panels: view() });
     return String(outs[0]);
   },
 });
@@ -104,7 +104,7 @@ export const senateTrace = tracer<{ s: string }>({
     const d: number[] = [];
     [...s].forEach((c, i) => (c === 'R' ? r : d).push(i));
     const view = (): Panel[] => [queuePanel(r, 'R ki baari (index)'), queuePanel(d, 'D ki baari (index)')];
-    t.frame({ line: 'face', caption: 'Har party ki apni queue — jis order mein bolenge. Chhota index = pehle bolta hai. Sabse achha: apni baari par AGLE bolne wale virodhi ka haq chheeno.', panels: view() });
+    t.frame({ line: 'face', caption: 'Har party ki apni queue — jis order mein bolenge. Chhota index = pehle bolta hai. Sabse achha: apni baari par AGLE bolne wale opponent ka haq chheeno.', panels: view() });
     while (r.length && d.length) {
       const ri = r.shift()!;
       const di = d.shift()!;

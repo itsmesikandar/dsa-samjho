@@ -1,4 +1,4 @@
-// Anagrams ko ek group mein rakho. Key = letters sort karke (anagrams ka sorted roop same hota hai)
+// Anagrams ko ek group mein rakho. Key = letters sort karke (anagrams ka sorted form same hota hai)
 fun groupAnagrams(words: List<String>): List<List<String>> {
     val groups = HashMap<String, MutableList<String>>() //@init
     for (w in words) {

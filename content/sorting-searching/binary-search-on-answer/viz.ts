@@ -3,12 +3,12 @@ import type { ArrRange, Panel, Tone, ToneMap } from '@/components/viz/engine/typ
 
 const ceilDiv = (p: number, k: number) => Math.floor((p - 1) / k) + 1;
 const hours = (piles: number[], k: number) => piles.reduce((s, p) => s + ceilDiv(p, k), 0);
-const pilesCheck = ({ piles, h }: { piles: number[]; h: number }) => (h >= piles.length ? null : `h (${h}) kam se kam dheron ki ginti (${piles.length}) jitna ho — har dher ko 1 ghanta to chahiye.`);
+const pilesCheck = ({ piles, h }: { piles: number[]; h: number }) => (h >= piles.length ? null : `h (${h}) kam se kam bahut saare ki count (${piles.length}) jitna ho — har pile ko 1 ghanta to chahiye.`);
 
 // ---------- 3. Visual intro: answer ki range par monotonic graph ----------
 export const answerChart = tracer<{ piles: number[]; h: number }>({
   inputs: [
-    { name: 'piles', type: 'intArray', label: 'Kele ke dher', default: [3, 6, 7, 11], minLen: 1, maxLen: 6, min: 1, max: 15 },
+    { name: 'piles', type: 'intArray', label: 'Kele ke pile', default: [3, 6, 7, 11], minLen: 1, maxLen: 6, min: 1, max: 15 },
     { name: 'h', type: 'int', label: 'Ghante (h)', default: 8, min: 1, max: 30 },
   ],
   check: pilesCheck,
@@ -26,7 +26,7 @@ export const answerChart = tracer<{ piles: number[]; h: number }>({
       ],
       marker,
     });
-    t.frame({ caption: `Speed badhao → ghante kam (ya barabar). Graph hamesha neeche jaata hai — MONOTONIC. To "ghante ≤ ${h}" wale speeds ek lagatar hissa hain: F F F T T T. Pehla T = answer.`, panels: [chart()] });
+    t.frame({ caption: `Speed badhao → ghante kam (ya barabar). Graph hamesha neeche jaata hai — MONOTONIC. To "ghante ≤ ${h}" wale speeds ek continuous hissa hain: F F F T T T. Pehla T = answer.`, panels: [chart()] });
     let lo = 1;
     let hi = max;
     while (lo < hi) {
@@ -52,12 +52,12 @@ export const kokoTrace = tracer<{ piles: number[]; h: number }>({
   run({ piles, h }, t) {
     let lo = 1;
     let hi = Math.max(...piles);
-    t.frame({ line: 'init', caption: `Answer ki range: speed 1 (sabse dheere) se ${hi} (sabse bada dher — isse tez ka koi fayda nahi). Har speed par "h mein khatam?" ka jawab F…F T…T.`, vars: { lo, hi }, panels: [array(piles, { label: 'piles' })] });
+    t.frame({ line: 'init', caption: `Answer ki range: speed 1 (sabse dheere) se ${hi} (sabse bada pile — isse tez ka koi fayda nahi). Har speed par "h mein khatam?" ka jawab F…F T…T.`, vars: { lo, hi }, panels: [array(piles, { label: 'piles' })] });
     while (lo < hi) {
       const mid = lo + Math.floor((hi - lo) / 2);
       const per = piles.map((p) => ceilDiv(p, mid));
       const hr = per.reduce((s, x) => s + x, 0);
-      t.frame({ line: 'mid', caption: `mid = ${mid}: har dher ⌈p / ${mid}⌉ ghante → total ${hr}.`, vars: { lo, hi, mid, ghante: hr }, panels: [array(piles, { label: 'piles' }), array(per, { label: `ghante (k = ${mid})`, tones: Object.fromEntries(per.map((_, i) => [i, 'compare' as Tone])) })] });
+      t.frame({ line: 'mid', caption: `mid = ${mid}: har pile ⌈p / ${mid}⌉ ghante → total ${hr}.`, vars: { lo, hi, mid, ghante: hr }, panels: [array(piles, { label: 'piles' }), array(per, { label: `ghante (k = ${mid})`, tones: Object.fromEntries(per.map((_, i) => [i, 'compare' as Tone])) })] });
       if (hr <= h) {
         hi = mid;
         t.frame({ line: 'ok', caption: `${hr} ≤ ${h} → speed ${mid} chalegi. Shayad aur dheere bhi — hi = ${mid}.`, vars: { lo, hi }, panels: [array(piles, { label: 'piles' }), array(per, { label: `ghante (k = ${mid})`, tones: Object.fromEntries(per.map((_, i) => [i, 'found' as Tone])) })] });
@@ -150,7 +150,7 @@ export const pairDistTrace = tracer<{ nums: number[]; k: number }>({
     const n = a.length;
     let lo = 0;
     let hi = a[n - 1] - a[0];
-    t.frame({ line: 'init', caption: `Sort kiya. Saare ${(n * (n - 1)) / 2} jode bana ke sort karna O(n² log n). Ulta socho: answer (doori) 0..${hi} ke beech. Sawaal: "doori ≤ d wale jode ≥ ${k}?" — d badhao to jode badhte hain → monotonic!`, vars: { lo, hi }, panels: [array(a, { label: 'sorted' })] });
+    t.frame({ line: 'init', caption: `Sort kiya. Saare ${(n * (n - 1)) / 2} jode bana ke sort karna O(n² log n). Ulta socho: answer (distance) 0..${hi} ke beech. Sawaal: "distance ≤ d wale jode ≥ ${k}?" — d badhao to jode badhte hain → monotonic!`, vars: { lo, hi }, panels: [array(a, { label: 'sorted' })] });
     while (lo < hi) {
       const mid = lo + Math.floor((hi - lo) / 2);
       let count = 0;
@@ -161,11 +161,11 @@ export const pairDistTrace = tracer<{ nums: number[]; k: number }>({
         count += r - l;
         per.push(r - l);
       }
-      t.frame({ line: 'count', caption: `d = ${mid}: har r ke liye kitne l (l < r) jinki doori ≤ ${mid} — two pointers se ek pass. Total ${count} jode.`, vars: { lo, hi, mid, count }, panels: [array(a, { label: 'sorted' }), array(per, { label: `r ke saath jode (d ≤ ${mid})`, tones: Object.fromEntries(per.map((_, i) => [i, 'compare' as Tone])) })] });
+      t.frame({ line: 'count', caption: `d = ${mid}: har r ke liye kitne l (l < r) jinki distance ≤ ${mid} — two pointers se ek pass. Total ${count} jode.`, vars: { lo, hi, mid, count }, panels: [array(a, { label: 'sorted' }), array(per, { label: `r ke saath jode (d ≤ ${mid})`, tones: Object.fromEntries(per.map((_, i) => [i, 'compare' as Tone])) })] });
       const ok = count >= k;
       if (ok) hi = mid;
       else lo = mid + 1;
-      t.frame({ line: ok ? 'ok' : 'notok', caption: ok ? `${count} ≥ ${k} → k-th doori ≤ ${mid}. hi = ${hi}.` : `${count} < ${k} → k-th doori ${mid} se badi. lo = ${lo}.`, vars: { lo, hi }, panels: [array(a, { label: 'sorted' })] });
+      t.frame({ line: ok ? 'ok' : 'notok', caption: ok ? `${count} ≥ ${k} → k-th distance ≤ ${mid}. hi = ${hi}.` : `${count} < ${k} → k-th distance ${mid} se badi. lo = ${lo}.`, vars: { lo, hi }, panels: [array(a, { label: 'sorted' })] });
     }
     const tones: ToneMap = {};
     t.frame({ line: 'done', caption: `Answer ${lo}. Sort O(n log n) + log(range) × O(n) count. Jode kabhi banaye hi nahi!`, vars: { answer: lo }, panels: [array(a, { label: 'sorted', tones })] });

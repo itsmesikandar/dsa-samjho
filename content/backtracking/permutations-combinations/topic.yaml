@@ -2,7 +2,7 @@ meta:
   id: permutations-combinations
   chapter: backtracking
   title: Permutations & Combinations
-  subtitle: Order matter karta hai ya nahi? used[] vs start index — aur duplicates ko ek hi baar ginna
+  subtitle: Order matter karta hai ya nahi? used[] vs start index — aur duplicates ko ek hi baar count karna
   level: intermediate
   minutes: 40
   prereqs: [backtracking-basics]
@@ -11,12 +11,12 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Backtracking ke do sabse common roop:
+    Backtracking ke 2 sabse common form:
 
     | | Permutation | Combination |
     |---|---|---|
     | Order matter? | **Haan** — [1, 2] ≠ [2, 1] | **Nahi** — {1, 2} = {2, 1} |
-    | Ginti | n! (ya n!/(n−k)!) | C(n, k) = n! / (k!(n−k)!) |
+    | Count | n! (ya n!/(n−k)!) | C(n, k) = n! / (k!(n−k)!) |
     | Har level par options | Saare jo **use nahi hue** (`used[]`) | Sirf **start se aage** wale |
     | Example | Line mein baithne ke tareeke | Team mein kaun-kaun |
 
@@ -28,9 +28,9 @@ what:
     ```
 
     > [!yaad]
-    > Ek line ka farak: **start index** (combination) vs **used array** (permutation). Yahi sawaal ka asli faisla hai.
+    > Ek line ka farak: **start index** (combination) vs **used array** (permutation). Yahi sawaal ka asli decision hai.
   analogy: |
-    **Cricket team (combination):** 15 mein se 11 chunne hain — kaun-kaun, order se fark nahi.
+    **Cricket team (combination):** 15 mein se 11 choose karne hain — kaun-kaun, order se fark nahi.
 
     **Batting order (permutation):** wahi 11 log, par pehle kaun, doosra kaun — order hi sab kuch.
 
@@ -42,19 +42,19 @@ why:
     - Lottery / team selection → combination.
     - Letters ka har arrangement (anagrams) → permutation.
 
-    Galat dhaancha liya to ya to answers **dobara** aayenge (combination mein permutation logic) ya **chhoot** jaayenge.
+    Galat structure liya to ya to answers **dobara** aayenge (combination mein permutation logic) ya **chhoot** jaayenge.
 
-    **Duplicates** (input `[1, 1, 2]`) — naive permutation `[1, 1, 2]` do baar banata hai (dono 1 alag samjhe). Sort + skip rule se ek hi baar.
+    **Duplicates** (input `[1, 1, 2]`) — naive permutation `[1, 1, 2]` 2 baar banata hai (dono 1 alag samjhe). Sort + skip rule se ek hi baar.
 
     > [!socho]
-    > 5 log, 3 kursiyan (order matter). Kitne tareeke? Aur sirf "kaun 3 baithenge" (order nahi)?
+    > 5 log, 3 chairs (order matter). Kitne tareeke? Aur sirf "kaun 3 baithenge" (order nahi)?
     >
     > Permutation: 5 × 4 × 3 = **60**. Combination: 60 / 3! = **10** — har group ke 3! = 6 orders ko ek gina.
 
 # 3. Visual intro
 visual:
   body: |
-    Permutation ka ped: har level par jo items **abhi use nahi hue** (grey nahi) unka ek raasta. Pehli jagah n options, doosri n − 1… → n! patte.
+    Permutation ka tree: har level par jo items **abhi use nahi hue** (grey nahi) unka ek raasta. Pehli jagah n options, doosri n − 1… → n! patte.
   viz: { tracer: permTree }
 
 # 4. Kaise kaam karta hai
@@ -63,7 +63,7 @@ how:
     **Permutations (distinct):**
     - `used[i]` = kya `nums[i]` path mein hai.
     - Har call: `0..n−1` loop, used wale skip. Choose (`used = true`, path add) → recurse → un-choose (dono wapas).
-    - Path ki lambai n → result.
+    - Path ki length n → result.
 
     `[1, 2, 3]` → `[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]`
 
@@ -81,7 +81,7 @@ operations:
   - op: "k-permutations (n mein se k ka order)"
     time: O(k · n!/(n−k)!)
     space: O(k)
-    why: "Gehraai k par ruko."
+    why: "Depth k par ruko."
   - op: "Combinations C(n, k)"
     time: O(k · C(n, k))
     space: O(k)
@@ -155,10 +155,10 @@ examples:
       - `start` se loop, agli call `i + 1`.
       - `path.size == k` → result.
 
-      **Pruning:** abhi `need = k − path.size` aur chahiye. `i` itna bada mat lo ki aage `need` numbers bache hi na: `i ≤ n − need + 1`. Bekaar shaakhein shuru hi nahi hoti.
+      **Pruning:** abhi `need = k − path.size` aur chahiye. `i` itna bada mat lo ki aage `need` numbers bache hi na: `i ≤ n − need + 1`. Bekaar branches shuru hi nahi hoti.
 
       > [!tip]
-      > Bina pruning bhi sahi hai, bas dheema (khaali shaakhon mein bhatakta hai). n = 20, k = 18 jaise cases mein bahut fark.
+      > Bina pruning bhi sahi hai, bas slow (khaali branches mein bhatakta hai). n = 20, k = 18 jaise cases mein bahut fark.
     dryRun: |
       n = 4, k = 2
 
@@ -184,13 +184,13 @@ examples:
 
       Example: `[1, 1, 2]` → `[[1,1,2], [1,2,1], [2,1,1]]`
     intuition: |
-      Naive permutation dono 1s ko alag maanta hai → har arrangement do baar. HashSet se hatao → kaam karta hai par bekaar mehnat.
+      Naive permutation dono 1s ko alag maanta hai → har arrangement 2 baar. HashSet se hatao → kaam karta hai par bekaar mehnat.
 
-      **Rule:** sort karo; same value ki copies hamesha **baayein se daayein** order mein use hon:
+      **Rule:** sort karo; same value ki copies hamesha **left se right** order mein use hon:
       ```
       if (i > 0 && a[i] == a[i−1] && !used[i−1]) continue
       ```
-      Matlab: baayein wali copy abhi **unused** hai (is level par wo try ho ke wapas aa chuki) — to daayein wali ko yahan rakhna same ped dobara banana hai. Skip.
+      Matlab: left wali copy abhi **unused** hai (is level par wo try ho ke wapas aa chuki) — to right wali ko yahan rakhna same tree dobara banana hai. Skip.
 
       > [!galti]
       > `!used[i−1]` ki jagah `used[i−1]` likh diya — bhi sahi answers deta hai (ulta order force karta hai) par bahut kam pruning. `!used` wala standard aur tez.
@@ -217,7 +217,7 @@ when:
     - "Har position ke options alag (phone keypad) → level = position."
     - "Input mein duplicates aur alag answers → sort + skip rule."
   avoid:
-    - "Sirf GINTI chahiye — formula (n!, C(n, k)) ya DP."
+    - "Sirf COUNT chahiye — formula (n!, C(n, k)) ya DP."
     - "Sirf agla order chahiye — Next Permutation O(n)."
     - "k-th permutation — factorial number system (LC 60), saare banana nahi."
   signals:
@@ -233,9 +233,9 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Password / PIN security"
-    how: "4-digit PIN = 10⁴ combinations (repetition ke saath) — brute force kitna mushkil, ye ginti se pata chalta hai."
+    how: "4-digit PIN = 10⁴ combinations (repetition ke saath) — brute force kitna mushkil, ye count se pata chalta hai."
   - where: "Fantasy cricket (Dream11)"
-    how: "22 players mein se 11 ki team = combinations; captain/vice-captain chunna = order wala hissa."
+    how: "22 players mein se 11 ki team = combinations; captain/vice-captain choose karna = order wala hissa."
   - where: "Testing"
     how: "Feature flags ke saare combinations, ya UI steps ke saare orders test karna."
   - where: "Route planning (chhote n)"
@@ -281,7 +281,7 @@ interview:
   questions:
     - q: "Permutation aur combination backtracking mein code ka fark?"
       a: |
-        Permutation: har level 0 se loop + used[]. Combination: start index se loop, agli call i + 1. Order matter karta hai ya nahi — yahi faisla.
+        Permutation: har level 0 se loop + used[]. Combination: start index se loop, agli call i + 1. Order matter karta hai ya nahi — yahi decision.
     - q: "Permutations ki complexity?"
       a: |
         n! permutations × O(n) copy = O(n · n!). n = 10 par 3.6 crore — isliye n ≤ 8-10.
@@ -319,7 +319,7 @@ practice:
     url: "https://leetcode.com/problems/pascals-triangle/"
     level: easy
     pattern: "C(n, k) table"
-    hint: "Har entry = upar ke do ka jod — yahi C(n, k) = C(n−1, k−1) + C(n−1, k). Combinations ki ginti yahin se."
+    hint: "Har entry = upar ke do ka jod — yahi C(n, k) = C(n−1, k−1) + C(n−1, k). Combinations ki count yahin se."
   - name: "Pascal's Triangle II"
     platform: LeetCode
     num: 119
@@ -367,7 +367,7 @@ practice:
     url: "https://leetcode.com/problems/number-of-squareful-arrays/"
     level: hard
     pattern: Permutations II + adjacency check
-    hint: "Example 3 ka dhaancha; choose karne se pehle check: path ka aakhri + naya = perfect square? Nahi to us raaste mat jao."
+    hint: "Example 3 ka structure; choose karne se pehle check: path ka aakhri + naya = perfect square? Nahi to us raaste mat jao."
 
 # 13. Quick revision
 revision:
@@ -376,7 +376,7 @@ revision:
     - "Permutations n!, combinations C(n, k)."
     - "Duplicates: sort + (a[i] == a[i−1] && !used[i−1]) skip."
     - "Combination pruning: i ≤ n − need + 1."
-    - "Ginti / k-th / next — formula ya O(n) algorithm, saare banana nahi."
+    - "Count / k-th / next — formula ya O(n) algorithm, saare banana nahi."
   cheatsheet: |
     ```kotlin
     // permutation
@@ -413,11 +413,11 @@ revision:
 connections:
   related:
     - id: backtracking-basics
-      why: "Choose / explore / un-choose dhaancha."
+      why: "Choose / explore / un-choose structure."
     - id: sorting-in-practice
       why: "Duplicates skip ke liye pehle sort."
   usedLater:
     - id: constraint-backtracking
       how: "N-Queens = har row ke liye column ka permutation + constraints."
     - id: dp-intro
-      how: "Ginti (C(n, k), paths) DP/Pascal se."
+      how: "Count (C(n, k), paths) DP/Pascal se."

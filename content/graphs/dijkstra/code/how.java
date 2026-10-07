@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 class Main {
-    // Dijkstra: jo abhi sabse paas hai (heap ka top) uski doori pakki; wahan se padosiyon ko sasta karo
+    // Dijkstra: jo abhi sabse paas hai (heap ka top) uski distance pakki; wahan se neighbors ko sasta karo
     static int[] dijkstra(int n, int[][] edges, int src) {
-        List<List<int[]>> adj = new ArrayList<>(); // (padosi, weight)
+        List<List<int[]>> adj = new ArrayList<>(); // (neighbor, weight)
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
         for (int[] e : edges) {
             adj.get(e[0]).add(new int[] {e[1], e[2]});
-            adj.get(e[1]).add(new int[] {e[0], e[2]}); // undirected sadak
+            adj.get(e[1]).add(new int[] {e[0], e[2]}); // undirected road
         }
         int[] dist = new int[n];
         Arrays.fill(dist, Integer.MAX_VALUE);

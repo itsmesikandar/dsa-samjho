@@ -4,9 +4,9 @@ fun largestRectangleArea(h: IntArray): Int {
     var best = 0
     for (i in 0..h.size) {
         val cur = if (i == h.size) 0 else h[i] // aakhir mein nakli 0 height: bache sab bars pop ho jaayein
-        while (st.isNotEmpty() && h[st.last()] >= cur) { // top bar ki height wala rectangle ab daayein nahi badh sakta //@pop
+        while (st.isNotEmpty() && h[st.last()] >= cur) { // top bar ki height wala rectangle ab right nahi badh sakta //@pop
             val height = h[st.removeLast()]
-            val left = if (st.isEmpty()) -1 else st.last() // isse chhota pichhla bar = left deewar
+            val left = if (st.isEmpty()) -1 else st.last() // isse chhota pichhla bar = left wall
             best = maxOf(best, height * (i - left - 1)) // width = left aur i ke beech ke bars //@area
         }
         st.addLast(i) //@push

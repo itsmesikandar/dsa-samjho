@@ -2,7 +2,7 @@ meta:
   id: dfs
   chapter: graphs
   title: DFS
-  subtitle: Ek raste mein gehraai tak jao, band ho to wapas — components, islands, cycle
+  subtitle: Ek raste mein depth tak jao, band ho to wapas — components, islands, cycle
   level: intermediate
   minutes: 45
   prereqs: [bfs, recursion-basics, tree-traversals]
@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **DFS (Depth-First Search)** ek padosi pakadta hai aur uski **poori gehraai** tak jaata hai. Aage rasta band (saare padosi visited) → ek kadam **wapas** (backtrack), wahan ka agla padosi.
+    **DFS (Depth-First Search)** ek neighbor pakadta hai aur uski **poori depth** tak jaata hai. Aage rasta band (saare neighbor visited) → ek step **wapas** (backtrack), wahan ka agla neighbor.
 
     Engine = **stack** — mostly recursion ka call stack:
     ```text
@@ -25,10 +25,10 @@ what:
     Tree ka preorder yahi tha. Graph mein bas `visited` aur jud gaya, kyunki cycle ho sakta hai.
 
     > [!yaad]
-    > BFS = queue = chaudai (paas pehle). DFS = stack = gehraai (ek raasta poora pehle). Dono O(V + E), dono har node ek baar.
+    > BFS = queue = width (paas pehle). DFS = stack = depth (ek raasta poora pehle). Dono O(V + E), dono har node ek baar.
   analogy: |
     **Bhool-bhulaiya (maze) mein dhaga le ke chalna:**
-    Har mod par pehla khula rasta lo, peeche dhaga chhodte jao. Deewar aa gayi → dhaga lapet ke pichhle mod tak wapas, wahan ka agla rasta. Jis kamre mein chaak ka nishaan hai (visited) wahan dobara nahi ghuste.
+    Har mod par pehla khula rasta lo, peeche dhaga chhodte jao. Wall aa gayi → dhaga lapet ke pichhle mod tak wapas, wahan ka agla rasta. Jis kamre mein chaak ka mark hai (visited) wahan dobara nahi ghuste.
 
     Dhaga = call stack. Chaak = visited.
 
@@ -36,7 +36,7 @@ what:
 why:
   body: |
     BFS shortest path ke liye best hai, par bahut sawaal "poora hissa explore karo" type ke hain — wahan DFS chhota aur natural hai:
-    - **Connected components / islands** ginna
+    - **Connected components / islands** count karna
     - **Cycle** dhoondhna (undirected: parent trick; directed: 3 colours — agla topic)
     - **Topological sort**, path exist karta hai?, saare raste
     - Flood fill, region ka size
@@ -46,22 +46,22 @@ why:
     > [!socho]
     > 1 lakh nodes ki ek seedhi line (0-1-2-…-99999) par recursive DFS. Kya hoga?
     >
-    > Recursion 1 lakh gehri → **StackOverflowError** (JVM ka default stack chhota). Aise input par apna stack (iterative DFS) ya BFS lo — code section dekho.
+    > Recursion 1 lakh deep → **StackOverflowError** (JVM ka default stack chhota). Aise input par apna stack (iterative DFS) ya BFS lo — code section dekho.
 
 # 3. Visual intro
 visual:
   body: |
-    Same graph, same start — upar DFS, neeche BFS. Har kadam par dono kaunsa node pakadte hain, dekho. DFS ek taraf ghus jaata hai; BFS ring by ring phailta hai. Neeli edges = DFS jis raste se gaya.
+    Same graph, same start — upar DFS, neeche BFS. Har step par dono kaunsa node pakadte hain, dekho. DFS ek taraf ghus jaata hai; BFS ring by ring spread hota hai. Blue edges = DFS jis raste se gaya.
   viz: { tracer: versusTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
     1. `dfs(u)`: aate hi `visited[u] = true`.
-    2. Har padosi `v`: visited nahi → `dfs(v)` call. u wahin ruka rehta hai (stack mein).
-    3. Saare padosi ho gaye → function khatam → caller par wapas (backtrack), wo apna agla padosi dekhta hai.
+    2. Har neighbor `v`: visited nahi → `dfs(v)` call. u wahin ruka rehta hai (stack mein).
+    3. Saare neighbor ho gaye → function khatam → caller par wapas (backtrack), wo apna agla neighbor dekhta hai.
 
-    Order padosiyon ki list ke order par depend karta hai — isliye "DFS order" ke ek se zyada sahi jawab ho sakte hain.
+    Order neighbors ki list ke order par depend karta hai — isliye "DFS order" ke ek se zyada sahi jawab ho sakte hain.
 
     > [!galti]
     > `visited` ko recursion ke andar naya bana diya (`dfs(v, BooleanArray(n))`) — har call alag visited dekhegi, cycle par infinite recursion. Ek hi shared array pass karo.
@@ -73,23 +73,23 @@ operations:
   - op: "DFS (adjacency list)"
     time: "O(V + E)"
     space: O(V)
-    why: "Har node ek baar enter, har edge (undirected) do baar check. Visited + stack gehraai tak."
-  - op: "Recursion stack ki gehraai"
+    why: "Har node ek baar enter, har edge (undirected) 2 baar check. Visited + stack depth tak."
+  - op: "Recursion stack ki depth"
     time: "O(1) har push/pop"
     space: "O(V) worst"
-    why: "Seedhi line jaise graph par stack V gehra — bada V ho to iterative lo."
+    why: "Seedhi line jaise graph par stack V deep — bada V ho to iterative lo."
   - op: "Connected components"
     time: "O(V + E)"
     space: O(V)
-    why: "Har unvisited node se ek DFS; har node kul milake ek hi baar."
+    why: "Har unvisited node se ek DFS; har node overall ek hi baar."
   - op: "Grid DFS (R × C)"
     time: "O(R × C)"
     space: "O(R × C)"
-    why: "Har cell ek baar, 4 padosi. Worst stack = poora grid ek saanp jaisa rasta."
+    why: "Har cell ek baar, 4 neighbor. Worst stack = poora grid ek snake jaisa rasta."
   - op: "Undirected cycle check"
     time: "O(V + E)"
     space: O(V)
-    why: "Ek DFS; 'visited aur parent nahi' wala padosi milte hi ruk jao."
+    why: "Ek DFS; 'visited aur parent nahi' wala neighbor milte hi ruk jao."
 
 # 6. Code
 code:
@@ -97,10 +97,10 @@ code:
     file: dfs-iterative
     note: |
       Recursion ka call stack = apna `ArrayDeque` (LIFO). Do fark:
-      - Ek node stack mein **do baar** aa sakta hai (do padosiyon ne daala) → **nikalte waqt** visited check.
-      - Padosi **ulte** daalo, taaki pehla padosi sabse upar rahe aur order recursive jaisa aaye.
+      - Ek node stack mein **2 baar** aa sakta hai (do neighbors ne daala) → **nikalte time** visited check.
+      - Neighbor **ulte** daalo, taaki pehla neighbor sabse upar rahe aur order recursive jaisa aaye.
 
-      Bahut gehre graph (lambi chain, bada grid) par yahi lo. Order chahiye hi nahi (sirf "pahunch sakte ho?") to BFS bhi chalega.
+      Bahut deep graph (lambi chain, bada grid) par yahi lo. Order chahiye hi nahi (sirf "pahunch sakte ho?") to BFS bhi chalega.
 
 # 7. Examples
 examples:
@@ -135,25 +135,25 @@ examples:
     complexity:
       time: "O(V + E)"
       space: "O(V + E)"
-      why: "Adjacency list O(V + E); har node ek baar visit, har edge do baar check. Visited + stack O(V)."
+      why: "Adjacency list O(V + E); har node ek baar visit, har edge 2 baar check. Visited + stack O(V)."
 
   - id: islands
     level: medium
     title: Grid mein kitne island
     source: { name: Number of Islands, platform: LeetCode, url: "https://leetcode.com/problems/number-of-islands/" }
     problem: |
-      Grid mein '1' = zameen, '0' = paani. Upar-neeche-daayein-baayein jude zameen ke cells ek **island** banate hain (tirchha jud-na nahi ginta). Kitne island hain?
+      Grid mein '1' = land, '0' = paani. Upar-neeche-daayein-baayein jude land ke cells ek **island** banate hain (diagonal jud-na nahi count karta). Kitne island hain?
 
       Example: `["11000","11010","00100","00011"]` → **4**
     intuition: |
-      Grid = implicit graph (har '1' node, 4 padosi). Sawaal = **connected components** ginna — Example 1 hi, bas padosi `(i±1, j)`, `(i, j±1)` se.
+      Grid = implicit graph (har '1' node, 4 neighbor). Sawaal = **connected components** count karna — Example 1 hi, bas neighbor `(i±1, j)`, `(i, j±1)` se.
 
-      Visited array ki jagah zameen ko **dooba do** ('1' → '0'). Ab wo dobara '1' nahi dikhega.
+      Visited array ki jagah land ko **dooba do** ('1' → '0'). Ab wo dobara '1' nahi dikhega.
 
       `sink(i, j)` ki pehli line hi saare checks: bahar? paani? → return. Isse 4 recursive calls bina if ke likh sakte ho.
 
       > [!galti]
-      > Diagonal ko bhi padosi maan liya → (1,3) aur (2,2) jaise tirchhe cells ek island ban jaate hain. Sawaal padho: 4 dishayein ya 8?
+      > Diagonal ko bhi neighbor maan liya → (1,3) aur (2,2) jaise diagonal cells ek island ban jaate hain. Sawaal padho: 4 dishayein ya 8?
     dryRun: |
       | Scan par '1' | Dooba (DFS) | Islands |
       |---|---|---|
@@ -166,28 +166,28 @@ examples:
     complexity:
       time: "O(R × C)"
       space: "O(R × C)"
-      why: "Har cell max ek baar dooba, 4 padosi. Extra sirf recursion stack — worst case poora grid zameen."
+      why: "Har cell max ek baar dooba, 4 neighbor. Extra sirf recursion stack — worst case poora grid land."
 
   - id: undirected-cycle
     level: tricky
     title: Undirected graph mein cycle hai?
     problem: |
-      n nodes ka undirected graph (edge list). Kya isme koi **cycle** hai — aisa rasta jo bina koi edge dobara liye wahin lauta?
+      n nodes ka undirected graph (edge list). Kya isme koi **cycle** hai — aisa rasta jo bina koi edge dobara liye wahin return kar?
 
       Example: n = 7, edges `[[0,1],[1,2],[1,3],[3,4],[4,5],[5,3],[2,6]]` → **true** (3 → 4 → 5 → 3)
     intuition: |
-      DFS mein agar koi padosi **pehle se visited** hai, to wahan doosre raste se bhi pahunche → cycle.
+      DFS mein agar koi neighbor **pehle se visited** hai, to wahan doosre raste se bhi pahunche → cycle.
 
-      Par undirected mein ek dhokha: edge u — v dono taraf dikhti hai. v se u par aaye, to v ke padosiyon mein u (jahan se aaye) visited dikhega — ye cycle nahi! Isliye **parent** saath bhejo: `dfs(v, parent = u)`, aur `v == parent` ko skip.
+      Par undirected mein ek dhokha: edge u — v dono taraf dikhti hai. v se u par aaye, to v ke neighbors mein u (jahan se aaye) visited dikhega — ye cycle nahi! Isliye **parent** saath bhejo: `dfs(v, parent = u)`, aur `v == parent` ko skip.
 
-      Niyam: **visited padosi jo parent nahi → cycle**.
+      Rule: **visited neighbor jo parent nahi → cycle**.
 
       Graph disconnected ho sakta hai → har unvisited node se DFS (Example 1 wala loop).
 
       > [!galti]
       > Directed graph par yahi trick galat hai: 0 → 1, 0 → 2, 1 → 2 mein cycle nahi, par 2 "visited aur parent nahi" dikhega. Directed ke liye 3 colours (topological sort topic).
     dryRun: |
-      | dfs(u, parent) | Padosi | Faisla |
+      | dfs(u, parent) | Neighbor | Decision |
       |---|---|---|
       | (0, -) | 1 | naya → andar |
       | (1, 0) | 0 | parent, skip |
@@ -210,11 +210,11 @@ when:
   use:
     - "Poora connected hissa explore karna: components, islands, flood fill, region size."
     - "Cycle dhoondhna, topological order, 'kya s se t pahunch sakte hain?'."
-    - "Saare raste / backtracking jaisi khoj (raste mein state saath le ke chalna)."
+    - "Saare raste / backtracking jaisi search (raste mein state saath le ke chalna)."
     - "Tree / graph par recursion se kuch jodna (subtree size, depth)."
   avoid:
     - "Minimum steps / shortest path (unweighted) → BFS. DFS ka pehla rasta sabse chhota nahi hota."
-    - "Bahut gehra graph (lakhon nodes ki chain) aur recursion → StackOverflow; iterative DFS ya BFS."
+    - "Bahut deep graph (lakhon nodes ki chain) aur recursion → StackOverflow; iterative DFS ya BFS."
     - "Weighted shortest path → Dijkstra."
   signals:
     - keyword: "number of islands / regions / provinces / components"
@@ -229,7 +229,7 @@ when:
 # 9. Real-world
 realWorld:
   - where: "MS Paint ka bucket fill"
-    how: "Click wale pixel se DFS/BFS — same rang ke jude pixels naye rang mein. Yahi flood fill hai."
+    how: "Click wale pixel se DFS/BFS — same color ke jude pixels naye color mein. Yahi flood fill hai."
   - where: "Garbage collector (mark phase)"
     how: "Root objects se DFS — jo pahunch mein hain unhe mark; baaki memory free."
   - where: "Maze / puzzle solver"
@@ -262,15 +262,15 @@ mistakes:
   - title: "Undirected cycle mein parent skip nahi kiya"
     type: logic
     wrong: |
-      Har visited padosi ko cycle maan liya → har edge (u — v — u) cycle dikhegi, jawab hamesha true.
+      Har visited neighbor ko cycle maan liya → har edge (u — v — u) cycle dikhegi, jawab hamesha true.
     right: |
       `dfs(v, parent = u)`; `if (v == parent) continue`. (Parallel edges ho sakti hon to parent node ki jagah edge ka index yaad rakho.)
-  - title: "Gehre input par recursion"
+  - title: "Deep input par recursion"
     type: overflow
     wrong: |
       10⁵ nodes ki chain / 1000 × 1000 grid par recursive DFS → StackOverflowError.
     right: |
-      Iterative DFS (apna stack) ya BFS. Kotlin/Java mein recursion ~10⁴ gehraai tak hi bharosemand.
+      Iterative DFS (apna stack) ya BFS. Kotlin/Java mein recursion ~10⁴ depth tak hi bharosemand.
   - title: "Directed graph par undirected wala cycle check"
     type: logic
     wrong: |
@@ -283,16 +283,16 @@ interview:
   questions:
     - q: "DFS ki time aur space complexity?"
       a: |
-        O(V + E) time (adjacency list). Space O(V): visited + recursion stack (worst case V gehra).
+        O(V + E) time (adjacency list). Space O(V): visited + recursion stack (worst case V deep).
     - q: "BFS vs DFS — kab kaunsa?"
       a: |
-        Shortest path / levels → BFS. Components, cycle, topological sort, saare raste, backtracking → DFS. Gehre graph par DFS ka stack, chaude graph par BFS ki queue badi hoti hai.
+        Shortest path / levels → BFS. Components, cycle, topological sort, saare raste, backtracking → DFS. Deep graph par DFS ka stack, wide graph par BFS ki queue badi hoti hai.
     - q: "Recursive DFS ko iterative kaise banaoge?"
       a: |
-        Apna stack. Start push; loop: pop, visited hai to skip, warna mark + padosi (ulte order mein) push. Nikalte waqt visited check, kyunki ek node do baar push ho sakta hai.
+        Apna stack. Start push; loop: pop, visited hai to skip, warna mark + neighbor (ulte order mein) push. Nikalte time visited check, kyunki ek node 2 baar push ho sakta hai.
     - q: "Undirected graph mein cycle kaise?"
       a: |
-        DFS with parent: visited padosi jo parent nahi → cycle. Ya union-find: edge ke dono sire pehle se ek set mein → cycle.
+        DFS with parent: visited neighbor jo parent nahi → cycle. Ya union-find: edge ke dono sire pehle se ek set mein → cycle.
     - q: "Number of Islands — BFS ya DFS?"
       a: |
         Dono O(R × C). DFS chhota code; bahut bada grid ho to BFS / iterative (stack overflow ka dar). Union-find bhi chalta hai.
@@ -301,15 +301,15 @@ interview:
         Alag `visited[R][C]` boolean array. Ya interview mein poochho ki input badalna allowed hai ya nahi.
     - q: "DFS order unique kyun nahi?"
       a: |
-        Padosiyon ki list jis order mein hai usi se DFS chalta hai. Alag order = alag (par sahi) DFS order.
+        Neighbors ki list jis order mein hai usi se DFS chalta hai. Alag order = alag (par sahi) DFS order.
     - q: "Directed graph mein cycle?"
       followUp: true
       a: |
-        3 colours: white (anchhua), gray (stack mein), black (poora). DFS mein gray node dobara mila → back edge → cycle. Topological sort wale topic mein detail.
+        3 colours: white (untouched), gray (stack mein), black (poora). DFS mein gray node dobara mila → back edge → cycle. Topological sort wale topic mein detail.
     - q: "s se t ke saare raste?"
       followUp: true
       a: |
-        DFS + current path list; t pahunche to copy save. Wapas aate waqt path se hatao (backtrack). DAG mein visited ki zaroorat nahi; cycle ho to path-wala visited.
+        DFS + current path list; t pahunche to copy save. Wapas aate time path se hatao (backtrack). DAG mein visited ki zaroorat nahi; cycle ho to path-wala visited.
     - q: "Surrounded Regions mein kya trick hai?"
       followUp: true
       a: |
@@ -318,7 +318,7 @@ interview:
     - "Max Area of Island (DFS return size)."
     - "Surrounded Regions / Number of Enclaves (border se DFS)."
     - "Clone Graph (DFS + HashMap old → new)."
-    - "Pacific Atlantic Water Flow (do baar ulta DFS)."
+    - "Pacific Atlantic Water Flow (2 baar ulta DFS)."
 
 # 12. Practice
 practice:
@@ -328,7 +328,7 @@ practice:
     url: "https://leetcode.com/problems/flood-fill/"
     level: easy
     pattern: Grid DFS
-    hint: "sink jaisa: purana rang nahi to return, warna naya rang + 4 calls. Naya == purana ho to shuru mein hi lautao."
+    hint: "sink jaisa: purana color nahi to return, warna naya color + 4 calls. Naya == purana ho to shuru mein hi return karo."
   - name: Find if Path Exists in Graph
     platform: LeetCode
     num: 1971
@@ -341,22 +341,22 @@ practice:
     num: 463
     url: "https://leetcode.com/problems/island-perimeter/"
     level: easy
-    pattern: Grid padosi ginna
-    hint: "Har zameen cell 4 deta hai, har zameen-zameen padosi jodi 2 ghatati hai. Ya DFS mein paani / bahar par +1."
+    pattern: Grid neighbor count karna
+    hint: "Har land cell 4 deta hai, har zameen-zameen neighbor pair 2 ghatati hai. Ya DFS mein paani / bahar par +1."
   - name: Max Area of Island
     platform: LeetCode
     num: 695
     url: "https://leetcode.com/problems/max-area-of-island/"
     level: medium
     pattern: DFS return size
-    hint: "sink se 1 + chaaron calls ka jod lautao. Har island ka size, max rakho."
+    hint: "sink se 1 + all 4 calls ka jod return karo. Har island ka size, max rakho."
   - name: Number of Provinces
     platform: LeetCode
     num: 547
     url: "https://leetcode.com/problems/number-of-provinces/"
     level: medium
     pattern: Components (matrix input)
-    hint: "isConnected matrix hi adjacency matrix. Har unvisited city se DFS, row padh ke padosi. count++."
+    hint: "isConnected matrix hi adjacency matrix. Har unvisited city se DFS, row padh ke neighbor. count++."
   - name: Surrounded Regions
     platform: LeetCode
     num: 130
@@ -370,7 +370,7 @@ practice:
     url: "https://leetcode.com/problems/making-a-large-island/"
     level: hard
     pattern: DFS se island id + size
-    hint: "Pehle DFS se har island ko id do (2, 3, …) aur size[id] rakho. Phir har '0' ke 4 padosiyon ke alag ids ke size jodo + 1. Sab zameen ho to poora size."
+    hint: "Pehle DFS se har island ko id do (2, 3, …) aur size[id] rakho. Phir har '0' ke 4 neighbors ke alag ids ke size jodo + 1. Sab land ho to poora size."
   - name: Critical Connections in a Network
     platform: LeetCode
     num: 1192
@@ -382,11 +382,11 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "DFS = stack (recursion) se gehraai pehle; band ho to backtrack. O(V + E)."
+    - "DFS = stack (recursion) se depth pehle; band ho to backtrack. O(V + E)."
     - "Pehli line mein visited mark; grid mein cell ko dooba do."
     - "Components / islands: har unvisited se ek DFS, count++."
-    - "Undirected cycle: visited padosi jo parent nahi. Directed ke liye 3 colours."
-    - "Gehre input par recursion = StackOverflow → iterative DFS (apna stack)."
+    - "Undirected cycle: visited neighbor jo parent nahi. Directed ke liye 3 colours."
+    - "Deep input par recursion = StackOverflow → iterative DFS (apna stack)."
   cheatsheet: |
     ```kotlin
     fun dfs(u: Int) {
@@ -401,23 +401,23 @@ revision:
     - q: "DFS kaunsa data structure (seedha ya recursion ke through) use karta hai?"
       options: ["Queue", "Stack", "Heap", "Set"]
       answer: 1
-      explain: "LIFO — sabse naya padosi pehle; recursion ka call stack wahi kaam karta hai."
+      explain: "LIFO — sabse naya neighbor pehle; recursion ka call stack wahi kaam karta hai."
     - q: "Unweighted graph mein shortest path ke liye DFS?"
       options: ["Hamesha sahi", "Galat ho sakta hai", "BFS se tez aur sahi", "Sirf tree mein galat"]
       answer: 1
       explain: "DFS pehle lamba rasta pakad sakta hai. Shortest ke liye BFS."
-    - q: "Undirected DFS mein padosi visited hai par wahi parent hai. Kya matlab?"
+    - q: "Undirected DFS mein neighbor visited hai par wahi parent hai. Kya matlab?"
       options: ["Cycle mila", "Wahi edge wapas — cycle nahi", "Graph disconnected", "Error"]
       answer: 1
       explain: "Undirected edge dono taraf dikhti hai; parent ko skip karo."
-    - q: "Grid 4 × 5 mein islands ginne ka time?"
+    - q: "Grid 4 × 5 mein islands count karne ka time?"
       options: ["O(4 + 5)", "O(20)", "O(20²)", "O(2^20)"]
       answer: 1
-      explain: "O(R × C) — har cell max ek baar dooba, 4 padosi constant."
-    - q: "10⁵ nodes ki seedhi chain par recursive DFS ka khatra?"
+      explain: "O(R × C) — har cell max ek baar dooba, 4 neighbor constant."
+    - q: "10⁵ nodes ki seedhi chain par recursive DFS ka risk?"
       options: ["Galat order", "StackOverflowError", "O(n²) time", "Kuch nahi"]
       answer: 1
-      explain: "Recursion 10⁵ gehri — JVM stack bhar jaata hai. Iterative DFS / BFS lo."
+      explain: "Recursion 10⁵ deep — JVM stack bhar jaata hai. Iterative DFS / BFS lo."
 
 # 14. Connections
 connections:
@@ -425,9 +425,9 @@ connections:
     - id: tree-traversals
       why: "Preorder / postorder = tree par DFS (visited ki zaroorat nahi thi)."
     - id: backtracking-basics
-      why: "Backtracking = DFS jo raste ki state saath le ke chalta hai aur wapas aate waqt undo karta hai."
+      why: "Backtracking = DFS jo raste ki state saath le ke chalta hai aur wapas aate time undo karta hai."
     - id: bfs
-      why: "Same 'visited + padosi' dhaancha; queue ki jagah stack. BFS shortest path, DFS explore."
+      why: "Same 'visited + neighbor' structure; queue ki jagah stack. BFS shortest path, DFS explore."
   usedLater:
     - id: topological-sort
       how: "DFS ka postorder ulta = topological order; directed cycle 3 colours se."

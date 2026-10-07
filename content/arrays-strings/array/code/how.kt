@@ -5,7 +5,7 @@ fun insertAt(arr: IntArray, size: Int, index: Int, value: Int): Int {
     require(index in 0..size) { "Index 0..size ke beech hona chahiye" }
     var i = size - 1 // last bhare hue dabbe se shuru //@init
     while (i >= index) { // index tak peeche aate jao //@loop
-        arr[i + 1] = arr[i] // har item ek kadam right copy //@shift
+        arr[i + 1] = arr[i] // har item ek step right copy //@shift
         i--
     }
     arr[index] = value // ab ye jagah khaali hai, value rakh do //@place

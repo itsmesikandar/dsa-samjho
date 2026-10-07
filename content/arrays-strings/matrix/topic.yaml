@@ -2,7 +2,7 @@ meta:
   id: matrix
   chapter: arrays-strings
   title: 2D Array / Matrix
-  subtitle: Rows aur columns ka grid — traversal, padosi, rotate aur spiral
+  subtitle: Rows aur columns ka grid — traversal, neighbor, rotate aur spiral
   level: beginner
   minutes: 35
   prereqs: [array]
@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **2D array (matrix)** = rows aur columns ka grid. Har cell tak pahunchne ke liye **do index**: `grid[row][col]`.
+    **2D array (matrix)** = rows aur columns ka grid. Har cell tak pahunchne ke liye **2 index**: `grid[row][col]`.
 
     ```kotlin
     val grid = Array(3) { IntArray(4) }   // 3 rows, har row mein 4 columns
@@ -38,7 +38,7 @@ why:
     - Tables, spreadsheets, calendar
     - DP tables (aage ke chapters mein bahut kaam aayega)
 
-    Interview mein matrix problems ka apna set hai — rotate, spiral, search in sorted matrix, islands (graph), path counting (DP). In sab ki neev: **2D indexing, traversal order, aur bounds check**.
+    Interview mein matrix problems ka apna set hai — rotate, spiral, search in sorted matrix, islands (graph), path counting (DP). In sab ki foundation: **2D indexing, traversal order, aur bounds check**.
 
     > [!socho]
     > Grid 1000 × 1000 hai. Kya `grid[999][999]` dhoondhne mein zyada time lagega?
@@ -54,7 +54,7 @@ visual:
 
     **flat index = r × cols + c**
 
-    Animation mein grid aur uski "line wali" shakal dono dekho. "Apna input try karo" mein r aur c badal ke formula check karo.
+    Animation mein grid aur uski "line wali" shape dono dekho. "Apna input try karo" mein r aur c badal ke formula check karo.
   viz: { tracer: rowMajor }
 
 # 4. Kaise kaam karta hai
@@ -73,7 +73,7 @@ how:
     Ek hi traversal mein har row ka sum aur har column ka sum nikaalte hain. Total kaam = **rows × cols** cells, har ek ek baar.
 
     > [!tip]
-    > Row-by-row padhna (andar ka loop column par) column-by-column padhne se **tez** hota hai — ek row memory mein lagatar hai, CPU cache achha kaam karta hai.
+    > Row-by-row padhna (andar ka loop column par) column-by-column padhne se **tez** hota hai — ek row memory mein continuous hai, CPU cache achha kaam karta hai.
   viz: { tracer: rowColSums }
   code: how
 
@@ -82,7 +82,7 @@ operations:
   - op: "`grid[r][c]` padhna / likhna"
     time: O(1)
     space: O(1)
-    why: "Row ka array, phir usme column — do seedhe jumps."
+    why: "Row ka array, phir usme column — 2 seedhe jumps."
   - op: "Poora grid traverse"
     time: "O(R × C)"
     space: O(1)
@@ -103,14 +103,14 @@ operations:
     time: O(n²)
     space: O(1)
     why: "Transpose + har row reverse, sirf swaps."
-  - op: "Ek cell ke 4 padosi dekhna"
+  - op: "Ek cell ke 4 neighbor dekhna"
     time: O(1)
     space: O(1)
     why: "Direction arrays se 4 checks (bounds ke saath)."
 
 # 6. Code
 code:
-  - title: Grid banana, padhna, aur 4 padosi (direction arrays)
+  - title: Grid banana, padhna, aur 4 neighbor (direction arrays)
     file: grid-basics
     note: |
       **Direction arrays** (`dr`, `dc`) grid problems ka sabse kaam ka trick hai — upar/neeche/left/right ke liye 4 alag `if` likhne ki jagah ek loop. 8 directions (diagonal bhi) chahiye to arrays mein 8 entries.
@@ -152,10 +152,10 @@ examples:
 
   - id: rotate
     level: medium
-    title: Matrix ko 90° clockwise ghumao (in-place)
+    title: Matrix ko 90° clockwise rotate karo (in-place)
     source: { name: Rotate Image, platform: LeetCode, url: "https://leetcode.com/problems/rotate-image/" }
     problem: |
-      Ek n × n matrix (jaise photo) ko **90° clockwise** ghumao — **usi matrix mein**, naya matrix banaye bina.
+      Ek n × n matrix (jaise photo) ko **90° clockwise** rotate karo — **usi matrix mein**, naya matrix banaye bina.
 
       Example: `[[1,2,3],[4,5,6],[7,8,9]]` → `[[7,4,1],[8,5,2],[9,6,3]]`
     intuition: |
@@ -165,7 +165,7 @@ examples:
       1. **Transpose** (in-place): sirf diagonal ke upar wale cells (`j > i`) ko unke "aaine" wale cell se swap karo.
       2. **Har row reverse** karo.
 
-      Kaagaz par try karo — 1 2 3 wali row transpose ke baad column ban jaati hai, aur reverse ke baad sahi jagah aa jaati hai.
+      Paper par try karo — 1 2 3 wali row transpose ke baad column ban jaati hai, aur reverse ke baad sahi jagah aa jaati hai.
 
       > [!tip]
       > Anti-clockwise chahiye? Transpose + har **column** reverse (ya pehle har row reverse, phir transpose).
@@ -180,18 +180,18 @@ examples:
     complexity:
       time: O(n²)
       space: O(1)
-      why: "Har cell ek-do baar swap hota hai; sirf ek temp variable."
+      why: "Har cell ek-2 baar swap hota hai; sirf ek temp variable."
 
   - id: spiral
     level: tricky
     title: Matrix ko spiral order mein padho
     source: { name: Spiral Matrix, platform: LeetCode, url: "https://leetcode.com/problems/spiral-matrix/" }
     problem: |
-      Ek R × C matrix diya hai. Uske saare elements **spiral order** mein lo — bahar ki deewar se ghoomte hue andar ki taraf (clockwise).
+      Ek R × C matrix diya hai. Uske saare elements **spiral order** mein lo — bahar ki wall se ghoomte hue andar ki taraf (clockwise).
 
       Example: `[[1,2,3,4],[5,6,7,8],[9,10,11,12]]` → `[1, 2, 3, 4, 8, 12, 11, 10, 9, 5, 6, 7]`
     intuition: |
-      Chaar **deewarein** (boundaries) rakho: `top`, `bottom`, `left`, `right`.
+      4 **walls** (boundaries) rakho: `top`, `bottom`, `left`, `right`.
 
       Har chakkar mein:
       1. Upar wali row (left → right), phir `top++`.
@@ -199,14 +199,14 @@ examples:
       3. Neeche wali row (right → left), phir `bottom--` — **sirf agar** `top <= bottom`.
       4. Left column (neeche → upar), phir `left++` — **sirf agar** `left <= right`.
 
-      Jab deewarein cross ho jaayein — ruk jao.
+      Jab walls cross ho jaayein — ruk jao.
 
       > [!galti]
-      > Step 3 aur 4 ke `if` checks bhoole to single row ya single column wali matrix mein elements **do baar** aa jaayenge. Hamesha 1 × n aur n × 1 par test karo.
+      > Step 3 aur 4 ke `if` checks bhoole to single row ya single column wali matrix mein elements **2 baar** aa jaayenge. Hamesha 1 × n aur n × 1 par test karo.
     dryRun: |
       3 × 4 matrix
 
-      | Chakkar | Hissa | Liye gaye | Deewar badli |
+      | Chakkar | Hissa | Liye gaye | Wall badli |
       |---|---|---|---|
       | 1 | top row | 1, 2, 3, 4 | top = 1 |
       | 1 | right col | 8, 12 | right = 2 |
@@ -218,21 +218,21 @@ examples:
     complexity:
       time: "O(R × C)"
       space: "O(1) (result list chhod ke)"
-      why: "Har cell sirf ek baar liya; sirf chaar boundary variables."
+      why: "Har cell sirf ek baar liya; sirf 4 boundary variables."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "Data naturally grid mein ho — board, map, image, table."
-    - "DP mein do cheezon par depend karne wali state (i, j) — 2D DP table."
-    - "Graph ko grid ki shakal mein diya ho (islands, maze) — cells = nodes, padosi = edges."
+    - "DP mein 2 cheezon par depend karne wali state (i, j) — 2D DP table."
+    - "Graph ko grid ki shape mein diya ho (islands, maze) — cells = nodes, neighbor = edges."
   avoid:
     - "Grid bahut bada par zyada-tar khaali (sparse) ho — `HashMap<Pair, Value>` ya sirf bhare cells ki list lo."
     - "Sirf ek dimension kaafi ho — 1D array simple aur tez."
     - "n × n grid jab n = 10⁵ — 10¹⁰ cells! Memory pehle calculate karo."
   signals:
     - keyword: "matrix, grid, board, image"
-      think: "2D array + nested loop; padosi ke liye direction arrays."
+      think: "2D array + nested loop; neighbor ke liye direction arrays."
     - keyword: "rotate image, in-place"
       think: "Transpose + reverse rows."
     - keyword: "spiral / diagonal / zigzag order"
@@ -243,11 +243,11 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Photos aur camera filters"
-    how: "Image = pixels ka grid. Rotate button = matrix rotate. Blur = har pixel ko uske padosiyon ka average."
+    how: "Image = pixels ka grid. Rotate button = matrix rotate. Blur = har pixel ko uske neighbors ka average."
   - where: "Games"
-    how: "Candy Crush, Ludo, chess, Minesweeper — board ek 2D array; move check = padosi aur bounds."
+    how: "Candy Crush, Ludo, chess, Minesweeper — board ek 2D array; move check = neighbor aur bounds."
   - where: "Maps aur navigation"
-    how: "Shehar ko grid mein baant ke shortest path (BFS / A*) — robot vacuum cleaner bhi aise hi chalta hai."
+    how: "City ko grid mein divide kar ke shortest path (BFS / A*) — robot vacuum cleaner bhi aise hi chalta hai."
   - where: "Calendar UI"
     how: "Mahina = 5-6 rows × 7 columns ka grid. Date se (row, column) nikaalna = index math."
   - where: "Spreadsheets / tables"
@@ -264,12 +264,12 @@ mistakes:
       ```
     right: |
       `rows = grid.size`, `cols = grid[0].size`, access `grid[r][c]`. Square matrix par bug chhup jaata hai — non-square par test karo.
-  - title: "Padosi dekhte waqt bounds check bhoolna"
+  - title: "Neighbor dekhte time bounds check bhoolna"
     type: off-by-one
     wrong: |
       `grid[r - 1][c]` jab r = 0 → `ArrayIndexOutOfBoundsException`.
     right: |
-      Har padosi se pehle: `nr in 0 until rows && nc in 0 until cols`.
+      Har neighbor se pehle: `nr in 0 until rows && nc in 0 until cols`.
   - title: "Khaali grid par `grid[0].size`"
     type: empty
     wrong: |
@@ -297,15 +297,15 @@ interview:
         Concept mein **row-major** — row by row (index = r × cols + c). JVM mein ye "array of arrays" hai: ek array jisme har row ke IntArray ka reference. Isliye rows alag lengths ki ho sakti hain (jagged).
     - q: "Row-by-row traversal column-by-column se tez kyun hai?"
       a: |
-        Ek row memory mein lagatar hai — CPU ek chunk (cache line) laata hai aur agle cells already cache mein hote hain. Column-wise jump karne par har baar nayi row (alag jagah) se padhna padta hai.
-    - q: "Matrix ko in-place 90° clockwise kaise ghumaoge?"
+        Ek row memory mein continuous hai — CPU ek chunk (cache line) laata hai aur agle cells already cache mein hote hain. Column-wise jump karne par har baar nayi row (alag jagah) se padhna padta hai.
+    - q: "Matrix ko in-place 90° clockwise kaise rotate karoge?"
       a: |
         Transpose (sirf j > i swap) + har row reverse. O(n²) time, O(1) space. Anti-clockwise ke liye transpose + har column reverse.
     - q: "Spiral order mein kya edge cases hain?"
       followUp: true
       a: |
         Single row, single column, 1×1, aur non-square. Bottom row aur left column padhne se pehle `top <= bottom` / `left <= right` check, warna duplicates.
-    - q: "Grid mein 4 padosi kaise nikaaloge, saaf code mein?"
+    - q: "Grid mein 4 neighbor kaise nikaaloge, saaf code mein?"
       a: |
         Direction arrays: `dr = [-1, 1, 0, 0]`, `dc = [0, 0, -1, 1]`. Loop mein `nr = r + dr[k]`, `nc = c + dc[k]`, phir bounds check.
     - q: "Row-wise aur column-wise sorted matrix mein target kaise dhoondhoge?"
@@ -323,7 +323,7 @@ interview:
         10⁶ × 4 bytes ≈ 4 MB (plus 1000 row objects ka chhota overhead).
   mayAsk:
     - "Set Matrix Zeroes — O(1) extra space mein."
-    - "Matrix mein islands gino (graph chapter)."
+    - "Matrix mein islands count karo (graph chapter)."
     - "Diagonal traversal / zigzag print karo."
     - "Image ko flip (mirror) karo."
 
@@ -342,7 +342,7 @@ practice:
     url: "https://leetcode.com/problems/matrix-diagonal-sum/"
     level: easy
     pattern: Diagonal index (r == c, r + c == n − 1)
-    hint: "Ek loop: `m[i][i] + m[i][n - 1 - i]`. n odd ho to beech wala do baar gina gaya — ek baar ghatao."
+    hint: "Ek loop: `m[i][i] + m[i][n - 1 - i]`. n odd ho to beech wala 2 baar gina gaya — ek baar ghatao."
   - name: Richest Customer Wealth
     platform: LeetCode
     num: 1672
@@ -369,7 +369,7 @@ practice:
     num: 289
     url: "https://leetcode.com/problems/game-of-life/"
     level: medium
-    pattern: 8 padosi + in-place state encoding
+    pattern: 8 neighbor + in-place state encoding
     hint: "8 directions ke arrays. In-place ke liye purani aur nayi state ek hi number mein rakho (jaise 2 = zinda tha, ab marega)."
   - name: Spiral Matrix II
     platform: Custom
@@ -382,7 +382,7 @@ practice:
     url: "https://leetcode.com/problems/maximal-rectangle/"
     level: hard
     pattern: Har row ko histogram banana + monotonic stack
-    hint: "Har row tak column-wise lagatar 1s ki height nikaalo — har row ek histogram ban jaati hai. Har histogram par 'largest rectangle' (monotonic stack chapter)."
+    hint: "Har row tak column-wise continuous 1s ki height nikaalo — har row ek histogram ban jaati hai. Har histogram par 'largest rectangle' (monotonic stack chapter)."
 
 # 13. Quick revision
 revision:
@@ -390,7 +390,7 @@ revision:
     - "2D array = grid; access `grid[r][c]` O(1); rows = grid.size, cols = grid[0].size."
     - "Memory mein row-major: index = r × cols + c (JVM: array of row arrays)."
     - "Traverse: nested loop, O(R × C); row-wise tez (cache)."
-    - "Padosi: direction arrays + bounds check."
+    - "Neighbor: direction arrays + bounds check."
     - "Rotate 90° = transpose + row reverse; spiral = 4 boundaries + checks."
   cheatsheet: |
     | Kaam | Kotlin | Java |
@@ -410,11 +410,11 @@ revision:
       options: ["6", "9", "7", "3"]
       answer: 1
       explain: "2 × 4 + 1 = 9."
-    - q: "n × n matrix ko 90° clockwise in-place ghumane ka tareeka?"
+    - q: "n × n matrix ko 90° clockwise in-place rotate karne ka tareeka?"
       options: ["Sirf transpose", "Transpose + har row reverse", "Har row sort", "Naya matrix banana zaroori hai"]
       answer: 1
       explain: "Do in-place steps, O(1) extra space."
-    - q: "Cell (0, 0) ke kitne valid 4-direction padosi (grid 3×3)?"
+    - q: "Cell (0, 0) ke kitne valid 4-direction neighbor (grid 3×3)?"
       options: ["4", "3", "2", "1"]
       answer: 2
       explain: "Sirf neeche aur right — upar aur left grid ke bahar."

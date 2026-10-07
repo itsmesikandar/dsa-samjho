@@ -13,14 +13,14 @@ class Main {
         int i = m;
         int j = n;
         while (i > 0 && j > 0) {
-            if (a.charAt(i - 1) == b.charAt(j - 1)) { // match - ye char LCS ka hai, tirchha jao
+            if (a.charAt(i - 1) == b.charAt(j - 1)) { // match - ye char LCS ka hai, diagonal jao
                 sb.append(a.charAt(i - 1));
                 i--;
                 j--;
             } else if (dp[i - 1][j] >= dp[i][j - 1]) {
                 i--; // jawab upar se aaya tha
             } else {
-                j--; // baayein se aaya tha
+                j--; // left se aaya tha
             }
         }
         return sb.reverse().toString(); // peeche se banaya - ulta karo

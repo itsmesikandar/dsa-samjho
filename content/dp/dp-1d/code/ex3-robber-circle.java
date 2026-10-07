@@ -1,5 +1,5 @@
 class Main {
-    // Gol mohalla: pehla aur aakhri ghar padosi. Dono ek saath nahi - to do seedhi lines: pehla hata ke, aakhri hata ke
+    // Gol mohalla: pehla aur aakhri ghar neighbor. Dono ek saath nahi - to do seedhi lines: pehla hata ke, aakhri hata ke
     static int robLine(int[] nums, int lo, int hi) { // lo..hi ek seedhi line (house robber)
         int prev2 = 0, prev1 = 0;
         for (int i = lo; i <= hi; i++) {
@@ -11,7 +11,7 @@ class Main {
     }
 
     static int rob2(int[] nums) {
-        if (nums.length == 1) return nums[0]; // ek hi ghar - koi padosi nahi //@one
+        if (nums.length == 1) return nums[0]; // ek hi ghar - koi neighbor nahi //@one
         return Math.max(robLine(nums, 0, nums.length - 2), robLine(nums, 1, nums.length - 1)); // aakhri chhodo / pehla chhodo //@split
     }
 

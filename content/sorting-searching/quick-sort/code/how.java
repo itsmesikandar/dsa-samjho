@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 class Main {
-    // Quick sort: pivot chuno, chhote left / bade right (partition), phir dono taraf recursion
+    // Quick sort: pivot choose karo, chhote left / bade right (partition), phir dono taraf recursion
     static void quickSort(int[] a, int l, int r) {
         if (l >= r) return; // 0 ya 1 item //@base
         int p = partition(a, l, r);

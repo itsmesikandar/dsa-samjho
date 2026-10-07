@@ -28,7 +28,7 @@ export const rowMajor = tracer<{ rows: number; cols: number; r: number; c: numbe
     const gridTones: Tones = {};
     g.forEach((row, i) => row.forEach((_, j) => (gridTones[`${i},${j}`] = rowTone(i))));
     t.frame({
-      caption: `2D array = ${rows} rows × ${cols} columns ka grid. Kisi cell tak pahunchne ke liye do index: grid[row][col]. Har cell mein uska number likha hai.`,
+      caption: `2D array = ${rows} rows × ${cols} columns ka grid. Kisi cell tak pahunchne ke liye 2 index: grid[row][col]. Har cell mein uska number likha hai.`,
       vars: { rows, cols },
       panels: [grid(g)],
     });
@@ -133,7 +133,7 @@ export const rotateTrace = tracer<{ g: number[][] }>({
         [m[i][j], m[j][i]] = [m[j][i], m[i][j]];
         t.frame({
           line: 'transpose',
-          caption: `Swap m[${i}][${j}] ↔ m[${j}][${i}]. Sirf diagonal ke UPAR wale (j > i) — warna har pair do baar swap hokar wapas aa jaata!`,
+          caption: `Swap m[${i}][${j}] ↔ m[${j}][${i}]. Sirf diagonal ke UPAR wale (j > i) — warna har pair 2 baar swap hokar wapas aa jaata!`,
           vars: { i, j },
           panels: [grid(m, { [`${i},${j}`]: 'swap', [`${j},${i}`]: 'swap' })],
         });
@@ -156,7 +156,7 @@ export const rotateTrace = tracer<{ g: number[][] }>({
       }
     }
     t.frame({
-      caption: 'Ghoom gaya! Pehli row ab aakhri column hai. O(n²) time (har cell ek-do baar), O(1) extra space.',
+      caption: 'Ghoom gaya! Pehli row ab aakhri column hai. O(n²) time (har cell ek-2 baar), O(1) extra space.',
       panels: [grid(m, Object.fromEntries(m.flatMap((row, i) => row.map((_, j) => [`${i},${j}`, 'done' as Tone]))))],
     });
     return gridStr(m);
@@ -184,7 +184,7 @@ export const spiralTrace = tracer<{ g: number[][] }>({
       });
       seen[`${r},${c}`] = 'done';
     };
-    t.frame({ line: 'init', caption: 'Chaar deewarein: top, bottom, left, right. Har chakkar mein ek row/column padho aur us deewar ko andar khiskao.', vars: vars(), panels: [grid(g), array(res, { label: 'result' })] });
+    t.frame({ line: 'init', caption: '4 walls: top, bottom, left, right. Har chakkar mein ek row/column padho aur us wall ko andar shift karo.', vars: vars(), panels: [grid(g), array(res, { label: 'result' })] });
     while (top <= bottom && left <= right) {
       for (let c = left; c <= right; c++) take(top, c, 'top', 'Upar wali row, left → right');
       top++;
@@ -201,7 +201,7 @@ export const spiralTrace = tracer<{ g: number[][] }>({
     }
     t.frame({
       line: 'done',
-      caption: `Spiral poora: ${res.length} cells, har ek ek baar → O(rows × cols). Bina \`if (top <= bottom)\` check ke single row/column waale grid mein items do baar aa jaate.`,
+      caption: `Spiral poora: ${res.length} cells, har ek ek baar → O(rows × cols). Bina \`if (top <= bottom)\` check ke single row/column waale grid mein items 2 baar aa jaate.`,
       vars: vars(),
       panels: [grid(g, seen), array(res, { label: 'result' })],
     });

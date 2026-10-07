@@ -1,6 +1,6 @@
 class ListNode(var value: Int, var next: ListNode? = null)
 
-// Do sorted lists ko ek sorted list mein jodo (naye nodes nahi - wahi nodes re-link)
+// 2 sorted lists ko ek sorted list mein jodo (naye nodes nahi - wahi nodes re-link)
 fun mergeTwoLists(a: ListNode?, b: ListNode?): ListNode? {
     val dummy = ListNode(0) // nakli shuruaat: "pehla node kaun" wala special case khatam
     var tail = dummy // result ka aakhri node //@init

@@ -1,10 +1,10 @@
 class Main {
-    // Kitne 1 bits? x & (x - 1) har baar sabse daayein wala 1 mitata - loop sirf utni baar jitne 1 bits
+    // Kitne 1 bits? x & (x - 1) har baar sabse right wala 1 hatata - loop sirf utni baar jitne 1 bits
     static int hammingWeight(int n) {
         int x = n;
         int count = 0;
         while (x != 0) {
-            x = x & (x - 1); // sabse daayein wala 1 gaya //@drop
+            x = x & (x - 1); // sabse right wala 1 gaya //@drop
             count++;
         }
         return count; //@done

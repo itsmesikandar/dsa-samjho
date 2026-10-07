@@ -6,7 +6,7 @@ class Main {
         while (lo <= hi) { // range khaali nahi hui
             int mid = lo + (hi - lo) / 2; // (lo + hi) / 2 bade index par overflow kar sakta hai //@mid
             if (a[mid] == target) return mid; //@found
-            if (a[mid] < target) lo = mid + 1; // target right mein: mid samet left aadha bekaar //@right
+            if (a[mid] < target) lo = mid + 1; // target right mein: mid including left aadha bekaar //@right
             else hi = mid - 1; // target left mein //@left
         }
         return -1; // range khaali: target hai hi nahi //@none

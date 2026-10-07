@@ -1,4 +1,4 @@
-// Rat (0,0) se (n-1,n-1) jaana chahta hai. 1 = khula, 0 = deewar. Chaal: D, L, R, U. Saare raaste.
+// Rat (0,0) se (n-1,n-1) jaana chahta hai. 1 = khula, 0 = wall. Move: D, L, R, U. Saare raaste.
 fun findPaths(m: Array<IntArray>): List<String> {
     val n = m.size
     val res = mutableListOf<String>()
@@ -23,7 +23,7 @@ fun findPaths(m: Array<IntArray>): List<String> {
                 path.deleteCharAt(path.length - 1)
             }
         }
-        seen[r][c] = false // wapas jaate waqt cell phir khula - doosre raaste isse guzar sakein
+        seen[r][c] = false // wapas jaate time cell phir khula - doosre raaste isse guzar sakein
     }
     go(0, 0)
     return res

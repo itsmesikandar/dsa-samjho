@@ -35,9 +35,9 @@ fun main() {
     }
     val levels = bfsLevels(adj, 0)
     println(levels)
-    println("0 se sabse door: ${levels.last()} (${levels.size - 1} kadam)")
+    println("0 se sabse door: ${levels.last()} (${levels.size - 1} step)")
 }
 
 // Output:
 // [[0], [1, 2], [3, 4], [5, 6]]
-// 0 se sabse door: [5, 6] (3 kadam)
+// 0 se sabse door: [5, 6] (3 step)

@@ -5,7 +5,8 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done (validate + check:code pas
 
 ## Current
 - Step: 3 (Content) DONE — all 15 chapters, 71 topics (chapter 14 committed 2026-10-06).
-- Step 4: Search, Patterns, Cheatsheets, Glossary done (2026-10-06). Next action: "Aaj revise karo" on home.
+- Step 4: Search, Patterns, Cheatsheets, Glossary done (2026-10-06).
+- 2026-10-07: easy-words sweep — hard Hindi words → English, Hindi numbers → digits, all content (rule in CLAUDE.md). Next action: "Aaj revise karo" on home.
 - Patterns: `src/app/patterns/page.tsx` (server, renders all signals) + `src/components/patterns/client.tsx` (word-prefix filter, chapter chips). Linked from sidebar, home, search (`page` docs in gen.ts).
 - Cheatsheets: `content/cheatsheets.yaml` (Big-O, constraints, DS ops, sorting, recurrences, Kotlin vs Java) + every topic's revision summary/cheatsheet in per-chapter <details>. Glossary: `content/glossary.yaml` (120 terms, `topic` link checked by validate), anchors `termSlug()` = g-<slug>, terms in search (kind `term`). Shared filter UI: `src/components/layout/StickyFilter.tsx`.
 - Search: `scripts/gen.ts` writes `src/generated/search-index.json` (chapters, topics, examples, practice; ~35 KB gz, lazy chunk). Matching in `src/lib/search.ts` (no lib). UI `src/components/layout/Search.tsx` (Ctrl/⌘ K, `/`), portalled to body (header backdrop-blur traps `fixed`). LeetCode numbers only searchable for practice entries (examples have no `num`).

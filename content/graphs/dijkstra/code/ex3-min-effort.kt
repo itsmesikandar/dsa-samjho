@@ -1,7 +1,7 @@
 import java.util.PriorityQueue
 import kotlin.math.abs
 
-// Rasta utna hi mushkil jitna uska SABSE BADA kadam. Dijkstra, bas "jodo" ki jagah "max lo"
+// Rasta utna hi mushkil jitna uska SABSE BADA step. Dijkstra, bas "jodo" ki jagah "max lo"
 fun minimumEffortPath(heights: Array<IntArray>): Int {
     val r = heights.size
     val c = heights[0].size
@@ -13,12 +13,12 @@ fun minimumEffortPath(heights: Array<IntArray>): Int {
     while (pq.isNotEmpty()) {
         val (x, y, e) = pq.poll() //@poll
         if (e > effort[x][y]) continue // purani entry //@stale
-        if (x == r - 1 && y == c - 1) return e // manzil heap se nikli = pakka jawab //@found
+        if (x == r - 1 && y == c - 1) return e // destination heap se nikli = pakka jawab //@found
         for ((dx, dy) in dirs) {
             val nx = x + dx
             val ny = y + dy
             if (nx !in 0 until r || ny !in 0 until c) continue
-            val ne = maxOf(e, abs(heights[nx][ny] - heights[x][y])) // ab tak ka sabse bada kadam //@relax
+            val ne = maxOf(e, abs(heights[nx][ny] - heights[x][y])) // ab tak ka sabse bada step //@relax
             if (ne < effort[nx][ny]) {
                 effort[nx][ny] = ne //@update
                 pq.add(intArrayOf(nx, ny, ne))

@@ -1,14 +1,14 @@
 class Main {
-    // Do deewarein chuno jinke beech sabse zyada paani aaye
+    // Do walls choose karo jinke beech sabse zyada paani aaye
     static int maxArea(int[] h) {
         int l = 0; //@init
         int r = h.length - 1;
         int best = 0;
         while (l < r) {
-            int area = Math.min(h[l], h[r]) * (r - l); // paani = chhoti deewar x doori //@area
+            int area = Math.min(h[l], h[r]) * (r - l); // paani = chhoti wall x distance //@area
             best = Math.max(best, area);
             if (h[l] < h[r]) {
-                l++; // chhoti deewar hatao - badi ko rakhne se hi aage fayda ho sakta hai //@moveL
+                l++; // chhoti wall hatao - badi ko rakhne se hi aage fayda ho sakta hai //@moveL
             } else {
                 r--; //@moveR
             }

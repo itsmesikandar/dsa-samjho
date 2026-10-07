@@ -3,11 +3,11 @@ import type { CallNode, MemoryPanel, Panel, Tone, ToneMap } from '@/components/v
 
 const doneUpTo = (k: number): ToneMap => Object.fromEntries(Array.from({ length: k }, (_, i) => [i, 'done' as Tone]));
 
-// ---------- 3. Visual intro: kya ginte hain, kya nahi ----------
+// ---------- 3. Visual intro: kya count karte hain, kya nahi ----------
 export const spaceMeter = tracer<{ n: number }>({
   inputs: [{ name: 'n', type: 'int', label: 'n (input size)', default: 4, min: 1, max: 6 }],
   run({ n }, t) {
-    const input = array(Array.from({ length: n }, (_, i) => i + 1), { label: `Input array (n = ${n}) — ye diya hua hai, extra space mein nahi ginte` });
+    const input = array(Array.from({ length: n }, (_, i) => i + 1), { label: `Input array (n = ${n}) — ye diya hua hai, extra space mein nahi count karte` });
     const vars: MemoryPanel = {
       kind: 'memory',
       label: 'Extra: chhote variables',
@@ -21,7 +21,7 @@ export const spaceMeter = tracer<{ n: number }>({
     const grid: Panel = { kind: 'grid', label: `Extra: grid = ${n} × ${n}`, values: Array.from({ length: n }, () => Array(n).fill(0)) };
 
     t.frame({
-      caption: 'Space complexity mein hum ginte hain ki algorithm ne input ke ALAWA kitni memory li. Input to pehle se diya hua hai — usko aam taur par nahi ginte.',
+      caption: 'Space complexity mein hum count karte hain ki algorithm ne input ke ALAWA kitni memory li. Input to pehle se diya hua hai — usko usually nahi count karte.',
       vars: { n },
       panels: [input],
     });
@@ -72,7 +72,7 @@ export const squaresSpace = tracer<{ arr: number[] }>({
     }
     t.frame({
       line: 'done',
-      caption: `Extra space = result (${n}) + i (1) = O(n). Dhyaan do: kai log output array ko ginti mein nahi lete ("O(1) auxiliary, output chhod ke"). Interview mein saaf bolo kya gina.`,
+      caption: `Extra space = result (${n}) + i (1) = O(n). Dhyaan do: kai log output array ko count mein nahi lete ("O(1) auxiliary, output chhod ke"). Interview mein saaf bolo kya gina.`,
       vars: { 'extra dabbe': n + 1 },
       panels: [array(arr, { label: 'arr (input)' }), array(res.map((v) => v ?? 0), { label: 'result (naya)', tones: doneUpTo(n) })],
     });
@@ -110,7 +110,7 @@ export const copyVsInPlace = tracer<{ arr: number[] }>({
     let r = n - 1;
     t.frame({
       line: 'swap',
-      caption: 'Tareeka 2: usi array mein swap. Extra memory sirf l, r, temp — 3 dabbe, n kitna bhi ho. Yaani O(1).',
+      caption: 'Tareeka 2: usi array mein swap. Extra memory sirf l, r, temp — 3 dabbe, n kitna bhi ho. Matlab O(1).',
       vars: { l, r, 'extra dabbe': 3 },
       panels: [array(a, { label: 'arr (in-place)', ids: id, pointers: { l, r } })],
     });
@@ -211,7 +211,7 @@ export const recursiveSum = tracer<{ arr: number[] }>({
       show('call', `sum(i=${i}) = arr[${i}] + ${sub} = ${acc}. Return → frame stack se hata.`, i, i);
     }
     t.frame({
-      caption: `Answer ${acc}. Loop wala version yahi kaam sirf 1 variable (total) se karta — O(1) space. Recursion depth = n hai to space O(n), aur n = 10⁵ par StackOverflowError ka khatra.`,
+      caption: `Answer ${acc}. Loop wala version yahi kaam sirf 1 variable (total) se karta — O(1) space. Recursion depth = n hai to space O(n), aur n = 10⁵ par StackOverflowError ka risk.`,
       vars: { 'loop: extra': 1, 'recursion: max frames': n + 1 },
       panels: [array(arr, { tones: doneUpTo(n) }), { kind: 'recursion', label: 'Recursion tree', calls }],
     });

@@ -30,7 +30,7 @@ class Main {
         if (lo > hi) return null; //@base
         int v = pre[p++]; // preorder ka agla = is subtree ka ROOT //@root
         TreeNode node = new TreeNode(v);
-        int m = pos.get(v); // inorder mein root ke baayein = left subtree, daayein = right //@split
+        int m = pos.get(v); // inorder mein root ke left = left subtree, right = right //@split
         node.left = make(pre, lo, m - 1); // pehle left: preorder mein left subtree wale pehle aate hain
         node.right = make(pre, m + 1, hi);
         return node;

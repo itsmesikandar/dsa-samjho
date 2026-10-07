@@ -2,7 +2,7 @@ meta:
   id: quick-sort
   chapter: sorting-searching
   title: Quick Sort
-  subtitle: Pivot chuno, chhote left — bade right, phir dono taraf wahi. Partition hi asli hathiyaar hai
+  subtitle: Pivot choose karo, chhote left — bade right, phir dono taraf wahi. Partition hi asli tool hai
   level: intermediate
   minutes: 40
   prereqs: [merge-sort, two-pointers-same]
@@ -15,8 +15,8 @@ what:
     - Merge sort: todna aasaan (beech se), **jodna** mehnat (merge).
     - Quick sort: **todna** mehnat (partition), jodna kuch nahi.
 
-    Kadam:
-    1. Ek **pivot** chuno.
+    Step:
+    1. Ek **pivot** choose karo.
     2. **Partition:** pivot se chhote items left, bade right. Pivot apni **pakki jagah** par pahunch jaata hai.
     3. Left aur right hisson par wahi (recursion).
 
@@ -56,7 +56,7 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Ek **partition** dekho. Pivot (neela) end par. Hare = pivot se chhote (aage aa gaye), grey = bade.
+    Ek **partition** dekho. Pivot (blue) end par. Hare = pivot se chhote (aage aa gaye), grey = bade.
 
     Aakhir mein pivot hare aur grey ke beech — uski **pakki jagah**. Apna array daal ke try karo.
   viz: { tracer: partitionBars }
@@ -82,11 +82,11 @@ operations:
   - op: "Quick sort (average)"
     time: O(n log n)
     space: "O(log n) stack"
-    why: "Pivot lagbhag beech ka → log n levels."
+    why: "Pivot approx beech ka → log n levels."
   - op: "Quick sort (worst)"
     time: O(n²)
     space: "O(n) stack"
-    why: "Pivot baar-baar kinare ka (sorted input + pehla pivot, ya sab barabar + Lomuto)."
+    why: "Pivot baar-baar edge ka (sorted input + pehla pivot, ya sab barabar + Lomuto)."
   - op: "Partition (ek baar)"
     time: O(n)
     space: O(1)
@@ -98,20 +98,20 @@ operations:
   - op: "Dutch flag (3-way partition)"
     time: O(n)
     space: O(1)
-    why: "low / mid / high — ek pass mein teen hisse."
+    why: "low / mid / high — ek pass mein 3 hisse."
   - op: "Stable?"
-    time: "lagu nahi"
-    space: "lagu nahi"
+    time: "apply nahi"
+    space: "apply nahi"
     why: "Nahi — lambe swaps barabar items ka order badal dete hain."
 
 # 6. Code
 code:
-  - title: Hoare-style partition (dono kinaron se)
+  - title: Hoare-style partition (dono edges se)
     file: hoare
     note: |
-      `i` left se aage badhta hai jab tak item pivot se chhota hai; `j` right se peeche jab tak bada hai. Dono ruk gaye = dono **galat taraf** → swap. Lomuto se ~3 guna kam swaps.
+      `i` left se aage badhta hai jab tak item pivot se chhota hai; `j` right se peeche jab tak bada hai. Dono ruk gaye = dono **galat taraf** → swap. Lomuto se ~3 times kam swaps.
 
-      **Sab items barabar** ho to Lomuto har baar pivot ko kinare par rakhta hai (O(n²)), par ye version beech mein todta hai — O(n log n). Interview mein ye fark bolo.
+      **Sab items barabar** ho to Lomuto har baar pivot ko edge par rakhta hai (O(n²)), par ye version beech mein todta hai — O(n log n). Interview mein ye fark bolo.
 
 # 7. Examples
 examples:
@@ -132,7 +132,7 @@ examples:
       Ek pass, koi extra array nahi.
 
       > [!tip]
-      > "Do group mein baanto (condition se), order matter nahi" → partition. Order bhi bachana ho (stable) → Move Zeroes jaisa read/write copy, ya extra array.
+      > "Do group mein divide karo (condition se), order matter nahi" → partition. Order bhi bachana ho (stable) → Move Zeroes jaisa read/write copy, ya extra array.
     dryRun: |
       | i | a[i] | Even? | Array | s |
       |---|---|---|---|---|
@@ -152,11 +152,11 @@ examples:
     title: Sort Colors — 0, 1, 2 ek pass mein
     source: { name: Sort Colors, platform: LeetCode, url: "https://leetcode.com/problems/sort-colors/" }
     problem: |
-      Array mein sirf `0`, `1`, `2` hain (teen rang). Inhe **ek hi pass** mein sort karo, in-place, library sort ke bina.
+      Array mein sirf `0`, `1`, `2` hain (3 color). Inhe **ek hi pass** mein sort karo, in-place, library sort ke bina.
 
       Example: `[2, 0, 2, 1, 1, 0]` → `[0, 0, 1, 1, 2, 2]`
     intuition: |
-      Counting (kitne 0, 1, 2) se do pass mein ho jaata hai. **Ek pass** ke liye **3-way partition** (Dijkstra ka Dutch National Flag):
+      Counting (kitne 0, 1, 2) se 2 pass mein ho jaata hai. **Ek pass** ke liye **3-way partition** (Dijkstra ka Dutch National Flag):
 
       - `[0, low)` = 0s, `[low, mid)` = 1s, `[mid, high]` = abhi dekhe nahi, `(high, end]` = 2s.
       - `a[mid] == 0` → `low` se swap, `low++`, `mid++`.
@@ -184,7 +184,7 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Har kadam mid badhta hai ya high ghatta hai — max n kadam."
+      why: "Har step mid badhta hai ya high ghatta hai — max n step."
 
   - id: kth-largest
     level: tricky
@@ -209,7 +209,7 @@ examples:
     dryRun: |
       `[3, 2, 1, 5, 6, 4]`, k = 2 → target index = 6 − 2 = 4
 
-      | Range | Pivot | Pakki jagah p | Faisla |
+      | Range | Pivot | Pakki jagah p | Decision |
       |---|---|---|---|
       | 0..5 | 1 | 0 | p < 4 → right |
       | 1..5 | 5 | 4 | p == 4 → **5** |
@@ -224,7 +224,7 @@ examples:
 when:
   use:
     - "Array (primitives) ko fast, in-place sort karna hai."
-    - "Do/teen group mein baantna hai (partition, Dutch flag)."
+    - "Do/teen group mein divide karna hai (partition, Dutch flag)."
     - "k-th smallest / largest, median — quickselect O(n) average."
     - "Top k items chahiye, order zaroori nahi — quickselect se partition."
   avoid:
@@ -245,9 +245,9 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Java Arrays.sort(int[])"
-    how: "Dual-pivot quick sort — do pivot, teen hisse. Primitives ke liye kyunki stability ka matlab nahi."
+    how: "Dual-pivot quick sort — do pivot, 3 hisse. Primitives ke liye kyunki stability ka matlab nahi."
   - where: "C++ std::sort"
-    how: "Introsort: quick sort, par recursion bahut gehri ho to heap sort par switch (worst O(n log n) guarantee)."
+    how: "Introsort: quick sort, par recursion bahut deep ho to heap sort par switch (worst O(n log n) guarantee)."
   - where: "Databases / analytics"
     how: "Median, percentile (p95 latency) nikaalna — quickselect jaisa, poora sort nahi."
   - where: "Image processing"
@@ -260,10 +260,10 @@ mistakes:
   - title: "Hamesha pehla/aakhri item pivot"
     type: logic
     wrong: |
-      Sorted ya ulta-sorted input → har partition mein ek taraf khaali → O(n²) aur gehri recursion (StackOverflowError).
+      Sorted ya ulta-sorted input → har partition mein ek taraf khaali → O(n²) aur deep recursion (StackOverflowError).
     right: |
       Beech wala ya random pivot.
-  - title: "Recursion mein pivot bhi shamil"
+  - title: "Recursion mein pivot bhi include"
     type: off-by-one
     wrong: |
       `quickSort(l, p)` aur `quickSort(p, r)` (Lomuto ke saath) → pivot dobara, kabhi-kabhi infinite recursion.
@@ -293,10 +293,10 @@ interview:
   questions:
     - q: "Quick sort ki average aur worst complexity? Worst kab?"
       a: |
-        Average O(n log n), worst O(n²) — jab pivot baar-baar sabse chhota/bada ho (sorted input + kinare ka pivot, ya sab barabar + Lomuto).
+        Average O(n log n), worst O(n²) — jab pivot baar-baar sabse chhota/bada ho (sorted input + edge ka pivot, ya sab barabar + Lomuto).
     - q: "Worst case se kaise bachoge?"
       a: |
-        Random pivot / median-of-three, duplicates ke liye 3-way partition, aur introsort (gehraai zyada → heap sort).
+        Random pivot / median-of-three, duplicates ke liye 3-way partition, aur introsort (depth zyada → heap sort).
     - q: "Quick sort vs merge sort?"
       followUp: true
       a: |
@@ -306,7 +306,7 @@ interview:
         Har baar sirf ek hissa: n + n/2 + n/4 + … = 2n (average). Worst O(n²); median-of-medians se guaranteed O(n) (par slow constant).
     - q: "Lomuto vs Hoare partition?"
       a: |
-        Lomuto: ek pointer, samajhna aasaan, zyada swaps, duplicates par kharab. Hoare: do pointers kinaron se, kam swaps, duplicates par behtar.
+        Lomuto: ek pointer, samajhna aasaan, zyada swaps, duplicates par kharab. Hoare: 2 pointers edges se, kam swaps, duplicates par better.
     - q: "Quick sort stable kyun nahi?"
       a: |
         Partition mein door ke swaps barabar items ka relative order badal dete hain.
@@ -433,7 +433,7 @@ connections:
     - id: two-pointers-same
       why: "Lomuto partition = read/write pointers; Sort Colors wahan practice mein bhi."
     - id: two-pointers-opposite
-      why: "Hoare partition = dono kinaron se pointers."
+      why: "Hoare partition = dono edges se pointers."
   usedLater:
     - id: sorting-in-practice
       how: "Dual-pivot quick sort, introsort, kab kaunsa."

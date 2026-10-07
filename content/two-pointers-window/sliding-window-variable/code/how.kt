@@ -1,13 +1,13 @@
-// Sabse chhota lagatar subarray jiska sum >= target (saare numbers positive). Na mile to 0.
+// Sabse chhota continuous subarray jiska sum >= target (saare numbers positive). Na mile to 0.
 fun minSubArrayLen(target: Int, nums: IntArray): Int {
     var l = 0
     var sum = 0
     var best = Int.MAX_VALUE // abhi tak koi valid window nahi //@init
     for (r in nums.indices) {
-        sum += nums[r] // window daayein failao //@expand
+        sum += nums[r] // window right spread karo //@expand
         while (sum >= target) { // valid hai: ab chhota karke dekho //@check
             best = minOf(best, r - l + 1) //@update
-            sum -= nums[l] // baayein se sikodo //@shrink
+            sum -= nums[l] // left se shrink karo //@shrink
             l++
         }
     }

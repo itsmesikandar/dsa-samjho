@@ -2,7 +2,7 @@ meta:
   id: dp-1d
   chapter: dp
   title: 1D DP
-  subtitle: Ek index wala state — lo ya chhodo, aakhri tukda kya tha
+  subtitle: Ek index wala state — lo ya chhodo, aakhri piece kya tha
   level: intermediate
   minutes: 50
   prereqs: [dp-intro, kadane]
@@ -13,24 +13,24 @@ what:
   body: |
     **1D DP** = state ek hi number se bata do: `dp[i]` = "pehle i items / i par khatam / i tak" ka jawab.
 
-    Teen sawaal har baar:
-    1. **State:** `dp[i]` ka matlab ek line mein. (Sabse mushkil kadam.)
-    2. **Transition:** `dp[i]` pichhle states se kaise? Aksar **aakhri faisla** socho:
+    3 sawaal har baar:
+    1. **State:** `dp[i]` ka matlab ek line mein. (Sabse mushkil step.)
+    2. **Transition:** `dp[i]` pichhle states se kaise? Often **aakhri decision** socho:
        - **Lo ya chhodo** (house robber): `max(dp[i-1], dp[i-2] + nums[i])`.
-       - **Aakhri tukda kitna lamba** (decode ways, word break): `Σ dp[i - len]`.
+       - **Aakhri piece kitna lamba** (decode ways, word break): `Σ dp[i - len]`.
        - **i par khatam / naya shuru** (Kadane): `max(nums[i], dp[i-1] + nums[i])`.
     3. **Base + jawab:** `dp[0]` kya hai, aur jawab `dp[n]` hai ya `max(dp)`.
 
     > [!yaad]
     > "Sabse bada subarray" jaise sawaal mein state "i **par khatam** hone wala best" lo — tab hi ek pichhle state se judta hai. Jawab phir saare states ka max.
   analogy: |
-    **Shaadi mein mithai counter, par ek shart: lagaataar do mithaiyan nahi le sakte (dadi dekh rahi hai):**
-    Har mithai par socho: "ye lun ya chhodun?" Lun → pichhli chhodni padegi, to "do pehle tak ka best + ye". Chhodun → "pichhle tak ka best". Jo zyada, wahi. Aage badhte jao — har kadam sirf pichhle do faisle yaad.
+    **Shaadi mein mithai counter, par ek condition: continuous do mithaiyan nahi le sakte (dadi dekh rahi hai):**
+    Har mithai par socho: "ye lun ya chhodun?" Lun → pichhli chhodni padegi, to "do pehle tak ka best + ye". Chhodun → "pichhle tak ka best". Jo zyada, wahi. Aage badhte jao — har step sirf pichhle do decision yaad.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    Bahut saare "array / string par choice" wale sawaal 1D DP hain. Seedha har subset / har tukde try karna exponential hai:
+    Bahut saare "array / string par choice" wale sawaal 1D DP hain. Seedha har subset / har pieces try karna exponential hai:
 
     | Sawaal | Brute force | 1D DP |
     |---|---|---|
@@ -38,33 +38,33 @@ why:
     | Decode ways | 2ⁿ tareeke todne ke | O(n) |
     | Word break | 2ⁿ kaat | O(n²) (ya n × max word length) |
 
-    Aur aksar sirf pichhle 1-2 states chahiye → O(1) memory.
+    Aur often sirf pichhle 1-2 states chahiye → O(1) memory.
 
     > [!socho]
     > House robber mein greedy "sabse bada ghar pehle" kyun nahi?
     >
-    > `[2, 1, 1, 2]` — sabse bada (2) lo, padosi jal gaye… par sahi jawab 2 + 2 = 4 (pehla aur aakhri). Faisle ka asar aage tak — DP.
+    > `[2, 1, 1, 2]` — sabse bada (2) lo, neighbor jal gaye… par sahi jawab 2 + 2 = 4 (pehla aur aakhri). Decision ka effect aage tak — DP.
 
 # 3. Visual intro
 visual:
   body: |
-    Kadane (max subarray) ko DP ki nazar se: `dp[i]` = i par **khatam** hone wala sabse bada sum. Har kadam sirf ek sawaal — pichhle mein judun ya naya shuru karun? Jawab = sab dp ka max.
+    Kadane (max subarray) ko DP ki nazar se: `dp[i]` = i par **khatam** hone wala sabse bada sum. Har step sirf ek sawaal — pichhle mein judun ya naya shuru karun? Jawab = sab dp ka max.
   viz: { tracer: kadaneDpTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    **House Robber:** padosi do ghar ek saath nahi lootne.
+    **House Robber:** neighbor 2 ghar ek saath nahi lootne.
     - State: `dp[i]` = pehle i ghar (0..i−1) se max.
-    - Ghar i−1 par do faisle:
+    - Ghar i−1 par do decision:
       - **Chhodo** → `dp[i−1]`.
-      - **Lo** → padosi (i−2) chhodna pada → `dp[i−2] + nums[i−1]`.
+      - **Lo** → neighbor (i−2) chhodna pada → `dp[i−2] + nums[i−1]`.
     - `dp[i] = max(dono)`. Base: `dp[0] = 0`, `dp[1] = nums[0]`. Jawab `dp[n]`.
 
     Ye "**lo ya chhodo**" template knapsack tak jaata hai.
 
     > [!galti]
-    > `dp[i] = dp[i−2] + nums[i]` hamesha (lena hi lena) — kabhi do chhodna behtar hota hai (`[2, 1, 1, 2]`). Har baar dono options ka max.
+    > `dp[i] = dp[i−2] + nums[i]` hamesha (lena hi lena) — kabhi do chhodna better hota hai (`[2, 1, 1, 2]`). Har baar dono options ka max.
   viz: { tracer: robberTrace }
   code: how
 
@@ -77,7 +77,7 @@ operations:
   - op: "Decode ways"
     time: O(n)
     space: "O(n) → O(1)"
-    why: "Har i par do options (1 ya 2 digit)."
+    why: "Har i par 2 options (1 ya 2 digit)."
   - op: "Word break"
     time: "O(n² · L)"
     space: O(n)
@@ -89,16 +89,16 @@ operations:
   - op: "House robber II (gol)"
     time: O(n)
     space: O(1)
-    why: "Do baar seedhi line wala."
+    why: "2 baar seedhi line wala."
 
 # 6. Code
 code:
-  - title: Word Break — aakhri tukda dictionary ka word?
+  - title: Word Break — aakhri piece dictionary ka word?
     file: word-break
     note: |
       `dp[i]` = s ke pehle i characters dictionary ke words mein poore toot sakte hain?
 
-      Transition: koi j ho jahan `dp[j]` sach **aur** `s[j..i)` ek word → `dp[i] = true`. "Aakhri tukda kitna lamba?" wala template.
+      Transition: koi j ho jahan `dp[j]` sach **aur** `s[j..i)` ek word → `dp[i] = true`. "Aakhri piece kitna lamba?" wala template.
 
       Words ka `HashSet` — lookup O(L). Speed-up: j ko sirf `i − maxWordLen` tak peeche jaane do. (LeetCode 139.)
 
@@ -113,17 +113,17 @@ examples:
 
       Example: `[1, 1, 2, 3, 3, 5]` → **13** (1 + 1 + 3 + 3 + 5)
     intuition: |
-      Ek baar x uthaya to baaki saare x bhi utha lo (unke padosi to pehle hi jal chuke). To value v ke **kul points** = `v × (v ki ginti)`.
+      Ek baar x uthaya to baaki saare x bhi utha lo (unke neighbor to pehle hi jal chuke). To value v ke **total points** = `v × (v ki ginti)`.
 
-      Ab values ko ghar maano: `points[v]` paisa, aur padosi values (v − 1, v + 1) ek saath nahi → **House Robber** hi hai!
+      Ab values ko ghar maano: `points[v]` paisa, aur neighbor values (v − 1, v + 1) ek saath nahi → **House Robber** hi hai!
 
       1. `points[v] += v` (bucket).
-      2. `v = 0..max` par robber — yahan `take / skip` do variables se:
+      2. `v = 0..max` par robber — yahan `take / skip` 2 variables se:
          - `take = skip + points[v]` (v lene ke liye pichhli chhodi honi chahiye)
          - `skip = max(skip, take)`.
 
       > [!tip]
-      > Naya sawaal dekh ke socho: "kya ye kisi purane DP mein badal sakta hai?" Yahi DP ki asli taaqat hai — 20 sawaal, 5 pattern.
+      > Naya sawaal dekh ke socho: "kya ye kisi purane DP mein badal sakta hai?" Yahi DP ki asli power hai — 20 sawaal, 5 pattern.
     dryRun: |
       | v | points[v] | take | skip |
       |---|---|---|---|
@@ -180,17 +180,17 @@ examples:
     title: Gol mohalle mein chori (House Robber II)
     source: { name: House Robber II, platform: LeetCode, url: "https://leetcode.com/problems/house-robber-ii/" }
     problem: |
-      House Robber jaisa, par ghar **gol** mein hain — pehla aur aakhri bhi padosi. Max paisa?
+      House Robber jaisa, par ghar **gol** mein hain — pehla aur aakhri bhi neighbor. Max paisa?
 
-      Example: `[6, 2, 3, 7]` → **9** (seedhi line hoti to 6 + 7 = 13, par yahan 0 aur 3 padosi)
+      Example: `[6, 2, 3, 7]` → **9** (seedhi line hoti to 6 + 7 = 13, par yahan 0 aur 3 neighbor)
     intuition: |
-      Gol hone se sirf ek nayi pabandi: **pehla aur aakhri ek saath nahi.** To do hi case:
+      Gol hone se sirf ek nayi restriction: **pehla aur aakhri ek saath nahi.** To do hi case:
       1. Aakhri ghar chhodo → `0..n−2` seedhi line.
       2. Pehla ghar chhodo → `1..n−1` seedhi line.
 
       Dono par normal house robber, max lo. Ek ghar ho to wahi jawab (dono ranges khaali ho jaate).
 
-      Pattern: **gol / circular** pabandi ko "do seedhe cases" mein todna — bahut jagah kaam aata hai.
+      Pattern: **gol / circular** restriction ko "2 seedhe cases" mein todna — bahut jagah kaam aata hai.
 
       > [!galti]
       > n = 1 case bhool gaye → `0..−1` aur `1..0` dono khaali → jawab 0, sahi hai nums[0].
@@ -205,33 +205,33 @@ examples:
     complexity:
       time: O(n)
       space: O(1)
-      why: "Do baar O(n) pass, do variables."
+      why: "2 baar O(n) pass, 2 variables."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Array / string par har element ke liye 'lo / chhodo' ya 'kahan kaatein' jaise faisle."
+    - "Array / string par har element ke liye 'lo / chhodo' ya 'kahan kaatein' jaise decision."
     - "Jawab ek index tak ke jawab se banta hai (prefix par DP)."
-    - "'Kitne tareeke se todein / padhein' (decode, word break) — aakhri tukda."
-    - "Lagaataar wale elements par pabandi (padosi nahi, cooldown)."
+    - "'Kitne tareeke se todein / padhein' (decode, word break) — aakhri piece."
+    - "Continuous wale elements par restriction (neighbor nahi, cooldown)."
   avoid:
-    - "Do cheezon ko saath track karna pade (do strings, grid, capacity) → 2D DP."
-    - "Faisla sirf abhi ke best se ho jaata hai (greedy saabit) → DP ki zaroorat nahi."
+    - "2 cheezon ko saath track karna pade (2 strings, grid, capacity) → 2D DP."
+    - "Decision sirf abhi ke best se ho jaata hai (greedy saabit) → DP ki zaroorat nahi."
     - "Actual saare tareeke print karne → backtracking (DP se path wapas bhi bana sakte, par sab nahi)."
   signals:
     - keyword: "adjacent nahi le sakte / no two consecutive"
       think: "House robber: max(dp[i-1], dp[i-2] + x)."
     - keyword: "number of ways to decode / split / break string"
-      think: "dp[i] = Σ dp[i - len] valid aakhri tukde par."
+      think: "dp[i] = Σ dp[i - len] valid aakhri pieces par."
     - keyword: "circular array"
-      think: "Do seedhe cases: pehla hata ke, aakhri hata ke."
+      think: "2 seedhe cases: pehla hata ke, aakhri hata ke."
     - keyword: "max subarray / i par khatam"
       think: "State 'i par khatam', jawab max(dp)."
 
 # 9. Real-world
 realWorld:
   - where: "Ad scheduling"
-    how: "Lagaataar do slots mein same advertiser nahi — max revenue = house robber jaisa."
+    how: "Continuous do slots mein same advertiser nahi — max revenue = house robber jaisa."
   - where: "SMS / OTP parsing"
     how: "Digits ko codes mein todne ke tareeke — decode ways."
   - where: "Search engines (word segmentation)"
@@ -239,7 +239,7 @@ realWorld:
   - where: "Thai / Chinese text processing"
     how: "Spaces nahi hote — dictionary se words mein todna (word break)."
   - where: "Fitness apps (rest days)"
-    how: "Lagaataar do din heavy workout nahi — max progress plan (take/skip DP)."
+    how: "Continuous do din heavy workout nahi — max progress plan (take/skip DP)."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -248,11 +248,11 @@ mistakes:
     wrong: |
       `dp[i] = dp[i-2] + nums[i]` — chhodne ka option bhool gaye.
     right: |
-      `max(dp[i-1], dp[i-2] + nums[i])` — dono faisle compare.
+      `max(dp[i-1], dp[i-2] + nums[i])` — dono decision compare.
   - title: "Decode mein '0' ka case"
     type: logic
     wrong: |
-      '0' ko bhi akela letter gin liya, ya '06' ko 6 maan liya.
+      '0' ko bhi akela letter count kar liya, ya '06' ko 6 maan liya.
     right: |
       1 digit: '1'–'9'. 2 digit: 10–26 (pehla digit '0' nahi).
   - title: "Gol mohalle mein n = 1"
@@ -266,7 +266,7 @@ mistakes:
     wrong: |
       dp[i] = 'pehle i' maana, par nums[i] use kiya (nums[i-1] chahiye tha).
     right: |
-      Ek convention chuno (prefix length i → item i − 1) aur har jagah wahi.
+      Ek convention choose karo (prefix length i → item i − 1) aur har jagah wahi.
   - title: "Word break mein greedy"
     type: logic
     wrong: |
@@ -276,7 +276,7 @@ mistakes:
   - title: "Bada jawab overflow"
     type: overflow
     wrong: |
-      Tareeke ginne mein Int overflow (lambi strings).
+      Tareeke count karne mein Int overflow (lambi strings).
     right: |
       Long, ya `% (10⁹ + 7)` agar sawaal kahe.
 
@@ -288,13 +288,13 @@ interview:
         dp[i] = max(dp[i-1], dp[i-2] + nums[i]). Ghar i ya to chhoda (pichhla best) ya liya (tab i-1 nahi, to i-2 tak ka best + ye).
     - q: "Space O(1) kaise?"
       a: |
-        Sirf dp[i-1] aur dp[i-2] chahiye — do variables khiskao (prev1, prev2).
+        Sirf dp[i-1] aur dp[i-2] chahiye — 2 variables shift karo (prev1, prev2).
     - q: "Decode ways mein '0' kaise handle karte ho?"
       a: |
         '0' akela letter nahi; sirf '10' / '20' ka hissa. 1-digit branch tab hi jab digit ≠ '0'; 2-digit branch tab jab 10 ≤ two ≤ 26.
     - q: "House Robber II ko seedhi line mein kaise badla?"
       a: |
-        Pehla-aakhri dono saath nahi → do cases: [0..n-2] aur [1..n-1]. Har ek par normal robber, max.
+        Pehla-aakhri dono saath nahi → 2 cases: [0..n-2] aur [1..n-1]. Har ek par normal robber, max.
     - q: "Word break ki complexity aur optimisation?"
       a: |
         O(n²) substrings × hashing. j ko sirf max word length peeche tak chalao; ya Trie se prefix walk.
@@ -303,11 +303,11 @@ interview:
         State = i par khatam hone wala best; dp[i] = max(nums[i], dp[i-1] + nums[i]); jawab max(dp).
     - q: "Delete and Earn ko house robber kaise banaya?"
       a: |
-        Value v ke kul points = v × count. Padosi values (v±1) ek saath nahi → values par robber.
+        Value v ke total points = v × count. Neighbor values (v±1) ek saath nahi → values par robber.
     - q: "House Robber III (tree)?"
       followUp: true
       a: |
-        Har node se do values lautao: (le liya, nahi liya). Liya = node + dono bachchon ka 'nahi liya'. Nahi liya = har bachche ka max. Postorder DFS.
+        Har node se 2 values return karo: (le liya, nahi liya). Liya = node + dono bachchon ka 'nahi liya'. Nahi liya = har bachche ka max. Postorder DFS.
     - q: "Word Break II (saare sentences)?"
       followUp: true
       a: |
@@ -326,7 +326,7 @@ practice:
     url: "https://leetcode.com/problems/house-robber/"
     level: easy
     pattern: Lo ya chhodo
-    hint: "How wala — pehle dp array, phir do variables. (LeetCode par medium.)"
+    hint: "How wala — pehle dp array, phir 2 variables. (LeetCode par medium.)"
   - name: Maximum Subarray
     platform: LeetCode
     num: 53
@@ -346,14 +346,14 @@ practice:
     num: 139
     url: "https://leetcode.com/problems/word-break/"
     level: medium
-    pattern: Aakhri tukda
+    pattern: Aakhri piece
     hint: "Code section wala. dp[0] = true."
   - name: Maximum Product Subarray
     platform: LeetCode
     num: 152
     url: "https://leetcode.com/problems/maximum-product-subarray/"
     level: medium
-    pattern: Do states (max aur min)
+    pattern: 2 states (max aur min)
     hint: "Negative se min, max ban jaata hai. Har i par curMax, curMin dono: candidates (x, x·max, x·min)."
   - name: Minimum Cost For Tickets
     platform: LeetCode
@@ -361,29 +361,29 @@ practice:
     url: "https://leetcode.com/problems/minimum-cost-for-tickets/"
     level: medium
     pattern: dp[din] = min (1, 7, 30 din ka pass)
-    hint: "dp[d] = safar ke din nahi to dp[d-1]; warna min(dp[d-1] + c1, dp[d-7] + c7, dp[d-30] + c30) (index < 0 → 0)."
+    hint: "dp[d] = trip ke din nahi to dp[d-1]; warna min(dp[d-1] + c1, dp[d-7] + c7, dp[d-30] + c30) (index < 0 → 0)."
   - name: Decode Ways II
     platform: LeetCode
     num: 639
     url: "https://leetcode.com/problems/decode-ways-ii/"
     level: hard
     pattern: Decode ways + '*' cases
-    hint: "'*' = 1–9. Har 1-digit aur 2-digit case ke liye kitne combinations — ginti guna karo. Long + mod."
+    hint: "'*' = 1–9. Har 1-digit aur 2-digit case ke liye kitne combinations — count multiply karo. Long + mod."
   - name: Best Time to Buy and Sell Stock with Cooldown
     platform: LeetCode
     num: 309
     url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/"
     level: hard
     pattern: State machine (hold / sold / rest)
-    hint: "Teen states har din: hold = max(hold, rest - p), sold = hold + p, rest = max(rest, sold_kal). (LeetCode par medium.)"
+    hint: "3 states har din: hold = max(hold, rest - p), sold = hold + p, rest = max(rest, sold_kal). (LeetCode par medium.)"
 
 # 13. Quick revision
 revision:
   summary:
-    - "1D DP: dp[i] ka matlab ek line mein; transition = aakhri faisla."
+    - "1D DP: dp[i] ka matlab ek line mein; transition = aakhri decision."
     - "Lo ya chhodo: dp[i] = max(dp[i-1], dp[i-2] + x)."
-    - "Aakhri tukda: dp[i] = Σ dp[i - len] (decode ways, word break); dp[0] = 1 / true."
-    - "Circular: do seedhe cases. Max subarray: state 'i par khatam', jawab max(dp)."
+    - "Aakhri piece: dp[i] = Σ dp[i - len] (decode ways, word break); dp[0] = 1 / true."
+    - "Circular: 2 seedhe cases. Max subarray: state 'i par khatam', jawab max(dp)."
     - "Pichhle 1-2 states → rolling variables, O(1) memory."
   cheatsheet: |
     ```kotlin
@@ -405,10 +405,10 @@ revision:
       options: ["1", "2", "3", "4"]
       answer: 2
       explain: "2 2 6, 22 6, 2 26 → 3."
-    - q: "House robber II mein pehla aur aakhri padosi. Kaise solve?"
+    - q: "House robber II mein pehla aur aakhri neighbor. Kaise solve?"
       options: ["Dono le lo", "Do seedhi lines (pehla hata, aakhri hata) ka max", "Greedy", "2D DP"]
       answer: 1
-      explain: "Dono saath nahi aa sakte → do cases."
+      explain: "Dono saath nahi aa sakte → 2 cases."
     - q: "Max subarray ke DP mein dp[i] ka matlab?"
       options: ["0..i ka sabse bada subarray", "i par KHATAM hone wala sabse bada", "i se shuru hone wala", "Prefix sum"]
       answer: 1
@@ -422,7 +422,7 @@ revision:
 connections:
   related:
     - id: dp-intro
-      why: "Same safar — state, transition, base; yahan zyada pattern."
+      why: "Same trip — state, transition, base; yahan zyada pattern."
     - id: kadane
       why: "Kadane = 1D DP with 'i par khatam' state."
     - id: greedy-classics

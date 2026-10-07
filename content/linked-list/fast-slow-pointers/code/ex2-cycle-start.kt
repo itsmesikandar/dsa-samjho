@@ -9,7 +9,7 @@ fun detectCycle(head: ListNode?): ListNode? {
         fast = fast.next?.next
         if (slow === fast) { // mile: circle pakka hai
             var p = head // ek pointer head par wapas //@restart
-            while (p !== slow) { // dono 1-1 kadam: circle ki shuruaat par milenge (maths neeche) //@walk
+            while (p !== slow) { // dono 1-1 step: circle ki shuruaat par milenge (maths neeche) //@walk
                 p = p?.next
                 slow = slow?.next
             }

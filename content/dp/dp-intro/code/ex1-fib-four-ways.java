@@ -1,5 +1,5 @@
 class Main {
-    // Ek sawaal, chaar tareeke: recursion -> memo -> tabulation -> do variables
+    // Ek sawaal, 4 tareeke: recursion -> memo -> tabulation -> 2 variables
     static long calls = 0;
 
     static long fibPlain(int n) { // 1. seedhi recursion: O(2^n)
@@ -26,7 +26,7 @@ class Main {
         long b = 1; // fib(i + 1)
         for (int k = 0; k < n; k++) {
             long c = a + b;
-            a = b; // khidki ek aage khiski //@slide
+            a = b; // window ek aage shift hui //@slide
             b = c;
         }
         return a; //@done

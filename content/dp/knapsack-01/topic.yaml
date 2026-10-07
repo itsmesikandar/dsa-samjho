@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    **0/1 Knapsack:** `n` items, har ek ka **weight** aur **value**. Bag ki capacity `W`. Har item ya **poora lo (1)** ya **chhodo (0)** — aadha nahi, do baar nahi. Weight `W` ke andar rakhte hue value **max** karo.
+    **0/1 Knapsack:** `n` items, har ek ka **weight** aur **value**. Bag ki capacity `W`. Har item ya **poora lo (1)** ya **chhodo (0)** — aadha nahi, 2 baar nahi. Weight `W` ke andar rakhte hue value **max** karo.
 
     Template:
     1. **State:** `dp[i][w]` = pehle `i` items mein se, jagah `w` ho to **max value**.
@@ -22,7 +22,7 @@ what:
     3. **Base:** 0 items → value 0 (pehli row poori 0).
     4. **Jawab:** `dp[n][W]`.
 
-    Yahi dhaancha bahut saare sawaalon mein chhupa hai: **subset sum** (jod ban sakta?), **partition** (do barabar hisse?), **ginti** (kitne subsets?). Value ki jagah `true/false` ya count aa jaata hai.
+    Yahi structure bahut saare sawaalon mein chhupa hai: **subset sum** (jod ban sakta?), **partition** (do barabar hisse?), **count** (kitne subsets?). Value ki jagah `true/false` ya count aa jaata hai.
 
     > [!yaad]
     > Har row sirf **upar wali row** par depend → ek 1D array `dp[w]` kaafi — par capacity loop **ULTA** (`W` se `wt` tak). Seedha chalaya to ek item kai baar jud jaata hai.
@@ -35,7 +35,7 @@ what:
 # 2. Kyun chahiye?
 why:
   body: |
-    Seedha tareeka: har subset try karo. Har item ke do options → `2ⁿ` subsets:
+    Seedha tareeka: har subset try karo. Har item ke 2 options → `2ⁿ` subsets:
 
     | Items (n) | Subsets (2ⁿ) |
     |---|---|
@@ -43,7 +43,7 @@ why:
     | 30 | ~10⁹ |
     | 100 | ~10³⁰ |
 
-    Par asal mein alag sawaal sirf `(kaunsa item, kitni jagah bachi)` — kul `n × W`. DP: **O(n · W)**. 100 items, W = 10,000 → 10⁶ kaam.
+    Par asal mein alag sawaal sirf `(kaunsa item, kitni jagah bachi)` — total `n × W`. DP: **O(n · W)**. 100 items, W = 10,000 → 10⁶ kaam.
 
     **Greedy kyun nahi?** "Sabse zyada value / kg pehle" — 0/1 mein fail:
     - Bag 4 kg. Items: A (3 kg, ₹5), B (2 kg, ₹3), C (2 kg, ₹3).
@@ -53,12 +53,12 @@ why:
     > [!socho]
     > Agar items tod sakte (aadha kilo chawal) — tab greedy kyun chalta hai?
     >
-    > Tod sakte ho to jagah kabhi waste nahi hoti: sabse accha per-kg pehle bharo, aakhri item ka tukda le lo. Ye **fractional knapsack** hai (greedy chapter). 0/1 mein jagah bach ke waste ho sakti hai — isliye har choice ka asar aage tak, DP chahiye.
+    > Tod sakte ho to jagah kabhi waste nahi hoti: sabse accha per-kg pehle bharo, aakhri item ka piece le lo. Ye **fractional knapsack** hai (greedy chapter). 0/1 mein jagah bach ke waste ho sakti hai — isliye har choice ka effect aage tak, DP chahiye.
 
 # 3. Visual intro
 visual:
   body: |
-    3 items, chhota bag. Har item par do raaste: **lo** ya **chhodo**. Poora ped dekho — aur red nodes par dhyaan do: wahi `(item, bachi jagah)` alag raaston se **dobara** aa rahi hai. Yahi overlapping subproblems hain → table mein yaad rakho.
+    3 items, chhota bag. Har item par 2 raaste: **lo** ya **chhodo**. Poora tree dekho — aur red nodes par dhyaan do: wahi `(item, bachi jagah)` alag raaston se **dobara** aa rahi hai. Yahi overlapping subproblems hain → table mein yaad rakho.
   viz: { tracer: choiceTreeTrace }
 
 # 4. Kaise kaam karta hai
@@ -75,7 +75,7 @@ how:
     **Kaunse items liye?** Neeche se upar chalo: `dp[i][w] ≠ dp[i−1][w]` matlab item `i` liya → `w −= wt`.
 
     > [!galti]
-    > `dp[i][w − wt]` (isi row se) le liya → ek item kai baar ginaa gaya. 0/1 mein "lo" hamesha **upar wali row** (`i − 1`) se.
+    > `dp[i][w − wt]` (isi row se) le liya → ek item kai baar count kiya gaya. 0/1 mein "lo" hamesha **upar wali row** (`i − 1`) se.
   viz: { tracer: knapTableTrace }
   code: how
 
@@ -84,7 +84,7 @@ operations:
   - op: "Brute force (har subset)"
     time: "O(2ⁿ)"
     space: "O(n)"
-    why: "Har item lo / chhodo; recursion stack n gehra."
+    why: "Har item lo / chhodo; recursion stack n deep."
   - op: "0/1 knapsack (2D table)"
     time: "O(n · W)"
     space: "O(n · W)"
@@ -97,14 +97,14 @@ operations:
     time: "O(n · S)"
     space: "O(S)"
     why: "Boolean dp[s], S = target jod."
-  - op: "Subsets ginna (jod = S)"
+  - op: "Subsets count karna (jod = S)"
     time: "O(n · S)"
     space: "O(S)"
     why: "dp[s] += dp[s − x], ulta loop."
-  - op: "Chune items nikalna"
+  - op: "Choose kiye items nikalna"
     time: "O(n)"
     space: "O(n · W)"
-    why: "2D table chahiye; neeche se upar ek row ek kadam."
+    why: "2D table chahiye; neeche se upar ek row ek step."
 
 # 6. Code
 code:
@@ -115,7 +115,7 @@ code:
 
       **Ulta** (`W` se `wt` tak): jab `dp[w]` badlo, `dp[w − wt]` abhi tak **purana** hai (is item se pehle ka) — item ek hi baar juda. ✔
 
-      **Seedha** (`wt` se `W` tak): `dp[w − wt]` pehle hi is item ke saath update ho chuka → item phir se juda. Ek item (2 kg, ₹3), bag 6 → seedha loop **₹9** deta hai (teen baar liya!). Ye galti nahi, **unbounded knapsack** hai — agla topic.
+      **Seedha** (`wt` se `W` tak): `dp[w − wt]` pehle hi is item ke saath update ho chuka → item phir se juda. Ek item (2 kg, ₹3), bag 6 → seedha loop **₹9** deta hai (3 baar liya!). Ye galti nahi, **unbounded knapsack** hai — agla topic.
 
 # 7. Examples
 examples:
@@ -124,11 +124,11 @@ examples:
     title: Do barabar hisse (Partition Equal Subset Sum)
     source: { name: Partition Equal Subset Sum, platform: LeetCode, url: "https://leetcode.com/problems/partition-equal-subset-sum/" }
     problem: |
-      Positive numbers ki list. Kya inhe **do groups** mein baant sakte ho jinka jod **barabar** ho? Har number exactly ek group mein.
+      Positive numbers ki list. Kya inhe **2 groups** mein divide kar sakte ho jinka jod **barabar** ho? Har number exactly ek group mein.
 
       Example: `[3, 1, 5, 9, 2]` → **true** (`9 + 1` aur `3 + 5 + 2`, dono 10)
     intuition: |
-      Kul jod `total`. Do barabar hisse → har hissa `total / 2`. Agar ek group ka jod `total / 2` ho gaya, baaki apne aap `total / 2`.
+      Total jod `total`. Do barabar hisse → har hissa `total / 2`. Agar ek group ka jod `total / 2` ho gaya, baaki apne aap `total / 2`.
 
       To sawaal badal gaya: **kya koi subset ka jod `total / 2` hai?** Ye knapsack hai — weight = number, capacity = `total / 2`, aur value ki jagah sirf `true/false`.
 
@@ -156,27 +156,27 @@ examples:
 
   - id: last-stone
     level: medium
-    title: Patthar takrao, kam se kam bache (Last Stone Weight II)
+    title: Stone collision, kam se kam bache (Last Stone Weight II)
     source: { name: Last Stone Weight II, platform: LeetCode, url: "https://leetcode.com/problems/last-stone-weight-ii/" }
     problem: |
-      Pattharon ke wazan diye hain. Har baar koi do patthar uthao aur takrao: barabar → dono khatam; warna chhota mit jaata, bade ka wazan farak jitna reh jaata. Jab tak ek ya zero na bache. Aakhri bache patthar ka **kam se kam** wazan? (Kuch na bache → 0.)
+      Stones ke weight diye hain. Har baar koi do stone uthao aur collision: barabar → dono khatam; warna chhota mit jaata, bade ka weight farak jitna reh jaata. Jab tak ek ya zero na bache. Aakhri bache stone ka **kam se kam** weight? (Kuch na bache → 0.)
 
       Example: `[6, 3, 8, 2]` → **1**
     intuition: |
-      Simulation mat socho — **signs** socho. Har takkar mein ek patthar `+` aur ek `−` ke saath judta hai. Aakhir mein bacha = kuch pattharon ka jod **minus** baaki ka jod.
+      Simulation mat socho — **signs** socho. Har takkar mein ek stone `+` aur ek `−` ke saath judta hai. Aakhir mein bacha = kuch stones ka jod **minus** baaki ka jod.
 
-      Matlab pattharon ko **do dheron** mein baanto: A aur B. Bacha = `|A − B|`. (Aur ulta bhi sach: koi bhi baant ho, takrane ka order aisa chun sakte ho ki wahi farak bache.)
+      Matlab stones ko **do bahut saare** mein divide karo: A aur B. Bacha = `|A − B|`. (Aur ulta bhi sach: koi bhi division ho, collide hone ka order aisa choose kar sakte ho ki wahi farak bache.)
 
       `A + B = total` fix hai. Farak kam → A ko `total / 2` ke jitna paas laao (neeche se). Ye subset sum hai:
-      - `dp[s]` = koi dher jiska jod `s`, `s ≤ total / 2`.
+      - `dp[s]` = koi pile jiska jod `s`, `s ≤ total / 2`.
       - Sabse bada `s` jo ban sake → jawab `total − 2s`.
 
       `[6, 3, 8, 2]`: total 19, half 9. `{6, 3}` = 9 → doosra 10 → bacha 1. Order: 8 vs 6 → 2; 3 vs 2 → 1; 2 vs 1 → **1**.
 
       > [!galti]
-      > Greedy "har baar do sabse bhaari takrao" — Last Stone Weight I ke liye sahi, yahan nahi. Yahan sawaal "kam se kam bache" hai.
+      > Greedy "har baar 2 sabse bhaari collision" — Last Stone Weight I ke liye sahi, yahan nahi. Yahan sawaal "kam se kam bache" hai.
     dryRun: |
-      | Patthar | Ban sakne wale jod (≤ 9) |
+      | Stone | Ban sakne wale jod (≤ 9) |
       |---|---|
       | shuru | 0 |
       | 6 | 0 6 |
@@ -205,13 +205,13 @@ examples:
       - `P + N = total`
       - Dono jodo → `P = (total + target) / 2`.
 
-      Ab sawaal: **kitne subsets ka jod `P`?** Ginti wala knapsack:
+      Ab sawaal: **kitne subsets ka jod `P`?** Count wala knapsack:
       - `dp[0] = 1` (khaali subset ek tareeka).
       - Har number `x`, `s` ulta: `dp[s] += dp[s − x]` — "jo subsets `s − x` banate the, unme `x` jodo to `s`".
 
       `P` fraction ho (`total + target` odd) ya `|target| > total` → 0 tareeke.
 
-      Zero wale numbers? `x = 0` par `dp[s] += dp[s]` — sab doguna. Sahi bhi: `+0` aur `−0` do alag tareeke.
+      Zero wale numbers? `x = 0` par `dp[s] += dp[s]` — sab double. Sahi bhi: `+0` aur `−0` 2 alag tareeke.
 
       > [!galti]
       > Parity check bhool gaye — `(total + target) / 2` integer division chupke se neeche round karta hai aur galat `P` ka jawab de deta hai. Negative target par `P` negative → array size crash.
@@ -235,9 +235,9 @@ when:
   use:
     - "Har item ek hi baar, lo ya chhodo — aur ek limit (weight, budget, jod)."
     - "Kya koi subset ka jod S ban sakta hai? Kitne subsets? (subset sum)"
-    - "List ko do groups mein baantna — barabar ya farak kam se kam."
-    - "Har number par + / − lagana → P aur N mein baant ke subset sum."
-    - "Do limits ek saath (jaise 0s aur 1s ki ginti) → 2D capacity, wahi ulta loop."
+    - "List ko 2 groups mein divide karna — barabar ya farak kam se kam."
+    - "Har number par + / − lagana → P aur N mein divide kar ke subset sum."
+    - "Do limits ek saath (jaise 0s aur 1s ki count) → 2D capacity, wahi ulta loop."
   avoid:
     - "Item tod sakte (fractional) → greedy, value / weight se sort."
     - "Ek item kitni bhi baar le sakte → unbounded knapsack (seedha loop)."
@@ -251,21 +251,21 @@ when:
     - keyword: "minimize difference of two groups"
       think: "Subset sum, total / 2 ke sabse paas."
     - keyword: "assign + / − to reach target"
-      think: "P = (total + target) / 2, subsets gino."
+      think: "P = (total + target) / 2, subsets count karo."
     - keyword: "count subsets with sum K"
       think: "dp[0] = 1, dp[s] += dp[s − x], ulta."
 
 # 9. Real-world
 realWorld:
   - where: "Truck / container loading"
-    how: "Weight limit mein kaunse parcels — sabse zyada kamai wale combination."
+    how: "Weight limit mein kaunse parcels — sabse zyada profit wale combination."
   - where: "Budget planning"
-    how: "Har project ka kharcha aur fayda, fixed budget — kaunse projects chuno (capital budgeting)."
+    how: "Har project ka cost aur fayda, fixed budget — kaunse projects choose karo (capital budgeting)."
   - where: "TV / YouTube ad break"
-    how: "Break fixed seconds ka; har ad ki length aur kamai — max kamai wale ads fit karo."
+    how: "Break fixed seconds ka; har ad ki length aur profit — max profit wale ads fit karo."
   - where: "Cloud servers"
     how: "Ek machine ki RAM / CPU limit mein kaunse jobs chalao ki sabse zyada kaam ho."
-  - where: "Cryptography ka itihaas"
+  - where: "Cryptography ka history"
     how: "Merkle–Hellman knapsack cryptosystem (1978) subset sum par bana tha — baad mein tod diya gaya."
 
 # 10. Common galtiyan & edge cases
@@ -279,13 +279,13 @@ mistakes:
   - title: "Base bhool gaye"
     type: logic
     wrong: |
-      Subset sum mein `dp[0] = false` / ginti mein `dp[0] = 0` chhod diya → kuch bhi nahi banta, sab false / 0.
+      Subset sum mein `dp[0] = false` / count mein `dp[0] = 0` chhod diya → kuch bhi nahi banta, sab false / 0.
     right: |
       `dp[0] = true` (ya 1) — khaali subset ka jod 0.
   - title: "Item index i vs i − 1"
     type: off-by-one
     wrong: |
-      2D table mein row i par `wt[i]` padha — ek item aage khisak gaya, aakhri par crash.
+      2D table mein row i par `wt[i]` padha — ek item aage shift ho gaya, aakhri par crash.
     right: |
       Row i = pehle i items → item `wt[i - 1]`, `value[i - 1]`.
   - title: "Target sum mein parity / range check nahi"
@@ -311,7 +311,7 @@ mistakes:
     wrong: |
       W = 0 ya koi item nahi par alag `if` bhool gaye ya index -1 padha.
     right: |
-      Template khud sambhaal leta hai — loop chalega hi nahi, `dp[W] = 0`. Bas `dp[w - wt]` se pehle `wt <= w` check.
+      Template khud handle kar leta hai — loop chalega hi nahi, `dp[W] = 0`. Bas `dp[w - wt]` se pehle `wt <= w` check.
 
 # 11. Interview corner
 interview:
@@ -328,7 +328,7 @@ interview:
     - q: "Greedy (value/weight) kyun fail?"
       a: |
         Bag 4: (3kg, 5), (2kg, 3), (2kg, 3). Greedy 5, sahi 6. Jagah waste hoti hai. Fractional mein tod sakte to greedy sahi.
-    - q: "Kaunse items chune, wo kaise nikaloge?"
+    - q: "Kaunse items choose kiye, wo kaise nikaloge?"
       a: |
         2D table rakho. i = n se 1: dp[i][w] != dp[i-1][w] to item i liya, w -= wt[i-1]. 1D se ye nahi milta.
     - q: "Partition equal subset sum ko knapsack kaise banaya?"
@@ -336,7 +336,7 @@ interview:
         Total odd → false. Warna kya koi subset total/2 banata — boolean subset sum, ulta loop.
     - q: "Target sum ko subset count mein kaise badla?"
       a: |
-        P - N = target, P + N = total → P = (total + target)/2. Ab subsets gino jinka jod P. Parity aur |target| <= total check.
+        P - N = target, P + N = total → P = (total + target)/2. Ab subsets count karo jinka jod P. Parity aur |target| <= total check.
     - q: "W bahut bada (10^9) par values chhoti?"
       followUp: true
       a: |
@@ -369,7 +369,7 @@ practice:
     platform: GFG
     url: "https://www.geeksforgeeks.org/problems/perfect-sum-problem5633/1"
     level: easy
-    pattern: Subsets gino
+    pattern: Subsets count karo
     hint: "dp[0] = 1, dp[s] += dp[s - x]. Zero wale numbers bhi aate hain — s ko 0 tak chalao. Modulo dhyaan se."
   - name: Ones and Zeroes
     platform: LeetCode
@@ -377,7 +377,7 @@ practice:
     url: "https://leetcode.com/problems/ones-and-zeroes/"
     level: medium
     pattern: Do capacity wala knapsack
-    hint: "Har string = item, weight do hain (0s ginti, 1s ginti). dp[i][j] = max strings; dono loops ulta."
+    hint: "Har string = item, weight do hain (0s count, 1s count). dp[i][j] = max strings; dono loops ulta."
   - name: Length of the Longest Subsequence That Sums to Target
     platform: LeetCode
     num: 2915
@@ -397,15 +397,15 @@ practice:
     num: 879
     url: "https://leetcode.com/problems/profitable-schemes/"
     level: hard
-    pattern: Do aayam — log aur profit
+    pattern: Do dimension — log aur profit
     hint: "dp[members][profit] = tareeke; profit ko minProfit par cap karo (min(p + gain, minProfit)). Members loop ulta."
   - name: Tallest Billboard
     platform: LeetCode
     num: 956
     url: "https://leetcode.com/problems/tallest-billboard/"
     level: hard
-    pattern: State = do dheron ka farak
-    hint: "dp[diff] = chhote dher ki max height. Har rod: left mein, right mein, ya chhodo. Copy se update karo."
+    pattern: State = do bahut saare ka farak
+    hint: "dp[diff] = chhote pile ki max height. Har rod: left mein, right mein, ya chhodo. Copy se update karo."
 
 # 13. Quick revision
 revision:
@@ -413,7 +413,7 @@ revision:
     - "0/1 knapsack: har item ek baar, lo ya chhodo; dp[i][w] = max(chhodo, lo)."
     - "Lo = upar wali row se: dp[i-1][w - wt] + value."
     - "1D: dp[w], capacity loop ULTA (W se wt). Seedha = unbounded."
-    - "Subset sum = value ki jagah true/false; ginti = dp[s] += dp[s - x], dp[0] = 1."
+    - "Subset sum = value ki jagah true/false; count = dp[s] += dp[s - x], dp[0] = 1."
     - "Partition → total/2. Target sum → P = (total + target)/2. O(n·W) pseudo-polynomial — W bada to nahi chalega."
   cheatsheet: |
     ```kotlin
@@ -423,7 +423,7 @@ revision:
     // subset sum
     val can = BooleanArray(S + 1); can[0] = true
     for (x in nums) for (s in S downTo x) if (can[s - x]) can[s] = true
-    // subsets ginna
+    // subsets count karna
     val ways = IntArray(S + 1); ways[0] = 1
     for (x in nums) for (s in S downTo x) ways[s] += ways[s - x]
     ```
@@ -431,7 +431,7 @@ revision:
     - q: "Items (1kg ₹1), (3kg ₹4), (4kg ₹5), (5kg ₹7); bag 7 kg. Max value?"
       options: ["8", "9", "10", "12"]
       answer: 1
-      explain: "3kg + 4kg = ₹9. (5kg + 1kg = ₹8.) Teeno bade ek saath fit nahi."
+      explain: "3kg + 4kg = ₹9. (5kg + 1kg = ₹8.) All 3 bade ek saath fit nahi."
     - q: "0/1 knapsack 1D array mein capacity loop?"
       options: ["w = 0 se W", "w = W se wt tak (ulta)", "Koi bhi order", "w = wt se W"]
       answer: 1
@@ -455,7 +455,7 @@ connections:
     - id: dp-grid
       why: "Item × capacity ki table — upar wali row se bharna, ek row ka array."
     - id: permutations-combinations
-      why: "Lo / chhodo wala subsets recursion — knapsack uska memoized roop."
+      why: "Lo / chhodo wala subsets recursion — knapsack uska memoized form."
     - id: greedy-basics
       why: "Fractional knapsack greedy se; 0/1 mein greedy kyun fail hota hai."
   usedLater:

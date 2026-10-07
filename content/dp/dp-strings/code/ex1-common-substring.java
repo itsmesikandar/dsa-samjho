@@ -1,5 +1,5 @@
 class Main {
-    // Sabse lamba common SUBSTRING (lagaataar, gap nahi). LCS jaisa table, par mismatch par 0 - silsila toot gaya
+    // Sabse lamba common SUBSTRING (continuous, gap nahi). LCS jaisa table, par mismatch par 0 - chain toot gaya
     static int longestCommonSubstr(String a, String b) {
         int[][] dp = new int[a.length() + 1][b.length() + 1]; // dp[i][j] = a[i-1] aur b[j-1] par KHATAM hone wala common substring
         int best = 0;

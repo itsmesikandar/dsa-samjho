@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // Recursion ki jagah apna stack: bahut gehre graph (1 lakh nodes ki line) par StackOverflow se bachao
+    // Recursion ki jagah apna stack: bahut deep graph (1 lakh nodes ki line) par StackOverflow se bachao
     static List<Integer> dfsIterative(List<List<Integer>> adj, int start) {
         boolean[] visited = new boolean[adj.size()];
         List<Integer> order = new ArrayList<>();
@@ -11,11 +11,11 @@ class Main {
         stack.push(start);
         while (!stack.isEmpty()) {
             int u = stack.pop(); // LIFO - sabse naya pehle
-            if (visited[u]) continue; // ek node stack mein do baar aa sakta hai - nikalte waqt check
+            if (visited[u]) continue; // ek node stack mein 2 baar aa sakta hai - nikalte time check
             visited[u] = true;
             order.add(u);
             List<Integer> nb = adj.get(u);
-            for (int i = nb.size() - 1; i >= 0; i--) { // ulta daalo taaki pehla padosi sabse upar rahe
+            for (int i = nb.size() - 1; i >= 0; i--) { // ulta daalo taaki pehla neighbor sabse upar rahe
                 if (!visited[nb.get(i)]) stack.push(nb.get(i));
             }
         }

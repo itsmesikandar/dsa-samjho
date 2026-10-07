@@ -2,7 +2,7 @@ class Main {
     // Gol raaste par stations: i par gas[i] milta, agle station tak cost[i] lagta. Kahan se shuru karein ki
     // poora chakkar ho jaaye? Na ho to -1. (Answer ho to ek hi hota hai.)
     static int canCompleteCircuit(int[] gas, int[] cost) {
-        int total = 0; // poore chakkar ka hisaab: < 0 to namumkin
+        int total = 0; // poore chakkar ka hisaab: < 0 to impossible
         int tank = 0; // abhi wale start se ab tak tank
         int start = 0;
         for (int i = 0; i < gas.length; i++) {

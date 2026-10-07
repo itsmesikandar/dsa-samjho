@@ -4,7 +4,7 @@ class Main {
     // Saare UNIQUE triplets jinka sum 0 ho
     static List<List<Integer>> threeSum(int[] nums) {
         int[] a = nums.clone();
-        Arrays.sort(a); // sort -> two pointers chal sakte hain, aur duplicates padosi ban jaate hain //@sort
+        Arrays.sort(a); // sort -> two pointers chal sakte hain, aur duplicates neighbor ban jaate hain //@sort
         List<List<Integer>> res = new ArrayList<>();
         for (int i = 0; i < a.length; i++) {
             if (i > 0 && a[i] == a[i - 1]) continue; // same pehla number dobara -> wahi triplets milenge, skip //@skipI

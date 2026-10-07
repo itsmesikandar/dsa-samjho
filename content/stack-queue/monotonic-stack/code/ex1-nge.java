@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class Main {
-    // nums1 ke har number ke liye: nums2 mein usi number ke DAAYEIN pehla bada (na ho to -1). nums1 subset of nums2, sab distinct.
+    // nums1 ke har number ke liye: nums2 mein usi number ke RIGHT pehla bada (na ho to -1). nums1 subset of nums2, sab distinct.
     static int[] nextGreaterElement(int[] nums1, int[] nums2) {
         Map<Integer, Integer> next = new HashMap<>(); // value -> uska next greater (nums2 mein)
         Deque<Integer> st = new ArrayDeque<>(); // values jinka next greater abhi nahi mila

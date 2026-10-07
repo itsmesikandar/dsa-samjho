@@ -33,7 +33,7 @@ export const memoryLayout = tracer<{ arr: number[]; i: number }>({
       panels: [{ kind: 'memory', label: 'RAM (memory)', start, cells: cells('empty') }],
     });
     t.frame({
-      caption: `intArrayOf(...) likhte hi ${arr.length} dabbe EK SAATH, ek ke baad ek (contiguous) mil gaye. Beech mein koi gap nahi — yahi array ki sabse badi taakat hai.`,
+      caption: `intArrayOf(...) likhte hi ${arr.length} dabbe EK SAATH, ek ke baad ek (contiguous) mil gaye. Beech mein koi gap nahi — yahi array ki sabse badi power hai.`,
       panels: [{ kind: 'memory', label: 'RAM (memory)', start, cells: cells('alloc') }],
     });
     t.frame({
@@ -80,7 +80,7 @@ export const insertAt = tracer<{ arr: number[]; index: number; value: number }>(
     let i = size - 1;
     t.frame({
       line: 'init',
-      caption: `i = size - 1 = ${i}. Peeche (right end) se shuru kyun? Agar aage se khiskaate to har copy agle value ko mita deti.`,
+      caption: `i = size - 1 = ${i}. Peeche (right end) se shuru kyun? Agar aage se shift karte to har copy agle value ko hata deti.`,
       vars: { i, index, value },
       panels: [view({ [i]: 'compare' }, { i })],
     });
@@ -88,7 +88,7 @@ export const insertAt = tracer<{ arr: number[]; index: number; value: number }>(
     while (i >= index) {
       t.frame({
         line: 'loop',
-        caption: `i = ${i} ≥ index ${index} — matlab arr[${i}] ko abhi ek kadam right khiskana baaki hai.`,
+        caption: `i = ${i} ≥ index ${index} — matlab arr[${i}] ko abhi ek step right shift karna baaki hai.`,
         vars: { i, index, value },
         panels: [view({ [i]: 'compare' }, { i })],
       });
@@ -96,7 +96,7 @@ export const insertAt = tracer<{ arr: number[]; index: number; value: number }>(
       shifts++;
       t.frame({
         line: 'shift',
-        caption: `arr[${i + 1}] = arr[${i}]: ${a[i]} right mein copy hua. Abhi ${a[i]} do jagah dikh raha hai — chinta mat karo, arr[${i}] baad mein overwrite hoga.`,
+        caption: `arr[${i + 1}] = arr[${i}]: ${a[i]} right mein copy hua. Abhi ${a[i]} 2 jagah dikh raha hai — chinta mat karo, arr[${i}] baad mein overwrite hoga.`,
         vars: { i, index, value },
         panels: [view({ [i]: 'compare', [i + 1]: 'new' }, { i })],
       });
@@ -106,7 +106,7 @@ export const insertAt = tracer<{ arr: number[]; index: number; value: number }>(
       line: 'loop',
       caption:
         shifts === 0
-          ? `i = ${i} < index ${index}, loop chala hi nahi. End par daalne mein kuch khiskana nahi padta — isliye wo O(1) hai.`
+          ? `i = ${i} < index ${index}, loop chala hi nahi. End par daalne mein kuch shift karna nahi padta — isliye wo O(1) hai.`
           : `i = ${i} < index ${index}, loop ruk gaya. arr[${index}] ka purana value aage copy ho chuka hai, ab ye jagah hamari hai.`,
       vars: { i, index, value },
       panels: [view({ [index]: 'active' }, { i })],
@@ -114,7 +114,7 @@ export const insertAt = tracer<{ arr: number[]; index: number; value: number }>(
     a[index] = value;
     t.frame({
       line: 'place',
-      caption: `arr[${index}] = ${value}. Is baar ${shifts} item khiskane pade. Worst case (index 0) mein saare n items khiskte hain — isliye beech mein insert O(n) hai.`,
+      caption: `arr[${index}] = ${value}. Is baar ${shifts} item shift karne pade. Worst case (index 0) mein saare n items shift hote hain — isliye beech mein insert O(n) hai.`,
       vars: { index, value, shifts },
       panels: [view({ [index]: 'found' })],
     });
@@ -185,7 +185,7 @@ export const reverseArray = tracer<{ arr: number[] }>({
     };
     t.frame({
       line: 'init',
-      caption: 'Do pointers: l shuru pe, r end pe. Idea: pehla ↔ aakhri, doosra ↔ second-last… aise beech tak swap karte jao.',
+      caption: '2 pointers: l shuru pe, r end pe. Idea: pehla ↔ aakhri, doosra ↔ second-last… aise beech tak swap karte jao.',
       vars: { l, r },
       panels: [array(a, { ids: id, pointers: { l, r } })],
     });
@@ -241,7 +241,7 @@ export const rotateRight = tracer<{ arr: number[]; k: number }>({
       line: 'mod',
       caption:
         k >= n
-          ? `k = ${k} lekin n = ${n}. Poore ${n} steps ghumane par array wapas waisa hi ho jaata hai, isliye sirf k % n = ${steps} steps kaafi hain.`
+          ? `k = ${k} lekin n = ${n}. Poore ${n} steps rotate karne par array wapas waisa hi ho jaata hai, isliye sirf k % n = ${steps} steps kaafi hain.`
           : `steps = k % n = ${k} % ${n} = ${steps}. (k agar n se bada hota, to bhi % se sahi number mil jaata.)`,
       vars: { n, k, steps },
       panels: [array(a, { ids: id })],
@@ -281,7 +281,7 @@ export const rotateRight = tracer<{ arr: number[]; k: number }>({
     );
     t.frame({
       line: 'right',
-      caption: `Ho gaya! Har item ${steps} jagah right khisak gaya. Teen reverse, har ek O(n) → total O(n) time, aur koi nayi array nahi → O(1) space.`,
+      caption: `Ho gaya! Har item ${steps} jagah right shift ho gaya. 3 reverse, har ek O(n) → total O(n) time, aur koi nayi array nahi → O(1) space.`,
       vars: { n, steps },
       panels: [array(a, { ids: id, tones: allDone(n) })],
     });

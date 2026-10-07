@@ -12,7 +12,7 @@ fun solveSudoku(b: Array<IntArray>): Boolean {
                 b[r][c] = 0 // aage raasta band hua: ye digit galat tha, wapas //@undo
             }
         }
-        return false // is khaali cell mein koi digit nahi chala: PICHHLA faisla galat tha //@dead
+        return false // is khaali cell mein koi digit nahi chala: PICHHLA decision galat tha //@dead
     }
     return true // koi khaali cell nahi bacha: solved //@solved
 }

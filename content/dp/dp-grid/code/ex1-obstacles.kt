@@ -1,15 +1,15 @@
-// Unique paths, par kuch cells mein patthar (1). Patthar par dp = 0 - wahan se koi rasta aage nahi jaata
+// Unique paths, par kuch cells mein stone (1). Stone par dp = 0 - wahan se koi rasta aage nahi jaata
 fun uniquePathsWithObstacles(grid: Array<IntArray>): Int {
     val m = grid.size
     val n = grid[0].size
     val dp = Array(m) { IntArray(n) }
     for (i in 0 until m) {
         for (j in 0 until n) {
-            if (grid[i][j] == 1) { // patthar //@rock
+            if (grid[i][j] == 1) { // stone //@rock
                 dp[i][j] = 0
                 continue
             }
-            if (i == 0 && j == 0) { // shuruaat (patthar nahi) - 1 rasta //@start
+            if (i == 0 && j == 0) { // shuruaat (stone nahi) - 1 rasta //@start
                 dp[i][j] = 1
                 continue
             }

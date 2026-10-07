@@ -1,4 +1,4 @@
-// Do alag arrays ka total sum: ek loop ke BAAD doosra loop
+// 2 alag arrays ka total sum: ek loop ke BAAD doosra loop
 fun sumBoth(a: IntArray, b: IntArray): Int {
     var s = 0
     for (x in a) s += x // n baar //@loopA

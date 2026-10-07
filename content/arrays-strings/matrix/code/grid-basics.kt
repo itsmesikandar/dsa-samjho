@@ -6,7 +6,7 @@ fun main() {
     println(grid.contentDeepToString())
     println(grid[1][2]) // row 1, column 2
 
-    // 4 padosi (upar, neeche, left, right) - direction arrays se
+    // 4 neighbor (upar, neeche, left, right) - direction arrays se
     val dr = intArrayOf(-1, 1, 0, 0)
     val dc = intArrayOf(0, 0, -1, 1)
     val r = 0
@@ -17,7 +17,7 @@ fun main() {
         val nc = c + dc[k]
         if (nr in 0 until rows && nc in 0 until cols) nbrs.add(grid[nr][nc]) // grid ke bahar? to chhodo
     }
-    println(nbrs) // corner (0,0) ke sirf 2 valid padosi
+    println(nbrs) // corner (0,0) ke sirf 2 valid neighbor
 }
 
 // Output:

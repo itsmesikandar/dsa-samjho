@@ -1,11 +1,11 @@
-// Sirf padosiyon ko swap karke sort karna hai. Kam se kam kitne swaps lagenge?
+// Sirf neighbors ko swap karke sort karna hai. Kam se kam kitne swaps lagenge?
 // (Jawab = inversions: aise jode i < j jahan a[i] > a[j])
 fun countSwaps(arr: IntArray): Int {
     val a = arr.copyOf()
     var swaps = 0
     for (pass in 0 until a.size - 1) {
         for (j in 0 until a.size - 1 - pass) {
-            if (a[j] > a[j + 1]) { // galat order wale padosi //@compare
+            if (a[j] > a[j + 1]) { // galat order wale neighbor //@compare
                 val t = a[j] // har aisa swap thik EK inversion khatam karta hai //@swap
                 a[j] = a[j + 1]
                 a[j + 1] = t

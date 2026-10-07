@@ -5,7 +5,7 @@ fun letterCombinations(digits: String): List<String> {
     val res = mutableListOf<String>()
     val sb = StringBuilder()
     fun bt(i: Int) {
-        if (i == digits.length) { // har digit ka ek letter chun liya //@found
+        if (i == digits.length) { // har digit ka ek letter choose kar liya //@found
             res.add(sb.toString())
             return
         }

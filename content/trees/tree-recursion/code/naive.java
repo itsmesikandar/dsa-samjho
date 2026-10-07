@@ -44,7 +44,7 @@ class Main {
 
     public static void main(String[] args) {
         System.out.println(isBalancedNaive(build(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
-        System.out.println("visits = " + visits); // 10 nodes, par 19 baar gine
+        System.out.println("visits = " + visits); // 10 nodes, par 19 baar count kiye
     }
 }
 

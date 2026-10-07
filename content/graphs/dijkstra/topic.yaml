@@ -15,23 +15,23 @@ what:
 
     Idea:
     - `dist[src] = 0`, baaki ∞.
-    - Bache hue nodes mein jo **abhi sabse paas** hai, uski doori **pakki**. (Weights negative nahi, to kisi aur raste se ghoom ke aana usse sasta nahi ho sakta.)
-    - Uske padosiyon ko **relax** karo: `dist[u] + w < dist[v]` → `dist[v]` ghatao.
+    - Bache hue nodes mein jo **abhi sabse paas** hai, uski distance **pakki**. (Weights negative nahi, to kisi aur raste se ghoom ke aana usse sasta nahi ho sakta.)
+    - Uske neighbors ko **relax** karo: `dist[u] + w < dist[v]` → `dist[v]` ghatao.
 
     "Sabse paas" baar baar chahiye → **min-heap (PriorityQueue)**. BFS ki queue ki jagah heap — bas itna fark.
 
     > [!yaad]
     > Dijkstra = BFS + weights + heap. Negative weight ho to Dijkstra galat ho sakta hai (Bellman-Ford lo).
   analogy: |
-    **Shaadi ka card baantna, petrol bachana:**
-    Ghar se nikle. Jo rishtedaar sabse paas (kam km) hai, pehle uske ghar. Wahan pahunch ke dekho: "is ghar se kin rishtedaaron tak ab kam km lagega?" — notebook mein unki doori sudharo. Phir notebook mein jo sabse paas (abhi tak na gaye) hai, wahan.
+    **Shaadi ka card divide karna, petrol bachana:**
+    Ghar se nikle. Jo relative sabse paas (kam km) hai, pehle uske ghar. Wahan pahunch ke dekho: "is ghar se kin relatives tak ab kam km lagega?" — notebook mein unki distance improve karo. Phir notebook mein jo sabse paas (abhi tak na gaye) hai, wahan.
 
     Notebook = dist[]. "Sabse paas kaun" turant batane wali diary = min-heap.
 
 # 2. Kyun chahiye?
 why:
   body: |
-    BFS edges ginta hai. Par asli duniya mein edges barabar nahi hoti — sadak 2 km ki bhi, 20 km ki bhi. **Kam sadkein ≠ kam kharcha.**
+    BFS edges count karta hai. Par asli duniya mein edges barabar nahi hoti — road 2 km ki bhi, 20 km ki bhi. **Kam roads ≠ kam cost.**
 
     | Tareeka | Kab sahi | Time |
     |---|---|---|
@@ -43,14 +43,14 @@ why:
     Maps, network routing, game pathfinding — sab isi par (ya iske upgrade A* par) chalte hain.
 
     > [!socho]
-    > Ek node heap mein do baar aa sakta hai — (3:9) aur baad mein (3:8). Purani wali entry hataate kyun nahi?
+    > Ek node heap mein 2 baar aa sakta hai — (3:9) aur baad mein (3:8). Purani wali entry hataate kyun nahi?
     >
     > Java ke heap se beech ki entry hatana O(n) hai. Sasta tareeka: nayi daal do, aur purani jab nikle to `d > dist[u]` dekh ke skip (lazy deletion).
 
 # 3. Visual intro
 visual:
   body: |
-    Pehle dekho BFS kaunsa rasta chunta (sabse kam sadkein) aur asli sasta rasta kaunsa hai. Phir Dijkstra nodes ko **paas se door** ke order mein pakka karta hai — har node par badge uski final doori.
+    Pehle dekho BFS kaunsa rasta choose karta (sabse kam roads) aur asli sasta rasta kaunsa hai. Phir Dijkstra nodes ko **paas se door** ke order mein pakka karta hai — har node par badge uski final distance.
   viz: { tracer: whyTrace }
 
 # 4. Kaise kaam karta hai
@@ -82,11 +82,11 @@ operations:
   - op: "Dijkstra (array, bina heap)"
     time: "O(V²)"
     space: O(V)
-    why: "Har baar V nodes mein se min dhoondhna. Dense graph (E ≈ V²) par yahi behtar."
+    why: "Har baar V nodes mein se min dhoondhna. Dense graph (E ≈ V²) par yahi better."
   - op: "Ek target tak (early stop)"
     time: "O((V + E) log V) worst"
     space: O(V)
-    why: "Target heap se nikla to ruk jao — aksar kaafi jaldi."
+    why: "Target heap se nikla to ruk jao — often kaafi jaldi."
   - op: "Path reconstruct"
     time: "O(V)"
     space: O(V)
@@ -94,7 +94,7 @@ operations:
   - op: "Grid par (R × C)"
     time: "O(RC log(RC))"
     space: "O(RC)"
-    why: "Har cell node, 4 padosi."
+    why: "Har cell node, 4 neighbor."
 
 # 6. Code
 code:
@@ -113,20 +113,20 @@ code:
 examples:
   - id: cheapest-path
     level: easy
-    title: Sabse sasta rasta — kharcha aur rasta dono
+    title: Sabse sasta rasta — cost aur rasta dono
     problem: |
-      Directed graph, har edge par kharcha (≥ 0). src se dst tak sabse sasta rasta: kharcha aur nodes ki list lautao (`"kharcha: a -> b -> c"`). Rasta na ho to `"rasta nahi"`.
+      Directed graph, har edge par cost (≥ 0). src se dst tak sabse sasta rasta: cost aur nodes ki list return karo (`"kharcha: a -> b -> c"`). Rasta na ho to `"rasta nahi"`.
 
       Example: `0→1:2, 0→2:6, 1→2:3, 1→3:8, 2→3:2, 2→4:7, 3→4:1, 3→5:6, 4→5:2`, 0 se 5 → **10: 0 -> 1 -> 2 -> 3 -> 4 -> 5**
     intuition: |
       How wala Dijkstra + **parent[]** (BFS jaisa): jab bhi `dist[v]` sasta ho, `parent[v] = u`. Aakhri baar jo set hua wahi sabse saste raste ka pichhla node.
 
-      dst heap se nikla → ruk jao (uski doori pakki). Phir dst se parent pakad ke src tak, list ulti.
+      dst heap se nikla → ruk jao (uski distance pakki). Phir dst se parent pakad ke src tak, list ulti.
 
       Dekho: 5 edges wala rasta (10) 3 edges wale (0→2→4→5 = 15) se sasta hai.
 
       > [!galti]
-      > Parent sirf pehli baar (BFS ki tarah) set kiya. Dijkstra mein dist kai baar sudharta hai — parent bhi har sudhar par badlo.
+      > Parent sirf pehli baar (BFS ki tarah) set kiya. Dijkstra mein dist kai baar improve karta hai — parent bhi har improve par badlo.
     dryRun: |
       | Pakka (u, d) | Sasta hua | parent |
       |---|---|---|
@@ -181,47 +181,47 @@ examples:
     title: Pahaadi grid mein sabse aasaan rasta (Path With Minimum Effort)
     source: { name: Path With Minimum Effort, platform: LeetCode, url: "https://leetcode.com/problems/path-with-minimum-effort/" }
     problem: |
-      Grid mein har cell ki height. Upar-baayein se neeche-daayein jaana hai (4 dishayein). Raste ka **effort** = raste ke kisi bhi do lagaataar cells ki height ke farak ka **maximum**. Sabse kam effort wala rasta — uska effort batao.
+      Grid mein har cell ki height. Upar-baayein se neeche-daayein jaana hai (4 dishayein). Raste ka **effort** = raste ke kisi bhi do continuous cells ki height ke farak ka **maximum**. Sabse kam effort wala rasta — uska effort batao.
 
       Example: `[[1,2,8],[4,9,3],[2,3,4]]` → **3** (1 → 4 → 2 → 3 → 4)
     intuition: |
-      Grid = graph, cells nodes, padosi edges, weight = |height farak|. Par rasta ka "kharcha" **jod nahi, max** hai.
+      Grid = graph, cells nodes, neighbor edges, weight = |height farak|. Par rasta ka "cost" **jod nahi, max** hai.
 
       Dijkstra phir bhi chalta hai! Sirf relax badlo: `ne = max(effort[u], |h[v] - h[u]|)`. Kyun? Max bhi "raste mein aage badhne par kabhi ghatta nahi" — jaise jod. Isliye jo cell heap se pehle nikla, uska effort pakka.
 
-      Manzil heap se nikle → wahi jawab.
+      Destination heap se nikle → wahi jawab.
 
       Doosra tareeka: effort par **binary search** (kya effort ≤ X mein pahunch sakte? → BFS). O(RC log maxH).
 
       > [!galti]
       > BFS / DFS se "pehla mila rasta" le liya — wo kam effort wala zaroori nahi. Ya `effort = e + farak` (jod) likh diya — sawaal max ka hai.
     dryRun: |
-      | Nikla (cell, effort) | Sudhre padosi |
+      | Nikla (cell, effort) | Sudhre neighbor |
       |---|---|
       | (0,0), 0 | (1,0): 3, (0,1): 1 |
       | (0,1), 1 | (1,1): 7, (0,2): 6 |
       | (1,0), 3 | (2,0): 3, (1,1): 5 |
       | (2,0), 3 | (2,1): 3 |
       | (2,1), 3 | (1,1): 6 → nahi (5 hai), (2,2): 3 |
-      | (2,2), 3 | manzil → **3** |
+      | (2,2), 3 | destination → **3** |
     viz: { tracer: effortTrace }
     code: ex3-min-effort
     complexity:
       time: "O(RC log(RC))"
       space: "O(RC)"
-      why: "RC nodes, har ek ke 4 padosi; har push/poll log(RC)."
+      why: "RC nodes, har ek ke 4 neighbor; har push/poll log(RC)."
 
 # 8. Kab use karein / kab NAHI
 when:
   use:
     - "Weighted graph (weights ≥ 0) mein ek source se sabse sasta / jaldi rasta."
-    - "'Minimum cost / time / effort' aur raste ka kharcha har kadam par badhta (ya same rehta) hai."
-    - "Grid jahan har move ka alag kharcha (Dijkstra on grid)."
+    - "'Minimum cost / time / effort' aur raste ka cost har step par badhta (ya same rehta) hai."
+    - "Grid jahan har move ka alag cost (Dijkstra on grid)."
     - "State graph — (node, kuch extra) states, weights ≥ 0 (jaise fuel, stops)."
   avoid:
     - "Saare weights barabar → BFS (log V bachta hai)."
     - "Negative weights → Bellman-Ford (ya SPFA); negative cycle check bhi wahi."
-    - "Saare jodon (all pairs) ki doori, chhota V → Floyd-Warshall O(V³)."
+    - "Saare jodon (all pairs) ki distance, chhota V → Floyd-Warshall O(V³)."
     - "DAG → topo order + relax, O(V + E), heap nahi chahiye."
   signals:
     - keyword: "minimum cost / time / distance, weights alag"
@@ -236,15 +236,15 @@ when:
 # 9. Real-world
 realWorld:
   - where: "Google Maps / Ola-Uber ETA"
-    how: "Chauraahe nodes, sadkein weighted edges (traffic wala time). Dijkstra / A* (Dijkstra + 'manzil kitni door' ka andaza)."
+    how: "Junction nodes, roads weighted edges (traffic wala time). Dijkstra / A* (Dijkstra + 'destination kitni door' ka estimate)."
   - where: "Internet routing (OSPF protocol)"
     how: "Har router poore network ka map rakh ke Dijkstra se har destination ka sabse sasta next-hop nikalta hai."
   - where: "Games (pathfinding)"
-    how: "Daldal / pahaad mehenga, sadak sasti — grid par Dijkstra / A*."
+    how: "Swamp / mountain mehenga, road sasti — grid par Dijkstra / A*."
   - where: "Flight / train booking 'sabse sasta'"
-    how: "Shehar nodes, flights edges (kiraya weight). Stops ki limit ho to state mein stops bhi."
+    how: "City nodes, flights edges (fare weight). Stops ki limit ho to state mein stops bhi."
   - where: "Logistics (delivery)"
-    how: "Warehouse se har pin code tak sabse kam time / kharcha."
+    how: "Warehouse se har pin code tak sabse kam time / cost."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -271,8 +271,8 @@ mistakes:
     wrong: |
       `PriorityQueue<Int>(compareBy { dist[it] })` — baad mein dist badla to heap ka order nahi badalta (heap ko pata hi nahi).
     right: |
-      Entry ke saath us waqt ka dist daalo: `(node, dist)` jodi. Comparator usi number par.
-  - title: "Unreachable ko 0 / INF hi lauta diya"
+      Entry ke saath us time ka dist daalo: `(node, dist)` pair. Comparator usi number par.
+  - title: "Unreachable ko 0 / INF hi return kar diya"
     type: empty
     wrong: |
       Network delay mein ek node tak rasta nahi, par max mein INF aa gaya (2147483647).
@@ -290,10 +290,10 @@ interview:
   questions:
     - q: "Dijkstra kaise kaam karta hai? Sahi kyun hai?"
       a: |
-        Har baar sabse kam dist wala unvisited node pakka karo aur padosi relax karo. Sahi kyun: weights ≥ 0, to kisi aur (abhi ke dist se bade) node se ghoom ke aana sasta nahi ho sakta — greedy choice safe hai.
+        Har baar sabse kam dist wala unvisited node pakka karo aur neighbor relax karo. Sahi kyun: weights ≥ 0, to kisi aur (abhi ke dist se bade) node se ghoom ke aana sasta nahi ho sakta — greedy choice safe hai.
     - q: "Complexity?"
       a: |
-        Binary heap ke saath O((V + E) log V). Array se min dhoondhein to O(V²) — dense graph par behtar. Fibonacci heap se O(E + V log V) (theory).
+        Binary heap ke saath O((V + E) log V). Array se min dhoondhein to O(V²) — dense graph par better. Fibonacci heap se O(E + V log V) (theory).
     - q: "Negative weights mein kya dikkat?"
       a: |
         Ek node 'pakka' maan liya, par baad mein negative edge se sasta rasta mil sakta hai. Bellman-Ford O(VE) lo; negative cycle ho to shortest path hi nahi.
@@ -305,7 +305,7 @@ interview:
         Saare weights barabar → BFS (queue, O(V + E)). Alag weights → Dijkstra (heap). 0/1 weights → 0-1 BFS (deque).
     - q: "Sirf ek target ka shortest path?"
       a: |
-        Target heap se nikle to ruk jao — tab tak uski doori pakki. A* aur tez: heap ka key = dist + andaza(target tak), andaza kabhi asli se zyada na ho.
+        Target heap se nikle to ruk jao — tab tak uski distance pakki. A* aur tez: heap ka key = dist + andaza(target tak), estimate kabhi asli se zyada na ho.
     - q: "Path kaise nikaaloge?"
       a: |
         Relax par parent[v] = u. Target se parent pakad ke src tak, ulta.
@@ -321,7 +321,7 @@ interview:
     - "Cheapest Flights Within K Stops."
     - "Swim in Rising Water (minimax Dijkstra)."
     - "Number of Ways to Arrive at Destination (Dijkstra + count)."
-    - "Path with Maximum Probability (max-heap, gunaa)."
+    - "Path with Maximum Probability (max-heap, multiply)."
 
 # 12. Practice
 practice:
@@ -329,7 +329,7 @@ practice:
     platform: Custom
     level: easy
     pattern: Dijkstra template
-    hint: "How + Example 1 bina dekhe. Test: unreachable node, src == dst, do nodes ke beech do alag weight ki edges."
+    hint: "How + Example 1 bina dekhe. Test: unreachable node, src == dst, 2 nodes ke beech 2 alag weight ki edges."
   - name: Network Delay Time
     platform: LeetCode
     num: 743
@@ -343,14 +343,14 @@ practice:
     url: "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/"
     level: easy
     pattern: Har node se Dijkstra (ya Floyd)
-    hint: "Har shehar se Dijkstra, threshold ke andar kitne. Sabse kam wala; tie par bada index. n ≤ 100 → Floyd-Warshall bhi. (LeetCode par medium.)"
+    hint: "Har city se Dijkstra, threshold ke andar kitne. Sabse kam wala; tie par bada index. n ≤ 100 → Floyd-Warshall bhi. (LeetCode par medium.)"
   - name: Path with Maximum Probability
     platform: LeetCode
     num: 1514
     url: "https://leetcode.com/problems/path-with-maximum-probability/"
     level: medium
-    pattern: Max-heap, gunaa
-    hint: "Prob gunaa karne se ghatti hai (≤ 1) — Dijkstra ulta: max-heap, prob[v] = prob[u] × p agar bada."
+    pattern: Max-heap, multiply
+    hint: "Prob multiply karne se ghatti hai (≤ 1) — Dijkstra ulta: max-heap, prob[v] = prob[u] × p agar bada."
   - name: Cheapest Flights Within K Stops
     platform: LeetCode
     num: 787
@@ -377,17 +377,17 @@ practice:
     num: 2203
     url: "https://leetcode.com/problems/minimum-weighted-subgraph-with-the-required-paths/"
     level: hard
-    pattern: Teen Dijkstra (ek ulte graph par)
+    pattern: 3 Dijkstra (ek ulte graph par)
     hint: "src1 se, src2 se, aur dest se ULTE graph par Dijkstra. Har node x ko milan-bindu maano: d1[x] + d2[x] + dRev[x]. Minimum. Long."
 
 # 13. Quick revision
 revision:
   summary:
-    - "Dijkstra: weights ≥ 0; sabse paas wala (min-heap top) pakka, padosi relax."
-    - "Heap mein (node, dist) jodi; poll ke baad 'd > dist[u] → skip' (lazy deletion)."
+    - "Dijkstra: weights ≥ 0; sabse paas wala (min-heap top) pakka, neighbor relax."
+    - "Heap mein (node, dist) pair; poll ke baad 'd > dist[u] → skip' (lazy deletion)."
     - "O((V + E) log V). Dense graph par array version O(V²)."
     - "Path: relax par parent[v] = u. Ek target: heap se nikle to ruko."
-    - "Relax rule badal sakta hai (max for effort, gunaa for probability) jab tak 'aage badhne par behtar na ho'."
+    - "Relax rule badal sakta hai (max for effort, multiply for probability) jab tak 'aage badhne par better na ho'."
   cheatsheet: |
     ```kotlin
     val dist = IntArray(n) { Int.MAX_VALUE }; dist[s] = 0
@@ -415,10 +415,10 @@ revision:
       options: ["Dijkstra", "BFS", "Bellman-Ford", "Floyd-Warshall"]
       answer: 1
       explain: "Barabar weights → BFS O(V + E), heap ki zaroorat nahi."
-    - q: "Path With Minimum Effort mein relax ka niyam?"
+    - q: "Path With Minimum Effort mein relax ka rule?"
       options: ["dist[u] + diff", "max(dist[u], diff)", "min(dist[u], diff)", "dist[u] × diff"]
       answer: 1
-      explain: "Raste ka effort = sabse bada kadam → max. Aage badhne par kabhi ghatta nahi, isliye Dijkstra chalta hai."
+      explain: "Raste ka effort = sabse bada step → max. Aage badhne par kabhi ghatta nahi, isliye Dijkstra chalta hai."
 
 # 14. Connections
 connections:
@@ -431,6 +431,6 @@ connections:
       why: "DAG mein topo order + relax se shortest path O(V + E)."
   usedLater:
     - id: greedy-basics
-      how: "Dijkstra greedy hai — har kadam 'abhi ka best' pakka; kab greedy sahi hota hai uski misaal."
+      how: "Dijkstra greedy hai — har step 'abhi ka best' pakka; kab greedy sahi hota hai uski example."
     - id: union-find
-      how: "Kruskal / Prim MST — Prim ka dhaancha Dijkstra jaisa (heap mein edge weight, dist nahi)."
+      how: "Kruskal / Prim MST — Prim ka structure Dijkstra jaisa (heap mein edge weight, dist nahi)."

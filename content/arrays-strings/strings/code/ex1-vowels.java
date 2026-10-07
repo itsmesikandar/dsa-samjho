@@ -1,7 +1,7 @@
 class Main {
     static int countVowels(String s) {
         int count = 0;
-        for (char c : s.toLowerCase().toCharArray()) { // 'A' aur 'a' dono gine jaayein
+        for (char c : s.toLowerCase().toCharArray()) { // 'A' aur 'a' dono count kiye jaayein
             if ("aeiou".indexOf(c) >= 0) count++; // vowel hai? //@check
         }
         return count; //@done

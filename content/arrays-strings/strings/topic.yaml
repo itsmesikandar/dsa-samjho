@@ -19,7 +19,7 @@ what:
     println(s.length)   // 4
     ```
 
-    Teen baatein jo String ko array se alag banati hain:
+    3 baatein jo String ko array se alag banati hain:
     1. **Immutable** — String ek baar ban gayi to **badal nahi sakti**. `uppercase()`, `substring()`, `+` — sab **nayi** String banate hain.
     2. **Har char ek number hai** — `'a'` = 97, `'b'` = 98 … Isliye `c - 'a'` se 0..25 index milta hai.
     3. **StringBuilder** — jab string ko baar-baar badalna/jodna ho, uske liye ek badalne wala (mutable) buffer.
@@ -29,7 +29,7 @@ what:
   analogy: |
     **String = chhapa hua newspaper.** Ek baar chhap gaya to us par kuch badalna ho to **naya chhapna** padta hai — purana waisa hi rehta hai.
 
-    **StringBuilder = whiteboard.** Likhte jao, mitao, jodo — wahi board, koi naya chhapna nahi. Kaam khatam ho jaaye to ek baar photo le lo (`toString()`).
+    **StringBuilder = whiteboard.** Likhte jao, hatao, jodo — wahi board, koi naya chhapna nahi. Kaam khatam ho jaaye to ek baar photo le lo (`toString()`).
 
 # 2. Kyun chahiye?
 why:
@@ -37,14 +37,14 @@ why:
     Har app mein text hai — naam, messages, search, URLs. Interview mein bhi strings ke questions bahut common hain: palindrome, anagram, reverse words, compression, substring.
 
     Strings ko samajhna zaroori hai kyunki:
-    - **Immutability ka kharcha** — loop mein `s += c` chhupa hua O(n²) hai.
+    - **Immutability ka cost** — loop mein `s += c` chhupa hua O(n²) hai.
     - **Char math** — `c - 'a'` aur `IntArray(26)` se bahut problems O(n) mein ho jaate hain.
     - **Edge cases** — uppercase/lowercase, spaces, punctuation, khaali string.
 
     > [!socho]
     > 10⁵ characters ko loop mein `s += c` se jodo to kitna kaam hoga?
     >
-    > Har `+=` poori purani string copy karta hai: 1 + 2 + … + 10⁵ ≈ **5 × 10⁹ copies**. StringBuilder se sirf ~10⁵. Wahi answer, 50,000 guna kam kaam.
+    > Har `+=` poori purani string copy karta hai: 1 + 2 + … + 10⁵ ≈ **5 × 10⁹ copies**. StringBuilder se sirf ~10⁵. Wahi answer, 50,000 times kam kaam.
 
 # 3. Visual intro
 visual:
@@ -60,7 +60,7 @@ visual:
 # 4. Kaise kaam karta hai
 how:
   body: |
-    String jodne ke do tareeke, aur unka asli kharcha:
+    String jodne ke 2 tareeke, aur unka asli cost:
 
     - **`s += c`** — String immutable hai, to har baar **nayi string** banti hai aur purane saare characters copy hote hain. n baar → 1 + 2 + … + n ≈ **n²/2 copies → O(n²)**.
     - **`StringBuilder.append(c)`** — andar ek **badhne wala char array** (dynamic array jaisa). Har append end mein likhta hai → **amortized O(1)**, total **O(n)**. Aakhir mein ek baar `toString()`.
@@ -97,7 +97,7 @@ operations:
   - op: "`sb.insert(0, x)` / `sb.deleteCharAt(0)`"
     time: O(n)
     space: O(1)
-    why: "Baaki characters khiskte hain — array jaisa."
+    why: "Baaki characters shift hote hain — array jaisa."
   - op: "`toCharArray()` / `String(chars)` / `split`"
     time: O(n)
     space: O(n)
@@ -108,7 +108,7 @@ code:
   - title: String ke kaam ke functions
     file: api
     note: |
-      `substring(start, end)` mein **end shamil nahi** hota: `substring(6, 12)` = index 6 se 11 tak. Aur ye nayi string banata hai — loop mein baar-baar substring O(n²) tak ja sakta hai.
+      `substring(start, end)` mein **end include nahi** hota: `substring(6, 12)` = index 6 se 11 tak. Aur ye nayi string banata hai — loop mein baar-baar substring O(n²) tak ja sakta hai.
 
 # 7. Examples
 examples:
@@ -116,7 +116,7 @@ examples:
     level: easy
     title: Text mein kitne vowels hain?
     problem: |
-      Ek text diya hai (capital aur small dono letters, spaces bhi). **Vowels** (a, e, i, o, u — case ignore) gino.
+      Ek text diya hai (capital aur small dono letters, spaces bhi). **Vowels** (a, e, i, o, u — case ignore) count karo.
 
       Example: `"Hello World"` → 3 (e, o, o)
     intuition: |
@@ -157,7 +157,7 @@ examples:
       **Seedha tareeka:** pehle ek "saaf" string banao (sirf letters/digits, lowercase), phir use reverse karke compare. Kaam karega — par O(n) extra memory.
 
       **Better — two pointers:** `l` shuru se, `r` end se.
-      - Faltu character (space, comma) mile to us pointer ko aage/peeche khiskao.
+      - Faltu character (space, comma) mile to us pointer ko aage/peeche shift karo.
       - Dono letter/digit par hon → lowercase karke compare. Alag → `false`.
       - Same → dono andar.
 
@@ -187,20 +187,20 @@ examples:
     title: String compression — "aaabbc" → "a3b2c"
     source: { name: String Compression, platform: LeetCode, url: "https://leetcode.com/problems/string-compression/" }
     problem: |
-      Ek string ko compress karo: har **lagatar same characters ke group (run)** ko us character aur uski ginti se badlo. Ginti sirf tab likho jab wo 1 se zyada ho.
+      Ek string ko compress karo: har **continuous same characters ke group (run)** ko us character aur uski count se badlo. Count sirf tab likho jab wo 1 se zyada ho.
 
       Examples: `"aaabbc"` → `"a3b2c"`, `"abc"` → `"abc"`, 12 baar `z` → `"z12"`.
 
       (LeetCode wala version yahi kaam char array ke andar in-place karta hai.)
     intuition: |
-      Do pointers: `i` run ki shuruaat, `j` aage badhta hai **jab tak same character** hai. Run length = `j − i`.
+      2 pointers: `i` run ki shuruaat, `j` aage badhta hai **jab tak same character** hai. Run length = `j − i`.
 
       Har run ke liye StringBuilder mein char, aur length > 1 ho to number. Phir `i = j` — agla run.
 
-      Har character ek hi baar `j` se guzarta hai → O(n).
+      Har character ek hi baar `j` se pass hota hai → O(n).
 
       > [!galti]
-      > Ginti 10 ya zyada ho sakti hai — "z12" mein 2 digits hain. Agar char array mein likh rahe ho to har digit alag likhna padega (`count.toString()` ke characters).
+      > Count 10 ya zyada ho sakti hai — "z12" mein 2 digits hain. Agar char array mein likh rahe ho to har digit alag likhna padega (`count.toString()` ke characters).
 
       > [!galti]
       > `result += ...` loop mein mat karo — StringBuilder lo, warna O(n²).
@@ -232,13 +232,13 @@ when:
     - "Java mein `==` se strings compare — `.equals()` lo."
   signals:
     - keyword: "palindrome"
-      think: "Two pointers dono kinaron se (ya expand from center)."
+      think: "Two pointers dono edges se (ya expand from center)."
     - keyword: "anagram / same characters"
       think: "Count array `IntArray(26)` ya sorted string as key."
     - keyword: "only lowercase English letters"
       think: "`c - 'a'` → 0..25 index."
     - keyword: "build result string / encode / compress"
-      think: "StringBuilder; runs ke liye do pointers."
+      think: "StringBuilder; runs ke liye 2 pointers."
 
 # 9. Real-world
 realWorld:
@@ -271,7 +271,7 @@ mistakes:
   - title: "Case ka dhyaan na rakhna"
     type: logic
     wrong: |
-      `'A' == 'a'` → **false**. "Racecar" ko palindrome check karte waqt fail.
+      `'A' == 'a'` → **false**. "Racecar" ko palindrome check karte time fail.
     right: |
       Compare se pehle `lowercaseChar()` / `Character.toLowerCase()`.
   - title: "`substring` ka end index"
@@ -298,7 +298,7 @@ interview:
   questions:
     - q: "String immutable kyun hai (Java/Kotlin mein)?"
       a: |
-        Safety aur speed: (1) String pool mein ek hi literal share ho sakta hai, (2) HashMap key ke roop mein safe — hash badalta nahi, (3) thread-safe bina lock ke, (4) security (file paths, URLs beech mein badal nahi sakte).
+        Safety aur speed: (1) String pool mein ek hi literal share ho sakta hai, (2) HashMap key ke form mein safe — hash badalta nahi, (3) thread-safe bina lock ke, (4) security (file paths, URLs beech mein badal nahi sakte).
     - q: "String, StringBuilder aur StringBuffer mein kya fark hai?"
       a: |
         String immutable. StringBuilder mutable aur fast (single thread). StringBuffer mutable par synchronized (thread-safe, slow) — aaj kal kam use hota hai.
@@ -324,12 +324,12 @@ interview:
         Java 7u6 ke baad O(k) — nayi copy banti hai (pehle original array share hota tha, jisse memory leak hota tha). Loop mein substring se bacho, indexes se kaam karo.
     - q: "Unicode / emoji ke saath kya dikkat hai?"
       a: |
-        Kuch characters (emoji) 2 `Char` (surrogate pair) lete hain — `length` 2 aata hai. DSA problems aam taur par ASCII maante hain; real apps mein `codePoints()` use karo.
+        Kuch characters (emoji) 2 `Char` (surrogate pair) lete hain — `length` 2 aata hai. DSA problems usually ASCII maante hain; real apps mein `codePoints()` use karo.
   mayAsk:
     - "Words ko reverse karo (\"hello world\" → \"world hello\")."
     - "Sabse lambi common prefix nikaalo."
     - "String ko integer mein badlo (atoi) — edge cases?"
-    - "Do strings mein se ek doosri ki rotation hai?"
+    - "2 strings mein se ek doosri ki rotation hai?"
 
 # 12. Practice
 practice:
@@ -339,7 +339,7 @@ practice:
     url: "https://leetcode.com/problems/reverse-string/"
     level: easy
     pattern: Two pointers swap
-    hint: "Char array ko dono kinaron se swap — O(1) extra space."
+    hint: "Char array ko dono edges se swap — O(1) extra space."
   - name: Valid Anagram
     platform: LeetCode
     num: 242
@@ -374,14 +374,14 @@ practice:
     url: "https://leetcode.com/problems/longest-palindromic-substring/"
     level: medium
     pattern: Expand around center
-    hint: "Har index (aur har do index ke beech) ko center maano, dono taraf failao jab tak match ho. O(n²) time, O(1) space."
+    hint: "Har index (aur har 2 index ke beech) ko center maano, dono taraf spread karo jab tak match ho. O(n²) time, O(1) space."
   - name: Text Justification
     platform: LeetCode
     num: 68
     url: "https://leetcode.com/problems/text-justification/"
     level: hard
     pattern: StringBuilder + careful counting
-    hint: "Ek line mein jitne words aa sakein lo; extra spaces gaps mein baanto (left wale gaps ko pehle zyada). Last line left-justified."
+    hint: "Ek line mein jitne words aa sakein lo; extra spaces gaps mein divide karo (left wale gaps ko pehle zyada). Last line left-justified."
   - name: Shortest Palindrome
     platform: LeetCode
     num: 214
@@ -426,7 +426,7 @@ revision:
       options: ["\"amo\"", "\"am\"", "\"sam\"", "\"mo\""]
       answer: 1
       explain: "End exclusive — index 1 aur 2."
-    - q: "Java mein do strings ki VALUE compare kaise?"
+    - q: "Java mein 2 strings ki VALUE compare kaise?"
       options: ["a == b", "a.equals(b)", "a === b", "a.compareTo(b) == 1"]
       answer: 1
       explain: "Java `==` reference compare karta hai."

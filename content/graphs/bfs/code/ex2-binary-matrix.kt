@@ -1,4 +1,4 @@
-// Grid = implicit graph: har khula cell (0) ek node, 8 padosi cells edges. Length = path ke cells
+// Grid = implicit graph: har khula cell (0) ek node, 8 neighbor cells edges. Length = path ke cells
 fun shortestPathBinaryMatrix(grid: Array<IntArray>): Int {
     val r = grid.size
     val c = grid[0].size

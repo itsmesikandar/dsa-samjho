@@ -16,7 +16,7 @@ const showFrom = (nodes: Map<string, LNode>, head: string | null) => {
   }
   return out.length ? out.join(' -> ') : '(khaali)';
 };
-/** from se 'upto' (shamil) tak ki chain ki copy — result ka sirf bana hua hissa dikhane ke liye */
+/** from se 'upto' (include) tak ki chain ki copy — result ka sirf bana hua hissa dikhane ke liye */
 function chainView(nodes: Map<string, LNode>, from: string, upto: string, label: string, tones: Record<string, Tone> = {}, pointers: Record<string, string | null> = {}): Panel {
   const copy = new Map<string, LNode>();
   const prefix = `${label}:`;
@@ -114,11 +114,11 @@ export const oddEvenTrace = tracer<{ values: number[] }>({
     let even = evenHead;
     const tones = (): Record<string, Tone> => Object.fromEntries(ids.map((id, i) => [id, (i % 2 === 0 ? 'compare' : 'active') as Tone]));
     const view = () => [listView(nodes, null, { extra: ids, pointers: { odd, even, evenHead }, tones: tones() })];
-    t.frame({ line: 'odd', caption: 'Position 1, 3, 5… (neela) ek list; 2, 4, 6… (narangi) doosri. Nodes apni jagah — sirf arrows badlenge. evenHead yaad rakho — aakhir mein jodna hai.', legend: { compare: 'odd position', active: 'even position' }, panels: view() });
+    t.frame({ line: 'odd', caption: 'Position 1, 3, 5… (blue) ek list; 2, 4, 6… (narangi) doosri. Nodes apni jagah — sirf arrows badlenge. evenHead yaad rakho — aakhir mein jodna hai.', legend: { compare: 'odd position', active: 'even position' }, panels: view() });
     while (even && nodes.get(even)!.next) {
       nodes.get(odd)!.next = nodes.get(even)!.next;
       odd = nodes.get(odd)!.next!;
-      t.frame({ line: 'odd', caption: `odd.next = even.next → ${nodes.get(odd)!.value}. Odd chain ek kadam badi.`, legend: { compare: 'odd position', active: 'even position' }, panels: view() });
+      t.frame({ line: 'odd', caption: `odd.next = even.next → ${nodes.get(odd)!.value}. Odd chain ek step badi.`, legend: { compare: 'odd position', active: 'even position' }, panels: view() });
       nodes.get(even)!.next = nodes.get(odd)!.next;
       even = nodes.get(even)!.next;
       t.frame({ line: 'even', caption: `even.next = odd.next → ${even ? nodes.get(even)!.value : 'null'}.`, legend: { compare: 'odd position', active: 'even position' }, panels: view() });
@@ -148,7 +148,7 @@ export const partitionTrace = tracer<{ values: number[]; x: number }>({
       chainView(nodes, 'L', less, `< ${x}`, { L: 'muted', ...(hot ? { [hot]: 'new' } : {}) }, { less }),
       chainView(nodes, 'M', more, `≥ ${x}`, { M: 'muted', ...(hot ? { [hot]: 'new' } : {}) }, { more }),
     ];
-    t.frame({ line: 'less', caption: `Do dummy lists: L (x se chhote) aur M (baaki). Har node ko sahi list ke end mein jodo — order apne aap bana rahega.`, legend: { muted: 'dummy', new: 'juda' }, panels: view(ids[0]) });
+    t.frame({ line: 'less', caption: `2 dummy lists: L (x se chhote) aur M (baaki). Har node ko sahi list ke end mein jodo — order apne aap bana rahega.`, legend: { muted: 'dummy', new: 'juda' }, panels: view(ids[0]) });
     for (const id of ids) {
       const v = nodes.get(id)!.value as number;
       if (v < x) {
@@ -208,7 +208,7 @@ export const reorderTrace = tracer<{ values: number[] }>({
       second = n2;
     }
     const s = showFrom(nodes, ids[0]);
-    t.frame({ line: 'weave', caption: `Result ${s}. Teen jaane-pehchaane tools: middle + reverse + merge. O(n), O(1).`, legend: { compare: 'pehla aadha', active: 'doosra aadha' }, panels: [listView(nodes, ids[0], { tones: halfTones() })] });
+    t.frame({ line: 'weave', caption: `Result ${s}. 3 jaane-pehchaane tools: middle + reverse + merge. O(n), O(1).`, legend: { compare: 'pehla aadha', active: 'doosra aadha' }, panels: [listView(nodes, ids[0], { tones: halfTones() })] });
     return s;
   },
 });

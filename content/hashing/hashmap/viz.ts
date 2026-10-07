@@ -18,7 +18,7 @@ export const listVsMap = tracer<Record<string, never>>({
     const nums = [98100, 99200, 97300, 96400, 95500, 94600];
     const q = 'Dev';
     t.frame({
-      caption: `Phonebook mein "${q}" ka number chahiye. Pehla tareeka: list mein ek-ek naam check karo (jaise purani diary ke panne palatna).`,
+      caption: `Phonebook mein "${q}" ka number chahiye. Pehla tareeka: list mein ek-ek naam check karo (jaise purani diary ke panne flip karna).`,
       panels: [array(names, { label: 'List (naam)' })],
     });
     for (let i = 0; i < names.length; i++) {
@@ -32,7 +32,7 @@ export const listVsMap = tracer<Record<string, never>>({
     }
     const entries: Entry[] = names.map((n, i) => ({ key: n, value: nums[i], tone: n === q ? 'found' : undefined }));
     t.frame({
-      caption: `HashMap: hash("${q}") → seedha uska bucket → number mil gaya. Ek hi kadam — 6 contacts hon ya 60 lakh. Average O(1).`,
+      caption: `HashMap: hash("${q}") → seedha uska bucket → number mil gaya. Ek hi step — 6 contacts hon ya 60 lakh. Average O(1).`,
       vars: { checks: 1 },
       panels: [mapPanel(entries, 'HashMap<String, Int>', 'naam (key)', 'number (value)')],
     });
@@ -70,19 +70,19 @@ export const twoSumTrace = tracer<{ nums: number[]; target: number }>({
   run({ nums, target }, t) {
     const seen = new Map<number, number>();
     const view = (hl?: number, tone: Tone = 'new') => mapPanel([...seen].map(([k, v]) => ({ key: k, value: v, tone: k === hl ? tone : undefined })), 'seen (value → index)', 'value', 'index');
-    t.frame({ line: 'init', caption: 'seen = khaali map (value → index). Har number par sawaal: "mera jodi (target − x) pehle aa chuka hai?"', vars: { target }, panels: [array(nums), view()] });
+    t.frame({ line: 'init', caption: 'seen = khaali map (value → index). Har number par sawaal: "mera pair (target − x) pehle aa chuka hai?"', vars: { target }, panels: [array(nums), view()] });
     for (let i = 0; i < nums.length; i++) {
       const need = target - nums[i];
-      t.frame({ line: 'need', caption: `nums[${i}] = ${nums[i]} → jodi chahiye: ${target} − ${nums[i]} = ${need}. seen mein ${need} hai?`, vars: { i, need }, panels: [array(nums, { tones: { [i]: 'active' }, pointers: { i } }), view(seen.has(need) ? need : undefined, 'found')] });
+      t.frame({ line: 'need', caption: `nums[${i}] = ${nums[i]} → pair chahiye: ${target} − ${nums[i]} = ${need}. seen mein ${need} hai?`, vars: { i, need }, panels: [array(nums, { tones: { [i]: 'active' }, pointers: { i } }), view(seen.has(need) ? need : undefined, 'found')] });
       const j = seen.get(need);
       if (j !== undefined) {
         t.frame({ line: 'found', caption: `Haan! ${need} index ${j} par tha. Answer [${j}, ${i}]. Har number ek baar, lookup O(1) → O(n).`, vars: { i, j }, panels: [array(nums, { tones: { [j]: 'found', [i]: 'found' }, pointers: { j, i } }), view(need, 'found')] });
         return listStr([j, i]);
       }
       seen.set(nums[i], i);
-      t.frame({ line: 'store', caption: `Nahi mila. ${nums[i]} → index ${i} yaad rakh liya — aage koi number iska jodi ho sakta hai.`, vars: { i }, panels: [array(nums, { tones: { [i]: 'done' }, pointers: { i } }), view(nums[i])] });
+      t.frame({ line: 'store', caption: `Nahi mila. ${nums[i]} → index ${i} yaad rakh liya — aage koi number iska pair ho sakta hai.`, vars: { i }, panels: [array(nums, { tones: { [i]: 'done' }, pointers: { i } }), view(nums[i])] });
     }
-    t.frame({ line: 'none', caption: 'Koi jodi nahi mili → [-1, -1].', panels: [array(nums), view()] });
+    t.frame({ line: 'none', caption: 'Koi pair nahi mili → [-1, -1].', panels: [array(nums), view()] });
     return listStr([-1, -1]);
   },
 });
@@ -106,7 +106,7 @@ export const isoTrace = tracer<{ s: string; t: string }>({
       t.frame({ caption: `Lengths alag (${s.length} vs ${tt.length}) → ek-se-ek mapping ho hi nahi sakti → false.`, panels: views(0) });
       return 'false';
     }
-    t.frame({ line: 'init', caption: 'Do maps: s → t aur t → s. Dono taraf ka rishta pakka hona chahiye (ek char ek hi se juda).', panels: views(0) });
+    t.frame({ line: 'init', caption: '2 maps: s → t aur t → s. Dono taraf ka rishta pakka hona chahiye (ek char ek hi se juda).', panels: views(0) });
     for (let i = 0; i < s.length; i++) {
       const a = s[i];
       const b = tt[i];
@@ -120,7 +120,7 @@ export const isoTrace = tracer<{ s: string; t: string }>({
       const pb = ts.get(b);
       if (pb === undefined) ts.set(b, a);
       if (pb !== undefined && pb !== a) {
-        t.frame({ line: 'ts', caption: `Ulti taraf: '${b}' pehle '${pb}' se juda tha, ab '${a}' se? Do alag chars ek par map nahi ho sakte → false.`, vars: { i }, panels: views(i, undefined, b, 'error') });
+        t.frame({ line: 'ts', caption: `Ulti taraf: '${b}' pehle '${pb}' se juda tha, ab '${a}' se? 2 alag chars ek par map nahi ho sakte → false.`, vars: { i }, panels: views(i, undefined, b, 'error') });
         return 'false';
       }
       t.frame({ line: 'ts', caption: pb === undefined ? `Ulti taraf '${b}' → '${a}' bhi yaad rakha.` : `Ulti taraf '${b}' → '${a}' theek.`, vars: { i }, panels: views(i, undefined, b) });

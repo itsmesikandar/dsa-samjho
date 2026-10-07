@@ -67,7 +67,7 @@ export const insertTrace = tracer<{ levels: (number | null)[]; key: number }>({
         if (parent) parent[side!] = nid;
         else tr.root = nid;
         tones[nid] = 'new';
-        t.frame({ line: 'new', caption: parent ? `${parent.value} ka ${side} khaali → ${key} yahin baithega. Koi node hilana nahi pada — naya node hamesha LEAF banta hai.` : `Tree khaali → ${key} hi root.`, legend, panels: view() });
+        t.frame({ line: 'new', caption: parent ? `${parent.value} ka ${side} khaali → ${key} yahin baithega. Koi node move karna nahi pada — naya node hamesha LEAF banta hai.` : `Tree khaali → ${key} hi root.`, legend, panels: view() });
         return nid;
       }
       const n = tr.nodes.get(id)!;
@@ -149,11 +149,11 @@ export const validateTrace = tracer<{ levels: (number | null)[] }>({
       badges[id] = `${inf(lo)}..${inf(hi)}`;
       if (n.value <= lo || n.value >= hi) {
         tones[id] = 'error';
-        t.frame({ line: 'bad', caption: `${n.value} range (${inf(lo)}, ${inf(hi)}) se bahar! Apne parent se theek dikhta ho, par upar ke kisi ancestor ki shart toot gayi → false.`, legend, panels: view() });
+        t.frame({ line: 'bad', caption: `${n.value} range (${inf(lo)}, ${inf(hi)}) se bahar! Apne parent se theek dikhta ho, par upar ke kisi ancestor ki condition toot gayi → false.`, legend, panels: view() });
         return false;
       }
       tones[id] = 'done';
-      t.frame({ line: 'go', caption: `${n.value} range (${inf(lo)}, ${inf(hi)}) mein ✓. Left ko (${inf(lo)}, ${n.value}) do, right ko (${n.value}, ${inf(hi)}) — upar ki saari shartein neeche saath jaati hain.`, legend, panels: view(id) });
+      t.frame({ line: 'go', caption: `${n.value} range (${inf(lo)}, ${inf(hi)}) mein ✓. Left ko (${inf(lo)}, ${n.value}) do, right ko (${n.value}, ${inf(hi)}) — upar ki saari conditions neeche saath jaati hain.`, legend, panels: view(id) });
       return valid(n.left, lo, n.value) && valid(n.right, n.value, hi);
     };
     const ok = valid(tr.root, -Infinity, Infinity);
@@ -203,10 +203,10 @@ export const deleteTrace = tracer<{ levels: (number | null)[]; key: number }>({
       while (tr.nodes.get(s)!.left) s = tr.nodes.get(s)!.left!;
       const sv = tr.nodes.get(s)!.value;
       tones[s] = 'found';
-      t.frame({ line: 'succ', caption: `${n.value} mila — DO bachche. Seedha hata nahi sakte. Right subtree ka sabse chhota (${sv}) dhoondho: right mein ek baar, phir left-left. Ye left ke sab se bada, right ke baaki sab se chhota — jagah ke liye perfect.`, legend, panels: view(id) });
+      t.frame({ line: 'succ', caption: `${n.value} mila — 2 bachche. Seedha hata nahi sakte. Right subtree ka sabse chhota (${sv}) dhoondho: right mein ek baar, phir left-left. Ye left ke sab se bada, right ke baaki sab se chhota — jagah ke liye perfect.`, legend, panels: view(id) });
       n.value = sv;
       tones[id] = 'done';
-      t.frame({ line: 'copy', caption: `${sv} ki value yahan copy. Ab right subtree mein ${sv} do baar hai — purana hatana hai.`, legend, panels: view(id) });
+      t.frame({ line: 'copy', caption: `${sv} ki value yahan copy. Ab right subtree mein ${sv} 2 baar hai — purana hatana hai.`, legend, panels: view(id) });
       t.frame({ line: 'again', caption: `Right subtree se ${sv} delete karo. Successor ka left kabhi nahi hota → ye aasaan case (0 ya 1 bachcha).`, legend, panels: view(s) });
       n.right = del(n.right, sv);
       return id;

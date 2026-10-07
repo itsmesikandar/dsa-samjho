@@ -1,14 +1,14 @@
 import java.util.Arrays;
 
 class Main {
-    // Bottom-up merge sort: recursion nahi. Pehle 1-1 size ke tukde jodo, phir 2-2, phir 4-4 ...
+    // Bottom-up merge sort: recursion nahi. Pehle 1-1 size ke pieces jodo, phir 2-2, phir 4-4 ...
     static void mergeSortBottomUp(int[] a) {
         int n = a.length;
         int[] tmp = new int[n];
         for (int width = 1; width < n; width *= 2) {
-            for (int l = 0; l < n - width; l += 2 * width) { // right wala tukda ho tabhi merge
+            for (int l = 0; l < n - width; l += 2 * width) { // right wala piece ho tabhi merge
                 int mid = l + width - 1;
-                int r = Math.min(l + 2 * width - 1, n - 1); // aakhri tukda chhota ho sakta hai
+                int r = Math.min(l + 2 * width - 1, n - 1); // aakhri piece chhota ho sakta hai
                 merge(a, l, mid, r, tmp);
             }
         }

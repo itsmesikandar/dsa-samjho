@@ -1,13 +1,13 @@
 // Saare subsets (power set). Backtracking: choose -> explore -> un-choose
 fun subsets(nums: IntArray): List<List<Int>> {
     val res = mutableListOf<List<Int>>()
-    val path = mutableListOf<Int>() // abhi tak chune hue items
+    val path = mutableListOf<Int>() // abhi tak choose kiye hue items
     fun bt(start: Int) {
         res.add(path.toList()) // har node khud ek subset hai - COPY daalo (path aage badlega) //@add
         for (i in start until nums.size) {
             path.add(nums[i]) // choose //@choose
             bt(i + 1) // explore: sirf aage ke items (peeche wale lene se same subset dobara banega)
-            path.removeAt(path.size - 1) // un-choose: wapas pehle jaisi halat //@unchoose
+            path.removeAt(path.size - 1) // un-choose: wapas pehle jaisi state //@unchoose
         }
     }
     bt(0)

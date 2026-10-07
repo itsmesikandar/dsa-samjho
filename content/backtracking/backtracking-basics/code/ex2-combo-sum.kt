@@ -9,7 +9,7 @@ fun combinationSum(cand: IntArray, target: Int): List<List<Int>> {
             return
         }
         for (i in start until c.size) {
-            if (c[i] > remain) break // is shaakh ke aage sab bekaar - kaat do (pruning) //@prune
+            if (c[i] > remain) break // is branch ke aage sab bekaar - kaat do (pruning) //@prune
             path.add(c[i]) //@choose
             bt(i, remain - c[i]) // i se hi: same number dobara le sakte; i se pehle nahi (warna [2,3] aur [3,2] dono)
             path.removeAt(path.size - 1) //@unchoose

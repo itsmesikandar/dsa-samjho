@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-    // Sorted, bina takraav wali list mein naya interval: teen hisse - pehle wale, takraane wale (milao), baad wale
+    // Sorted, bina collision wali list mein naya interval: 3 hisse - pehle wale, collide hone wale (milao), baad wale
     static List<List<Integer>> insert(int[][] intervals, int[] newInterval) {
         List<List<Integer>> out = new ArrayList<>();
         int s = newInterval[0], e = newInterval[1];
@@ -11,7 +11,7 @@ class Main {
             out.add(List.of(intervals[i][0], intervals[i][1]));
             i++;
         }
-        while (i < n && intervals[i][0] <= e) { // naye se takraata hai - milao
+        while (i < n && intervals[i][0] <= e) { // naye se collide karta hai - milao
             s = Math.min(s, intervals[i][0]);
             e = Math.max(e, intervals[i][1]);
             i++;

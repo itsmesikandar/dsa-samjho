@@ -36,7 +36,7 @@ export const stableDemo = tracer<{ marks: number[] }>({
     t.frame({ caption: 'STABLE sort (insertion / merge / TimSort): barabar marks wale apne purane order (A pehle, phir B…) mein hi rahe.', panels: [array(people.map(label), { label: 'Shuru' }), array(st.map(label), { label: 'Stable sort', tones: Object.fromEntries(st.map((_, i) => [i, 'done' as Tone])) })] });
     const anyBroken = Object.keys(broken).length > 0;
     t.frame({
-      caption: anyBroken ? 'UNSTABLE sort (selection / quick): laal jodi dekho — barabar marks, par naam ka order ulta ho gaya! Pehle naam se sort kiya tha, wo mehnat gayi.' : 'Is input par unstable sort ne bhi order nahi toda — par guarantee nahi hai. [3, 1, 3, 2, 1] try karo.',
+      caption: anyBroken ? 'UNSTABLE sort (selection / quick): red pair dekho — barabar marks, par naam ka order ulta ho gaya! Pehle naam se sort kiya tha, wo mehnat gayi.' : 'Is input par unstable sort ne bhi order nahi toda — par guarantee nahi hai. [3, 1, 3, 2, 1] try karo.',
       legend: { error: 'order toota' },
       panels: [array(st.map(label), { label: 'Stable sort' }), array(un.map(label), { label: 'Unstable sort', tones: broken })],
     });
@@ -77,7 +77,7 @@ export const freqTrace = tracer<{ nums: number[] }>({
     const mapPanel = (hot?: number): Panel => ({ kind: 'map', label: 'freq', keyLabel: 'number', valueLabel: 'kitni baar', entries: [...freq.entries()].map(([k, v]) => ({ key: k, value: v, tone: k === hot ? ('new' as Tone) : undefined })) });
     for (let i = 0; i < nums.length; i++) {
       freq.set(nums[i], (freq.get(nums[i]) ?? 0) + 1);
-      t.frame({ line: 'count', caption: `${nums[i]} ki ginti = ${freq.get(nums[i])}.`, vars: { i }, panels: [array(nums, { tones: { [i]: 'active' } }), mapPanel(nums[i])] });
+      t.frame({ line: 'count', caption: `${nums[i]} ki count = ${freq.get(nums[i])}.`, vars: { i }, panels: [array(nums, { tones: { [i]: 'active' } }), mapPanel(nums[i])] });
     }
     const sorted = [...nums].sort((a, b) => (freq.get(a)! - freq.get(b)!) || b - a);
     const keys = sorted.map((x) => `(${freq.get(x)}, ${x})`);

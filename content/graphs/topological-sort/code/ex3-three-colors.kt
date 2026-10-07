@@ -1,4 +1,4 @@
-// 3 rang: 0 = white (anchhua), 1 = gray (abhi DFS ke raste par), 2 = black (poora ho gaya)
+// 3 color: 0 = white (untouched), 1 = gray (abhi DFS ke raste par), 2 = black (poora ho gaya)
 fun dfs(u: Int, adj: List<List<Int>>, color: IntArray, post: MutableList<Int>): Boolean { // true = cycle
     color[u] = 1 // gray: u abhi raste par hai //@gray
     for (v in adj[u]) {

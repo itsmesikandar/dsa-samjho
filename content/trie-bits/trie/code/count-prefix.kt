@@ -1,4 +1,4 @@
-// Har node par do ginti: pass = kitne words is prefix se guzre, ends = kitne yahin khatam
+// Har node par do count: pass = kitne words is prefix se guzre, ends = kitne yahin khatam
 class CNode {
     val next = arrayOfNulls<CNode>(26)
     var pass = 0
@@ -10,7 +10,7 @@ class CountTrie {
 
     fun insert(word: String) {
         var cur = root
-        cur.pass++ // khaali prefix "" se har word guzarta hai
+        cur.pass++ // khaali prefix "" se har word pass hota hai
         for (ch in word) {
             val k = ch - 'a'
             if (cur.next[k] == null) cur.next[k] = CNode()
@@ -20,7 +20,7 @@ class CountTrie {
         cur.ends++
     }
 
-    // maan ke chalo word trie mein hai - raaste ki har ginti ek kam
+    // maan ke chalo word trie mein hai - raaste ki har count ek kam
     fun erase(word: String) {
         var cur = root
         cur.pass--

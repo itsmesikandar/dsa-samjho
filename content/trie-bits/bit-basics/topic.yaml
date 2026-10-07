@@ -11,7 +11,7 @@ meta:
 # 1. Ye kya hai?
 what:
   body: |
-    Computer har number **bits** (0 / 1) mein rakhta hai. `Int` = 32 bits. Bit `k` (daayein se, 0 se shuru) ka wazan `2^k`:
+    Computer har number **bits** (0 / 1) mein rakhta hai. `Int` = 32 bits. Bit `k` (right se, 0 se shuru) ka weight `2^k`:
 
     `13 = 1101 = 8 + 4 + 0 + 1`
 
@@ -23,21 +23,21 @@ what:
     | OR | `a or b` | `a \| b` | koi ek 1 → 1 | 14 |
     | XOR | `a xor b` | `a ^ b` | alag → 1 | 6 |
     | NOT | `a.inv()` | `~a` | har bit ulta | −13 |
-    | Left shift | `a shl k` | `a << k` | baayein k jagah, × 2^k | 12 shl 2 = 48 |
-    | Right shift | `a shr k` | `a >> k` | daayein k jagah, ÷ 2^k (sign rakhta) | 12 shr 2 = 3 |
-    | Unsigned right | `a ushr k` | `a >>> k` | baayein se 0 bharta | negative par farak |
+    | Left shift | `a shl k` | `a << k` | left k jagah, × 2^k | 12 shl 2 = 48 |
+    | Right shift | `a shr k` | `a >> k` | right k jagah, ÷ 2^k (sign rakhta) | 12 shr 2 = 3 |
+    | Unsigned right | `a ushr k` | `a >>> k` | left se 0 bharta | negative par farak |
 
-    **Negative numbers — two's complement:** `−x = ~x + 1`. Sabse baayein (31st) bit = sign. Isliye `~12 = −13`.
+    **Negative numbers — two's complement:** `−x = ~x + 1`. Sabse left (31st) bit = sign. Isliye `~12 = −13`.
 
     > [!yaad]
     > Kotlin mein `&`, `|`, `^`, `~`, `<<` nahi hote — words hain: `and`, `or`, `xor`, `inv()`, `shl`, `shr`, `ushr`. (`&&` / `||` boolean ke liye hain, bits ke liye nahi.)
   analogy: |
     **Class ki attendance ek number mein:**
-    32 bachche, roll number 0 se 31. Ek `Int` lo — bit `i` = 1 matlab roll `i` aaya. Poori class ki haazri ek number!
+    32 bachche, roll number 0 se 31. Ek `Int` lo — bit `i` = 1 matlab roll `i` aaya. Poori class ki attendance ek number!
 
-    - Somvaar AND Mangalvaar = jo **dono** din aaye.
-    - Somvaar OR Mangalvaar = jo **kam se kam ek** din aaye.
-    - Somvaar XOR Mangalvaar = jinki haazri **badli**.
+    - Monday AND Tuesday = jo **dono** din aaye.
+    - Monday OR Tuesday = jo **kam se kam ek** din aaye.
+    - Monday XOR Tuesday = jinki attendance **badli**.
     - "Roll 5 aaya?" = `(x shr 5) and 1`.
 
     Har bit ek switch — on ya off. Bit manipulation = in switches ko ek saath, ek hi step mein chalana.
@@ -50,7 +50,7 @@ why:
     | Kaam | Normal | Bits se |
     |---|---|---|
     | Odd / even | `x % 2` | `x and 1` |
-    | 2 se guna / bhaag | `x * 2`, `x / 2` | `x shl 1`, `x shr 1` |
+    | 2 se times / bhaag | `x * 2`, `x / 2` | `x shl 1`, `x shr 1` |
     | 2 ki power hai? | baar baar 2 se bhaag, O(log n) | `n and (n − 1) == 0`, O(1) |
     | 32 flags rakhna | `BooleanArray(32)` | ek `Int` |
 
@@ -64,19 +64,19 @@ why:
 # 3. Visual intro
 visual:
   body: |
-    Koi number lo aur baar baar 2 se bhaag do — har baar bacha (0 ya 1) uska agla bit hai, daayein se baayein. Aakhir mein dekho: har 1 bit ka wazan (2 ki power) jodo, wahi number wapas.
+    Koi number lo aur baar baar 2 se bhaag do — har baar bacha (0 ya 1) uska agla bit hai, right se left. Aakhir mein dekho: har 1 bit ka weight (2 ki power) jodo, wahi number wapas.
   viz: { tracer: binaryTrace }
 
 # 4. Kaise kaam karta hai
 how:
   body: |
-    Har operator **column-wise** chalta hai — result ka bit `k` sirf `a` ke bit `k` aur `b` ke bit `k` se banta, padosi bits se koi lena dena nahi (carry nahi hota).
+    Har operator **column-wise** chalta hai — result ka bit `k` sirf `a` ke bit `k` aur `b` ke bit `k` se banta, neighbor bits se koi lena dena nahi (carry nahi hota).
 
-    - **AND** = chhaanna (mask): `x and 0b1111` → sirf neeche ke 4 bits bache.
+    - **AND** = filter karna (mask): `x and 0b1111` → sirf neeche ke 4 bits bache.
     - **OR** = on karna: `x or (1 shl i)` → bit `i` on.
     - **XOR** = ulta / farak: `x xor x = 0`, `x xor 0 = x`. Same bits mit jaate hain.
     - **NOT** = sab ulta. 32 bits hain, to sign bit bhi ulta → `~x = −x − 1`.
-    - **Shift:** `x shl k` = `x × 2^k`, `x shr k` = `x ÷ 2^k` (neeche round). Negative par `shr` sign bit copy karta; `ushr` baayein se 0 bharta.
+    - **Shift:** `x shl k` = `x × 2^k`, `x shr k` = `x ÷ 2^k` (neeche round). Negative par `shr` sign bit copy karta; `ushr` left se 0 bharta.
 
     > [!galti]
     > Brackets bhool gaye: Kotlin `x and 1 == 0` → `x and (1 == 0)` (compile error). Java `x & 1 == 0` bhi error. Hamesha `(x and 1) == 0`.
@@ -92,19 +92,19 @@ operations:
   - op: "Shift (shl / shr / ushr)"
     time: "O(1)"
     space: "O(1)"
-    why: "Bits khiskana bhi ek instruction; × / ÷ 2^k."
+    why: "Bits shift karna bhi ek instruction; × / ÷ 2^k."
   - op: "Bit i padho / on / off / ulta"
     time: "O(1)"
     space: "O(1)"
     why: "Mask 1 shl i ke saath AND / OR / AND-NOT / XOR."
-  - op: "Sabse daayein ka 1 (x and −x)"
+  - op: "Sabse right ka 1 (x and −x)"
     time: "O(1)"
     space: "O(1)"
     why: "Two's complement ka kamaal — baaki sab bits cancel."
-  - op: "1 bits ginna (x and (x − 1) loop)"
+  - op: "1 bits count karna (x and (x − 1) loop)"
     time: "O(k)"
     space: "O(1)"
-    why: "k = 1 bits; har round ek mitata. Integer.bitCount hardware se O(1)."
+    why: "k = 1 bits; har round ek hatata. Integer.bitCount hardware se O(1)."
   - op: "Power of two check"
     time: "O(1)"
     space: "O(1)"
@@ -118,16 +118,16 @@ code:
       Har kaam ek **mask** se: `1 shl i` (sirf bit `i` on).
       - Padho: `(x shr i) and 1`
       - On: `x or mask` · Off: `x and mask.inv()` · Ulta: `x xor mask`
-      - Sabse daayein ka 1: `x and −x`
+      - Sabse right ka 1: `x and −x`
 
       Odd / even ke liye `x and 1` — negative par bhi sahi. `x % 2 == 1` negative odd (`−3 % 2 = −1`) par **galat** hai.
   - title: Negative numbers — two's complement
     file: twos-complement
     note: |
-      `−x = ~x + 1`. Fayda: ek hi adder circuit se + aur − dono, aur zero ka ek hi roop.
+      `−x = ~x + 1`. Fayda: ek hi adder circuit se + aur − dono, aur zero ka ek hi form.
 
       - `Integer.toBinaryString(−5)` → poore 32 bits (aage sab 1). Kotlin ka `toString(2)` sirf `−101` likhta — bits nahi.
-      - `shr` / `>>` sign bit copy karta (−16 shr 2 = −4). `ushr` / `>>>` baayein se 0 (bada positive).
+      - `shr` / `>>` sign bit copy karta (−16 shr 2 = −4). `ushr` / `>>>` left se 0 (bada positive).
       - `Int.MAX_VALUE + 1` chupchaap `Int.MIN_VALUE` ban jaata — overflow.
 
 # 7. Examples
@@ -175,16 +175,16 @@ examples:
 
       Example: `26` (`11010`) → **3**
     intuition: |
-      Seedha: 32 baar `(x shr i) and 1` jodo — hamesha 32 kadam.
+      Seedha: 32 baar `(x shr i) and 1` jodo — hamesha 32 step.
 
-      **Brian Kernighan trick:** `x and (x − 1)` sabse **daayein wala 1** mita deta hai (x − 1 us 1 ko 0 aur neeche ke 0s ko 1 karta; AND se wo saare 0). Jab tak `x ≠ 0`, mitate jao aur gino — loop sirf **utni baar** jitne 1 bits.
+      **Brian Kernighan trick:** `x and (x − 1)` sabse **right wala 1** hata deta hai (x − 1 us 1 ko 0 aur neeche ke 0s ko 1 karta; AND se wo saare 0). Jab tak `x ≠ 0`, hatate jao aur count karo — loop sirf **utni baar** jitne 1 bits.
 
       Library: Java `Integer.bitCount(x)`, Kotlin `x.countOneBits()`.
 
       Negative input (LeetCode mein "unsigned" bhi signed int mein aata): `while (x != 0)` theek chalega — max 32 baar.
 
       > [!galti]
-      > `while (x > 0)` likha → negative par loop chala hi nahi. Ya `x = x shr 1` se bits gine → negative par sign bit copy hota rehta, **infinite loop**. `ushr` lo.
+      > `while (x > 0)` likha → negative par loop chala hi nahi. Ya `x = x shr 1` se bits count kiye → negative par sign bit copy hota rehta, **infinite loop**. `ushr` lo.
     dryRun: |
       | x | x − 1 | x and (x − 1) | count |
       |---|---|---|---|
@@ -196,24 +196,24 @@ examples:
     complexity:
       time: "O(k)"
       space: "O(1)"
-      why: "k = 1 bits ki ginti (≤ 32). Har round ek bit mitta."
+      why: "k = 1 bits ki count (≤ 32). Har round ek bit mitta."
 
   - id: counting-bits
     level: tricky
     title: 0 se n tak sabke 1 bits (Counting Bits)
     source: { name: Counting Bits, platform: LeetCode, url: "https://leetcode.com/problems/counting-bits/" }
     problem: |
-      `n` diya. `0` se `n` tak har number mein kitne 1 bits — ek array lautao. O(n) mein.
+      `n` diya. `0` se `n` tak har number mein kitne 1 bits — ek array return karo. O(n) mein.
 
       Example: `n = 8` → **`[0, 1, 1, 2, 1, 2, 2, 3, 1]`**
     intuition: |
-      Har number par alag se ginna → O(n · 32). Behtar: **DP** — chhote number ka jawab bade mein use karo.
+      Har number par alag se count karna → O(n · 32). Better: **DP** — chhote number ka jawab bade mein use karo.
 
       `i shr 1` = `i` ke bits, bas aakhri bit hata ke. Ye chhota number hai — jawab pehle se nikal chuka. To:
 
       `ans[i] = ans[i shr 1] + (i and 1)`
 
-      Doosra roop: `ans[i] = ans[i and (i − 1)] + 1` (sabse daayein ka 1 hata ke wala number + 1).
+      Doosra form: `ans[i] = ans[i and (i − 1)] + 1` (sabse right ka 1 hata ke wala number + 1).
 
       > [!galti]
       > `ans[i] = ans[i − 1] + 1` socha — galat: `3 = 11` (2 bits) par `4 = 100` (1 bit). Pichhla number nahi, **aadha** number (shift) ka rishta hai.
@@ -238,10 +238,10 @@ examples:
 # 8. Kab use karein / kab NAHI
 when:
   use:
-    - "Odd / even, 2 se guna / bhaag, 2 ki power check — tez aur chhota."
+    - "Odd / even, 2 se times / bhaag, 2 ki power check — tez aur chhota."
     - "Bahut saare true / false flags ek number mein (permissions, chhota visited set)."
     - "Kisi bit ko padhna / on / off / ulta karna — masks."
-    - "Number ki binary property — 1s ginna, bits ulte, alternating bits."
+    - "Number ki binary property — 1s count karna, bits ulte, alternating bits."
   avoid:
     - "Speed ka farak nahi aur code mushkil ho jaaye → normal arithmetic (compiler x / 2 khud optimize karta)."
     - "Negative numbers par shift / % bina samjhe → sign ka chakkar."
@@ -257,7 +257,7 @@ when:
     - keyword: "count bits for every number 0..n"
       think: "ans[i] = ans[i shr 1] + (i and 1)."
     - keyword: "without using + / * / %"
-      think: "Bits: sum = a xor b, carry = (a and b) shl 1; shifts se guna."
+      think: "Bits: sum = a xor b, carry = (a and b) shl 1; shifts se times."
 
 # 9. Real-world
 realWorld:
@@ -270,7 +270,7 @@ realWorld:
   - where: "Colors (ARGB)"
     how: "Ek Int mein 4 bytes — red = (color shr 16) and 0xFF."
   - where: "Chess engines"
-    how: "Bitboard — 64 khaane = ek Long; chaalein shifts aur AND se."
+    how: "Bitboard — 64 khaane = ek Long; moves shifts aur AND se."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -316,32 +316,32 @@ interview:
   questions:
     - q: "AND, OR, XOR kab use karte ho?"
       a: |
-        AND = mask se bits chhaanna / check. OR = bits on karna. XOR = bits ulte karna, ya farak / duplicate cancel (x ^ x = 0).
+        AND = mask se bits filter karna / check. OR = bits on karna. XOR = bits ulte karna, ya farak / duplicate cancel (x ^ x = 0).
     - q: "n & (n − 1) kya karta hai?"
       a: |
-        Sabse daayein wala 1 bit hata deta. Use: power of two (result 0), 1 bits ginna (jitni baar chala).
+        Sabse right wala 1 bit hata deta. Use: power of two (result 0), 1 bits count karna (jitni baar chala).
     - q: "x & −x kya deta hai?"
       a: |
-        Sirf sabse daayein wala 1 bit (baaki 0). −x = ~x + 1 — neeche ke bits match karte, upar ke ulte. Fenwick tree isi par chalta.
+        Sirf sabse right wala 1 bit (baaki 0). −x = ~x + 1 — neeche ke bits match karte, upar ke ulte. Fenwick tree isi par chalta.
     - q: "Two's complement kyun use hota hai?"
       a: |
-        Ek hi adder se + aur − (a − b = a + (~b + 1)), aur zero ka ek hi roop. Sign = sabse upar ka bit.
+        Ek hi adder se + aur − (a − b = a + (~b + 1)), aur zero ka ek hi form. Sign = sabse upar ka bit.
     - q: ">> aur >>> mein farak?"
       a: |
-        >> sign bit copy karta (negative negative rehta, −16 >> 2 = −4). >>> baayein se 0 bharta — negative bada positive ban jaata.
+        >> sign bit copy karta (negative negative rehta, −16 >> 2 = −4). >>> left se 0 bharta — negative bada positive ban jaata.
     - q: "Odd / even bits se kaise, negative par bhi?"
       a: |
         (x & 1) == 1 → odd. Two's complement mein bhi aakhri bit parity batata hai. x % 2 negative par −1 deta.
-    - q: "1 bits ginne ke tareeke?"
+    - q: "1 bits count karne ke tareeke?"
       a: |
         32 bits ka loop O(32); Kernighan x &= x − 1, O(1 bits); Integer.bitCount (hardware popcount); 0..n ke liye DP ans[i >> 1] + (i & 1).
     - q: "Bina temp variable swap?"
       a: |
-        a ^= b; b ^= a; a ^= b. Par a aur b ek hi variable (same memory) ho to dono 0 ho jaate — practice mein temp hi behtar.
-    - q: "+ ke bina do numbers jodo?"
+        a ^= b; b ^= a; a ^= b. Par a aur b ek hi variable (same memory) ho to dono 0 ho jaate — practice mein temp hi better.
+    - q: "+ ke bina 2 numbers jodo?"
       followUp: true
       a: |
-        sum = a ^ b (bina carry), carry = (a & b) << 1. Jab tak carry 0 na ho, a = sum, b = carry dohrao. Negative bhi two's complement se chalta.
+        sum = a ^ b (bina carry), carry = (a & b) << 1. Jab tak carry 0 na ho, a = sum, b = carry repeat karo. Negative bhi two's complement se chalta.
     - q: "Bits ulte (Reverse Bits) kaise?"
       followUp: true
       a: |
@@ -359,7 +359,7 @@ practice:
     num: 461
     url: "https://leetcode.com/problems/hamming-distance/"
     level: easy
-    pattern: XOR + 1s ginna
+    pattern: XOR + 1s count karna
     hint: "Alag bits = x xor y ke 1 bits. bitCount ya Kernighan loop."
   - name: Binary Number with Alternating Bits
     platform: LeetCode
@@ -394,7 +394,7 @@ practice:
     num: 477
     url: "https://leetcode.com/problems/total-hamming-distance/"
     level: medium
-    pattern: Har bit alag se gino
+    pattern: Har bit alag se count karo
     hint: "Har bit position par ones = kitno ka 1, zeros = n − ones. Jawab += ones × zeros. O(32 · n)."
   - name: Find XOR Sum of All Pairs Bitwise AND
     platform: LeetCode
@@ -414,10 +414,10 @@ practice:
 # 13. Quick revision
 revision:
   summary:
-    - "Int = 32 bits; bit k ka wazan 2^k; negative = two's complement (−x = ~x + 1)."
-    - "AND chhaanto (mask), OR on karo, XOR ulto / farak, NOT sab ulta."
-    - "shl k = × 2^k, shr k = ÷ 2^k; ushr / >>> baayein 0 bharta."
-    - "n and (n − 1) sabse daayein ka 1 hatata — power of two, 1s ginna."
+    - "Int = 32 bits; bit k ka weight 2^k; negative = two's complement (−x = ~x + 1)."
+    - "AND filter karo (mask), OR on karo, XOR ulto / farak, NOT sab ulta."
+    - "shl k = × 2^k, shr k = ÷ 2^k; ushr / >>> left 0 bharta."
+    - "n and (n − 1) sabse right ka 1 hatata — power of two, 1s count karna."
     - "Kotlin: and, or, xor, inv(), shl, shr, ushr — aur hamesha brackets."
   cheatsheet: |
     ```kotlin
@@ -426,8 +426,8 @@ revision:
     x or (1 shl i)                  // bit i on
     x and (1 shl i).inv()           // bit i off
     x xor (1 shl i)                 // bit i ulta
-    x and (x - 1)                   // sabse daayein ka 1 hatao
-    x and -x                        // sirf sabse daayein ka 1
+    x and (x - 1)                   // sabse right ka 1 hatao
+    x and -x                        // sirf sabse right ka 1
     n > 0 && (n and (n - 1)) == 0   // power of two
     x.countOneBits()                // 1 bits (Java: Integer.bitCount)
     ```

@@ -1,13 +1,13 @@
 // Merge intervals: start se sort, phir ek pass - har interval ya to pichhle mein ghul jaata hai ya naya shuru
 fun merge(intervals: Array<IntArray>): List<List<Int>> {
-    intervals.sortBy { it[0] } // start se sort - takraane wale paas paas aa jaate hain //@sort
+    intervals.sortBy { it[0] } // start se sort - collide hone wale paas paas aa jaate hain //@sort
     val out = mutableListOf<IntArray>()
     for (cur in intervals) {
         val last = out.lastOrNull()
         if (last == null || cur[0] > last[1]) {
             out.add(intArrayOf(cur[0], cur[1])) // pichhle ke khatam hone ke baad shuru - naya interval //@new
         } else {
-            last[1] = maxOf(last[1], cur[1]) // takraaya - pichhle ko aage tak khiincho //@extend
+            last[1] = maxOf(last[1], cur[1]) // collide hua - pichhle ko aage tak khiincho //@extend
         }
     }
     return out.map { it.toList() } //@done

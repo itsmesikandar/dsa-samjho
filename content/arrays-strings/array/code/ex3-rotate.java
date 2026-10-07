@@ -13,11 +13,11 @@ class Main {
         }
     }
 
-    // Har item ko k jagah right khisakao; jo end se bahar gire wo shuru mein aaye
+    // Har item ko k jagah right shift karo; jo end se bahar gire wo shuru mein aaye
     static void rotateRight(int[] arr, int k) {
         int n = arr.length;
         if (n == 0) return;
-        int steps = k % n; // n steps ghumao to array wapas wahi; isliye k % n kaafi //@mod
+        int steps = k % n; // n steps rotate karo to array wapas wahi; isliye k % n kaafi //@mod
         reverse(arr, 0, n - 1); // 1) poora array ulta //@all
         reverse(arr, 0, steps - 1); // 2) pehle 'steps' items ulte //@left
         reverse(arr, steps, n - 1); // 3) baaki items ulte //@right

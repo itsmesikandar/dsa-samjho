@@ -12,7 +12,7 @@ export const subarraysMap = tracer<{ arr: number[] }>({
     let bi = 0;
     let bj = 0;
     t.frame({
-      caption: `Subarray = array ka LAGATAR hissa, jaise arr[i..j]. ${n} items ke ${(n * (n + 1)) / 2} subarrays hote hain. Grid mein har cell (i, j) = arr[i..j] ka sum.`,
+      caption: `Subarray = array ka CONTINUOUS hissa, jaise arr[i..j]. ${n} items ke ${(n * (n + 1)) / 2} subarrays hote hain. Grid mein har cell (i, j) = arr[i..j] ka sum.`,
       panels: [array(arr), { kind: 'grid', values: g, ...labels }],
     });
     for (let i = 0; i < n; i++) {
@@ -66,8 +66,8 @@ export const kadaneTrace = tracer<{ nums: number[] }>({
       t.frame({
         line: 'choose',
         caption: restart
-          ? `Purana cur negative tha — bojh hai. ${nums[i]} akela (${nums[i]}) > saath mein (${extend}). Yahin se naya subarray shuru: cur = ${cur}.`
-          : `Purana sum saath lo: ${extend - nums[i]} + ${nums[i]} = ${extend} (akela ${nums[i]} se behtar ya barabar). cur = ${cur}.`,
+          ? `Purana cur negative tha — load hai. ${nums[i]} akela (${nums[i]}) > saath mein (${extend}). Yahin se naya subarray shuru: cur = ${cur}.`
+          : `Purana sum saath lo: ${extend - nums[i]} + ${nums[i]} = ${extend} (akela ${nums[i]} se better ya barabar). cur = ${cur}.`,
         vars: { i, cur, best },
         panels: [view(i, { [i]: restart ? 'new' : 'compare' })],
       });
@@ -80,7 +80,7 @@ export const kadaneTrace = tracer<{ nums: number[] }>({
     }
     t.frame({
       line: 'done',
-      caption: `Answer ${best} (range [${bl}..${br}]). Har item par sirf ek faisla — "jodun ya naya shuru karun?" → O(n), sirf do variables → O(1) space.`,
+      caption: `Answer ${best} (range [${bl}..${br}]). Har item par sirf ek decision — "jodun ya naya shuru karun?" → O(n), sirf 2 variables → O(1) space.`,
       vars: { best },
       panels: [array(nums, { ranges: [{ from: bl, to: br, label: `best = ${best}`, tone: 'found' }] })],
     });
@@ -90,14 +90,14 @@ export const kadaneTrace = tracer<{ nums: number[] }>({
 
 // ---------- Example 1: stock buy-sell ----------
 export const stockTrace = tracer<{ prices: number[] }>({
-  inputs: [{ name: 'prices', type: 'intArray', label: 'Har din ka daam', default: [7, 1, 5, 3, 6, 4], minLen: 1, maxLen: 10, min: 1, max: 20 }],
+  inputs: [{ name: 'prices', type: 'intArray', label: 'Har din ka price', default: [7, 1, 5, 3, 6, 4], minLen: 1, maxLen: 10, min: 1, max: 20 }],
   run({ prices }, t) {
     let minPrice = prices[0];
     let mi = 0;
     let best = 0;
     let buy = 0;
     let sell = 0;
-    const bars = (i: number, tones: ToneMap = {}) => ({ kind: 'bars' as const, label: 'daam (din ke hisaab se)', values: [...prices], tones: { [mi]: 'found' as Tone, ...tones }, pointers: [{ name: 'min', index: mi }, ...(i !== mi ? [{ name: 'i', index: i }] : [])] });
+    const bars = (i: number, tones: ToneMap = {}) => ({ kind: 'bars' as const, label: 'price (din ke hisaab se)', values: [...prices], tones: { [mi]: 'found' as Tone, ...tones }, pointers: [{ name: 'min', index: mi }, ...(i !== mi ? [{ name: 'i', index: i }] : [])] });
     t.frame({ line: 'init', caption: `minPrice = ${minPrice} (din 0). Har din socho: "agar aaj bechun aur ab tak ke SABSE SASTE din kharida ho, to kitna fayda?"`, vars: { minPrice, best }, legend: { found: 'sabse sasta din' }, panels: [bars(0)] });
     for (let i = 1; i < prices.length; i++) {
       const profit = prices[i] - minPrice;
@@ -122,10 +122,10 @@ export const stockTrace = tracer<{ prices: number[] }>({
     }
     t.frame({
       line: 'done',
-      caption: best > 0 ? `Best: din ${buy} kharido (${prices[buy]}), din ${sell} becho (${prices[sell]}) → profit ${best}. Kadane jaisa: ek pass, "ab tak ka min" yaad rakha → O(n).` : 'Daam girte hi rahe — koi fayda nahi, answer 0 (na kharido).',
+      caption: best > 0 ? `Best: din ${buy} kharido (${prices[buy]}), din ${sell} becho (${prices[sell]}) → profit ${best}. Kadane jaisa: ek pass, "ab tak ka min" yaad rakha → O(n).` : 'Price girte hi rahe — koi fayda nahi, answer 0 (na kharido).',
       vars: { best },
       legend: { found: 'kharido', done: 'becho' },
-      panels: [{ kind: 'bars', label: 'daam', values: [...prices], tones: best > 0 ? { [buy]: 'found', [sell]: 'done' } : {} }],
+      panels: [{ kind: 'bars', label: 'price', values: [...prices], tones: best > 0 ? { [buy]: 'found', [sell]: 'done' } : {} }],
     });
     return String(best);
   },
@@ -228,7 +228,7 @@ export const circularTrace = tracer<{ nums: number[] }>({
       for (let k = 0; k < n; k++) tones[k] = k >= wl && k <= wr ? 'muted' : 'found';
       t.frame({
         line: 'done',
-        caption: `Wrap wala answer: total (${total}) − beech ka sabse bura hissa (${worst}) = ${ans} > normal best (${best}). Dono kinaron ke items ek saath (wrap karke) lo!`,
+        caption: `Wrap wala answer: total (${total}) − beech ka sabse bura hissa (${worst}) = ${ans} > normal best (${best}). Dono edges ke items ek saath (wrap karke) lo!`,
         vars: { best, worst, total, answer: ans },
         legend: { found: 'liya (wrap)', muted: 'chhoda (min hissa)' },
         panels: [array(nums, { tones })],

@@ -18,11 +18,11 @@ class Main {
         System.out.println(buildAdj(6, edges, false));
         System.out.println(buildAdj(6, edges, true));
         List<List<Integer>> adj = buildAdj(6, edges, false);
-        System.out.println("1 ke padosi: " + adj.get(1) + ", degree " + adj.get(1).size());
+        System.out.println("1 ke neighbor: " + adj.get(1) + ", degree " + adj.get(1).size());
     }
 }
 
 // Output:
 // [[1, 2], [0, 2, 3], [0, 1], [1, 4], [3, 5], [4]]
 // [[1, 2], [2, 3], [], [4], [5], []]
-// 1 ke padosi: [0, 2, 3], degree 3
+// 1 ke neighbor: [0, 2, 3], degree 3

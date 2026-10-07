@@ -1,4 +1,4 @@
-// Teen approaches, ek hi sawaal: kya koi number do baar hai?
+// 3 approaches, ek hi sawaal: kya koi number 2 baar hai?
 
 // 3) HashSet: O(n) time, O(n) space (final choice jab n bada ho)
 fun hasDupSet(arr: IntArray): Boolean {
@@ -16,7 +16,7 @@ fun hasDupBrute(arr: IntArray): Boolean {
     return false
 }
 
-// 2) Sort + padosi check: O(n log n) time (copy banayi, isliye O(n) space)
+// 2) Sort + neighbor check: O(n log n) time (copy banayi, isliye O(n) space)
 fun hasDupSort(arr: IntArray): Boolean {
     val s = arr.sortedArray()
     for (i in 1 until s.size) if (s[i] == s[i - 1]) return true

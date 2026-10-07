@@ -4,7 +4,7 @@ import type { Cell, Panel, Tone } from '@/components/viz/engine/types';
 type GT = Record<string, Tone>;
 const chars = (s: string) => s.split('');
 
-/** do strings ki table: row 0 / col 0 = khaali prefix (∅), phir har char */
+/** 2 strings ki table: row 0 / col 0 = khaali prefix (∅), phir har char */
 const table = (dp: (number | null)[][], a: string, b: string, label: string, tones: GT = {}): Panel => ({
   kind: 'grid',
   label,
@@ -48,9 +48,9 @@ export const subseqEnumTrace = tracer<{ a: string; b: string }>({
       const ok = at.length === sub.length;
       const nb = ok && sub.length > best.length;
       if (nb) best = sub;
-      t.frame({ caption: ok ? `"${sub}" — b mein bhi isi order mein mila.${nb ? ' Ab tak ka sabse lamba!' : ''}` : `"${sub}" — b mein is order mein nahi mila.`, vars: { best: best ? `"${best}"` : '—' }, legend: { new: 'chuna', found: 'b mein mila', error: 'nahi mila' }, panels: [array(chars(a), { label: 'a', tones: Object.fromEntries(pick.map((i) => [i, 'new' as Tone])) }), array(chars(b), { label: 'b', tones: ok ? Object.fromEntries(at.map((i) => [i, 'found' as Tone])) : Object.fromEntries(at.map((i) => [i, 'error' as Tone])) })] });
+      t.frame({ caption: ok ? `"${sub}" — b mein bhi isi order mein mila.${nb ? ' Ab tak ka sabse lamba!' : ''}` : `"${sub}" — b mein is order mein nahi mila.`, vars: { best: best ? `"${best}"` : '—' }, legend: { new: 'choose kiya', found: 'b mein mila', error: 'nahi mila' }, panels: [array(chars(a), { label: 'a', tones: Object.fromEntries(pick.map((i) => [i, 'new' as Tone])) }), array(chars(b), { label: 'b', tones: ok ? Object.fromEntries(at.map((i) => [i, 'found' as Tone])) : Object.fromEntries(at.map((i) => [i, 'error' as Tone])) })] });
     }
-    t.frame({ caption: `LCS = "${best}" (${best.length}). Par 20 chars ki string ke 10 lakh se zyada subsequences! Behtar: chhote sawaal — "a ke pehle i chars aur b ke pehle j chars ka LCS". Sirf (m + 1) × (n + 1) aise sawaal → table.`, legend: { found: 'LCS' }, panels: [array(chars(a), { label: 'a' }), array(chars(b), { label: 'b' })] });
+    t.frame({ caption: `LCS = "${best}" (${best.length}). Par 20 chars ki string ke 10 lakh se zyada subsequences! Better: chhote sawaal — "a ke pehle i chars aur b ke pehle j chars ka LCS". Sirf (m + 1) × (n + 1) aise sawaal → table.`, legend: { found: 'LCS' }, panels: [array(chars(a), { label: 'a' }), array(chars(b), { label: 'b' })] });
     return String(best.length);
   },
 });
@@ -66,7 +66,7 @@ export const lcsTrace = tracer<{ a: string; b: string }>({
     const n = b.length;
     const dp: (number | null)[][] = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => (i === 0 || j === 0 ? 0 : null)));
     const label = 'dp[i][j] = a ke pehle i, b ke pehle j chars ka LCS';
-    const legend = { active: 'abhi', new: 'match: tirchha + 1', found: 'jeeta', muted: 'haara' };
+    const legend = { active: 'abhi', new: 'match: diagonal + 1', found: 'jeeta', muted: 'haara' };
     t.frame({ caption: 'Row 0 aur column 0 = khaali string (∅) — kisi ke saath LCS 0. Har cell (i, j): a ka i-th aur b ka j-th char — dono aakhri chars dekho.', legend, panels: [table(dp, a, b, label)] });
     for (let i = 1; i <= m; i++) {
       for (let j = 1; j <= n; j++) {
@@ -74,12 +74,12 @@ export const lcsTrace = tracer<{ a: string; b: string }>({
         const y = b[j - 1];
         if (x === y) {
           dp[i][j] = dp[i - 1][j - 1]! + 1;
-          t.frame({ line: 'match', caption: `'${x}' = '${y}' → dono LCS mein: tirchha ${dp[i - 1][j - 1]} + 1 = ${dp[i][j]}.`, vars: { i, j }, legend, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j - 1}`]: 'new' })] });
+          t.frame({ line: 'match', caption: `'${x}' = '${y}' → dono LCS mein: diagonal ${dp[i - 1][j - 1]} + 1 = ${dp[i][j]}.`, vars: { i, j }, legend, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j - 1}`]: 'new' })] });
         } else {
           const up = dp[i - 1][j]!;
           const left = dp[i][j - 1]!;
           dp[i][j] = Math.max(up, left);
-          t.frame({ line: 'skip', caption: `'${x}' ≠ '${y}' → ek chhodna padega: upar ${up} ('${x}' chhodo) ya baayein ${left} ('${y}' chhodo). Max = ${dp[i][j]}.`, vars: { i, j }, legend, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j}`]: up >= left ? 'found' : 'muted', [`${i},${j - 1}`]: up >= left ? 'muted' : 'found' })] });
+          t.frame({ line: 'skip', caption: `'${x}' ≠ '${y}' → ek chhodna padega: upar ${up} ('${x}' chhodo) ya left ${left} ('${y}' chhodo). Max = ${dp[i][j]}.`, vars: { i, j }, legend, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j}`]: up >= left ? 'found' : 'muted', [`${i},${j - 1}`]: up >= left ? 'muted' : 'found' })] });
         }
       }
     }
@@ -91,7 +91,7 @@ export const lcsTrace = tracer<{ a: string; b: string }>({
       if (a[i - 1] === b[j - 1]) (path[`${i},${j}`] = 'new'), (s = a[i - 1] + s), i--, j--;
       else (path[`${i},${j}`] = 'found'), dp[i - 1][j]! >= dp[i][j - 1]! ? i-- : j--;
     }
-    t.frame({ line: 'done', caption: `LCS = ${dp[m][n]}${s ? ` ("${s}")` : ''}. String chahiye to (${m}, ${n}) se peeche: match par tirchha (char lo), warna jidhar se bada aaya. O(m × n).`, legend: { new: 'LCS ka char', found: 'raasta' }, panels: [table(dp, a, b, label, path)] });
+    t.frame({ line: 'done', caption: `LCS = ${dp[m][n]}${s ? ` ("${s}")` : ''}. String chahiye to (${m}, ${n}) se peeche: match par diagonal (char lo), warna jidhar se bada aaya. O(m × n).`, legend: { new: 'LCS ka char', found: 'raasta' }, panels: [table(dp, a, b, label, path)] });
     return String(dp[m][n]);
   },
 });
@@ -109,14 +109,14 @@ export const substrTrace = tracer<{ a: string; b: string }>({
     const label = 'dp[i][j] = a[i−1] aur b[j−1] par KHATAM hone wala common substring';
     let best = 0;
     let at = [0, 0];
-    t.frame({ caption: 'Substring = lagaataar chars (gap nahi). LCS jaisa table, par cell ka matlab badla: "yahin khatam hone wala" common hissa. Match → tirchha + 1, mismatch → 0 (silsila toota).', panels: [table(dp, a, b, label)] });
+    t.frame({ caption: 'Substring = continuous chars (gap nahi). LCS jaisa table, par cell ka matlab badla: "yahin khatam hone wala" common hissa. Match → diagonal + 1, mismatch → 0 (chain toota).', panels: [table(dp, a, b, label)] });
     for (let i = 1; i <= m; i++) {
       for (let j = 1; j <= n; j++) {
         if (a[i - 1] === b[j - 1]) {
           dp[i][j] = dp[i - 1][j - 1]! + 1;
           const nb = dp[i][j]! > best;
           if (nb) (best = dp[i][j]!), (at = [i, j]);
-          t.frame({ line: 'match', caption: `'${a[i - 1]}' = '${b[j - 1]}' → tirchha ${dp[i - 1][j - 1]} + 1 = ${dp[i][j]}.${nb ? ` Naya best: "${a.slice(i - best, i)}".` : ''}`, vars: { i, j, best }, legend: { active: 'abhi', new: 'tirchha' }, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j - 1}`]: 'new' })] });
+          t.frame({ line: 'match', caption: `'${a[i - 1]}' = '${b[j - 1]}' → diagonal ${dp[i - 1][j - 1]} + 1 = ${dp[i][j]}.${nb ? ` Naya best: "${a.slice(i - best, i)}".` : ''}`, vars: { i, j, best }, legend: { active: 'abhi', new: 'diagonal' }, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j - 1}`]: 'new' })] });
         } else {
           dp[i][j] = 0;
           t.frame({ line: 'reset', caption: `'${a[i - 1]}' ≠ '${b[j - 1]}' → yahan khatam hone wala koi common substring nahi: 0.`, vars: { i, j, best }, legend: { active: 'abhi' }, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active' })] });
@@ -126,7 +126,7 @@ export const substrTrace = tracer<{ a: string; b: string }>({
     const run: GT = {};
     for (let k = 0; k < best; k++) run[`${at[0] - k},${at[1] - k}`] = 'found';
     const l = lcsTable(a, b)[m][n];
-    t.frame({ line: 'done', caption: best ? `Sabse lamba common substring "${a.slice(at[0] - best, at[0])}" = ${best} (tirchhi line). LCS (gap allowed) yahan ${l} hota${l > best ? ' — substring mein lagaataar chahiye, isliye chhota' : ''}. O(m × n).` : `Koi common char nahi → 0. O(m × n).`, legend: { found: 'substring' }, panels: [table(dp, a, b, label, run)] });
+    t.frame({ line: 'done', caption: best ? `Sabse lamba common substring "${a.slice(at[0] - best, at[0])}" = ${best} (diagonal line). LCS (gap allowed) yahan ${l} hota${l > best ? ' — substring mein lagaataar chahiye, isliye chhota' : ''}. O(m × n).` : `Koi common char nahi → 0. O(m × n).`, legend: { found: 'substring' }, panels: [table(dp, a, b, label, run)] });
     return String(best);
   },
 });
@@ -139,19 +139,19 @@ export const lpsTrace = tracer<{ s: string }>({
     const dp: (number | null)[][] = Array.from({ length: n }, () => Array(n).fill(null));
     const view = (tones: GT = {}): Panel[] => [{ kind: 'grid', label: 'dp[i][j] = s[i..j] ka sabse lamba palindromic subsequence', values: dp.map((r, i) => r.map((v, j): Cell => (j < i ? '' : v === null ? '·' : v))), tones, rowLabels: chars(s).map((c, i) => `${i} ${c}`), colLabels: chars(s).map((c, j) => `${j} ${c}`), corner: 'i\\j' }];
     for (let i = 0; i < n; i++) dp[i][i] = 1;
-    t.frame({ line: 'one', caption: 'Ek akshar khud palindrome → diagonal 1. Ab tukde ki length 2, 3, … badhao — bada tukda hamesha chhote andar wale tukdon se banta hai.', legend: { found: 'length 1' }, panels: view(Object.fromEntries(Array.from({ length: n }, (_, i) => [`${i},${i}`, 'found' as Tone]))) });
+    t.frame({ line: 'one', caption: 'Ek letter khud palindrome → diagonal 1. Ab pieces ki length 2, 3, … badhao — bada piece hamesha chhote andar wale pieces se banta hai.', legend: { found: 'length 1' }, panels: view(Object.fromEntries(Array.from({ length: n }, (_, i) => [`${i},${i}`, 'found' as Tone]))) });
     for (let len = 2; len <= n; len++) {
       for (let i = 0; i + len - 1 < n; i++) {
         const j = i + len - 1;
         if (s[i] === s[j]) {
           const inner = len === 2 ? 0 : dp[i + 1][j - 1]!;
           dp[i][j] = inner + 2;
-          t.frame({ line: 'match', caption: `s[${i}..${j}]: kinaare '${s[i]}' = '${s[j]}' → andar wala ${inner} + 2 = ${dp[i][j]}.`, vars: { len, i, j }, legend: { active: 'abhi', new: 'andar wala' }, panels: view(len === 2 ? { [`${i},${j}`]: 'active' } : { [`${i},${j}`]: 'active', [`${i + 1},${j - 1}`]: 'new' }) });
+          t.frame({ line: 'match', caption: `s[${i}..${j}]: edge '${s[i]}' = '${s[j]}' → andar wala ${inner} + 2 = ${dp[i][j]}.`, vars: { len, i, j }, legend: { active: 'abhi', new: 'andar wala' }, panels: view(len === 2 ? { [`${i},${j}`]: 'active' } : { [`${i},${j}`]: 'active', [`${i + 1},${j - 1}`]: 'new' }) });
         } else {
           const lo = dp[i + 1][j]!;
           const hi = dp[i][j - 1]!;
           dp[i][j] = Math.max(lo, hi);
-          t.frame({ line: 'skip', caption: `s[${i}..${j}]: '${s[i]}' ≠ '${s[j]}' → ek kinaara chhodo: '${s[i]}' hatao → ${lo}, '${s[j]}' hatao → ${hi}. Max = ${dp[i][j]}.`, vars: { len, i, j }, legend: { active: 'abhi', found: 'jeeta', muted: 'haara' }, panels: view({ [`${i},${j}`]: 'active', [`${i + 1},${j}`]: lo >= hi ? 'found' : 'muted', [`${i},${j - 1}`]: lo >= hi ? 'muted' : 'found' }) });
+          t.frame({ line: 'skip', caption: `s[${i}..${j}]: '${s[i]}' ≠ '${s[j]}' → ek edge chhodo: '${s[i]}' hatao → ${lo}, '${s[j]}' hatao → ${hi}. Max = ${dp[i][j]}.`, vars: { len, i, j }, legend: { active: 'abhi', found: 'jeeta', muted: 'haara' }, panels: view({ [`${i},${j}`]: 'active', [`${i + 1},${j}`]: lo >= hi ? 'found' : 'muted', [`${i},${j - 1}`]: lo >= hi ? 'muted' : 'found' }) });
         }
       }
     }
@@ -169,7 +169,7 @@ export const lpsTrace = tracer<{ s: string }>({
       else j--;
     }
     const pal = left + mid + left.split('').reverse().join('');
-    t.frame({ line: 'done', caption: `Jawab dp[0][${n - 1}] = ${dp[0][n - 1]} ("${pal}"). Tukde O(n²), har ek O(1) → O(n²). Doosra tareeka: LCS(s, ulta s) — wahi jawab.`, legend: { found: 'jawab' }, panels: view({ [`0,${n - 1}`]: 'found' }) });
+    t.frame({ line: 'done', caption: `Jawab dp[0][${n - 1}] = ${dp[0][n - 1]} ("${pal}"). Pieces O(n²), har ek O(1) → O(n²). Doosra tareeka: LCS(s, ulta s) — wahi jawab.`, legend: { found: 'jawab' }, panels: view({ [`0,${n - 1}`]: 'found' }) });
     return String(dp[0][n - 1]);
   },
 });
@@ -190,7 +190,7 @@ export const editTrace = tracer<{ a: string; b: string }>({
       for (let j = 1; j <= n; j++) {
         if (a[i - 1] === b[j - 1]) {
           dp[i][j] = dp[i - 1][j - 1];
-          t.frame({ line: 'same', caption: `'${a[i - 1]}' = '${b[j - 1]}' → kuch nahi karna: tirchha ${dp[i][j]}.`, vars: { i, j }, legend: { active: 'abhi', new: 'tirchha' }, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j - 1}`]: 'new' })] });
+          t.frame({ line: 'same', caption: `'${a[i - 1]}' = '${b[j - 1]}' → kuch nahi karna: diagonal ${dp[i][j]}.`, vars: { i, j }, legend: { active: 'abhi', new: 'diagonal' }, panels: [table(dp, a, b, label, { [`${i},${j}`]: 'active', [`${i - 1},${j - 1}`]: 'new' })] });
           continue;
         }
         const del = dp[i - 1][j]!;

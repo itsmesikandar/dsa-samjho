@@ -3,7 +3,7 @@ class TreeNode(var value: Int) {
     var right: TreeNode? = null
 }
 
-// Level ki width = sabse baayein aur sabse daayein node ke beech ki saari jagahen (beech ke khaali bhi). Max width?
+// Level ki width = sabse left aur sabse right node ke beech ki saari jagahen (beech ke khaali bhi). Max width?
 fun widthOfBinaryTree(root: TreeNode?): Int {
     if (root == null) return 0
     val q = ArrayDeque<Pair<TreeNode, Long>>() // node + position (complete tree jaisa: bachche 2i aur 2i + 1)
@@ -11,11 +11,11 @@ fun widthOfBinaryTree(root: TreeNode?): Int {
     var best = 0L
     while (q.isNotEmpty()) {
         val size = q.size
-        val first = q.first().second // is level ka sabse baayein position //@level
+        val first = q.first().second // is level ka sabse left position //@level
         var last = 0L
         repeat(size) {
             val (n, idx) = q.removeFirst()
-            val i = idx - first // har level par 0 se gino - warna gehre tree mein numbers overflow //@pos
+            val i = idx - first // har level par 0 se count karo - warna deep tree mein numbers overflow //@pos
             last = i
             n.left?.let { q.addLast(it to 2 * i) } //@push
             n.right?.let { q.addLast(it to 2 * i + 1) }

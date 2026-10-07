@@ -13,12 +13,12 @@ class Main {
         int start = lo;
         for (int i = lo; i < hi; i++) {
             if (cnt[s.charAt(i) - 'a'] < k) { // ye char kisi answer mein nahi aa sakta: yahin todo //@split
-                best = Math.max(best, solve(s, start, i, k)); // pichla tukda alag se hal karo
+                best = Math.max(best, solve(s, start, i, k)); // pichla piece alag se hal karo
                 start = i + 1;
             }
         }
         if (start == lo) return hi - lo; // koi kharab char nahi mila: poora hissa valid //@whole
-        return Math.max(best, solve(s, start, hi, k)); // aakhri tukda //@ret
+        return Math.max(best, solve(s, start, hi, k)); // aakhri piece //@ret
     }
 
     public static void main(String[] args) {

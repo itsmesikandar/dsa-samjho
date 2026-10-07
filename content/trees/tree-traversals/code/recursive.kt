@@ -3,7 +3,7 @@ class TreeNode(var value: Int) {
     var right: TreeNode? = null
 }
 
-// Teeno DFS orders - farak sirf ek line ki jagah ka: node ko KAB likhte ho
+// All 3 DFS orders - farak sirf ek line ki jagah ka: node ko KAB likhte ho
 fun preorder(r: TreeNode?, out: MutableList<Int>) {
     if (r == null) return
     out.add(r.value) // pehle node

@@ -1,4 +1,4 @@
-// n x n matrix ko 90 degree clockwise ghumao - usi matrix mein (in-place)
+// n x n matrix ko 90 degree clockwise rotate karo - usi matrix mein (in-place)
 fun rotate(m: Array<IntArray>) {
     val n = m.size
     // Step 1: transpose - diagonal ke upar wale cell ko neeche wale se swap

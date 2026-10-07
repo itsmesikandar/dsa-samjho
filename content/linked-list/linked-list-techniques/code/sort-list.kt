@@ -10,7 +10,7 @@ fun sortList(head: ListNode?): ListNode? {
         fast = fast.next?.next
     }
     val right = slow.next
-    slow.next = null // list do hisson mein kaat di
+    slow.next = null // list 2 hisson mein kaat di
     return merge(sortList(head), sortList(right))
 }
 

@@ -16,7 +16,7 @@ what:
     - **Shape rule (complete):** har level poora bhara, sirf aakhri level left se bharta hai. Beech mein gap nahi.
     - **Order rule (min-heap):** har parent ≤ uske bachche. (Max-heap mein ulta: parent ≥ bachche.)
 
-    Natija: **sabse chhota hamesha root par** (index 0). Dekhna O(1), daalna / nikaalna O(log n).
+    Result: **sabse chhota hamesha root par** (index 0). Dekhna O(1), daalna / nikaalna O(log n).
 
     Index ka hisaab (0-based):
     - `i` ke bachche: `2i + 1` aur `2i + 2`
@@ -26,11 +26,11 @@ what:
     > Heap **sorted nahi** hota. Rule sirf parent aur bachche ke beech hai; bhai-bhai (siblings) mein koi rule nahi. `[1, 5, 2, 6, 7, 3]` valid min-heap hai.
   analogy: |
     **Office hierarchy — rank number jitna chhota, utna senior:**
-    Har manager apni team ke har bande se senior hai. Par do alag teams ke log aapas mein compare nahi hote. CEO (root) sabse senior — ye pakka. 5th senior kaun hai — ye seedha nahi pata.
+    Har manager apni team ke har bande se senior hai. Par 2 alag teams ke log aapas mein compare nahi hote. CEO (root) sabse senior — ye pakka. 5th senior kaun hai — ye seedha nahi pata.
 
     Naya banda join kare to sabse neeche baithta hai. Apne manager se senior nikla to promotion — ek level upar (**sift up**), jab tak sahi jagah na mile.
 
-    CEO retire ho to sabse aakhri bande ko kursi par bithao. Wo apni team ke sabse senior se jagah badalta jaata hai (**sift down**), jab tak sahi level na mile.
+    CEO retire ho to sabse aakhri bande ko chair par place karo. Wo apni team ke sabse senior se jagah badalta jaata hai (**sift down**), jab tak sahi level na mile.
 
 # 2. Kyun chahiye?
 why:
@@ -47,14 +47,14 @@ why:
     BST bhi kar deta hai, par heap **sirf ek array** hai — koi pointer nahi, kam memory, cache friendly, chhota code. Aur poore array se heap **O(n)** mein ban jaata hai.
 
     > [!socho]
-    > Hospital emergency ward: mareez kabhi bhi aate hain, doctor hamesha sabse serious wala pehle dekhta hai. Normal queue (FIFO) chalegi?
+    > Hospital emergency ward: patient kabhi bhi aate hain, doctor hamesha sabse serious wala pehle dekhta hai. Normal queue (FIFO) chalegi?
     >
     > Nahi — FIFO aane ke order mein deta hai, seriousness ke order mein nahi. Yahan **priority queue** chahiye, aur uske andar heap hai.
 
 # 3. Visual intro
 visual:
   body: |
-    Ek hi data do tarah dikh raha hai: upar tree (samajhne ke liye), neeche array (jo memory mein sach mein hai). Node ke upar chhota number = array index.
+    Ek hi data 2 tarah dikh raha hai: upar tree (samajhne ke liye), neeche array (jo memory mein sach mein hai). Node ke upar chhota number = array index.
 
     Har index par dekho: parent `(i - 1) / 2`, bachche `2i + 1`, `2i + 2`. Shape complete hai, isliye formula kabhi khaali jagah par nahi le jaata.
   viz: { tracer: heapMap }
@@ -97,7 +97,7 @@ operations:
   - op: "Build heap (n items se)"
     time: O(n)
     space: O(1)
-    why: "Neeche se upar sift down; zyaadatar nodes neeche hain aur kam chalte hain."
+    why: "Neeche se upar sift down; mostly nodes neeche hain aur kam chalte hain."
   - op: "Kisi value ko search"
     time: O(n)
     space: O(1)
@@ -116,7 +116,7 @@ code:
 
       Java ka `PriorityQueue` andar se bilkul yahi karta hai — default min-heap, Comparator do to kuch bhi. Agle topic mein library use karenge.
 
-      Max-heap ki ek aur trick: values ka **minus** min-heap mein daalo, nikaalte waqt phir minus. (`Int.MIN_VALUE` par overflow — dhyan.)
+      Max-heap ki ek aur trick: values ka **minus** min-heap mein daalo, nikaalte time phir minus. (`Int.MIN_VALUE` par overflow — dhyan.)
 
 # 7. Examples
 examples:
@@ -125,7 +125,7 @@ examples:
     title: Kya ye array min-heap hai?
     source: { name: Does array represent Heap, platform: GFG, url: "https://www.geeksforgeeks.org/problems/does-array-represent-heap4345/1" }
     problem: |
-      Ek integer array diya hai (tree ka level order). Batao kya ye **min-heap** hai — yaani har parent apne bachchon se chhota ya barabar.
+      Ek integer array diya hai (tree ka level order). Batao kya ye **min-heap** hai — matlab har parent apne bachchon se chhota ya barabar.
 
       Example: `[3, 5, 4, 9, 6, 8, 1]` → **false** (index 6 ka 1 apne parent 4 se chhota)
     intuition: |
@@ -159,7 +159,7 @@ examples:
     intuition: |
       Pop wala hi trick: **aakhri item** ko `k` par rakho, array ek chhota karo. Shape bachi.
 
-      Ab naya item galat jagah ho sakta hai — par kis taraf? Aakhri item **doosri shaakha** se aaya hai, to:
+      Ab naya item galat jagah ho sakta hai — par kis taraf? Aakhri item **doosri branch** se aaya hai, to:
       - parent se chhota ho sakta hai → **sift up**
       - ya bachchon se bada → **sift down**
 
@@ -192,9 +192,9 @@ examples:
     intuition: |
       Seedha tareeka: ek-ek item push karo → n × O(log n) = **O(n log n)**.
 
-      Behtar: **neeche se upar**. Leaves (index `n/2` se aage) akele hain — apne aap heap. Ab aakhri parent `n/2 - 1` se root tak har node ko **sift down** karo. Jab kisi node ko theek karte ho, uske dono subtree pehle hi heap hain — bas ek node ko jagah dilani hai.
+      Better: **neeche se upar**. Leaves (index `n/2` se aage) akele hain — apne aap heap. Ab aakhri parent `n/2 - 1` se root tak har node ko **sift down** karo. Jab kisi node ko theek karte ho, uske dono subtree pehle hi heap hain — bas ek node ko jagah dilani hai.
 
-      O(n) kyun? Aadhe nodes leaves (0 kaam), chauthai nodes 1 level neeche ja sakte, aathwan hissa 2 level… Jod = n/4·1 + n/8·2 + n/16·3 + … < n. **Zyaadatar nodes neeche hain, aur unhe kam chalna padta hai.**
+      O(n) kyun? Aadhe nodes leaves (0 kaam), quarter nodes 1 level neeche ja sakte, aathwan hissa 2 level… Jod = n/4·1 + n/8·2 + n/16·3 + … < n. **Mostly nodes neeche hain, aur unhe kam chalna padta hai.**
 
       > [!galti]
       > Loop 0 se upar ki taraf chalaya. Root pehle theek kiya, par uske neeche ke subtree abhi heap nahi → galat result. Hamesha **neeche se upar** (`n/2 - 1 downTo 0`).
@@ -228,7 +228,7 @@ when:
     - keyword: "baar baar sabse chhota / bada nikaalo"
       think: "Heap / PriorityQueue — pop O(log n)."
     - keyword: "stream mein data aata rahe, top / median chahiye"
-      think: "Heap (ya do heaps)."
+      think: "Heap (ya 2 heaps)."
     - keyword: "merge k sorted"
       think: "Har list ka head min-heap mein."
 
@@ -243,7 +243,7 @@ realWorld:
   - where: "Hospital triage / support tickets"
     how: "Sabse urgent case pehle, chahe baad mein aaya ho."
   - where: "Huffman coding (zip / JPEG compression)"
-    how: "Do sabse kam frequency wale nodes baar baar heap se nikaal ke jodte hain."
+    how: "2 sabse kam frequency wale nodes baar baar heap se nikaal ke jodte hain."
 
 # 10. Common galtiyan & edge cases
 mistakes:
@@ -252,17 +252,17 @@ mistakes:
     wrong: |
       0-based array mein `parent = i / 2`, bachche `2i`, `2i + 1` → root (0) ka bachcha khud 0!
     right: |
-      0-based: parent `(i - 1) / 2`, bachche `2i + 1`, `2i + 2`. (1-based mein `i / 2`, `2i`, `2i + 1` — books mein aksar yahi milta hai.)
+      0-based: parent `(i - 1) / 2`, bachche `2i + 1`, `2i + 2`. (1-based mein `i / 2`, `2i`, `2i + 1` — books mein often yahi milta hai.)
   - title: "Sift down mein galat bachche se swap"
     type: logic
     wrong: |
       Left bachcha chhota hai → turant swap, right dekha hi nahi. Right aur bhi chhota tha → ab wo bade parent ke neeche.
     right: |
-      Pehle dono bachchon mein **sabse chhota** chuno, phir usse compare + swap.
+      Pehle dono bachchon mein **sabse chhota** choose karo, phir usse compare + swap.
   - title: "Pop mein root hata ke sab shift kiya"
     type: other
     wrong: |
-      `a.removeAt(0)` → saare items ek jagah khiske, parent-bachche rishte bigde, aur O(n).
+      `a.removeAt(0)` → saare items ek jagah shift hue, parent-bachche rishte bigde, aur O(n).
     right: |
       Aakhri item root par, array ka end hatao, phir sift down. O(log n).
   - title: "Khaali heap par peek / pop"
@@ -301,7 +301,7 @@ interview:
         Dono O(log n). Insert: end par daalo, sift up. Extract: root lo, aakhri ko root par, sift down (chhote bachche se swap).
     - q: "Build heap O(n) kaise, O(n log n) kyun nahi?"
       a: |
-        Neeche se upar sift down. Har node ka kaam = uski height. Zyaadatar nodes ki height chhoti (aadhe leaves = 0). Jod n/4·1 + n/8·2 + … < n.
+        Neeche se upar sift down. Har node ka kaam = uski height. Mostly nodes ki height chhoti (aadhe leaves = 0). Jod n/4·1 + n/8·2 + … < n.
     - q: "Max-heap kaise banaoge?"
       a: |
         Compare ulta (reverse Comparator), ya values ka minus min-heap mein. Java: `PriorityQueue<>(Collections.reverseOrder())`.
@@ -380,7 +380,7 @@ practice:
     url: "https://leetcode.com/problems/trapping-rain-water-ii/"
     level: hard
     pattern: Boundary ka min-heap
-    hint: "Kinaare ke cells min-heap mein. Sabse neecha cell nikaalo; har padosi par max(0, height - padosi) paani, phir padosi ko max(height, padosi) ke saath push."
+    hint: "Edge ke cells min-heap mein. Sabse neecha cell nikaalo; har neighbor par max(0, height - neighbor) paani, phir neighbor ko max(height, neighbor) ke saath push."
 
 # 13. Quick revision
 revision:
@@ -414,13 +414,13 @@ revision:
       answer: 0
       explain: "1 ≤ 5, 2; 5 ≤ 6, 7; 2 ≤ 3. Har parent ≤ bachche. Siblings mein order zaroori nahi."
     - q: "Pop ke baad root par kaun rakha jaata hai?"
-      options: ["Chhota bachcha", "Aakhri item", "Bada bachcha", "Koi nahi — sab ek jagah khiskate hain"]
+      options: ["Chhota bachcha", "Aakhri item", "Bada bachcha", "Koi nahi — sab ek jagah shift karte hain"]
       answer: 1
       explain: "Aakhri item — shape complete rehti hai; phir sift down."
     - q: "n items se heap banana (neeche se upar) — time?"
       options: ["O(log n)", "O(n)", "O(n log n)", "O(n²)"]
       answer: 1
-      explain: "Zyaadatar nodes neeche hain aur kam chalte hain — jod n se kam."
+      explain: "Mostly nodes neeche hain aur kam chalte hain — jod n se kam."
     - q: "Min-heap mein sabse bada element kahan hota hai?"
       options: ["Root par", "Index 1 par", "Kisi leaf mein", "Hamesha aakhri index par"]
       answer: 2
@@ -430,7 +430,7 @@ revision:
 connections:
   related:
     - id: binary-tree-basics
-      why: "Complete binary tree ka shape; heap usi ka array roop."
+      why: "Complete binary tree ka shape; heap usi ka array form."
     - id: bst
       why: "Dono tree mein order — BST poora sorted, heap sirf parent ≤ bachche."
   usedLater:

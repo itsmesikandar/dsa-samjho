@@ -1,12 +1,12 @@
 class Main {
-    // Unbounded knapsack: rod ko tukdon mein kaato, har length ka tukda KITNI BHI baar. Max kamai
-    // price[k - 1] = length k ke tukde ka daam, rod ki length = price.length
+    // Unbounded knapsack: rod ko pieces mein kaato, har length ka piece KITNI BHI baar. Max profit
+    // price[k - 1] = length k ke pieces ka price, rod ki length = price.length
     static int rodCut(int[] price) {
         int n = price.length;
-        int[][] dp = new int[n + 1][n + 1]; // dp[i][w] = length 1..i ke tukde allowed, rod w -> max kamai
+        int[][] dp = new int[n + 1][n + 1]; // dp[i][w] = length 1..i ke pieces allowed, rod w -> max profit
         for (int i = 1; i <= n; i++) {
             for (int w = 0; w <= n; w++) {
-                dp[i][w] = dp[i - 1][w]; // length i ka tukda mat kaato //@skip
+                dp[i][w] = dp[i - 1][w]; // length i ka piece mat kaato //@skip
                 if (i <= w) {
                     dp[i][w] = Math.max(dp[i][w], dp[i][w - i] + price[i - 1]); // kaato: ISI row se - bachi rod mein i phir kaat sakte //@take
                 }

@@ -25,7 +25,7 @@ export const maskSetTrace = tracer<{ mask: number }>({
   run({ mask }, t) {
     const cols = [3, 2, 1, 0].map((i) => `${i} ${TOPPINGS[i]}`);
     const grid = (tones: GT = {}): Panel => ({ kind: 'grid', label: `mask = ${mask}`, values: [bitsOf(mask, 4)], tones, rowLabels: ['bit'], colLabels: cols, corner: '' });
-    t.frame({ caption: `4 toppings: bit 0 = cheese, 1 = onion, 2 = paneer, 3 = corn. Ek pizza order = har topping hai (1) ya nahi (0) = 4 bits = ek number 0–15. Kul 2⁴ = 16 alag orders.`, panels: [grid()] });
+    t.frame({ caption: `4 toppings: bit 0 = cheese, 1 = onion, 2 = paneer, 3 = corn. Ek pizza order = har topping hai (1) ya nahi (0) = 4 bits = ek number 0–15. Total 2⁴ = 16 alag orders.`, panels: [grid()] });
     const chosen: string[] = [];
     for (let i = 0; i < 4; i++) {
       const on = (mask >> i) & 1;
@@ -34,7 +34,7 @@ export const maskSetTrace = tracer<{ mask: number }>({
     }
     const set = `{${chosen.join(', ')}}`;
     const addP = mask | (1 << 2);
-    t.frame({ caption: `mask ${mask} = ${set}. Set ke kaam ab bit ops: paneer jodo → mask | (1 << 2) = ${addP}; onion hatao → mask & ~(1 << 1) = ${mask & ~(1 << 1)}; do orders mein common → a & b. 0 se 15 tak gino = saare 16 subsets — yahi agla section.`, legend: { found: 'liya' }, panels: [grid(Object.fromEntries(bitsOf(mask, 4).flatMap((b, c) => (b ? [[`0,${c}`, 'found' as Tone]] : []))))] });
+    t.frame({ caption: `mask ${mask} = ${set}. Set ke kaam ab bit ops: paneer jodo → mask | (1 << 2) = ${addP}; onion hatao → mask & ~(1 << 1) = ${mask & ~(1 << 1)}; do orders mein common → a & b. 0 se 15 tak count karo = saare 16 subsets — yahi agla section.`, legend: { found: 'liya' }, panels: [grid(Object.fromEntries(bitsOf(mask, 4).flatMap((b, c) => (b ? [[`0,${c}`, 'found' as Tone]] : []))))] });
     return set;
   },
 });
@@ -66,12 +66,12 @@ export const singleTrace = tracer<{ nums: number[] }>({
     const c = new Map<number, number>();
     nums.forEach((x) => c.set(x, (c.get(x) ?? 0) + 1));
     const odd = [...c.values()].filter((v) => v === 1).length;
-    return odd === 1 && [...c.values()].every((v) => v === 1 || v === 2) ? null : 'Exactly ek number akela, baaki har number do baar.';
+    return odd === 1 && [...c.values()].every((v) => v === 1 || v === 2) ? null : 'Exactly ek number akela, baaki har number 2 baar.';
   },
   run({ nums }, t) {
     const w = widthFor(nums);
     let r = 0;
-    t.frame({ caption: 'XOR ke do niyam: x ^ x = 0 (same bits kat jaate), x ^ 0 = x. Aur order se farak nahi. To sabka XOR = jode kat jaayenge, akela bachega.', panels: [array(nums, { label: 'nums' }), bitGrid([{ label: 'r = 0', v: 0 }], w)] });
+    t.frame({ caption: 'XOR ke do rule: x ^ x = 0 (same bits kat jaate), x ^ 0 = x. Aur order se farak nahi. To sabka XOR = jode kat jaayenge, akela bachega.', panels: [array(nums, { label: 'nums' }), bitGrid([{ label: 'r = 0', v: 0 }], w)] });
     nums.forEach((x, i) => {
       const nr = r ^ x;
       t.frame({ line: 'xor', caption: `r ^ ${x} = ${nr}. ${x}${nums.indexOf(x) < i ? ' dusri baar aaya — uske bits wapas palat gaye (kat gaya).' : ' ke bits r mein palte.'}`, vars: { r: nr }, legend: { found: 'r mein 1' }, panels: [array(nums, { label: 'nums', tones: { [i]: 'active' } }), bitGrid([{ label: `r = ${r}`, v: r }, { label: `x = ${x}`, v: x }, { label: `r ^ x = ${nr}`, v: nr }], w, onesTone(2, nr, w, 'found'))] });
@@ -89,7 +89,7 @@ export const missingTrace = tracer<{ nums: number[] }>({
   run({ nums }, t) {
     const n = nums.length;
     let x = n;
-    t.frame({ line: 'xor', caption: `Numbers 0..${n} mein se ${n} hain, ek gayab. Har index (0..${n}) aur har value — sab XOR karo. Jo number dono jagah hai, do baar aayega → kat jaayega. Shuru x = ${n} (index ${n} loop mein nahi aata).`, vars: { x }, panels: [array(nums, { label: 'nums' })] });
+    t.frame({ line: 'xor', caption: `Numbers 0..${n} mein se ${n} hain, ek gayab. Har index (0..${n}) aur har value — sab XOR karo. Jo number dono jagah hai, 2 baar aayega → kat jaayega. Shuru x = ${n} (index ${n} loop mein nahi aata).`, vars: { x }, panels: [array(nums, { label: 'nums' })] });
     nums.forEach((v, i) => {
       const nx = x ^ i ^ v;
       t.frame({ line: 'xor', caption: `x ^ ${i} (index) ^ ${v} (value) = ${nx}.`, vars: { x: nx }, legend: { active: 'abhi' }, panels: [array(nums, { label: 'nums', tones: { [i]: 'active' } }), bitGrid([{ label: `x = ${x}`, v: x }, { label: `i = ${i}`, v: i }, { label: `nums[i] = ${v}`, v }, { label: `naya x = ${nx}`, v: nx }], widthFor([n]))] });
@@ -107,7 +107,7 @@ export const single3Trace = tracer<{ nums: number[] }>({
     const c = new Map<number, number>();
     nums.forEach((x) => c.set(x, (c.get(x) ?? 0) + 1));
     const vals = [...c.values()];
-    return vals.filter((v) => v === 1).length === 2 && vals.every((v) => v === 1 || v === 2) ? null : 'Exactly do number akele, baaki har number do baar.';
+    return vals.filter((v) => v === 1).length === 2 && vals.every((v) => v === 1 || v === 2) ? null : 'Exactly 2 number akele, baaki har number 2 baar.';
   },
   run({ nums }, t) {
     const w = widthFor(nums);
@@ -116,7 +116,7 @@ export const single3Trace = tracer<{ nums: number[] }>({
     t.frame({ line: 'all', caption: `Sabka XOR = jode kat gaye, bacha a ^ b = ${all}. Par a aur b alag kaise karein? Jahan ${all} mein 1 hai, wahan a aur b ke bits ALAG hain.`, panels: [array(nums, { label: 'nums' }), bitGrid([{ label: `a ^ b = ${all}`, v: all }], w, onesTone(0, all, w, 'compare'))] });
     const diff = all & -all;
     const col = w - 1 - Math.log2(diff);
-    t.frame({ line: 'bit', caption: `diff = all & −all = ${diff} → sirf sabse daayein ka 1 (bit ${Math.log2(diff)}). Is bit par a aur b alag — ek ka 1, doosre ka 0.`, legend: { new: 'diff bit' }, panels: [bitGrid([{ label: `a ^ b = ${all}`, v: all }, { label: `diff = ${diff}`, v: diff }], w, { [`0,${col}`]: 'new', [`1,${col}`]: 'new' })] });
+    t.frame({ line: 'bit', caption: `diff = all & −all = ${diff} → sirf sabse right ka 1 (bit ${Math.log2(diff)}). Is bit par a aur b alag — ek ka 1, doosre ka 0.`, legend: { new: 'diff bit' }, panels: [bitGrid([{ label: `a ^ b = ${all}`, v: all }, { label: `diff = ${diff}`, v: diff }], w, { [`0,${col}`]: 'new', [`1,${col}`]: 'new' })] });
     let a = 0;
     let b = 0;
     const g: Tones = {};
@@ -128,7 +128,7 @@ export const single3Trace = tracer<{ nums: number[] }>({
       t.frame({ line: 'split', caption: `${x}: bit ${Math.log2(diff)} = ${inA ? 1 : 0} → group ${inA ? 'A' : 'B'}.${i === 0 ? ' Jode hamesha ek hi group mein jaate (same bits) — har group mein ek akela + jode.' : ''}`, vars: { A: a, B: b }, legend: { found: 'group A (bit 1)', compare: 'group B (bit 0)' }, panels: [array(nums, { label: 'nums', tones: { ...g, [i]: 'active' } }), bitGrid([{ label: `x = ${x}`, v: x }], w, { [`0,${col}`]: inA ? 'found' : 'compare' })] });
     });
     const res = [a, b].sort((p, q) => p - q);
-    t.frame({ line: 'done', caption: `Group A ka XOR = ${a}, group B ka = ${b}. Dono akele: ${listStr(res)}. Do pass, O(1) memory.`, legend: { found: 'group A', compare: 'group B' }, panels: [array(nums, { label: 'nums', tones: g })] });
+    t.frame({ line: 'done', caption: `Group A ka XOR = ${a}, group B ka = ${b}. Dono akele: ${listStr(res)}. 2 pass, O(1) memory.`, legend: { found: 'group A', compare: 'group B' }, panels: [array(nums, { label: 'nums', tones: g })] });
     return listStr(res);
   },
 });

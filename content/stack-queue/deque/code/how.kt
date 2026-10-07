@@ -1,4 +1,4 @@
-// Size k ki har window (lagatar k items) ka maximum - O(n) mein
+// Size k ki har window (continuous k items) ka maximum - O(n) mein
 fun maxSlidingWindow(nums: IntArray, k: Int): IntArray {
     val dq = ArrayDeque<Int>() // INDEXES; inki values aage se peeche GHATTI hui (decreasing)
     val res = IntArray(nums.size - k + 1)

@@ -5,7 +5,7 @@ fun wordBreak(s: String, wordDict: List<String>): Boolean {
     dp[0] = true // khaali string - toot gayi (kuch nahi bacha)
     for (i in 1..s.length) {
         for (j in 0 until i) {
-            if (dp[j] && s.substring(j, i) in words) { // pehle j theek + aakhri tukda s[j..i) ek word
+            if (dp[j] && s.substring(j, i) in words) { // pehle j theek + aakhri piece s[j..i) ek word
                 dp[i] = true
                 break
             }

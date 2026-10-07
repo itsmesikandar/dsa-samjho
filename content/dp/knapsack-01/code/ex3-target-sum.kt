@@ -1,7 +1,7 @@
 import kotlin.math.abs
 
 // Har number ke aage + ya -. P = plus walon ka jod, N = minus walon ka. P - N = target, P + N = total
-// => P = (total + target) / 2. Ab sawaal: kitne subsets ka jod P? (0/1 knapsack - ginti)
+// => P = (total + target) / 2. Ab sawaal: kitne subsets ka jod P? (0/1 knapsack - count)
 fun findTargetSumWays(nums: IntArray, target: Int): Int {
     val total = nums.sum()
     if (abs(target) > total || (total + target) % 2 != 0) return 0 // P poora number hi nahi ban sakta //@check

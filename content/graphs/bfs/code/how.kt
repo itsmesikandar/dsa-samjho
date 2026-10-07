@@ -1,4 +1,4 @@
-// BFS: queue se level by level - pehle saare 1 kadam door, phir 2 kadam door...
+// BFS: queue se level by level - pehle saare 1 step door, phir 2 step door...
 fun bfs(adj: List<List<Int>>, start: Int): List<Int> {
     val visited = BooleanArray(adj.size)
     val order = mutableListOf<Int>()
@@ -10,7 +10,7 @@ fun bfs(adj: List<List<Int>>, start: Int): List<Int> {
         order.add(u)
         for (v in adj[u]) {
             if (!visited[v]) { // pehli baar dikha? //@check
-                visited[v] = true // queue mein DAALTE hi mark - warna do baar aa sakta //@mark
+                visited[v] = true // queue mein DAALTE hi mark - warna 2 baar aa sakta //@mark
                 queue.addLast(v)
             }
         }

@@ -17,15 +17,15 @@ what:
 
     | Sawaal | Stack ka order | Kab jawab milta hai |
     |---|---|---|
-    | Daayein pehla **bada** | ghatta (decreasing) | pop hote waqt |
-    | Daayein pehla **chhota** | badhta (increasing) | pop hote waqt |
-    | Baayein pehla **bada** | ghatta | push se pehle top |
-    | Baayein pehla **chhota** | badhta | push se pehle top |
+    | Right pehla **bada** | ghatta (decreasing) | pop hote time |
+    | Right pehla **chhota** | badhta (increasing) | pop hote time |
+    | Left pehla **bada** | ghatta | push se pehle top |
+    | Left pehla **chhota** | badhta | push se pehle top |
 
     > [!yaad]
-    > Har item **ek baar push, max ek baar pop** → andar `while` hone ke bawajood O(n).
+    > Har item **ek baar push, max ek baar pop** → andar `while` hone ke baad bhi O(n).
   analogy: |
-    **Line mein khade log, har ek aage dekhta hai:** "Mujhse lamba pehla insaan kaun?" Jab tak koi lamba nahi aata, log intezaar karte hain (stack mein). Jaise hi ek lamba aata hai, uske peeche khade saare chhote log ek saath jawab paa jaate hain — "ye raha!" — aur line chhod dete hain.
+    **Line mein khade log, har ek aage dekhta hai:** "Mujhse lamba pehla insaan kaun?" Jab tak koi lamba nahi aata, log wait karte hain (stack mein). Jaise hi ek lamba aata hai, uske peeche khade saare chhote log ek saath jawab paa jaate hain — "ye raha!" — aur line chhod dete hain.
 
 # 2. Kyun chahiye?
 why:
@@ -41,12 +41,12 @@ why:
     > [!socho]
     > Stack mein `[5, 3]` (neeche 5) hain, naya 4 aaya (next greater dhoondh rahe). 3 ko pop karo — kyun? Aur 5 ko kyun nahi?
     >
-    > 3 ka jawab mil gaya (4 > 3). 5 ka nahi (4 < 5) — wo intezaar karega. Aur 4 push hoga: stack `[5, 4]` — ab bhi ghatta. Order kabhi nahi tootta.
+    > 3 ka jawab mil gaya (4 > 3). 5 ka nahi (4 < 5) — wo wait karega. Aur 4 push hoga: stack `[5, 4]` — ab bhi ghatta. Order kabhi nahi tootta.
 
 # 3. Visual intro
 visual:
   body: |
-    Imaartein: har ek ki chhat se daayein **pehli lambi imaarat**. Narangi = intezaar mein (stack). Jaise hi lambi aati hai, peeche ki chhoti saari ek saath jawab paa leti hain.
+    Buildings: har ek ki chhat se right **pehli lambi building**. Narangi = wait mein (stack). Jaise hi lambi aati hai, peeche ki chhoti saari ek saath jawab paa leti hain.
   viz: { tracer: buildingsView }
 
 # 4. Kaise kaam karta hai
@@ -83,7 +83,7 @@ operations:
   - op: "Largest rectangle in histogram"
     time: O(n)
     space: O(n)
-    why: "Pop par left/right deewar dono pata."
+    why: "Pop par left/right wall dono pata."
   - op: "Online stock span (har naya din)"
     time: "O(1) amortized"
     space: O(n)
@@ -95,12 +95,12 @@ operations:
 
 # 6. Code
 code:
-  - title: Previous smaller element (baayein pehla chhota)
+  - title: Previous smaller element (left pehla chhota)
     file: prev-smaller
     note: |
-      "Baayein" wale sawaal mein jawab **push se pehle** milta hai: order todne wale (x se bade/barabar) pop karo, jo top par bacha wahi x ka baayein pehla chhota. Stack yahan **badhta** hua.
+      "Left" wale sawaal mein jawab **push se pehle** milta hai: order todne wale (x se bade/barabar) pop karo, jo top par bacha wahi x ka left pehla chhota. Stack yahan **badhta** hua.
 
-      Yaad rakhne ka tareeka: **daayein = pop hote waqt jawab**, **baayein = push se pehle top**.
+      Yaad rakhne ka tareeka: **right = pop hote time jawab**, **left = push se pehle top**.
 
 # 7. Examples
 examples:
@@ -109,7 +109,7 @@ examples:
     title: Next Greater Element I
     source: { name: Next Greater Element I, platform: LeetCode, url: "https://leetcode.com/problems/next-greater-element-i/" }
     problem: |
-      `nums1` ke har number ke liye: `nums2` mein **usi number ke daayein** pehla bada number (na ho to −1). `nums1` ke saare numbers `nums2` mein hain; sab distinct.
+      `nums1` ke har number ke liye: `nums2` mein **usi number ke right** pehla bada number (na ho to −1). `nums1` ke saare numbers `nums2` mein hain; sab distinct.
 
       Example: `nums1 = [4, 1, 2]`, `nums2 = [1, 3, 4, 2]` → `[−1, 3, −1]`
     intuition: |
@@ -146,12 +146,12 @@ examples:
 
       Example: `[73, 74, 75, 71, 69, 72, 76, 73]` → `[1, 1, 4, 2, 1, 1, 0, 0]`
     intuition: |
-      Next greater hi hai — par **value nahi, doori** chahiye. Isliye stack mein **index** (din) rakho: pop karte waqt `res[d] = i − d`.
+      Next greater hi hai — par **value nahi, distance** chahiye. Isliye stack mein **index** (din) rakho: pop karte time `res[d] = i − d`.
 
       Stack mein din jinke liye garam din abhi nahi aaya — unke temps neeche se upar ghatte hue.
 
       > [!galti]
-      > Stack mein temperature (value) rakh di → doori nikaal hi nahi sakte. Monotonic stack mein hamesha **index** rakho; value `arr[index]` se mil jaati hai.
+      > Stack mein temperature (value) rakh di → distance nikaal hi nahi sakte. Monotonic stack mein hamesha **index** rakho; value `arr[index]` se mil jaati hai.
     dryRun: |
       | Din i | Temp | Pop (res) | Stack (din) |
       |---|---|---|---|
@@ -178,14 +178,14 @@ examples:
 
       Example: `[2, 1, 5, 6, 2, 3]` → **10** (heights 5 aur 6 par, 5 × 2)
     intuition: |
-      Har bar ko "rectangle ki height" maano. Wo kitna chauda ho sakta hai? Left mein jab tak bars `≥` hain, right mein bhi. Yaani **previous smaller** aur **next smaller** ke beech.
+      Har bar ko "rectangle ki height" maano. Wo kitna wide ho sakta hai? Left mein jab tak bars `≥` hain, right mein bhi. Matlab **previous smaller** aur **next smaller** ke beech.
 
       Dono ek pass mein — **badhta hua** stack (indexes):
-      - Naya bar top se chhota/barabar → top pop. Uski height ke liye: **right deewar = i** (next smaller), **left deewar = stack mein uske neeche wala** (previous smaller). Width = `i − left − 1`.
+      - Naya bar top se chhota/barabar → top pop. Uski height ke liye: **right wall = i** (next smaller), **left wall = stack mein uske neeche wala** (previous smaller). Width = `i − left − 1`.
       - Aakhir mein nakli 0 height daalo — bache sab pop ho jaayein.
 
       > [!tip]
-      > Maximal Rectangle (0/1 matrix) = har row ko histogram banao (upar ki taraf lagatar 1s ki ginti) aur yahi function chalao.
+      > Maximal Rectangle (0/1 matrix) = har row ko histogram banao (upar ki taraf continuous 1s ki count) aur yahi function chalao.
     dryRun: |
       `[2, 1, 5, 6, 2, 3]`
 
@@ -208,8 +208,8 @@ examples:
 when:
   use:
     - "Har element ke liye next/previous greater/smaller."
-    - "'Kitne din tak', 'kitna door tak' — span / doori (index rakho)."
-    - "Rectangle / area jismein har bar ki left-right seema chahiye."
+    - "'Kitne din tak', 'kitna door tak' — span / distance (index rakho)."
+    - "Rectangle / area jismein har bar ki left-right boundary chahiye."
     - "Subarray min/max ka contribution (sum of subarray minimums)."
   avoid:
     - "Sliding window ka max/min — deque (purane aage se bhi hatane hain)."
@@ -217,9 +217,9 @@ when:
     - "k-th next greater ya range queries — sparse table / segment tree."
   signals:
     - keyword: "next greater / next smaller / previous greater"
-      think: "Monotonic stack of indexes; daayein = pop par, baayein = push se pehle."
+      think: "Monotonic stack of indexes; right = pop par, left = push se pehle."
     - keyword: "how many days until warmer / span"
-      think: "Index stack, doori = i − index."
+      think: "Index stack, distance = i − index."
     - keyword: "largest rectangle / histogram / maximal rectangle"
       think: "Increasing stack, pop par area."
     - keyword: "circular array next greater"
@@ -236,14 +236,14 @@ realWorld:
   - where: "Compilers"
     how: "Operator precedence parsing mein stack jo precedence order banaye rakhta hai."
   - where: "Skyline / city views"
-    how: "Kaunsi imaartein samundar dekh sakti hain (right se monotonic)."
+    how: "Kaunsi buildings sea dekh sakti hain (right se monotonic)."
 
 # 10. Common galtiyan & edge cases
 mistakes:
   - title: "Values rakhi, indexes nahi"
     type: logic
     wrong: |
-      Stack mein temperatures → doori nahi nikal sakti, duplicates mein confusion.
+      Stack mein temperatures → distance nahi nikal sakti, duplicates mein confusion.
     right: |
       Index rakho; value `arr[idx]`.
   - title: "< aur <= ka confusion"
@@ -261,7 +261,7 @@ mistakes:
   - title: "Histogram mein aakhri bars"
     type: logic
     wrong: |
-      Loop khatam, stack mein badhte bars bache — unke area kabhi nahi gine.
+      Loop khatam, stack mein badhte bars bache — unke area kabhi nahi count kiye.
     right: |
       Aakhir mein nakli 0 height (i = n) — sab pop ho jaate hain.
   - title: "Area overflow"
@@ -297,7 +297,7 @@ interview:
         Har a[i] kitne subarrays ka min: left (pichhle chhote tak) × right (agle chhote tak). Duplicates ke liye ek taraf < aur doosri taraf <=.
     - q: "Deque vs monotonic stack?"
       a: |
-        Stack: sirf ek kinare se pop (next/prev greater). Deque: window se bahar wale aage se bhi hatane hon (sliding window max).
+        Stack: sirf ek edge se pop (next/prev greater). Deque: window se bahar wale aage se bhi hatane hon (sliding window max).
   mayAsk:
     - "Online Stock Span."
     - "Next Greater Element II."
@@ -319,14 +319,14 @@ practice:
     url: "https://leetcode.com/problems/final-prices-with-a-special-discount-in-a-shop/"
     level: easy
     pattern: Next smaller or equal
-    hint: "Har item ka daayein pehla <= wala discount hai. Increasing stack; prices[top] >= cur par pop aur discount do."
+    hint: "Har item ka right pehla <= wala discount hai. Increasing stack; prices[top] >= cur par pop aur discount do."
   - name: Clear Digits
     platform: LeetCode
     num: 3174
     url: "https://leetcode.com/problems/clear-digits/"
     level: easy
     pattern: Stack pop on digit
-    hint: "Letter → push; digit → pop (sabse paas wala baayein letter gaya)."
+    hint: "Letter → push; digit → pop (sabse paas wala left letter gaya)."
   - name: Daily Temperatures
     platform: LeetCode
     num: 739
@@ -361,15 +361,15 @@ practice:
     url: "https://leetcode.com/problems/maximal-rectangle/"
     level: hard
     pattern: Rows as histograms
-    hint: "Har row tak har column mein upar lagatar 1s ki ginti = heights. Har row par Largest Rectangle chalao."
+    hint: "Har row tak har column mein upar continuous 1s ki count = heights. Har row par Largest Rectangle chalao."
 
 # 13. Quick revision
 revision:
   summary:
     - "Monotonic stack = sorted stack; naya order tode to pop."
-    - "Daayein pehla bada: decreasing stack, jawab pop par."
-    - "Baayein pehla chhota: increasing stack, jawab push se pehle top."
-    - "Index rakho (doori/width ke liye); har item ek push ek pop → O(n)."
+    - "Right pehla bada: decreasing stack, jawab pop par."
+    - "Left pehla chhota: increasing stack, jawab push se pehle top."
+    - "Index rakho (distance/width ke liye); har item ek push ek pop → O(n)."
     - "Histogram: pop par width = i − (neeche wala) − 1; aakhir mein 0 height."
   cheatsheet: |
     ```kotlin
@@ -386,7 +386,7 @@ revision:
     - q: "[3, 1, 4] mein 3 ka next greater?"
       options: ["1", "4", "−1", "3"]
       answer: 1
-      explain: "Daayein pehla bada 4."
+      explain: "Right pehla bada 4."
     - q: "Next greater ke liye stack (neeche se upar)?"
       options: ["Badhta", "Ghatta", "Random", "Sorted by index"]
       answer: 1

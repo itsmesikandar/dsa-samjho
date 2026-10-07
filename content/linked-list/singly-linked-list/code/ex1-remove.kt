@@ -10,7 +10,7 @@ fun removeElements(head: ListNode?, x: Int): ListNode? {
         if (nxt != null && nxt.value == x) {
             cur.next = nxt.next // nxt ko beech se nikaalo: uske aage wale se jod do //@skip
         } else {
-            cur = nxt // hataya nahi tabhi aage badho (lagatar x ho sakte hain) //@move
+            cur = nxt // hataya nahi tabhi aage badho (continuous x ho sakte hain) //@move
         }
     }
     return h

@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 class Main {
-    // Rasta utna hi mushkil jitna uska SABSE BADA kadam. Dijkstra, bas "jodo" ki jagah "max lo"
+    // Rasta utna hi mushkil jitna uska SABSE BADA step. Dijkstra, bas "jodo" ki jagah "max lo"
     static int minimumEffortPath(int[][] heights) {
         int r = heights.length, c = heights[0].length;
         int[][] effort = new int[r][c];
@@ -15,11 +15,11 @@ class Main {
             int[] top = pq.poll(); //@poll
             int x = top[0], y = top[1], e = top[2];
             if (e > effort[x][y]) continue; // purani entry //@stale
-            if (x == r - 1 && y == c - 1) return e; // manzil heap se nikli = pakka jawab //@found
+            if (x == r - 1 && y == c - 1) return e; // destination heap se nikli = pakka jawab //@found
             for (int[] d : dirs) {
                 int nx = x + d[0], ny = y + d[1];
                 if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
-                int ne = Math.max(e, Math.abs(heights[nx][ny] - heights[x][y])); // ab tak ka sabse bada kadam //@relax
+                int ne = Math.max(e, Math.abs(heights[nx][ny] - heights[x][y])); // ab tak ka sabse bada step //@relax
                 if (ne < effort[nx][ny]) {
                     effort[nx][ny] = ne; //@update
                     pq.add(new int[] {nx, ny, ne});

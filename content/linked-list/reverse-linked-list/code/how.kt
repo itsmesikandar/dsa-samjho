@@ -7,7 +7,7 @@ fun reverseList(head: ListNode?): ListNode? {
     while (cur != null) {
         val nxt = cur.next // aage ka raasta bachao - arrow ulta karte hi kho jaata //@save
         cur.next = prev // arrow ulta: ab peeche wale ko //@flip
-        prev = cur // dono ek kadam aage //@move
+        prev = cur // dono ek step aage //@move
         cur = nxt
     }
     return prev // cur null = sab ho gaya; prev = purana aakhri = naya head //@done

@@ -7,7 +7,7 @@ fun subarraySum(nums: IntArray, k: Int): Int {
     for (x in nums) {
         pre += x // ab tak ka total //@pre
         ans += count.getOrDefault(pre - k, 0) // pehle kitni baar prefix = pre - k tha? //@lookup
-        count[pre] = count.getOrDefault(pre, 0) + 1 // apna prefix bhi gino //@store
+        count[pre] = count.getOrDefault(pre, 0) + 1 // apna prefix bhi count karo //@store
     }
     return ans //@done
 }

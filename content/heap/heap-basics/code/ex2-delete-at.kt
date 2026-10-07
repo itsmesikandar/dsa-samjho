@@ -4,7 +4,7 @@ import java.util.Collections
 fun deleteAt(a: MutableList<Int>, k: Int) {
     val last = a.removeAt(a.size - 1) // aakhri jagah khaali karo - shape complete rahe //@last
     if (k == a.size) return // aakhri hi hatana tha //@end
-    a[k] = last // chhed ko aakhri item se bharo //@put
+    a[k] = last // hole ko aakhri item se bharo //@put
     var i = k
     while (i > 0 && a[(i - 1) / 2] > a[i]) { // parent se chhota - upar chadho //@up
         Collections.swap(a, i, (i - 1) / 2)
@@ -24,7 +24,7 @@ fun deleteAt(a: MutableList<Int>, k: Int) {
 
 fun main() {
     val h = mutableListOf(1, 10, 2, 11, 12, 3, 4)
-    deleteAt(h, 4) // 12 hatao; aakhri 4 wahan aakar UPAR jaata hai
+    deleteAt(h, 4) // 12 hatao; aakhri 4 wahan shape UPAR jaata hai
     println(h)
     deleteAt(h, 0) // root hatao = pop; aakhri 3 NEECHE jaata hai
     println(h)
